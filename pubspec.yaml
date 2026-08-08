@@ -1,0 +1,40 @@
+name: fallhub
+description: Life Colony OS — sistema operacional pessoal inspirado em gestão de colônia.
+publish_to: 'none'
+version: 0.1.0+1
+
+environment:
+  sdk: ^3.11.4
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  colony_design_system:
+    path: packages/colony_design_system
+  colony_domain:
+    path: packages/colony_domain
+  colony_database:
+    path: packages/colony_database
+  cupertino_icons: ^1.0.8
+  flutter_riverpod: ^3.0.3
+  go_router: ^17.0.0
+  intl: ^0.20.2
+  logging: ^1.3.0
+  share_plus: ^12.0.1
+  file_picker: ^10.3.2
+  uuid: ^4.5.1
+  flame: ^1.38.0
+  shared_preferences: ^2.5.3
+  living_habitat_assets:
+    path: packages/living_habitat_assets
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+  build_runner: ^2.7.0
+
+flutter:
+  uses-material-design: true

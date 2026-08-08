@@ -1,0 +1,115 @@
+{
+  "exported_at": "2026-08-07T12:00:00.000Z",
+  "version": 26,
+  "profile": {
+    "id": "profile-fixture-v26",
+    "colony_name": "Fixture V26",
+    "display_name": "Tester",
+    "timezone": "UTC",
+    "locale": "pt_BR",
+    "base_currency": "BRL",
+    "created_at": "2026-08-01T10:00:00.000Z",
+    "updated_at": "2026-08-07T12:00:00.000Z"
+  },
+  "preferences": {
+    "density_mode": "management",
+    "theme_mode": "dark",
+    "week_starts_on_monday": true,
+    "use_24_hour_format": true,
+    "sectors_enabled": [],
+    "onboarding_completed": true
+  },
+  "tasks": [],
+  "events": [],
+  "quests": [],
+  "projects": [],
+  "quest_project_links": [],
+  "decision_records": [],
+  "quest_decision_links": [],
+  "quest_prerequisite_links": [],
+  "work_priorities": [],
+  "bills": [],
+  "schedule_blocks": [],
+  "need_definitions": [],
+  "need_readings": [],
+  "check_ins": [],
+  "daily_reviews": [],
+  "mood_factors": [],
+  "weekly_reviews": [],
+  "research_nodes": [],
+  "research_prerequisite_links": [],
+  "quest_research_links": [],
+  "learning_sessions": [],
+  "research_evidence": [],
+  "financial_entities": [],
+  "financial_accounts": [],
+  "transactions": [],
+  "health_conditions": [],
+  "symptom_entries": [],
+  "inventory_items": [],
+  "people": [],
+  "category_budgets": [],
+  "person_interactions": [],
+  "trips": [
+    {
+      "id": "trip-1",
+      "title": "Lisboa",
+      "destinations": ["LIS"],
+      "purpose": "conferência",
+      "status": "planned",
+      "created_at": "2026-08-07T10:00:00.000Z",
+      "updated_at": "2026-08-07T10:00:00.000Z"
+    }
+  ],
+  "organizations": [],
+  "person_organization_links": [],
+  "home_maintenance_tasks": [],
+  "quest_inventory_links": [],
+  "commitments": [
+    {
+      "id": "commit-1",
+      "description": "Enviar relatório",
+      "made_by_label": "eu",
+      "made_to_label": "chefe",
+      "status": "open",
+      "created_at": "2026-08-07T10:00:00.000Z",
+      "updated_at": "2026-08-07T10:00:00.000Z"
+    }
+  ],
+  "context_zones": [
+    {
+      "id": "zone-1",
+      "name": "Avião",
+      "location_label": "cabine",
+      "capabilities": ["leitura", "notas"],
+      "unavailable_work_types": ["chamadas"],
+      "connectivity": "limited",
+      "notes": "modo offline",
+      "created_at": "2026-08-07T10:00:00.000Z",
+      "updated_at": "2026-08-07T10:00:00.000Z"
+    }
+  ],
+  "integration_consents": [
+    {
+      "id": "consent-1",
+      "kind": "calendarIcs",
+      "enabled": true,
+      "granted_at": "2026-08-07T09:00:00.000Z",
+      "created_at": "2026-08-07T09:00:00.000Z",
+      "updated_at": "2026-08-07T09:00:00.000Z"
+    }
+  ],
+  "external_calendar_events": [
+    {
+      "id": "ext-evt-1",
+      "external_uid": "uid-standup-1",
+      "title": "Standup",
+      "start_at": "2026-08-07T14:00:00.000Z",
+      "end_at": "2026-08-07T14:30:00.000Z",
+      "source_type": "integration",
+      "imported_at": "2026-08-07T11:00:00.000Z",
+      "created_at": "2026-08-07T11:00:00.000Z",
+      "updated_at": "2026-08-07T11:00:00.000Z"
+    }
+  ]
+}

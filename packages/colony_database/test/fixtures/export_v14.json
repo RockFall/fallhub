@@ -1,0 +1,133 @@
+{
+  "exported_at": "2026-08-07T12:00:00.000Z",
+  "version": 14,
+  "profile": {
+    "id": "profile-fixture-v14",
+    "colony_name": "Fixture V14",
+    "display_name": "Tester",
+    "timezone": "UTC",
+    "locale": "pt_BR",
+    "base_currency": "BRL",
+    "created_at": "2026-08-01T10:00:00.000Z",
+    "updated_at": "2026-08-07T12:00:00.000Z"
+  },
+  "preferences": {
+    "density_mode": "management",
+    "theme_mode": "dark",
+    "week_starts_on_monday": true,
+    "use_24_hour_format": true,
+    "sectors_enabled": [],
+    "onboarding_completed": true
+  },
+  "tasks": [],
+  "events": [],
+  "quests": [
+    {
+      "id": "quest-1",
+      "title": "Estudar Flutter",
+      "purpose": "UI sólida",
+      "success_criteria": [],
+      "risks": [],
+      "status": "active",
+      "created_at": "2026-08-06T12:00:00.000Z",
+      "updated_at": "2026-08-06T12:00:00.000Z",
+      "accepted_at": "2026-08-06T12:00:00.000Z"
+    }
+  ],
+  "projects": [],
+  "quest_project_links": [],
+  "decision_records": [],
+  "quest_decision_links": [],
+  "quest_prerequisite_links": [],
+  "work_priorities": [],
+  "bills": [],
+  "schedule_blocks": [],
+  "need_definitions": [],
+  "need_readings": [],
+  "check_ins": [],
+  "daily_reviews": [],
+  "mood_factors": [],
+  "weekly_reviews": [],
+  "research_nodes": [
+    {
+      "id": "research-1",
+      "title": "Flutter basics",
+      "type": "knowledge",
+      "status": "available",
+      "created_at": "2026-08-06T12:00:00.000Z",
+      "updated_at": "2026-08-06T12:00:00.000Z"
+    }
+  ],
+  "research_prerequisite_links": [],
+  "quest_research_links": [
+    {
+      "quest_id": "quest-1",
+      "research_node_id": "research-1",
+      "linked_at": "2026-08-06T13:00:00.000Z"
+    }
+  ],
+  "learning_sessions": [],
+  "research_evidence": [],
+  "financial_entities": [
+    {
+      "id": "entity-1",
+      "name": "Pessoal",
+      "kind": "personal",
+      "created_at": "2026-08-01T10:00:00.000Z",
+      "updated_at": "2026-08-01T10:00:00.000Z"
+    }
+  ],
+  "financial_accounts": [
+    {
+      "id": "account-1",
+      "entity_id": "entity-1",
+      "institution": "Banco",
+      "name": "Corrente",
+      "type": "checking",
+      "currency": "BRL",
+      "current_balance_minor": 0,
+      "include_in_net_worth": true,
+      "sensitive_display_mode": "hidden",
+      "created_at": "2026-08-01T10:00:00.000Z",
+      "updated_at": "2026-08-01T10:00:00.000Z"
+    }
+  ],
+  "transactions": [
+    {
+      "id": "tx-1",
+      "account_id": "account-1",
+      "occurred_at": "2026-08-06T12:00:00.000Z",
+      "description_original": "Mercado",
+      "amount_minor": 8500,
+      "currency": "BRL",
+      "direction": "outflow",
+      "fingerprint": "fixture-fingerprint-v14",
+      "created_at": "2026-08-06T12:00:00.000Z",
+      "updated_at": "2026-08-06T12:00:00.000Z"
+    }
+  ],
+  "health_conditions": [
+    {
+      "id": "health-1",
+      "title": "Enxaqueca",
+      "type": "symptom",
+      "status": "active",
+      "severity_user_reported": 3,
+      "body_regions": ["cabeça"],
+      "clinician_confirmed": false,
+      "created_at": "2026-08-07T10:00:00.000Z",
+      "updated_at": "2026-08-07T10:00:00.000Z"
+    }
+  ],
+  "symptom_entries": [
+    {
+      "id": "sym-1",
+      "condition_id": "health-1",
+      "occurred_at": "2026-08-07T14:00:00.000Z",
+      "intensity": 4,
+      "note": "após almoço",
+      "body_region": "cabeça",
+      "created_at": "2026-08-07T14:00:00.000Z"
+    }
+  ]
+}

@@ -1,0 +1,88 @@
+{
+  "exported_at": "2026-08-06T12:00:00.000Z",
+  "version": 10,
+  "profile": {
+    "id": "profile-fixture-v10",
+    "colony_name": "Fixture V10",
+    "display_name": "Tester",
+    "timezone": "UTC",
+    "locale": "pt_BR",
+    "base_currency": "BRL",
+    "created_at": "2026-08-01T10:00:00.000Z",
+    "updated_at": "2026-08-06T12:00:00.000Z"
+  },
+  "preferences": {
+    "density_mode": "management",
+    "theme_mode": "dark",
+    "week_starts_on_monday": true,
+    "use_24_hour_format": true,
+    "sectors_enabled": [],
+    "onboarding_completed": true
+  },
+  "tasks": [],
+  "events": [],
+  "quests": [],
+  "projects": [],
+  "quest_project_links": [],
+  "decision_records": [],
+  "quest_decision_links": [],
+  "quest_prerequisite_links": [],
+  "work_priorities": [],
+  "bills": [],
+  "schedule_blocks": [],
+  "need_definitions": [],
+  "need_readings": [],
+  "check_ins": [],
+  "daily_reviews": [],
+  "mood_factors": [],
+  "weekly_reviews": [],
+  "research_nodes": [
+    {
+      "id": "research-base",
+      "title": "Fundamentos",
+      "type": "knowledge",
+      "status": "demonstrated",
+      "created_at": "2026-08-01T10:00:00.000Z",
+      "updated_at": "2026-08-05T12:00:00.000Z",
+      "demonstrated_note": "Leitura concluída"
+    },
+    {
+      "id": "research-focus",
+      "title": "Em foco",
+      "type": "skill",
+      "status": "inResearch",
+      "created_at": "2026-08-02T10:00:00.000Z",
+      "updated_at": "2026-08-06T10:00:00.000Z"
+    }
+  ],
+  "research_prerequisite_links": [],
+  "learning_sessions": [
+    {
+      "id": "session-1",
+      "node_id": "research-focus",
+      "started_at": "2026-08-06T09:00:00.000Z",
+      "duration_minutes": 45,
+      "mode": "read",
+      "notes": "Capítulo 1"
+    }
+  ],
+  "research_evidence": [
+    {
+      "id": "evidence-1",
+      "node_id": "research-focus",
+      "session_id": "session-1",
+      "type": "note",
+      "title": "Resumo capítulo 1",
+      "body": "Conceitos principais anotados",
+      "created_at": "2026-08-06T10:00:00.000Z"
+    },
+    {
+      "id": "evidence-2",
+      "node_id": "research-base",
+      "type": "summary",
+      "title": "Demonstração (migrado)",
+      "body": "Leitura concluída",
+      "created_at": "2026-08-05T12:00:00.000Z"
+    }
+  ]
+}

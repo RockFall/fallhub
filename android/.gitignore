@@ -1,0 +1,13 @@
+/.gradle
+/captures/
+/local.properties
+# Keep gradle wrapper + scripts in git so clones can build Android without
+# regenerating the Flutter android/ scaffold.
+GeneratedPluginRegistrant.java
+.cxx/
+
+# Remember to never publicly share your keystore.
+# See https://flutter.dev/to/reference-keystore
+key.properties
+**/*.keystore
+**/*.jks

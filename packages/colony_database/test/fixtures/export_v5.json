@@ -1,0 +1,64 @@
+{
+  "exported_at": "2026-08-06T12:00:00.000Z",
+  "version": 5,
+  "profile": {
+    "id": "profile-fixture-v5",
+    "colony_name": "Fixture V5",
+    "display_name": "Tester",
+    "timezone": "UTC",
+    "locale": "pt_BR",
+    "base_currency": "BRL",
+    "created_at": "2026-08-01T10:00:00.000Z",
+    "updated_at": "2026-08-06T12:00:00.000Z"
+  },
+  "preferences": {
+    "density_mode": "management",
+    "theme_mode": "dark",
+    "week_starts_on_monday": true,
+    "use_24_hour_format": true,
+    "sectors_enabled": [],
+    "onboarding_completed": true
+  },
+  "tasks": [],
+  "events": [],
+  "quests": [
+    {
+      "id": "quest-v5-prereq",
+      "title": "Documentos",
+      "purpose": "Passaporte",
+      "success_criteria": [],
+      "risks": [],
+      "status": "completed",
+      "created_at": "2026-08-06T12:00:00.000Z",
+      "updated_at": "2026-08-06T12:00:00.000Z",
+      "completed_at": "2026-08-06T12:00:00.000Z"
+    },
+    {
+      "id": "quest-v5-main",
+      "title": "Reservas",
+      "purpose": "Hotéis e voos",
+      "success_criteria": [],
+      "risks": [],
+      "status": "draft",
+      "created_at": "2026-08-06T12:00:00.000Z",
+      "updated_at": "2026-08-06T12:00:00.000Z"
+    }
+  ],
+  "projects": [],
+  "quest_project_links": [],
+  "decision_records": [],
+  "quest_decision_links": [],
+  "quest_prerequisite_links": [
+    {
+      "quest_id": "quest-v5-main",
+      "prerequisite_quest_id": "quest-v5-prereq",
+      "linked_at": "2026-08-06T12:00:00.000Z"
+    }
+  ],
+  "work_priorities": [],
+  "bills": [],
+  "schedule_blocks": [],
+  "need_definitions": [],
+  "need_readings": [],
+  "check_ins": []
+}

@@ -1,0 +1,14 @@
+name: colony_domain
+description: Domain entities and value objects for Life Colony OS.
+publish_to: none
+version: 0.1.0
+
+environment:
+  sdk: ^3.11.4
+
+dependencies:
+  equatable: ^2.0.7
+  meta: ^1.17.0
+
+dev_dependencies:
+  test: ^1.26.2

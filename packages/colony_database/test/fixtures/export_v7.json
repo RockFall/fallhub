@@ -1,0 +1,52 @@
+{
+  "exported_at": "2026-08-06T12:00:00.000Z",
+  "version": 7,
+  "profile": {
+    "id": "profile-fixture-v7",
+    "colony_name": "Fixture V7",
+    "display_name": "Tester",
+    "timezone": "UTC",
+    "locale": "pt_BR",
+    "base_currency": "BRL",
+    "created_at": "2026-08-01T10:00:00.000Z",
+    "updated_at": "2026-08-06T12:00:00.000Z"
+  },
+  "preferences": {
+    "density_mode": "management",
+    "theme_mode": "dark",
+    "week_starts_on_monday": true,
+    "use_24_hour_format": true,
+    "sectors_enabled": [],
+    "onboarding_completed": true
+  },
+  "tasks": [],
+  "events": [],
+  "quests": [],
+  "projects": [],
+  "quest_project_links": [],
+  "decision_records": [],
+  "quest_decision_links": [],
+  "quest_prerequisite_links": [],
+  "work_priorities": [],
+  "bills": [],
+  "schedule_blocks": [],
+  "need_definitions": [],
+  "need_readings": [],
+  "check_ins": [],
+  "daily_reviews": [],
+  "mood_factors": [],
+  "weekly_reviews": [
+    {
+      "id": "weekly-v7-1",
+      "week_start_date": "2026-08-03T00:00:00.000Z",
+      "created_at": "2026-08-06T10:00:00.000Z",
+      "facts": "Entregamos export v6",
+      "wins": "Round-trip pawn",
+      "problems": "Preview labels faltando",
+      "projects": "Life Colony OS",
+      "learning": "Migrations FK-safe",
+      "next_week": "Weekly review MVP"
+    }
+  ]
+}
+

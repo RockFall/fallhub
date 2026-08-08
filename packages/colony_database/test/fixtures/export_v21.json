@@ -1,0 +1,80 @@
+{
+  "exported_at": "2026-08-07T12:00:00.000Z",
+  "version": 21,
+  "profile": {
+    "id": "profile-fixture-v21",
+    "colony_name": "Fixture V21",
+    "display_name": "Tester",
+    "timezone": "UTC",
+    "locale": "pt_BR",
+    "base_currency": "BRL",
+    "created_at": "2026-08-01T10:00:00.000Z",
+    "updated_at": "2026-08-07T12:00:00.000Z"
+  },
+  "preferences": {
+    "density_mode": "management",
+    "theme_mode": "dark",
+    "week_starts_on_monday": true,
+    "use_24_hour_format": true,
+    "sectors_enabled": [],
+    "onboarding_completed": true
+  },
+  "tasks": [],
+  "events": [],
+  "quests": [],
+  "projects": [],
+  "quest_project_links": [],
+  "decision_records": [],
+  "quest_decision_links": [],
+  "quest_prerequisite_links": [],
+  "work_priorities": [],
+  "bills": [],
+  "schedule_blocks": [],
+  "need_definitions": [],
+  "need_readings": [],
+  "check_ins": [],
+  "daily_reviews": [],
+  "mood_factors": [],
+  "weekly_reviews": [],
+  "research_nodes": [],
+  "research_prerequisite_links": [],
+  "quest_research_links": [],
+  "learning_sessions": [],
+  "research_evidence": [],
+  "financial_entities": [],
+  "financial_accounts": [],
+  "transactions": [],
+  "health_conditions": [],
+  "symptom_entries": [],
+  "inventory_items": [],
+  "people": [
+    {
+      "id": "person-1",
+      "display_name": "Ana",
+      "relationship_types": [],
+      "created_at": "2026-08-07T10:00:00.000Z",
+      "updated_at": "2026-08-07T10:00:00.000Z"
+    }
+  ],
+  "category_budgets": [],
+  "person_interactions": [],
+  "trips": [],
+  "organizations": [
+    {
+      "id": "org-1",
+      "name": "Acme Ltd",
+      "kind": "company",
+      "notes": "cliente",
+      "created_at": "2026-08-07T10:00:00.000Z",
+      "updated_at": "2026-08-07T10:00:00.000Z"
+    }
+  ],
+  "person_organization_links": [
+    {
+      "person_id": "person-1",
+      "organization_id": "org-1",
+      "linked_at": "2026-08-07T11:00:00.000Z",
+      "role": "membro"
+    }
+  ]
+}

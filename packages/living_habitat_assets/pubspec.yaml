@@ -1,0 +1,129 @@
+name: living_habitat_assets
+description: Visual assets for Living Habitat / Pawn Vivo (Flame renderer).
+publish_to: none
+version: 0.2.0
+
+environment:
+  sdk: ^3.11.4
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+flutter:
+  assets:
+    - assets/v0/furniture/bed_south.png
+    - assets/v0/furniture/chair_south.png
+    - assets/v0/furniture/lamp.png
+    - assets/v0/furniture/table_south.png
+    - assets/v0/pawn/apparel/jacket_fat_east.png
+    - assets/v0/pawn/apparel/jacket_fat_north.png
+    - assets/v0/pawn/apparel/jacket_fat_south.png
+    - assets/v0/pawn/apparel/jacket_female_east.png
+    - assets/v0/pawn/apparel/jacket_female_north.png
+    - assets/v0/pawn/apparel/jacket_female_south.png
+    - assets/v0/pawn/apparel/jacket_hulk_east.png
+    - assets/v0/pawn/apparel/jacket_hulk_north.png
+    - assets/v0/pawn/apparel/jacket_hulk_south.png
+    - assets/v0/pawn/apparel/jacket_male_east.png
+    - assets/v0/pawn/apparel/jacket_male_north.png
+    - assets/v0/pawn/apparel/jacket_male_south.png
+    - assets/v0/pawn/apparel/jacket_thin_east.png
+    - assets/v0/pawn/apparel/jacket_thin_north.png
+    - assets/v0/pawn/apparel/jacket_thin_south.png
+    - assets/v0/pawn/apparel/shirt_basic_fat_east.png
+    - assets/v0/pawn/apparel/shirt_basic_fat_north.png
+    - assets/v0/pawn/apparel/shirt_basic_fat_south.png
+    - assets/v0/pawn/apparel/shirt_basic_female_east.png
+    - assets/v0/pawn/apparel/shirt_basic_female_north.png
+    - assets/v0/pawn/apparel/shirt_basic_female_south.png
+    - assets/v0/pawn/apparel/shirt_basic_hulk_east.png
+    - assets/v0/pawn/apparel/shirt_basic_hulk_north.png
+    - assets/v0/pawn/apparel/shirt_basic_hulk_south.png
+    - assets/v0/pawn/apparel/shirt_basic_male_east.png
+    - assets/v0/pawn/apparel/shirt_basic_male_north.png
+    - assets/v0/pawn/apparel/shirt_basic_male_south.png
+    - assets/v0/pawn/apparel/shirt_basic_thin_east.png
+    - assets/v0/pawn/apparel/shirt_basic_thin_north.png
+    - assets/v0/pawn/apparel/shirt_basic_thin_south.png
+    - assets/v0/pawn/apparel/shirt_button_fat_east.png
+    - assets/v0/pawn/apparel/shirt_button_fat_north.png
+    - assets/v0/pawn/apparel/shirt_button_fat_south.png
+    - assets/v0/pawn/apparel/shirt_button_female_east.png
+    - assets/v0/pawn/apparel/shirt_button_female_north.png
+    - assets/v0/pawn/apparel/shirt_button_female_south.png
+    - assets/v0/pawn/apparel/shirt_button_hulk_east.png
+    - assets/v0/pawn/apparel/shirt_button_hulk_north.png
+    - assets/v0/pawn/apparel/shirt_button_hulk_south.png
+    - assets/v0/pawn/apparel/shirt_button_male_east.png
+    - assets/v0/pawn/apparel/shirt_button_male_north.png
+    - assets/v0/pawn/apparel/shirt_button_male_south.png
+    - assets/v0/pawn/apparel/shirt_button_thin_east.png
+    - assets/v0/pawn/apparel/shirt_button_thin_north.png
+    - assets/v0/pawn/apparel/shirt_button_thin_south.png
+    - assets/v0/pawn/beard/boxed_east.png
+    - assets/v0/pawn/beard/boxed_south.png
+    - assets/v0/pawn/beard/full_east.png
+    - assets/v0/pawn/beard/full_south.png
+    - assets/v0/pawn/beard/goatee_east.png
+    - assets/v0/pawn/beard/goatee_south.png
+    - assets/v0/pawn/body/fat_east.png
+    - assets/v0/pawn/body/fat_north.png
+    - assets/v0/pawn/body/fat_south.png
+    - assets/v0/pawn/body/female_east.png
+    - assets/v0/pawn/body/female_north.png
+    - assets/v0/pawn/body/female_south.png
+    - assets/v0/pawn/body/hulk_east.png
+    - assets/v0/pawn/body/hulk_north.png
+    - assets/v0/pawn/body/hulk_south.png
+    - assets/v0/pawn/body/male_east.png
+    - assets/v0/pawn/body/male_north.png
+    - assets/v0/pawn/body/male_south.png
+    - assets/v0/pawn/body/thin_east.png
+    - assets/v0/pawn/body/thin_north.png
+    - assets/v0/pawn/body/thin_south.png
+    - assets/v0/pawn/hair/afro_east.png
+    - assets/v0/pawn/hair/afro_north.png
+    - assets/v0/pawn/hair/afro_south.png
+    - assets/v0/pawn/hair/bob_east.png
+    - assets/v0/pawn/hair/bob_north.png
+    - assets/v0/pawn/hair/bob_south.png
+    - assets/v0/pawn/hair/burgundy_east.png
+    - assets/v0/pawn/hair/burgundy_north.png
+    - assets/v0/pawn/hair/burgundy_south.png
+    - assets/v0/pawn/hair/firestarter_east.png
+    - assets/v0/pawn/hair/firestarter_north.png
+    - assets/v0/pawn/hair/firestarter_south.png
+    - assets/v0/pawn/hair/mohawk_east.png
+    - assets/v0/pawn/hair/mohawk_north.png
+    - assets/v0/pawn/hair/mohawk_south.png
+    - assets/v0/pawn/hair/mop_east.png
+    - assets/v0/pawn/hair/mop_north.png
+    - assets/v0/pawn/hair/mop_south.png
+    - assets/v0/pawn/hair/pigtails_east.png
+    - assets/v0/pawn/hair/pigtails_north.png
+    - assets/v0/pawn/hair/pigtails_south.png
+    - assets/v0/pawn/hair/shaved_east.png
+    - assets/v0/pawn/hair/shaved_north.png
+    - assets/v0/pawn/hair/shaved_south.png
+    - assets/v0/pawn/hair/spikes_east.png
+    - assets/v0/pawn/hair/spikes_north.png
+    - assets/v0/pawn/hair/spikes_south.png
+    - assets/v0/pawn/hair/wavy_east.png
+    - assets/v0/pawn/hair/wavy_north.png
+    - assets/v0/pawn/hair/wavy_south.png
+    - assets/v0/pawn/hat/cowboy_east.png
+    - assets/v0/pawn/hat/cowboy_north.png
+    - assets/v0/pawn/hat/cowboy_south.png
+    - assets/v0/pawn/hat/tuque_east.png
+    - assets/v0/pawn/hat/tuque_north.png
+    - assets/v0/pawn/hat/tuque_south.png
+    - assets/v0/pawn/head/female_east.png
+    - assets/v0/pawn/head/female_north.png
+    - assets/v0/pawn/head/female_south.png
+    - assets/v0/pawn/head/male_east.png
+    - assets/v0/pawn/head/male_north.png
+    - assets/v0/pawn/head/male_south.png
+    - assets/v0/tiles/carpet.png
+    - assets/v0/tiles/concrete.png
+    - assets/v0/tiles/wood_floor.png

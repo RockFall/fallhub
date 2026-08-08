@@ -1,0 +1,65 @@
+{
+  "exported_at": "2026-08-06T12:00:00.000Z",
+  "version": 9,
+  "profile": {
+    "id": "profile-fixture-v9",
+    "colony_name": "Fixture V9",
+    "display_name": "Tester",
+    "timezone": "UTC",
+    "locale": "pt_BR",
+    "base_currency": "BRL",
+    "created_at": "2026-08-01T10:00:00.000Z",
+    "updated_at": "2026-08-06T12:00:00.000Z"
+  },
+  "preferences": {
+    "density_mode": "management",
+    "theme_mode": "dark",
+    "week_starts_on_monday": true,
+    "use_24_hour_format": true,
+    "sectors_enabled": [],
+    "onboarding_completed": true
+  },
+  "tasks": [],
+  "events": [],
+  "quests": [],
+  "projects": [],
+  "quest_project_links": [],
+  "decision_records": [],
+  "quest_decision_links": [],
+  "quest_prerequisite_links": [],
+  "work_priorities": [],
+  "bills": [],
+  "schedule_blocks": [],
+  "need_definitions": [],
+  "need_readings": [],
+  "check_ins": [],
+  "daily_reviews": [],
+  "mood_factors": [],
+  "weekly_reviews": [],
+  "research_nodes": [
+    {
+      "id": "research-base",
+      "title": "Fundamentos",
+      "type": "knowledge",
+      "status": "demonstrated",
+      "created_at": "2026-08-01T10:00:00.000Z",
+      "updated_at": "2026-08-05T12:00:00.000Z",
+      "demonstrated_note": "Leitura concluída"
+    },
+    {
+      "id": "research-advanced",
+      "title": "Avançado",
+      "type": "skill",
+      "status": "available",
+      "created_at": "2026-08-02T10:00:00.000Z",
+      "updated_at": "2026-08-02T10:00:00.000Z"
+    }
+  ],
+  "research_prerequisite_links": [
+    {
+      "node_id": "research-advanced",
+      "prerequisite_node_id": "research-base",
+      "linked_at": "2026-08-02T11:00:00.000Z"
+    }
+  ]
+}

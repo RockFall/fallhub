@@ -1,0 +1,87 @@
+{
+  "exported_at": "2026-08-07T12:00:00.000Z",
+  "version": 23,
+  "profile": {
+    "id": "profile-fixture-v23",
+    "colony_name": "Fixture V23",
+    "display_name": "Tester",
+    "timezone": "UTC",
+    "locale": "pt_BR",
+    "base_currency": "BRL",
+    "created_at": "2026-08-01T10:00:00.000Z",
+    "updated_at": "2026-08-07T12:00:00.000Z"
+  },
+  "preferences": {
+    "density_mode": "management",
+    "theme_mode": "dark",
+    "week_starts_on_monday": true,
+    "use_24_hour_format": true,
+    "sectors_enabled": [],
+    "onboarding_completed": true
+  },
+  "tasks": [],
+  "events": [],
+  "quests": [
+    {
+      "id": "quest-1",
+      "title": "Organizar oficina",
+      "purpose": "Kit de ferramentas pronto",
+      "success_criteria": [],
+      "risks": [],
+      "status": "active",
+      "created_at": "2026-08-07T10:00:00.000Z",
+      "updated_at": "2026-08-07T10:00:00.000Z",
+      "accepted_at": "2026-08-07T10:00:00.000Z"
+    }
+  ],
+  "projects": [],
+  "quest_project_links": [],
+  "decision_records": [],
+  "quest_decision_links": [],
+  "quest_prerequisite_links": [],
+  "work_priorities": [],
+  "bills": [],
+  "schedule_blocks": [],
+  "need_definitions": [],
+  "need_readings": [],
+  "check_ins": [],
+  "daily_reviews": [],
+  "mood_factors": [],
+  "weekly_reviews": [],
+  "research_nodes": [],
+  "research_prerequisite_links": [],
+  "quest_research_links": [],
+  "learning_sessions": [],
+  "research_evidence": [],
+  "financial_entities": [],
+  "financial_accounts": [],
+  "transactions": [],
+  "health_conditions": [],
+  "symptom_entries": [],
+  "inventory_items": [
+    {
+      "id": "inv-1",
+      "name": "Furadeira",
+      "category": "tool",
+      "status": "active",
+      "location_label": "oficina",
+      "tags": ["casa"],
+      "created_at": "2026-08-07T10:00:00.000Z",
+      "updated_at": "2026-08-07T10:00:00.000Z"
+    }
+  ],
+  "people": [],
+  "category_budgets": [],
+  "person_interactions": [],
+  "trips": [],
+  "organizations": [],
+  "person_organization_links": [],
+  "home_maintenance_tasks": [],
+  "quest_inventory_links": [
+    {
+      "quest_id": "quest-1",
+      "inventory_item_id": "inv-1",
+      "linked_at": "2026-08-07T11:00:00.000Z"
+    }
+  ]
+}

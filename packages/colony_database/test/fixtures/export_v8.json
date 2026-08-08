@@ -1,0 +1,112 @@
+{
+
+  "exported_at": "2026-08-06T12:00:00.000Z",
+
+  "version": 8,
+
+  "profile": {
+
+    "id": "profile-fixture-v8",
+
+    "colony_name": "Fixture V8",
+
+    "display_name": "Tester",
+
+    "timezone": "UTC",
+
+    "locale": "pt_BR",
+
+    "base_currency": "BRL",
+
+    "created_at": "2026-08-01T10:00:00.000Z",
+
+    "updated_at": "2026-08-06T12:00:00.000Z"
+
+  },
+
+  "preferences": {
+
+    "density_mode": "management",
+
+    "theme_mode": "dark",
+
+    "week_starts_on_monday": true,
+
+    "use_24_hour_format": true,
+
+    "sectors_enabled": [],
+
+    "onboarding_completed": true
+
+  },
+
+  "tasks": [],
+
+  "events": [],
+
+  "quests": [
+
+    {
+
+      "id": "quest-v8-1",
+
+      "title": "Missão aceita",
+
+      "purpose": "Validar export v8",
+
+      "success_criteria": [],
+
+      "risks": [],
+
+      "status": "active",
+
+      "created_at": "2026-08-01T10:00:00.000Z",
+
+      "updated_at": "2026-08-06T12:00:00.000Z",
+
+      "accepted_at": "2026-08-02T14:00:00.000Z",
+
+      "acceptance_deadline": "2026-09-01T00:00:00.000Z",
+
+      "acceptance_assumptions": [
+
+        "Tenho tempo nas próximas semanas",
+
+        "Documentos em ordem"
+
+      ]
+
+    }
+
+  ],
+
+  "projects": [],
+
+  "quest_project_links": [],
+
+  "decision_records": [],
+
+  "quest_decision_links": [],
+
+  "quest_prerequisite_links": [],
+
+  "work_priorities": [],
+
+  "bills": [],
+
+  "schedule_blocks": [],
+
+  "need_definitions": [],
+
+  "need_readings": [],
+
+  "check_ins": [],
+
+  "daily_reviews": [],
+
+  "mood_factors": [],
+
+  "weekly_reviews": []
+
+}
+

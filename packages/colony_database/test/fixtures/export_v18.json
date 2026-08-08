@@ -1,0 +1,70 @@
+{
+  "exported_at": "2026-08-07T12:00:00.000Z",
+  "version": 18,
+  "profile": {
+    "id": "profile-fixture-v18",
+    "colony_name": "Fixture V18",
+    "display_name": "Tester",
+    "timezone": "UTC",
+    "locale": "pt_BR",
+    "base_currency": "BRL",
+    "created_at": "2026-08-01T10:00:00.000Z",
+    "updated_at": "2026-08-07T12:00:00.000Z"
+  },
+  "preferences": {
+    "density_mode": "management",
+    "theme_mode": "dark",
+    "week_starts_on_monday": true,
+    "use_24_hour_format": true,
+    "sectors_enabled": [],
+    "onboarding_completed": true
+  },
+  "tasks": [],
+  "events": [],
+  "quests": [],
+  "projects": [],
+  "quest_project_links": [],
+  "decision_records": [],
+  "quest_decision_links": [],
+  "quest_prerequisite_links": [],
+  "work_priorities": [],
+  "bills": [],
+  "schedule_blocks": [],
+  "need_definitions": [],
+  "need_readings": [],
+  "check_ins": [],
+  "daily_reviews": [],
+  "mood_factors": [],
+  "weekly_reviews": [],
+  "research_nodes": [],
+  "research_prerequisite_links": [],
+  "quest_research_links": [],
+  "learning_sessions": [],
+  "research_evidence": [],
+  "financial_entities": [],
+  "financial_accounts": [],
+  "transactions": [],
+  "health_conditions": [],
+  "symptom_entries": [],
+  "inventory_items": [],
+  "people": [
+    {
+      "id": "person-1",
+      "display_name": "Ana Silva",
+      "relationship_types": ["amiga"],
+      "created_at": "2026-08-07T10:00:00.000Z",
+      "updated_at": "2026-08-07T10:00:00.000Z"
+    }
+  ],
+  "category_budgets": [],
+  "person_interactions": [
+    {
+      "id": "ix-1",
+      "person_id": "person-1",
+      "kind": "meeting",
+      "occurred_at": "2026-08-06T15:00:00.000Z",
+      "note": "café",
+      "created_at": "2026-08-06T15:05:00.000Z"
+    }
+  ]
+}
