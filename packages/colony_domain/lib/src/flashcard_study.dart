@@ -1,6 +1,7 @@
 import 'package:equatable/equatable.dart';
 
 import 'flashcard.dart';
+import 'flashcard_srs.dart';
 import 'id_generator.dart';
 import 'knowledge_area.dart';
 import 'knowledge_area_placement.dart';
@@ -71,6 +72,7 @@ class FlashcardTodayDigest extends Equatable {
   const FlashcardTodayDigest({
     required this.dueNowTotal,
     required this.dueNowByBucket,
+    required this.sessionByBucket,
     required this.dueLaterToday,
     required this.unscheduledCount,
     required this.completedToday,
@@ -81,6 +83,9 @@ class FlashcardTodayDigest extends Equatable {
 
   final int dueNowTotal;
   final FlashcardQueueCounts dueNowByBucket;
+
+  /// Buckets the upcoming session will actually serve (after deck limits).
+  final FlashcardQueueCounts sessionByBucket;
   final int dueLaterToday;
   final int unscheduledCount;
   final int completedToday;
@@ -92,6 +97,7 @@ class FlashcardTodayDigest extends Equatable {
   List<Object?> get props => [
         dueNowTotal,
         dueNowByBucket,
+        sessionByBucket,
         dueLaterToday,
         unscheduledCount,
         completedToday,
@@ -99,6 +105,64 @@ class FlashcardTodayDigest extends Equatable {
         limitDeferred,
         estimatedMinutes,
       ];
+}
+
+/// Canonical shelf for a card: own area, else the deck's area.
+abstract final class FlashcardAreaPolicy {
+  static EntityId? effectiveAreaId(
+    Flashcard card, {
+    FlashcardDeck? deck,
+    Map<EntityId, FlashcardDeck> decksById = const {},
+  }) {
+    if (card.areaId != null) return card.areaId;
+    return deck?.areaId ?? decksById[card.deckId]?.areaId;
+  }
+
+  static bool isVisibleInArea({
+    required Flashcard card,
+    required EntityId rootId,
+    required List<KnowledgeArea> areas,
+    List<KnowledgeAreaPlacement> placements = const [],
+    FlashcardDeck? deck,
+    Map<EntityId, FlashcardDeck> decksById = const {},
+  }) {
+    final areaId = effectiveAreaId(card, deck: deck, decksById: decksById);
+    if (areaId == null) return false;
+    return KnowledgeAreaPolicy.descendantIds(
+      rootId: rootId,
+      areas: areas,
+      placements: placements,
+    ).contains(areaId);
+  }
+
+  static bool canSpecialize({
+    required EntityId? deckAreaId,
+    required EntityId cardAreaId,
+    required List<KnowledgeArea> areas,
+    List<KnowledgeAreaPlacement> placements = const [],
+  }) {
+    if (deckAreaId == null) return true;
+    if (cardAreaId == deckAreaId) return true;
+    return KnowledgeAreaPolicy.descendantIds(
+      rootId: deckAreaId,
+      areas: areas,
+      placements: placements,
+    ).contains(cardAreaId);
+  }
+
+  static List<KnowledgeArea> specializationCandidates({
+    required EntityId? deckAreaId,
+    required List<KnowledgeArea> areas,
+    List<KnowledgeAreaPlacement> placements = const [],
+  }) {
+    if (deckAreaId == null) return List<KnowledgeArea>.from(areas);
+    final ids = KnowledgeAreaPolicy.descendantIds(
+      rootId: deckAreaId,
+      areas: areas,
+      placements: placements,
+    );
+    return [for (final area in areas) if (ids.contains(area.id)) area];
+  }
 }
 
 abstract final class FlashcardDailyUsagePolicy {
@@ -198,14 +262,16 @@ abstract final class FlashcardTodayDigestPolicy {
       now: now,
     );
 
-    var capped = 0;
+    var sessionNew = 0;
+    var sessionLearning = 0;
+    var sessionReview = 0;
     final byDeck = <EntityId, List<Flashcard>>{};
     for (final card in scheduled) {
       byDeck.putIfAbsent(card.deckId, () => []).add(card);
     }
     for (final entry in byDeck.entries) {
       final deck = deckById[entry.key];
-      capped += StudyQueuePolicy.buildQueue(
+      final queue = StudyQueuePolicy.buildQueue(
         cards: entry.value,
         srsByCard: srsByCard,
         now: now,
@@ -213,12 +279,30 @@ abstract final class FlashcardTodayDigestPolicy {
         reviewRemaining:
             (deck?.reviewLimitPerDay ?? 200) - (reviewUsed[entry.key] ?? 0),
         interleaveByArea: false,
-      ).length;
+        decks: decks,
+      );
+      for (final item in queue) {
+        switch (item.srs.status) {
+          case FlashcardSrsStatus.newCard:
+            sessionNew++;
+          case FlashcardSrsStatus.learning:
+          case FlashcardSrsStatus.relearning:
+            sessionLearning++;
+          case FlashcardSrsStatus.review:
+            sessionReview++;
+        }
+      }
     }
+    final capped = sessionNew + sessionLearning + sessionReview;
 
     return FlashcardTodayDigest(
       dueNowTotal: buckets.dueTotal,
       dueNowByBucket: buckets,
+      sessionByBucket: FlashcardQueueCounts(
+        newCount: sessionNew,
+        learningCount: sessionLearning,
+        reviewCount: sessionReview,
+      ),
       dueLaterToday: later,
       unscheduledCount: unscheduled,
       completedToday: completed,
@@ -296,10 +380,13 @@ abstract final class StudyQueuePolicy {
     required int newRemaining,
     required int reviewRemaining,
     bool interleaveByArea = true,
+    List<FlashcardDeck> decks = const [],
+    bool learningOnly = false,
   }) {
     final learning = <StudyCard>[];
     final reviews = <StudyCard>[];
     final news = <StudyCard>[];
+    final decksById = {for (final deck in decks) deck.id: deck};
 
     for (final card in cards) {
       if (!FlashcardSchedulePolicy.isInDueQueue(card)) continue;
@@ -312,9 +399,9 @@ abstract final class StudyQueuePolicy {
         case FlashcardSrsStatus.relearning:
           learning.add(item);
         case FlashcardSrsStatus.review:
-          reviews.add(item);
+          if (!learningOnly) reviews.add(item);
         case FlashcardSrsStatus.newCard:
-          news.add(item);
+          if (!learningOnly) news.add(item);
       }
     }
 
@@ -322,17 +409,25 @@ abstract final class StudyQueuePolicy {
     reviews.sort((a, b) => a.srs.dueAt.compareTo(b.srs.dueAt));
     news.sort((a, b) => a.card.createdAt.compareTo(b.card.createdAt));
 
-    final limitedReviews = reviews.take(reviewRemaining.clamp(0, reviews.length));
+    final limitedReviews =
+        reviews.take(reviewRemaining.clamp(0, reviews.length));
     final limitedNews = news.take(newRemaining.clamp(0, news.length));
     final combined = [...learning, ...limitedReviews, ...limitedNews];
     if (!interleaveByArea) return combined;
-    return _interleave(combined);
+    return _interleave(combined, decksById: decksById);
   }
 
-  static List<StudyCard> _interleave(List<StudyCard> cards) {
+  static List<StudyCard> _interleave(
+    List<StudyCard> cards, {
+    Map<EntityId, FlashcardDeck> decksById = const {},
+  }) {
     final buckets = <String, List<StudyCard>>{};
     for (final card in cards) {
-      final key = card.card.areaId?.value ?? card.card.deckId.value;
+      final key = FlashcardAreaPolicy.effectiveAreaId(
+            card.card,
+            decksById: decksById,
+          )?.value ??
+          card.card.deckId.value;
       buckets.putIfAbsent(key, () => []).add(card);
     }
     final keys = buckets.keys.toList()..sort();
@@ -417,12 +512,14 @@ abstract final class StudyQueuePolicy {
     required DateTime now,
     List<KnowledgeArea> areas = const [],
     List<KnowledgeAreaPlacement> placements = const [],
+    List<FlashcardDeck> decks = const [],
   }) {
     final logsByCard = <EntityId, List<FlashcardReviewLog>>{};
     for (final log in logs) {
       if (log.reviewKind != FlashcardReviewKind.srs) continue;
       logsByCard.putIfAbsent(log.cardId, () => []).add(log);
     }
+    final decksById = {for (final deck in decks) deck.id: deck};
 
     KnowledgeAreaHeat heatFor(
       EntityId areaId,
@@ -446,7 +543,10 @@ abstract final class StudyQueuePolicy {
     if (areas.isEmpty) {
       final cardsByArea = <EntityId, List<Flashcard>>{};
       for (final card in cards) {
-        final areaId = card.areaId;
+        final areaId = FlashcardAreaPolicy.effectiveAreaId(
+          card,
+          decksById: decksById,
+        );
         if (areaId == null) continue;
         cardsByArea.putIfAbsent(areaId, () => []).add(card);
       }
@@ -460,17 +560,96 @@ abstract final class StudyQueuePolicy {
       for (final area in areas)
         area.id: heatFor(
           area.id,
-          cards.where((card) {
-            final areaId = card.areaId;
-            if (areaId == null) return false;
-            return KnowledgeAreaPolicy.descendantIds(
+          cards.where(
+            (card) => FlashcardAreaPolicy.isVisibleInArea(
+              card: card,
               rootId: area.id,
               areas: areas,
               placements: placements,
-            ).contains(areaId);
-          }),
+              decksById: decksById,
+            ),
+          ),
         ),
     };
+  }
+
+  static List<Flashcard> cardsInArea({
+    required List<Flashcard> cards,
+    required EntityId rootId,
+    required List<KnowledgeArea> areas,
+    List<KnowledgeAreaPlacement> placements = const [],
+    List<FlashcardDeck> decks = const [],
+  }) {
+    final decksById = {for (final deck in decks) deck.id: deck};
+    return [
+      for (final card in cards)
+        if (FlashcardAreaPolicy.isVisibleInArea(
+          card: card,
+          rootId: rootId,
+          areas: areas,
+          placements: placements,
+          decksById: decksById,
+        ))
+          card,
+    ];
+  }
+
+  static List<Flashcard> cardsForResearch({
+    required List<Flashcard> cards,
+    required EntityId researchNodeId,
+    required List<FlashcardDeck> decks,
+    required List<ResearchKnowledgeLink> links,
+    required List<KnowledgeArea> areas,
+    List<KnowledgeAreaPlacement> placements = const [],
+  }) {
+    final linkedDecks = {
+      for (final deck in decks)
+        if (deck.researchNodeId == researchNodeId) deck.id,
+    };
+    final practiceAreas = {
+      for (final link in links)
+        if (link.researchNodeId == researchNodeId &&
+            (link.kind == ResearchKnowledgeLinkKind.primary ||
+                link.kind == ResearchKnowledgeLinkKind.practice))
+          link.areaId,
+    };
+    final decksById = {for (final deck in decks) deck.id: deck};
+    return [
+      for (final card in cards)
+        if (linkedDecks.contains(card.deckId) ||
+            practiceAreas.any(
+              (areaId) => FlashcardAreaPolicy.isVisibleInArea(
+                card: card,
+                rootId: areaId,
+                areas: areas,
+                placements: placements,
+                decksById: decksById,
+              ),
+            ))
+          card,
+    ];
+  }
+
+  static String formatDueAt(DateTime dueAt, DateTime now) {
+    if (!dueAt.isAfter(now)) return 'agora';
+    return Sm2Scheduler.formatInterval(dueAt.difference(now));
+  }
+
+  static String? nextDuePhrase(FlashcardSrsState? srs, DateTime now) {
+    if (srs == null) return null;
+    if (srs.status == FlashcardSrsStatus.newCard && srs.lastReviewedAt == null) {
+      return null;
+    }
+    return formatDueAt(srs.dueAt, now);
+  }
+
+  static List<String> forecastDayLabels(DateTime now, {int days = 7}) {
+    const labels = ['dom', 'seg', 'ter', 'qua', 'qui', 'sex', 'sáb'];
+    final start = now.toLocal();
+    return [
+      for (var i = 0; i < days; i++)
+        labels[DateTime(start.year, start.month, start.day + i).weekday % 7],
+    ];
   }
 
   static List<int> forecastDue({

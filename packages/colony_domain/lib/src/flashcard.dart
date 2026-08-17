@@ -470,6 +470,17 @@ abstract final class ClozeRenderer {
   static String answer(String source) {
     return source.replaceAllMapped(_pattern, (match) => match.group(2)!);
   }
+
+  /// Wraps [start, end) in `{{cN::…}}`. Next index is max existing + 1.
+  static String wrapSelection(String source, int start, int end) {
+    if (start < 0 || end > source.length || start >= end) return source;
+    final existing = indicesIn(source);
+    final next = existing.isEmpty
+        ? 1
+        : (existing.reduce((a, b) => a > b ? a : b) + 1);
+    final selected = source.substring(start, end);
+    return source.replaceRange(start, end, '{{c$next::$selected}}');
+  }
 }
 
 List<String> normalizeFlashcardTags(Iterable<String> tags) {

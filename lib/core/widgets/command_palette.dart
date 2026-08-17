@@ -43,6 +43,7 @@ class _CommandPaletteState extends ConsumerState<CommandPalette> {
     _PaletteCommand('Pesquisa', '/research', Icons.science_outlined),
     _PaletteCommand('Flashcards', '/flashcards', Icons.style_outlined),
     _PaletteCommand('Estudar flashcards', '/flashcards/study', Icons.play_arrow_outlined),
+    _PaletteCommand('Novo cartão', '/flashcards?capture=1', Icons.note_add_outlined),
     _PaletteCommand('Novo baralho', '/flashcards', Icons.add),
     _PaletteCommand('Novo nó de pesquisa', '/research?create=1', Icons.add),
     _PaletteCommand('Finanças', '/resources/finance', Icons.account_balance_wallet_outlined),

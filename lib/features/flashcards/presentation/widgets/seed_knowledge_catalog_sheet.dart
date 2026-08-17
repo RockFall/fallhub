@@ -49,6 +49,12 @@ class _SeedKnowledgeCatalogSheetState
             AppStrings.flashcardsSeedMapHint,
             style: Theme.of(context).textTheme.bodySmall,
           ),
+          Text(
+            AppStrings.flashcardsSeedAncestorsHint,
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: ColonyColors.accentCyan,
+                ),
+          ),
           const SizedBox(height: ColonySpacing.md),
           SizedBox(
             height: 360,

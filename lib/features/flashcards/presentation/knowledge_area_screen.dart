@@ -72,13 +72,11 @@ class KnowledgeAreaScreen extends ConsumerWidget {
       ).reversed,
       if (viaAlias) area,
     ];
-    final alsoIn = KnowledgeAreaPolicy.pathsTo(
+    final extraParents = KnowledgeAreaPolicy.extraParentsOf(
       areaId: area.id,
       areas: areas,
       placements: placements,
     );
-    final primary = KnowledgeAreaPolicy.pathLabel(areaId: area.id, areas: areas);
-    final extraPaths = alsoIn.where((path) => path != primary).toList();
     final linked = links.where((l) => l.areaId == area.id).toList();
 
     return ListView(
@@ -88,7 +86,15 @@ class KnowledgeAreaScreen extends ConsumerWidget {
           children: [
             IconButton(
               icon: const Icon(Icons.arrow_back),
-              onPressed: () => context.go('/flashcards'),
+              onPressed: () {
+                if (viaAreaId != null) {
+                  context.go('/flashcards/areas/$viaAreaId');
+                } else if (area.parentId != null) {
+                  context.go('/flashcards/areas/${area.parentId!.value}');
+                } else {
+                  context.go('/flashcards');
+                }
+              },
             ),
             Expanded(
               child: Text(
@@ -170,18 +176,44 @@ class KnowledgeAreaScreen extends ConsumerWidget {
           icon: const Icon(Icons.bolt_outlined),
           label: const Text(AppStrings.flashcardsPracticeArea),
         ),
-        if (extraPaths.isNotEmpty) ...[
+        if (extraParents.isNotEmpty) ...[
           const SizedBox(height: ColonySpacing.md),
           Wrap(
             spacing: ColonySpacing.sm,
             runSpacing: ColonySpacing.xs,
+            crossAxisAlignment: WrapCrossAlignment.center,
             children: [
               Text(
                 AppStrings.flashcardsAlsoIn,
                 style: Theme.of(context).textTheme.labelLarge,
               ),
-              for (final path in extraPaths)
-                Chip(label: Text(path), visualDensity: VisualDensity.compact),
+              for (final parent in extraParents)
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextButton(
+                      onPressed: () => context.go(
+                        '/flashcards/areas/${parent.id.value}',
+                      ),
+                      child: Text(
+                        KnowledgeAreaPolicy.pathLabel(
+                          areaId: parent.id,
+                          areas: areas,
+                        ),
+                      ),
+                    ),
+                    IconButton(
+                      tooltip: AppStrings.flashcardsRemovePlacement,
+                      icon: const Icon(Icons.close, size: 18),
+                      onPressed: () => ref
+                          .read(flashcardControllerProvider.notifier)
+                          .removePlacement(
+                            areaId: area.id,
+                            parentAreaId: parent.id,
+                          ),
+                    ),
+                  ],
+                ),
             ],
           ),
         ],
@@ -199,6 +231,11 @@ class KnowledgeAreaScreen extends ConsumerWidget {
           title: AppStrings.flashcardsSubareas,
           icon: Icons.account_tree_outlined,
           actions: [
+            TextButton(
+              onPressed: () =>
+                  CreateKnowledgeAreaSheet.show(context, parentId: area.id),
+              child: const Text(AppStrings.flashcardsNewLeafHere),
+            ),
             IconButton(
               onPressed: () =>
                   CreateKnowledgeAreaSheet.show(context, parentId: area.id),
@@ -277,32 +314,42 @@ class KnowledgeAreaScreen extends ConsumerWidget {
               ? const Text(AppStrings.flashcardsLinkedResearchEmpty)
               : Column(
                   children: [
-                    for (final link in linked)
-                      ListTile(
-                        contentPadding: EdgeInsets.zero,
-                        title: Text(
-                          nodes
-                              .where((n) => n.id == link.researchNodeId)
-                              .map((n) => n.title)
-                              .firstOrNull ??
-                              link.researchNodeId.value,
+                    for (final kind in ResearchKnowledgeLinkKind.values) ...[
+                      if (linked.any((l) => l.kind == kind))
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: ColonySpacing.xs),
+                          child: Align(
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              AppStrings.researchKnowledgeLinkLabel(kind),
+                              style: Theme.of(context).textTheme.labelLarge,
+                            ),
+                          ),
                         ),
-                        subtitle: Text(
-                          AppStrings.researchKnowledgeLinkLabel(link.kind),
+                      for (final link in linked.where((l) => l.kind == kind))
+                        ListTile(
+                          contentPadding: EdgeInsets.zero,
+                          title: Text(
+                            nodes
+                                .where((n) => n.id == link.researchNodeId)
+                                .map((n) => n.title)
+                                .firstOrNull ??
+                                link.researchNodeId.value,
+                          ),
+                          trailing: IconButton(
+                            icon: const Icon(Icons.close),
+                            onPressed: () => ref
+                                .read(flashcardControllerProvider.notifier)
+                                .unlinkResearch(
+                                  researchNodeId: link.researchNodeId,
+                                  areaId: area.id,
+                                ),
+                          ),
+                          onTap: () => context.go(
+                            '/research/${link.researchNodeId.value}',
+                          ),
                         ),
-                        trailing: IconButton(
-                          icon: const Icon(Icons.close),
-                          onPressed: () => ref
-                              .read(flashcardControllerProvider.notifier)
-                              .unlinkResearch(
-                                researchNodeId: link.researchNodeId,
-                                areaId: area.id,
-                              ),
-                        ),
-                        onTap: () => context.go(
-                          '/research/${link.researchNodeId.value}',
-                        ),
-                      ),
+                    ],
                   ],
                 ),
         ),

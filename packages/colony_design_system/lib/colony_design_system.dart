@@ -6,6 +6,8 @@ export 'src/chrome/colony_float_menu.dart';
 export 'src/chrome/colony_main_tab_bar.dart';
 export 'src/chrome/colony_surface.dart';
 export 'src/components/colony_panel.dart';
+export 'src/components/colony_heat_dot.dart';
+export 'src/components/colony_study_card.dart';
 export 'src/components/confidence_chip.dart';
 export 'src/components/data_provenance_badge.dart';
 export 'src/components/day_timeline.dart';

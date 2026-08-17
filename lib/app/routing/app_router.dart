@@ -187,7 +187,9 @@ final routerProvider = Provider<GoRouter>((ref) {
           ),
           GoRoute(
             path: '/flashcards',
-            builder: (context, state) => const FlashcardsHubScreen(),
+            builder: (context, state) => FlashcardsHubScreen(
+              openCapture: state.uri.queryParameters['capture'] == '1',
+            ),
             routes: [
               GoRoute(
                 path: 'study',
@@ -195,9 +197,15 @@ final routerProvider = Provider<GoRouter>((ref) {
                   deckId: state.uri.queryParameters['deckId'],
                   areaId: state.uri.queryParameters['areaId'],
                   cardId: state.uri.queryParameters['cardId'],
+                  researchId: state.uri.queryParameters['researchId'],
                   mode: state.uri.queryParameters['mode'] == 'practice'
                       ? FlashcardStudySessionMode.practice
                       : FlashcardStudySessionMode.scheduled,
+                  savedOnly: state.uri.queryParameters['saved'] == '1',
+                  laterOnly: state.uri.queryParameters['later'] == '1',
+                  minutes: int.tryParse(
+                    state.uri.queryParameters['minutes'] ?? '',
+                  ),
                 ),
               ),
               GoRoute(

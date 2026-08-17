@@ -17,13 +17,21 @@ class StudySessionScreen extends ConsumerStatefulWidget {
     this.deckId,
     this.areaId,
     this.cardId,
+    this.researchId,
     this.mode = FlashcardStudySessionMode.scheduled,
+    this.savedOnly = false,
+    this.laterOnly = false,
+    this.minutes,
   });
 
   final String? deckId;
   final String? areaId;
   final String? cardId;
+  final String? researchId;
   final FlashcardStudySessionMode mode;
+  final bool savedOnly;
+  final bool laterOnly;
+  final int? minutes;
 
   @override
   ConsumerState<StudySessionScreen> createState() => _StudySessionScreenState();
@@ -34,6 +42,8 @@ class _StudySessionScreenState extends ConsumerState<StudySessionScreen> {
   var _index = 0;
   var _revealed = false;
   DateTime? _shownAt;
+  DateTime? _sessionStartedAt;
+  var _timedOut = false;
   FlashcardReviewOutcome? _lastOutcome;
   FlashcardReviewLog? _lastPractice;
 
@@ -46,13 +56,23 @@ class _StudySessionScreenState extends ConsumerState<StudySessionScreen> {
     final decks = ref.watch(flashcardDecksProvider).asData?.value ?? const [];
     final cards = cardsAsync.asData?.value;
     final srs = srsAsync.asData?.value;
+    final areasReady = ref.watch(knowledgeAreasProvider).hasValue;
+    final placementsReady = ref.watch(knowledgePlacementsProvider).hasValue;
+    final linksReady = ref.watch(researchKnowledgeLinksProvider).hasValue;
 
     if (cards == null || srs == null) {
+      return const Center(child: CircularProgressIndicator());
+    }
+    if (widget.areaId != null && (!areasReady || !placementsReady)) {
+      return const Center(child: CircularProgressIndicator());
+    }
+    if (widget.researchId != null && !linksReady) {
       return const Center(child: CircularProgressIndicator());
     }
 
     if (_queue == null && cards.isNotEmpty) {
       _queue = _buildQueue(cards, srs, decks);
+      _sessionStartedAt ??= DateTime.now();
     } else if (_queue == null &&
         ref.watch(profileProvider).asData?.value != null) {
       _queue = const [];
@@ -60,6 +80,7 @@ class _StudySessionScreenState extends ConsumerState<StudySessionScreen> {
       return const Center(child: CircularProgressIndicator());
     }
     final queue = _queue!;
+    final remaining = (queue.length - _index).clamp(0, queue.length);
 
     return CallbackShortcuts(
       bindings: {
@@ -75,27 +96,34 @@ class _StudySessionScreenState extends ConsumerState<StudySessionScreen> {
       },
       child: Focus(
         autofocus: true,
-        child: Padding(
-          padding: const EdgeInsets.all(ColonySpacing.lg),
-          child: queue.isEmpty || _index >= queue.length
-              ? _Done(
-                  practice: _isPractice,
-                  onBack: () => context.go('/flashcards'),
-                )
-              : _StudyBody(
-                  item: queue[_index],
-                  current: _index + 1,
-                  total: queue.length,
-                  revealed: _revealed,
-                  canUndo: _lastOutcome != null || _lastPractice != null,
-                  practice: _isPractice,
-                  onReveal: _reveal,
-                  onRate: _rate,
-                  onUndo: _undo,
-                  onBury: _isPractice ? null : _bury,
-                  onSuspend: _suspend,
-                  onClose: () => context.go('/flashcards'),
-                ),
+        child: Semantics(
+          container: true,
+          identifier: 'flashcards.study',
+          label: AppStrings.flashcardsTitle,
+          child: Padding(
+            padding: const EdgeInsets.all(ColonySpacing.lg),
+            child: queue.isEmpty || _index >= queue.length || _timedOut
+                ? _Done(
+                    practice: _isPractice,
+                    timedOut: _timedOut,
+                    remaining: _timedOut ? remaining : 0,
+                    onBack: () => context.go('/flashcards'),
+                  )
+                : _StudyBody(
+                    item: queue[_index],
+                    current: _index + 1,
+                    total: queue.length,
+                    revealed: _revealed,
+                    canUndo: _lastOutcome != null || _lastPractice != null,
+                    practice: _isPractice,
+                    onReveal: _reveal,
+                    onRate: _rate,
+                    onUndo: _undo,
+                    onBury: _isPractice ? null : _bury,
+                    onSuspend: _suspend,
+                    onClose: () => context.go('/flashcards'),
+                  ),
+          ),
         ),
       ),
     );
@@ -110,24 +138,35 @@ class _StudySessionScreenState extends ConsumerState<StudySessionScreen> {
     if (widget.deckId != null) {
       filtered = filtered.where((c) => c.deckId.value == widget.deckId).toList();
     }
+    final areas = ref.read(knowledgeAreasProvider).asData?.value ?? const [];
+    final placements =
+        ref.read(knowledgePlacementsProvider).asData?.value ?? const [];
     if (widget.areaId != null) {
-      final areas = ref.read(knowledgeAreasProvider).asData?.value ?? const [];
-      final placements =
-          ref.read(knowledgePlacementsProvider).asData?.value ?? const [];
-      final ids = KnowledgeAreaPolicy.descendantIds(
+      filtered = StudyQueuePolicy.cardsInArea(
+        cards: filtered,
         rootId: EntityId(widget.areaId!),
         areas: areas,
         placements: placements,
+        decks: decks,
       );
-      filtered = filtered
-          .where((c) => c.areaId != null && ids.contains(c.areaId))
-          .toList();
+    }
+    if (widget.researchId != null) {
+      final links =
+          ref.read(researchKnowledgeLinksProvider).asData?.value ?? const [];
+      filtered = StudyQueuePolicy.cardsForResearch(
+        cards: filtered,
+        researchNodeId: EntityId(widget.researchId!),
+        decks: decks,
+        links: links,
+        areas: areas,
+        placements: placements,
+      );
     }
     if (widget.cardId != null) {
       filtered = filtered.where((c) => c.id.value == widget.cardId).toList();
     }
     if (_isPractice) {
-      if (widget.cardId == null) {
+      if (widget.savedOnly && widget.cardId == null) {
         filtered = filtered
             .where((c) => c.scheduleMode == FlashcardScheduleMode.unscheduled)
             .toList();
@@ -164,10 +203,15 @@ class _StudySessionScreenState extends ConsumerState<StudySessionScreen> {
           cards: entry.value,
           srsByCard: srs,
           now: now,
-          newRemaining: (deck?.newLimitPerDay ?? 20) - (newUsed[entry.key] ?? 0),
-          reviewRemaining:
-              (deck?.reviewLimitPerDay ?? 200) - (reviewUsed[entry.key] ?? 0),
+          newRemaining: widget.laterOnly
+              ? 0
+              : (deck?.newLimitPerDay ?? 20) - (newUsed[entry.key] ?? 0),
+          reviewRemaining: widget.laterOnly
+              ? 0
+              : (deck?.reviewLimitPerDay ?? 200) - (reviewUsed[entry.key] ?? 0),
           interleaveByArea: widget.deckId == null,
+          decks: decks,
+          learningOnly: widget.laterOnly,
         ),
       );
     }
@@ -176,10 +220,18 @@ class _StudySessionScreenState extends ConsumerState<StudySessionScreen> {
 
   void _reveal() {
     if (_revealed) return;
+    HapticFeedback.selectionClick();
     setState(() {
       _revealed = true;
       _shownAt ??= DateTime.now();
     });
+  }
+
+  bool _hitTimebox() {
+    final limit = widget.minutes;
+    final started = _sessionStartedAt;
+    if (limit == null || started == null) return false;
+    return DateTime.now().difference(started).inMinutes >= limit;
   }
 
   Future<void> _rate(FlashcardRating rating) async {
@@ -189,6 +241,7 @@ class _StudySessionScreenState extends ConsumerState<StudySessionScreen> {
     final duration = _shownAt == null
         ? null
         : DateTime.now().difference(_shownAt!).inMilliseconds;
+    HapticFeedback.lightImpact();
     if (_isPractice) {
       final log = await ref.read(flashcardControllerProvider.notifier).practice(
             card: item.card,
@@ -202,6 +255,7 @@ class _StudySessionScreenState extends ConsumerState<StudySessionScreen> {
         _index += 1;
         _revealed = false;
         _shownAt = null;
+        _timedOut = _hitTimebox();
       });
       return;
     }
@@ -222,6 +276,7 @@ class _StudySessionScreenState extends ConsumerState<StudySessionScreen> {
       _index += 1;
       _revealed = false;
       _shownAt = null;
+      _timedOut = _hitTimebox();
     });
   }
 
@@ -235,6 +290,7 @@ class _StudySessionScreenState extends ConsumerState<StudySessionScreen> {
         _lastPractice = null;
         _index = (_index - 1).clamp(0, _index);
         _revealed = false;
+        _timedOut = false;
       });
       return;
     }
@@ -246,6 +302,7 @@ class _StudySessionScreenState extends ConsumerState<StudySessionScreen> {
       _lastOutcome = null;
       _index = (_index - 1).clamp(0, _index);
       _revealed = false;
+      _timedOut = false;
     });
   }
 
@@ -369,49 +426,26 @@ class _StudyBody extends StatelessWidget {
         const SizedBox(height: ColonySpacing.lg),
         Expanded(
           child: GestureDetector(
-            onTap: revealed ? null : onReveal,
-            child: ColonySurface(
-              child: Padding(
-                padding: const EdgeInsets.all(ColonySpacing.xl),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      item.prompt,
-                      textAlign: TextAlign.center,
-                      style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                            height: 1.35,
-                            fontWeight: FontWeight.w500,
-                          ),
-                    ),
-                    const SizedBox(height: ColonySpacing.xl),
-                    if (!revealed)
-                      Text(
-                        AppStrings.flashcardsReveal,
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              color: ColonyColors.textMuted,
-                            ),
-                      )
-                    else ...[
-                      Text(
-                        item.answer,
-                        textAlign: TextAlign.center,
-                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                              color: ColonyColors.accentCyan,
-                              height: 1.4,
-                            ),
-                      ),
-                      if (item.extra != null) ...[
-                        const SizedBox(height: ColonySpacing.md),
-                        Text(
-                          item.extra!,
-                          textAlign: TextAlign.center,
-                          style: Theme.of(context).textTheme.bodySmall,
-                        ),
-                      ],
-                    ],
-                  ],
-                ),
+            onHorizontalDragEnd: revealed
+                ? (details) {
+                    final dx = details.primaryVelocity ?? 0;
+                    if (dx > 240) onRate(FlashcardRating.good);
+                    if (dx < -240) onRate(FlashcardRating.again);
+                  }
+                : null,
+            child: Semantics(
+              identifier: 'flashcards.reveal',
+              button: !revealed,
+              label: revealed
+                  ? item.answer
+                  : AppStrings.flashcardsReveal,
+              child: ColonyStudyCard(
+                prompt: item.prompt,
+                answer: item.answer,
+                extra: item.extra,
+                revealed: revealed,
+                hint: AppStrings.flashcardsReveal,
+                onReveal: onReveal,
               ),
             ),
           ),
@@ -426,24 +460,28 @@ class _StudyBody extends StatelessWidget {
                 label: AppStrings.flashcardsAgain,
                 interval: practice ? null : previews[FlashcardRating.again],
                 color: ColonyColors.statusCritical,
+                identifier: 'flashcards.rate.again',
                 onPressed: () => onRate(FlashcardRating.again),
               ),
               _RateButton(
                 label: AppStrings.flashcardsHard,
                 interval: practice ? null : previews[FlashcardRating.hard],
                 color: ColonyColors.statusAttention,
+                identifier: 'flashcards.rate.hard',
                 onPressed: () => onRate(FlashcardRating.hard),
               ),
               _RateButton(
                 label: AppStrings.flashcardsGood,
                 interval: practice ? null : previews[FlashcardRating.good],
                 color: ColonyColors.statusGood,
+                identifier: 'flashcards.rate.good',
                 onPressed: () => onRate(FlashcardRating.good),
               ),
               _RateButton(
                 label: AppStrings.flashcardsEasy,
                 interval: practice ? null : previews[FlashcardRating.easy],
                 color: ColonyColors.accentCyan,
+                identifier: 'flashcards.rate.easy',
                 onPressed: () => onRate(FlashcardRating.easy),
               ),
             ],
@@ -467,6 +505,7 @@ class _RateButton extends StatelessWidget {
     required this.label,
     required this.color,
     required this.onPressed,
+    required this.identifier,
     this.interval,
   });
 
@@ -474,28 +513,38 @@ class _RateButton extends StatelessWidget {
   final Duration? interval;
   final Color color;
   final VoidCallback onPressed;
+  final String identifier;
 
   @override
   Widget build(BuildContext context) {
     return Expanded(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 3),
-        child: FilledButton(
-          style: FilledButton.styleFrom(
-            backgroundColor: color.withValues(alpha: 0.18),
-            foregroundColor: color,
-            padding: const EdgeInsets.symmetric(vertical: 12),
-          ),
-          onPressed: onPressed,
-          child: Column(
-            children: [
-              Text(label, style: const TextStyle(fontWeight: FontWeight.w600)),
-              if (interval != null)
-                Text(
-                  Sm2Scheduler.formatInterval(interval!),
-                  style: Theme.of(context).textTheme.labelSmall,
-                ),
-            ],
+        child: Semantics(
+          identifier: identifier,
+          button: true,
+          label: label,
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(minHeight: 48),
+            child: FilledButton(
+              style: FilledButton.styleFrom(
+                backgroundColor: color.withValues(alpha: 0.18),
+                foregroundColor: color,
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                minimumSize: const Size(48, 48),
+              ),
+              onPressed: onPressed,
+              child: Column(
+                children: [
+                  Text(label, style: const TextStyle(fontWeight: FontWeight.w600)),
+                  if (interval != null)
+                    Text(
+                      Sm2Scheduler.formatInterval(interval!),
+                      style: Theme.of(context).textTheme.labelSmall,
+                    ),
+                ],
+              ),
+            ),
           ),
         ),
       ),
@@ -504,13 +553,30 @@ class _RateButton extends StatelessWidget {
 }
 
 class _Done extends StatelessWidget {
-  const _Done({required this.onBack, required this.practice});
+  const _Done({
+    required this.onBack,
+    required this.practice,
+    this.timedOut = false,
+    this.remaining = 0,
+  });
 
   final VoidCallback onBack;
   final bool practice;
+  final bool timedOut;
+  final int remaining;
 
   @override
   Widget build(BuildContext context) {
+    final title = timedOut
+        ? AppStrings.flashcardsTimeboxDone
+        : (practice
+            ? AppStrings.flashcardsPracticeDone
+            : AppStrings.flashcardsDone);
+    final hint = timedOut
+        ? AppStrings.flashcardsTimeboxDoneHint
+        : (practice
+            ? AppStrings.flashcardsPracticeDoneHint
+            : AppStrings.flashcardsDoneHint);
     return Center(
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -518,18 +584,20 @@ class _Done extends StatelessWidget {
           Icon(Icons.check_circle_outline, size: 48, color: ColonyColors.statusGood),
           const SizedBox(height: ColonySpacing.md),
           Text(
-            practice ? AppStrings.flashcardsPracticeDone : AppStrings.flashcardsDone,
+            title,
             style: Theme.of(context).textTheme.headlineSmall,
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: ColonySpacing.sm),
           Text(
-            practice
-                ? AppStrings.flashcardsPracticeDoneHint
-                : AppStrings.flashcardsDoneHint,
+            hint,
             textAlign: TextAlign.center,
             style: Theme.of(context).textTheme.bodyMedium,
           ),
+          if (timedOut && remaining > 0) ...[
+            const SizedBox(height: ColonySpacing.sm),
+            Text(AppStrings.flashcardsRemainingCount(remaining)),
+          ],
           const SizedBox(height: ColonySpacing.lg),
           FilledButton(
             onPressed: onBack,

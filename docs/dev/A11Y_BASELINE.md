@@ -2,7 +2,7 @@
 
 Checklist manual + asserts de Semantics em testes. Android-first; não substitui auditoria formal.
 
-**Última atualização:** Iter 91
+**Última atualização:** Flashcards evolution (hub, sessão, disclaimer)
 
 ## Princípios
 
@@ -18,6 +18,8 @@ Checklist manual + asserts de Semantics em testes. Android-first; não substitui
 | `/settings/integrations` | `integrations.screen`, `integrations.import_ics` | `integrations_screen_test` |
 | NarrativeDigest sheet | `narrative_digest.sheet`, `.disclaimer` | `narrative_digest_sheet_test` |
 | `/settings/sync` | `sync.screen`, `sync.process_local` | `sync_status_screen_test` |
+| `/flashcards` | `flashcards.hub`, `flashcards.hero`, `flashcards.disclaimer` | `flashcards_hub_test` |
+| `/flashcards/study` | `flashcards.study`, `flashcards.reveal`, `flashcards.rate.*` | `flashcards_study_test` |
 
 Widget tests assert texto visível + presença de `Semantics` (identifiers para TalkBack).
 
@@ -25,6 +27,7 @@ Widget tests assert texto visível + presença de `Semantics` (identifiers para 
 
 - [ ] TalkBack: Settings → Integrações — ouve título e estado do switch
 - [ ] TalkBack: Resumo da semana — ouve disclaimer de regras locais
+- [ ] TalkBack: Flashcards sessão — ouve revelar e as quatro notas
 - [ ] Contraste: texto disclaimer legível no tema dark do DS
 - [ ] Foco: botões Importar/Colar alcançáveis sem gesto obscuro
 

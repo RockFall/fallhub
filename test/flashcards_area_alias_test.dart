@@ -72,6 +72,67 @@ void main() {
 
     expect(find.text('Tropicalismo'), findsWidgets);
     expect(find.text(AppStrings.flashcardsAliasShortcut), findsOneWidget);
+    expect(find.text(AppStrings.flashcardsAlsoIn), findsNothing);
+
+    await _flush(tester);
+  });
+
+  testWidgets('Tropicalismo detail shows clickable extra parent', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(800, 1600);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    final now = DateTime.utc(2026, 8, 17, 12);
+    final db = ColonyDatabase.inMemory();
+    addTearDown(db.close);
+    final repos = ColonyRepositories.create(
+      db,
+      idGenerator: FixedIdGenerator([
+        for (var i = 1; i <= 80; i++) 'id-$i',
+      ]),
+      clock: () => now,
+    );
+    final profile = await repos.profiles.create(
+      colonyName: 'Test',
+      displayName: 'Caio',
+      timezone: 'UTC',
+      locale: 'pt_BR',
+      baseCurrency: 'BRL',
+    );
+    await repos.preferences.save(
+      AppPreferences.defaults().copyWith(onboardingCompleted: true),
+    );
+    await repos.flashcards.seedCatalog(
+      profileId: profile.id,
+      keys: const ['arts.music.tropicalismo'],
+    );
+    final trop = (await repos.flashcards.listAreas(profile.id)).firstWhere(
+      (a) => a.catalogKey == 'arts.music.tropicalismo',
+    );
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          databaseProvider.overrideWithValue(db),
+          clockProvider.overrideWithValue(() => now),
+        ],
+        child: MaterialApp(
+          theme: ColonyTheme.dark(),
+          home: Scaffold(
+            body: KnowledgeAreaScreen(areaId: trop.id.value),
+          ),
+        ),
+      ),
+    );
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 500));
+
+    expect(find.text(AppStrings.flashcardsAlsoIn), findsOneWidget);
+    expect(find.textContaining('História do Brasil'), findsWidgets);
+    expect(find.byTooltip(AppStrings.flashcardsRemovePlacement), findsOneWidget);
 
     await _flush(tester);
   });

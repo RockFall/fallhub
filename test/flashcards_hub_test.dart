@@ -8,6 +8,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:fallhub/app/localization/app_strings.dart';
 import 'package:fallhub/core/providers/app_providers.dart';
 import 'package:fallhub/features/flashcards/presentation/flashcards_hub_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 Future<void> _flushDisposeTimers(WidgetTester tester) async {
   await tester.pumpWidget(const SizedBox.shrink());
@@ -17,6 +18,10 @@ Future<void> _flushDisposeTimers(WidgetTester tester) async {
 }
 
 void main() {
+  setUp(() {
+    SharedPreferences.setMockInitialValues({});
+  });
+
   testWidgets('FlashcardsHubScreen empty state', (tester) async {
     tester.view.physicalSize = const Size(800, 1400);
     tester.view.devicePixelRatio = 1.0;
@@ -67,6 +72,8 @@ void main() {
     expect(find.text(AppStrings.flashcardsSeedMap), findsWidgets);
     expect(find.text(AppStrings.flashcardsNewDeck), findsOneWidget);
     expect(find.text(AppStrings.flashcardsDisclaimer), findsOneWidget);
+    expect(find.text(AppStrings.flashcardsNewCard), findsOneWidget);
+    expect(find.byType(Semantics), findsWidgets);
 
     await _flushDisposeTimers(tester);
   });
@@ -134,6 +141,12 @@ void main() {
 
     expect(find.text(AppStrings.flashcardsHeroStudyCount(1)), findsOneWidget);
     expect(find.text(AppStrings.flashcardsMinutes(1)), findsOneWidget);
+    expect(
+      find.text(
+        AppStrings.flashcardsSessionBuckets(learning: 0, review: 0, news: 1),
+      ),
+      findsOneWidget,
+    );
 
     await _flushDisposeTimers(tester);
   });

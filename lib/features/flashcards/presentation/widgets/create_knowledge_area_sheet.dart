@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../app/localization/app_strings.dart';
 import '../../application/flashcard_controllers.dart';
 import '../../application/flashcard_providers.dart';
+import 'knowledge_area_typeahead.dart';
 
 class CreateKnowledgeAreaSheet extends ConsumerStatefulWidget {
   const CreateKnowledgeAreaSheet({super.key, this.parentId, this.existing});
@@ -86,26 +87,14 @@ class _CreateKnowledgeAreaSheetState
             ),
           ),
           const SizedBox(height: ColonySpacing.sm),
-          DropdownButtonFormField<String>(
-            // ignore: deprecated_member_use
-            value: _parentId?.value,
-            decoration: const InputDecoration(
-              labelText: AppStrings.flashcardsParentArea,
-            ),
-            items: [
-              const DropdownMenuItem(
-                value: null,
-                child: Text(AppStrings.flashcardsNoParent),
-              ),
+          KnowledgeAreaTypeahead(
+            areas: [
               for (final area in areas)
-                DropdownMenuItem(
-                  value: area.id.value,
-                  child: Text(area.title),
-                ),
+                if (area.id != widget.existing?.id) area,
             ],
-            onChanged: (value) => setState(() {
-              _parentId = value == null ? null : EntityId(value);
-            }),
+            selectedId: _parentId,
+            label: AppStrings.flashcardsParentArea,
+            onSelected: (id) => setState(() => _parentId = id),
           ),
           const SizedBox(height: ColonySpacing.sm),
           TextField(

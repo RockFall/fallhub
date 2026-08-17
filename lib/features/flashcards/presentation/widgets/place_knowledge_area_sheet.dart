@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../app/localization/app_strings.dart';
 import '../../application/flashcard_controllers.dart';
 import '../../application/flashcard_providers.dart';
+import 'knowledge_area_typeahead.dart';
 
 class PlaceKnowledgeAreaSheet extends ConsumerStatefulWidget {
   const PlaceKnowledgeAreaSheet({super.key, required this.area});
@@ -67,31 +68,13 @@ class _PlaceKnowledgeAreaSheetState
                 ),
           ),
           const SizedBox(height: ColonySpacing.md),
-          DropdownButtonFormField<String>(
-            // ignore: deprecated_member_use
-            value: _parentId?.value,
-            decoration: const InputDecoration(
-              labelText: AppStrings.flashcardsPlacementParent,
-            ),
-            items: [
-              const DropdownMenuItem(
-                value: null,
-                child: Text(AppStrings.flashcardsNoParent),
-              ),
-              for (final area in candidates)
-                DropdownMenuItem(
-                  value: area.id.value,
-                  child: Text(
-                    KnowledgeAreaPolicy.pathLabel(
-                      areaId: area.id,
-                      areas: areas,
-                    ),
-                  ),
-                ),
-            ],
-            onChanged: (value) => setState(() {
-              _parentId = value == null ? null : EntityId(value);
-            }),
+          KnowledgeAreaTypeahead(
+            areas: candidates,
+            placements: placements,
+            selectedId: _parentId,
+            allowNone: false,
+            label: AppStrings.flashcardsPlacementParent,
+            onSelected: (id) => setState(() => _parentId = id),
           ),
           const SizedBox(height: ColonySpacing.lg),
           FilledButton(

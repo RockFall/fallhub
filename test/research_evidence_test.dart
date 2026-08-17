@@ -17,6 +17,15 @@ Future<void> _settleResearchDetail(WidgetTester tester) async {
   }
 }
 
+Future<void> _reveal(WidgetTester tester, Finder finder) async {
+  await tester.scrollUntilVisible(
+    finder,
+    400,
+    scrollable: find.byType(Scrollable).first,
+  );
+  await tester.pump();
+}
+
 Future<void> _tearDown(WidgetTester tester, ColonyDatabase db) async {
   await tester.pumpWidget(const SizedBox.shrink());
   await tester.pump();
@@ -90,6 +99,7 @@ void main() {
 
     expect(find.text(AppStrings.researchDemonstrateBlocked), findsOneWidget);
 
+    await _reveal(tester, find.text(AppStrings.researchAddEvidence));
     await tester.tap(find.text(AppStrings.researchAddEvidence));
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 500));
@@ -174,6 +184,7 @@ void main() {
     );
     await _settleResearchDetail(tester);
 
+    await _reveal(tester, find.text('Única evidência'));
     expect(find.text('Única evidência'), findsOneWidget);
     expect(find.byIcon(Icons.delete_outline), findsNothing);
 

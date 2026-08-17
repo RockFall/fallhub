@@ -88,6 +88,30 @@ void main() {
         'Humanidades · História · História do Brasil · Tropicalismo',
       ]),
     );
+    expect(
+      KnowledgeAreaPolicy.extraParentsOf(
+        areaId: trop.id,
+        areas: areas,
+        placements: placements,
+      ).map((a) => a.id),
+      [brazil.id],
+    );
+    expect(
+      KnowledgeAreaPolicy.hasSecondaryPlacement(
+        areaId: trop.id,
+        placements: placements,
+      ),
+      isTrue,
+    );
+    expect(
+      KnowledgeAreaPolicy.matchesQuery(
+        area: trop,
+        query: 'brasil',
+        areas: areas,
+        placements: placements,
+      ),
+      isTrue,
+    );
   });
 
   test('ODD sits under the autonomous-cars branch', () {
