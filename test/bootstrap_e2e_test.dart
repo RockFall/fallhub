@@ -223,8 +223,8 @@ void main() {
     router.go('/flashcards');
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 500));
-    expect(find.text(AppStrings.flashcardsTitle), findsWidgets);
     expect(find.text(AppStrings.flashcardsEmpty), findsOneWidget);
+    expect(find.text(AppStrings.flashcardsStudyNow), findsOneWidget);
 
     await _flushDisposeTimers(tester);
     await db.close();

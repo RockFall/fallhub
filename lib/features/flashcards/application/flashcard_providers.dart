@@ -3,52 +3,37 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/providers/app_providers.dart';
 
-final knowledgeAreasProvider = StreamProvider<List<KnowledgeArea>>((ref) async* {
-  final profile = await ref.watch(profileProvider.future);
-  if (profile == null) {
-    yield [];
-    return;
-  }
-  yield* ref.watch(repositoriesProvider).flashcards.watchAreas(profile.id);
+final knowledgeAreasProvider = StreamProvider<List<KnowledgeArea>>((ref) {
+  final profile = ref.watch(profileProvider).asData?.value;
+  if (profile == null) return const Stream.empty();
+  return ref.watch(repositoriesProvider).flashcards.watchAreas(profile.id);
 });
 
-final flashcardDecksProvider = StreamProvider<List<FlashcardDeck>>((ref) async* {
-  final profile = await ref.watch(profileProvider.future);
-  if (profile == null) {
-    yield [];
-    return;
-  }
-  yield* ref.watch(repositoriesProvider).flashcards.watchDecks(profile.id);
+final flashcardDecksProvider = StreamProvider<List<FlashcardDeck>>((ref) {
+  final profile = ref.watch(profileProvider).asData?.value;
+  if (profile == null) return const Stream.empty();
+  return ref.watch(repositoriesProvider).flashcards.watchDecks(profile.id);
 });
 
-final flashcardsProvider = StreamProvider<List<Flashcard>>((ref) async* {
-  final profile = await ref.watch(profileProvider.future);
-  if (profile == null) {
-    yield [];
-    return;
-  }
-  yield* ref.watch(repositoriesProvider).flashcards.watchCards(profile.id);
+final flashcardsProvider = StreamProvider<List<Flashcard>>((ref) {
+  final profile = ref.watch(profileProvider).asData?.value;
+  if (profile == null) return const Stream.empty();
+  return ref.watch(repositoriesProvider).flashcards.watchCards(profile.id);
 });
 
 final flashcardSrsProvider =
-    StreamProvider<Map<EntityId, FlashcardSrsState>>((ref) async* {
-  final profile = await ref.watch(profileProvider.future);
-  if (profile == null) {
-    yield {};
-    return;
-  }
-  yield* ref.watch(repositoriesProvider).flashcards.watchSrs(profile.id).map(
+    StreamProvider<Map<EntityId, FlashcardSrsState>>((ref) {
+  final profile = ref.watch(profileProvider).asData?.value;
+  if (profile == null) return const Stream.empty();
+  return ref.watch(repositoriesProvider).flashcards.watchSrs(profile.id).map(
         (list) => {for (final srs in list) srs.cardId: srs},
       );
 });
 
-final flashcardLogsProvider = StreamProvider<List<FlashcardReviewLog>>((ref) async* {
-  final profile = await ref.watch(profileProvider.future);
-  if (profile == null) {
-    yield [];
-    return;
-  }
-  yield* ref.watch(repositoriesProvider).flashcards.watchLogs(profile.id);
+final flashcardLogsProvider = StreamProvider<List<FlashcardReviewLog>>((ref) {
+  final profile = ref.watch(profileProvider).asData?.value;
+  if (profile == null) return const Stream.empty();
+  return ref.watch(repositoriesProvider).flashcards.watchLogs(profile.id);
 });
 
 final knowledgeForestProvider = Provider<List<KnowledgeAreaNode>>((ref) {

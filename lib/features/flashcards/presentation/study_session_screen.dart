@@ -29,15 +29,24 @@ class _StudySessionScreenState extends ConsumerState<StudySessionScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final cards = ref.watch(flashcardsProvider).asData?.value;
-    final srs = ref.watch(flashcardSrsProvider).asData?.value;
+    final cardsAsync = ref.watch(flashcardsProvider);
+    final srsAsync = ref.watch(flashcardSrsProvider);
     final decks = ref.watch(flashcardDecksProvider).asData?.value ?? const [];
+    final cards = cardsAsync.asData?.value;
+    final srs = srsAsync.asData?.value;
 
     if (cards == null || srs == null) {
       return const Center(child: CircularProgressIndicator());
     }
 
-    _queue ??= _buildQueue(cards, srs, decks);
+    if (_queue == null && cards.isNotEmpty) {
+      _queue = _buildQueue(cards, srs, decks);
+    } else if (_queue == null &&
+        ref.watch(profileProvider).asData?.value != null) {
+      _queue = const [];
+    } else if (_queue == null) {
+      return const Center(child: CircularProgressIndicator());
+    }
     final queue = _queue!;
 
     return CallbackShortcuts(

@@ -4,7 +4,6 @@ import 'package:colony_domain/colony_domain.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:go_router/go_router.dart';
 
 import 'package:fallhub/app/localization/app_strings.dart';
 import 'package:fallhub/core/providers/app_providers.dart';
@@ -51,42 +50,41 @@ void main() {
 
     await tester.pumpWidget(
       ProviderScope(
-        overrides: [databaseProvider.overrideWithValue(db)],
-        child: MaterialApp.router(
+        overrides: [
+          databaseProvider.overrideWithValue(db),
+          clockProvider.overrideWithValue(() => DateTime.utc(2026, 8, 17, 12)),
+        ],
+        child: MaterialApp(
           theme: ColonyTheme.dark(),
-          routerConfig: GoRouter(
-            initialLocation: '/flashcards/study',
-            routes: [
-              GoRoute(
-                path: '/flashcards',
-                builder: (_, __) => const Scaffold(body: Text('hub')),
-              ),
-              GoRoute(
-                path: '/flashcards/study',
-                builder: (_, __) => const Scaffold(body: StudySessionScreen()),
-              ),
-            ],
-          ),
+          home: const Scaffold(body: StudySessionScreen()),
         ),
       ),
     );
-    await tester.pumpAndSettle();
+    await tester.pump();
+    for (var i = 0; i < 20; i++) {
+      await tester.pump(const Duration(milliseconds: 50));
+      if (find.text('Capital da França').evaluate().isNotEmpty) break;
+    }
 
     expect(find.text('Capital da França'), findsOneWidget);
     expect(find.text(AppStrings.flashcardsReveal), findsOneWidget);
     expect(find.text('Paris'), findsNothing);
 
     await tester.tap(find.text('Capital da França'));
-    await tester.pumpAndSettle();
+    await tester.pump();
 
     expect(find.text('Paris'), findsOneWidget);
     expect(find.text(AppStrings.flashcardsGood), findsOneWidget);
 
     await tester.tap(find.text(AppStrings.flashcardsGood));
-    await tester.pumpAndSettle();
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 500));
 
     expect(find.text(AppStrings.flashcardsDone), findsOneWidget);
 
     await tester.pumpWidget(const SizedBox.shrink());
+    for (var i = 0; i < 80; i++) {
+      await tester.pump(const Duration(milliseconds: 1));
+    }
   });
 }

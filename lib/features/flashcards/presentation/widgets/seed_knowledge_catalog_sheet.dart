@@ -29,7 +29,7 @@ class _SeedKnowledgeCatalogSheetState
 
   @override
   Widget build(BuildContext context) {
-    final existing = {
+    final existing = <String>{
       for (final area
           in ref.watch(knowledgeAreasProvider).asData?.value ?? const [])
         if (area.catalogKey != null) area.catalogKey!,

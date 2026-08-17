@@ -403,7 +403,9 @@ abstract final class FlashcardPolicy {
     if (card.front.isEmpty) {
       throw FlashcardValidationException('A frente do cartão é obrigatória.');
     }
-    if (card.kind != FlashcardKind.freeRecall && card.back.isEmpty) {
+    if (card.kind != FlashcardKind.freeRecall &&
+        card.kind != FlashcardKind.cloze &&
+        card.back.isEmpty) {
       throw FlashcardValidationException('O verso do cartão é obrigatório.');
     }
     if (card.kind == FlashcardKind.cloze &&

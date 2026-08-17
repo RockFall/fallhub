@@ -21,7 +21,7 @@ class ResearchFlashcardDecksPanel extends ConsumerWidget {
       icon: Icons.style_outlined,
       child: decksAsync.when(
         loading: () => const LinearProgressIndicator(),
-        error: (_, __) => Text(AppStrings.errorGeneric),
+        error: (_, _) => Text(AppStrings.errorGeneric),
         data: (decks) {
           return Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,

@@ -90,7 +90,10 @@ class ColonySurface extends StatelessWidget {
       clipBehavior: clipBehavior,
       decoration: decoration,
       padding: padding,
-      child: child,
+      child: Material(
+        type: MaterialType.transparency,
+        child: child,
+      ),
     );
   }
 }

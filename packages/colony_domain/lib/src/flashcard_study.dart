@@ -2,7 +2,6 @@ import 'package:equatable/equatable.dart';
 
 import 'flashcard.dart';
 import 'id_generator.dart';
-import 'knowledge_area.dart';
 
 class StudyCard extends Equatable {
   const StudyCard({

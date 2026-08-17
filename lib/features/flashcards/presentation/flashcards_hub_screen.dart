@@ -91,7 +91,7 @@ class FlashcardsHubScreen extends ConsumerWidget {
           ),
           decksAsync.when(
             loading: () => const LinearProgressIndicator(),
-            error: (_, __) => Text(AppStrings.errorGeneric),
+            error: (_, _) => Text(AppStrings.errorGeneric),
             data: (decks) {
               final visible = decks.where((d) => !d.isArchived).toList();
               final cards = cardsAsync.asData?.value ?? const [];
@@ -153,7 +153,7 @@ class FlashcardsHubScreen extends ConsumerWidget {
             ),
             cardsAsync.when(
               loading: () => const SizedBox.shrink(),
-              error: (_, __) => const SizedBox.shrink(),
+              error: (_, _) => const SizedBox.shrink(),
               data: (cards) {
                 final matches =
                     cards.where((c) => FlashcardSearch.matches(c, query)).toList();
