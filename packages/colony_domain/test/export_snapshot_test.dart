@@ -1111,14 +1111,22 @@ void main() {
     expect(snapshot.tripInventoryLinks.first.inventoryItemId.value, 'inv-1');
   });
 
-  test('rejects unsupported version 32', () {
+  test('parses export version 32 with empty flashcard tags', () {
     final json = Map<String, dynamic>.from(baseJson)..['version'] = 32;
+    final snapshot = ExportSnapshot.fromJson(json);
+    expect(snapshot.version, 32);
+    expect(snapshot.flashcardTags, isEmpty);
+    expect(snapshot.flashcardTagLinks, isEmpty);
+  });
+
+  test('rejects unsupported version 33', () {
+    final json = Map<String, dynamic>.from(baseJson)..['version'] = 33;
 
     expect(
       () => ExportSnapshot.fromJson(json),
       throwsA(
         predicate<ExportSnapshotException>(
-          (e) => e.message.contains('32'),
+          (e) => e.message.contains('33'),
         ),
       ),
     );

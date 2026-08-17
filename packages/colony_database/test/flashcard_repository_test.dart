@@ -305,7 +305,7 @@ void main() {
 
     final listed = await repos.flashcards.listCards(created.id);
     final tagged = listed.firstWhere((c) => c.id == cards.single.id);
-    expect(tagged.tags, containsAll(['Harmonia', 'Jazz']));
+    expect(tagged.tags, containsAll(['harmonia', 'jazz']));
 
     final links = await repos.flashcards.listTagLinks(created.id);
     final hits = FlashcardTagPolicy.cardsWithTag(

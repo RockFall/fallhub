@@ -1,4 +1,3 @@
-import 'package:colony_design_system/colony_design_system.dart';
 import 'package:colony_domain/colony_domain.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
