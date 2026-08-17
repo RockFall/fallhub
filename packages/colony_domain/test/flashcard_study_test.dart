@@ -303,6 +303,47 @@ void main() {
       ),
       isFalse,
     );
+    expect(
+      FlashcardAreaPolicy.pathLabelForCard(
+        card: orphan,
+        areas: [music, theory],
+        deck: deckEntity,
+      ),
+      'Música',
+    );
+    expect(
+      FlashcardAreaPolicy.pathLabelForCard(
+        card: card('leaf', area: theory.id),
+        areas: [music, theory],
+        deck: deckEntity,
+      ),
+      'Música · Teoria',
+    );
+  });
+
+  test('google search uses the question and unwraps cloze', () {
+    final basic = card('q');
+    expect(
+      FlashcardGoogleSearch.questionText(basic),
+      'Q q',
+    );
+    expect(
+      FlashcardGoogleSearch.uriFor(basic).toString(),
+      'https://www.google.com/search?q=Q+q',
+    );
+    final cloze = Flashcard.create(
+      id: EntityId('cloze'),
+      profileId: profile,
+      deckId: deck,
+      kind: FlashcardKind.cloze,
+      front: 'The capital of {{c1::France}} is Paris',
+      back: '',
+      createdAt: now,
+    );
+    expect(
+      FlashcardGoogleSearch.questionText(cloze),
+      'The capital of France is Paris',
+    );
   });
 
   test('today digest caps the session and separates later / unscheduled', () {

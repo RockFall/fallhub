@@ -11,7 +11,9 @@ class ColonyStudyCard extends StatelessWidget {
     required this.revealed,
     this.answer,
     this.extra,
+    this.eyebrow,
     this.hint,
+    this.revealedFooter,
     this.onReveal,
   });
 
@@ -19,63 +21,90 @@ class ColonyStudyCard extends StatelessWidget {
   final bool revealed;
   final String? answer;
   final String? extra;
+  final String? eyebrow;
   final String? hint;
+  final Widget? revealedFooter;
   final VoidCallback? onReveal;
 
   @override
   Widget build(BuildContext context) {
     final text = Theme.of(context).textTheme;
+    final path = eyebrow?.trim() ?? '';
     return GestureDetector(
       onTap: revealed ? null : onReveal,
       child: ColonySurface(
         child: Padding(
           padding: const EdgeInsets.all(ColonySpacing.xl),
-          child: SingleChildScrollView(
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(minHeight: 160),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    prompt,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              if (path.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: ColonySpacing.md),
+                  child: Text(
+                    path,
                     textAlign: TextAlign.center,
-                    style: text.headlineSmall?.copyWith(
-                      height: 1.35,
-                      fontWeight: FontWeight.w500,
-                      fontSize: 28,
+                    style: text.labelLarge?.copyWith(
+                      color: ColonyColors.textMuted,
+                      letterSpacing: 0.2,
+                      height: 1.3,
                     ),
                   ),
-                  const SizedBox(height: ColonySpacing.xl),
-                  if (!revealed)
-                    Text(
-                      hint ?? '',
-                      style: text.bodyMedium?.copyWith(
-                        color: ColonyColors.textMuted,
-                      ),
-                    )
-                  else ...[
-                    if (answer != null && answer!.isNotEmpty)
-                      Text(
-                        answer!,
-                        textAlign: TextAlign.center,
-                        style: text.titleLarge?.copyWith(
-                          color: ColonyColors.accentCyan,
-                          height: 1.4,
-                          fontSize: 22,
+                ),
+              Expanded(
+                child: SingleChildScrollView(
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(minHeight: 160),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          prompt,
+                          textAlign: TextAlign.center,
+                          style: text.headlineSmall?.copyWith(
+                            height: 1.35,
+                            fontWeight: FontWeight.w500,
+                            fontSize: 28,
+                          ),
                         ),
-                      ),
-                    if (extra != null && extra!.isNotEmpty) ...[
-                      const SizedBox(height: ColonySpacing.md),
-                      Text(
-                        extra!,
-                        textAlign: TextAlign.center,
-                        style: text.bodySmall,
-                      ),
-                    ],
-                  ],
-                ],
+                        const SizedBox(height: ColonySpacing.xl),
+                        if (!revealed)
+                          Text(
+                            hint ?? '',
+                            style: text.bodyMedium?.copyWith(
+                              color: ColonyColors.textMuted,
+                            ),
+                          )
+                        else ...[
+                          if (answer != null && answer!.isNotEmpty)
+                            Text(
+                              answer!,
+                              textAlign: TextAlign.center,
+                              style: text.titleLarge?.copyWith(
+                                color: ColonyColors.accentCyan,
+                                height: 1.4,
+                                fontSize: 22,
+                              ),
+                            ),
+                          if (extra != null && extra!.isNotEmpty) ...[
+                            const SizedBox(height: ColonySpacing.md),
+                            Text(
+                              extra!,
+                              textAlign: TextAlign.center,
+                              style: text.bodySmall,
+                            ),
+                          ],
+                          if (revealedFooter != null) ...[
+                            const SizedBox(height: ColonySpacing.lg),
+                            revealedFooter!,
+                          ],
+                        ],
+                      ],
+                    ),
+                  ),
+                ),
               ),
-            ),
+            ],
           ),
         ),
       ),

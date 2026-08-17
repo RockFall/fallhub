@@ -686,6 +686,7 @@ abstract final class AppStrings {
       'Use {{c1::resposta}} para lacunas. Cada cN vira um cartão.';
   static const flashcardsNotFound = 'Não encontrado.';
   static const flashcardsReveal = 'Toque para revelar';
+  static const flashcardsSearchQuestion = 'Pesquisar pergunta';
   static const flashcardsAgain = 'De novo';
   static const flashcardsHard = 'Difícil';
   static const flashcardsGood = 'Bom';

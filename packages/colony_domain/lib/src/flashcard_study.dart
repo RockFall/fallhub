@@ -118,6 +118,18 @@ abstract final class FlashcardAreaPolicy {
     return deck?.areaId ?? decksById[card.deckId]?.areaId;
   }
 
+  static String? pathLabelForCard({
+    required Flashcard card,
+    required List<KnowledgeArea> areas,
+    FlashcardDeck? deck,
+    Map<EntityId, FlashcardDeck> decksById = const {},
+  }) {
+    final areaId = effectiveAreaId(card, deck: deck, decksById: decksById);
+    if (areaId == null) return null;
+    final label = KnowledgeAreaPolicy.pathLabel(areaId: areaId, areas: areas);
+    return label.trim().isEmpty ? null : label;
+  }
+
   static bool isVisibleInArea({
     required Flashcard card,
     required EntityId rootId,
@@ -680,5 +692,26 @@ abstract final class FlashcardSearch {
     if (card.back.toLowerCase().contains(q)) return true;
     if ((card.extra ?? '').toLowerCase().contains(q)) return true;
     return card.tags.any((tag) => tag.contains(q));
+  }
+}
+
+/// Builds a Google search for the card's question (opens in the browser).
+abstract final class FlashcardGoogleSearch {
+  static String questionText(Flashcard card, {String? prompt}) {
+    if (card.kind == FlashcardKind.cloze) {
+      return ClozeRenderer.answer(card.front).trim();
+    }
+    final text = (prompt ?? card.front).trim();
+    return text;
+  }
+
+  static Uri uriFor(Flashcard card, {String? prompt}) {
+    return uriForQuestion(questionText(card, prompt: prompt));
+  }
+
+  static Uri uriForQuestion(String question) {
+    return Uri.https('www.google.com', '/search', {
+      'q': question.trim(),
+    });
   }
 }

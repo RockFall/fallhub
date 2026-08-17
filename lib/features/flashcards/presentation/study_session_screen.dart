@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../app/localization/app_strings.dart';
 import '../../../core/providers/app_providers.dart';
@@ -54,6 +55,7 @@ class _StudySessionScreenState extends ConsumerState<StudySessionScreen> {
     final cardsAsync = ref.watch(flashcardsProvider);
     final srsAsync = ref.watch(flashcardSrsProvider);
     final decks = ref.watch(flashcardDecksProvider).asData?.value ?? const [];
+    final areas = ref.watch(knowledgeAreasProvider).asData?.value ?? const [];
     final cards = cardsAsync.asData?.value;
     final srs = srsAsync.asData?.value;
     final areasReady = ref.watch(knowledgeAreasProvider).hasValue;
@@ -111,6 +113,11 @@ class _StudySessionScreenState extends ConsumerState<StudySessionScreen> {
                   )
                 : _StudyBody(
                     item: queue[_index],
+                    areaLabel: FlashcardAreaPolicy.pathLabelForCard(
+                      card: queue[_index].card,
+                      areas: areas,
+                      decksById: {for (final deck in decks) deck.id: deck},
+                    ),
                     current: _index + 1,
                     total: queue.length,
                     revealed: _revealed,
@@ -121,6 +128,7 @@ class _StudySessionScreenState extends ConsumerState<StudySessionScreen> {
                     onUndo: _undo,
                     onBury: _isPractice ? null : _bury,
                     onSuspend: _suspend,
+                    onSearchQuestion: () => _searchQuestion(queue[_index]),
                     onClose: () => context.go('/flashcards'),
                   ),
           ),
@@ -225,6 +233,27 @@ class _StudySessionScreenState extends ConsumerState<StudySessionScreen> {
       _revealed = true;
       _shownAt ??= DateTime.now();
     });
+  }
+
+  Future<void> _searchQuestion(StudyCard item) async {
+    final uri = FlashcardGoogleSearch.uriFor(item.card, prompt: item.prompt);
+    if (uri.queryParameters['q']?.trim().isEmpty ?? true) return;
+    try {
+      final opened = await launchUrl(
+        uri,
+        mode: LaunchMode.externalApplication,
+      );
+      if (!opened && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text(AppStrings.errorGeneric)),
+        );
+      }
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text(AppStrings.errorGeneric)),
+      );
+    }
   }
 
   bool _hitTimebox() {
@@ -344,10 +373,13 @@ class _StudyBody extends StatelessWidget {
     required this.onUndo,
     required this.onBury,
     required this.onSuspend,
+    required this.onSearchQuestion,
     required this.onClose,
+    this.areaLabel,
   });
 
   final StudyCard item;
+  final String? areaLabel;
   final int current;
   final int total;
   final bool revealed;
@@ -358,6 +390,7 @@ class _StudyBody extends StatelessWidget {
   final VoidCallback onUndo;
   final VoidCallback? onBury;
   final VoidCallback onSuspend;
+  final VoidCallback onSearchQuestion;
   final VoidCallback onClose;
 
   @override
@@ -440,12 +473,23 @@ class _StudyBody extends StatelessWidget {
                   ? item.answer
                   : AppStrings.flashcardsReveal,
               child: ColonyStudyCard(
+                eyebrow: areaLabel,
                 prompt: item.prompt,
                 answer: item.answer,
                 extra: item.extra,
                 revealed: revealed,
                 hint: AppStrings.flashcardsReveal,
                 onReveal: onReveal,
+                revealedFooter: Semantics(
+                  identifier: 'flashcards.search_question',
+                  button: true,
+                  label: AppStrings.flashcardsSearchQuestion,
+                  child: TextButton.icon(
+                    onPressed: onSearchQuestion,
+                    icon: const Icon(Icons.search),
+                    label: const Text(AppStrings.flashcardsSearchQuestion),
+                  ),
+                ),
               ),
             ),
           ),

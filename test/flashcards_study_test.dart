@@ -37,13 +37,24 @@ void main() {
     await repos.preferences.save(
       AppPreferences.defaults().copyWith(onboardingCompleted: true),
     );
+    final languages = await repos.flashcards.createArea(
+      profileId: profile.id,
+      title: 'Linguagens',
+    );
+    final english = await repos.flashcards.createArea(
+      profileId: profile.id,
+      title: 'Inglês',
+      parentId: languages.id,
+    );
     final deck = await repos.flashcards.createDeck(
       profileId: profile.id,
       title: 'Básico',
+      areaId: english.id,
     );
     await repos.flashcards.createCard(
       profileId: profile.id,
       deckId: deck.id,
+      areaId: english.id,
       front: 'Capital da França',
       back: 'Paris',
     );
@@ -67,13 +78,16 @@ void main() {
     }
 
     expect(find.text('Capital da França'), findsOneWidget);
+    expect(find.text('Linguagens · Inglês'), findsOneWidget);
     expect(find.text(AppStrings.flashcardsReveal), findsOneWidget);
     expect(find.text('Paris'), findsNothing);
+    expect(find.text(AppStrings.flashcardsSearchQuestion), findsNothing);
 
     await tester.tap(find.text('Capital da França'));
     await tester.pump();
 
     expect(find.text('Paris'), findsOneWidget);
+    expect(find.text(AppStrings.flashcardsSearchQuestion), findsOneWidget);
     expect(find.text(AppStrings.flashcardsGood), findsOneWidget);
     expect(find.byType(Semantics), findsWidgets);
 
