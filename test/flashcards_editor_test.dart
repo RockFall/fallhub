@@ -7,26 +7,34 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'package:fallhub/app/localization/app_strings.dart';
 import 'package:fallhub/core/providers/app_providers.dart';
-import 'package:fallhub/features/flashcards/presentation/study_session_screen.dart';
+import 'package:fallhub/features/flashcards/presentation/widgets/flashcard_editor_sheet.dart';
+
+Future<void> _flush(WidgetTester tester) async {
+  await tester.pumpWidget(const SizedBox.shrink());
+  for (var i = 0; i < 80; i++) {
+    await tester.pump(const Duration(milliseconds: 1));
+  }
+}
 
 void main() {
-  testWidgets('StudySessionScreen reveals and rates a card', (tester) async {
+  testWidgets('capture sheet shows front, back and three intents first', (
+    tester,
+  ) async {
     tester.view.physicalSize = const Size(800, 1400);
     tester.view.devicePixelRatio = 1.0;
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
 
+    final now = DateTime.utc(2026, 8, 17, 12);
     final db = ColonyDatabase.inMemory();
     addTearDown(db.close);
-
     final repos = ColonyRepositories.create(
       db,
       idGenerator: FixedIdGenerator([
         for (var i = 1; i <= 40; i++) 'id-$i',
       ]),
-      clock: () => DateTime.utc(2026, 8, 17, 12),
+      clock: () => now,
     );
-
     final profile = await repos.profiles.create(
       colonyName: 'Test',
       displayName: 'Caio',
@@ -39,53 +47,34 @@ void main() {
     );
     final deck = await repos.flashcards.createDeck(
       profileId: profile.id,
-      title: 'Básico',
-    );
-    await repos.flashcards.createCard(
-      profileId: profile.id,
-      deckId: deck.id,
-      front: 'Capital da França',
-      back: 'Paris',
+      title: 'Caixa rápida',
     );
 
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
           databaseProvider.overrideWithValue(db),
-          clockProvider.overrideWithValue(() => DateTime.utc(2026, 8, 17, 12)),
+          clockProvider.overrideWithValue(() => now),
         ],
         child: MaterialApp(
           theme: ColonyTheme.dark(),
-          home: const Scaffold(body: StudySessionScreen()),
+          home: Scaffold(
+            body: FlashcardEditorSheet(deckId: deck.id),
+          ),
         ),
       ),
     );
     await tester.pump();
-    for (var i = 0; i < 20; i++) {
-      await tester.pump(const Duration(milliseconds: 50));
-      if (find.text('Capital da França').evaluate().isNotEmpty) break;
-    }
+    await tester.pump(const Duration(milliseconds: 300));
 
-    expect(find.text('Capital da França'), findsOneWidget);
-    expect(find.text(AppStrings.flashcardsReveal), findsOneWidget);
-    expect(find.text('Paris'), findsNothing);
+    expect(find.text(AppStrings.flashcardsNewCard), findsOneWidget);
+    expect(find.text(AppStrings.flashcardsFront), findsOneWidget);
+    expect(find.text(AppStrings.flashcardsBack), findsOneWidget);
+    expect(find.text(AppStrings.flashcardsSchedule), findsOneWidget);
+    expect(find.text(AppStrings.flashcardsSaveOnly), findsOneWidget);
+    expect(find.text(AppStrings.flashcardsPracticeNow), findsOneWidget);
+    expect(find.text(AppStrings.flashcardsAdvanced), findsOneWidget);
 
-    await tester.tap(find.text('Capital da França'));
-    await tester.pump();
-
-    expect(find.text('Paris'), findsOneWidget);
-    expect(find.text(AppStrings.flashcardsGood), findsOneWidget);
-    expect(find.byType(Semantics), findsWidgets);
-
-    await tester.tap(find.text(AppStrings.flashcardsGood));
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 500));
-
-    expect(find.text(AppStrings.flashcardsDone), findsOneWidget);
-
-    await tester.pumpWidget(const SizedBox.shrink());
-    for (var i = 0; i < 80; i++) {
-      await tester.pump(const Duration(milliseconds: 1));
-    }
+    await _flush(tester);
   });
 }

@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../app/localization/app_strings.dart';
+import '../../../core/providers/app_providers.dart';
 import '../application/flashcard_controllers.dart';
 import '../application/flashcard_providers.dart';
 import 'widgets/create_flashcard_deck_sheet.dart';
@@ -30,6 +31,7 @@ class _FlashcardDeckScreenState extends ConsumerState<FlashcardDeckScreen> {
         .where((c) => c.deckId.value == widget.deckId)
         .toList();
     final srs = ref.watch(flashcardSrsProvider).asData?.value ?? const {};
+    final now = ref.watch(clockProvider)();
 
     if (deck == null) {
       return Center(child: Text(AppStrings.flashcardsNotFound));
@@ -141,6 +143,7 @@ class _FlashcardDeckScreenState extends ConsumerState<FlashcardDeckScreen> {
               _CardTile(
                 card: card,
                 srs: srs[card.id],
+                now: now,
                 onOpen: () => FlashcardEditorSheet.show(
                   context,
                   deckId: deck.id,
@@ -159,11 +162,13 @@ class _CardTile extends ConsumerWidget {
   const _CardTile({
     required this.card,
     required this.srs,
+    required this.now,
     required this.onOpen,
   });
 
   final Flashcard card;
   final FlashcardSrsState? srs;
+  final DateTime now;
   final VoidCallback onOpen;
 
   @override
@@ -180,6 +185,11 @@ class _CardTile extends ConsumerWidget {
             AppStrings.flashcardsScheduled,
           if (card.suspended) AppStrings.flashcardsSuspended,
           if (srs?.leech == true) AppStrings.flashcardsLeechBadge,
+          if (card.scheduleMode == FlashcardScheduleMode.scheduled)
+            AppStrings.flashcardsNextDueIn(
+              StudyQueuePolicy.nextDuePhrase(srs, now) ??
+                  AppStrings.flashcardsNextDueNow,
+            ),
         ].join(' · '),
       ),
       onTap: onOpen,

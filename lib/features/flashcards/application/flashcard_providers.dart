@@ -1,5 +1,6 @@
 import 'package:colony_domain/colony_domain.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../core/providers/app_providers.dart';
 
@@ -104,6 +105,7 @@ final flashcardHeatProvider = Provider<Map<EntityId, KnowledgeAreaHeat>>((ref) {
     now: now,
     areas: areas,
     placements: placements,
+    decks: ref.watch(flashcardDecksProvider).asData?.value ?? const [],
   );
 });
 
@@ -142,3 +144,36 @@ final researchKnowledgeShelvesProvider =
       .flashcards
       .watchResearchLinksForNode(EntityId(nodeId));
 });
+
+const _disclaimerPrefsKey = 'flashcards.disclaimerDismissed';
+
+class FlashcardDisclaimerDismissed extends AsyncNotifier<bool> {
+  @override
+  Future<bool> build() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      return prefs.getBool(_disclaimerPrefsKey) ?? false;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  Future<void> dismiss() async {
+    state = const AsyncData(true);
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool(_disclaimerPrefsKey, true);
+    } catch (_) {}
+  }
+}
+
+final flashcardDisclaimerDismissedProvider =
+    AsyncNotifierProvider<FlashcardDisclaimerDismissed, bool>(
+  FlashcardDisclaimerDismissed.new,
+);
+
+FlashcardDeck? mostRecentFlashcardDeck(List<FlashcardDeck> decks) {
+  final visible = decks.where((d) => !d.isArchived).toList()
+    ..sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
+  return visible.firstOrNull;
+}

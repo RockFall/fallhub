@@ -5,6 +5,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../app/localization/app_strings.dart';
+import '../../flashcards/application/flashcard_providers.dart';
+import '../../flashcards/presentation/widgets/flashcard_due_hero.dart';
 import '../application/pawn_controllers.dart';
 import '../application/pawn_providers.dart';
 
@@ -67,6 +69,14 @@ class _DailyReviewScreenState extends ConsumerState<DailyReviewScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Text(AppStrings.dailyReviewIntro),
+              const SizedBox(height: ColonySpacing.lg),
+              FlashcardDueHero(
+                digest: ref.watch(flashcardTodayDigestProvider),
+                onStudy: () => context.go('/flashcards/study'),
+                onPractice: () =>
+                    context.go('/flashcards/study?mode=practice&saved=1'),
+                onLater: () => context.go('/flashcards/study?later=1'),
+              ),
               const SizedBox(height: ColonySpacing.lg),
               _field(AppStrings.reviewWhatHappened, _happened),
               _field(AppStrings.reviewCurrentState, _current),

@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../app/localization/app_strings.dart';
 import '../../application/flashcard_controllers.dart';
 import '../../application/flashcard_providers.dart';
+import 'knowledge_area_typeahead.dart';
 
 class FlashcardEditorSheet extends ConsumerStatefulWidget {
   const FlashcardEditorSheet({
@@ -49,6 +50,7 @@ class _FlashcardEditorSheetState extends ConsumerState<FlashcardEditorSheet> {
   late final TextEditingController _tags;
   late FlashcardKind _kind;
   var _bidirectional = false;
+  EntityId? _areaId;
 
   @override
   void initState() {
@@ -60,6 +62,7 @@ class _FlashcardEditorSheetState extends ConsumerState<FlashcardEditorSheet> {
     _tags = TextEditingController(text: existing?.tags.join(', ') ?? '');
     _kind = existing?.kind ?? FlashcardKind.basic;
     _bidirectional = existing?.kind == FlashcardKind.reverse;
+    _areaId = existing?.areaId ?? widget.areaId;
   }
 
   @override
@@ -75,6 +78,14 @@ class _FlashcardEditorSheetState extends ConsumerState<FlashcardEditorSheet> {
   Widget build(BuildContext context) {
     final decks = ref.watch(flashcardDecksProvider).asData?.value ?? const [];
     final deck = decks.where((d) => d.id == widget.deckId).firstOrNull;
+    final areas = ref.watch(knowledgeAreasProvider).asData?.value ?? const [];
+    final placements =
+        ref.watch(knowledgePlacementsProvider).asData?.value ?? const [];
+    final candidates = FlashcardAreaPolicy.specializationCandidates(
+      deckAreaId: deck?.areaId,
+      areas: areas,
+      placements: placements,
+    );
     return Padding(
       padding: EdgeInsets.fromLTRB(
         ColonySpacing.lg,
@@ -103,39 +114,40 @@ class _FlashcardEditorSheetState extends ConsumerState<FlashcardEditorSheet> {
               ),
             ],
             const SizedBox(height: ColonySpacing.md),
-            DropdownButtonFormField<FlashcardKind>(
-              // ignore: deprecated_member_use
-              value: _kind,
+            TextField(
+              controller: _front,
+              minLines: 2,
+              maxLines: 6,
+              autofocus: widget.existing == null,
               decoration: const InputDecoration(
-                labelText: AppStrings.flashcardsKind,
+                labelText: AppStrings.flashcardsFront,
               ),
-              items: [
-                for (final kind in FlashcardKind.values)
-                  DropdownMenuItem(
-                    value: kind,
-                    child: Text(AppStrings.flashcardKindLabel(kind)),
-                  ),
-              ],
-              onChanged: widget.existing == null
-                  ? (value) => setState(() => _kind = value ?? _kind)
-                  : null,
             ),
             if (_kind == FlashcardKind.cloze) ...[
-              const SizedBox(height: ColonySpacing.sm),
+              const SizedBox(height: ColonySpacing.xs),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: TextButton(
+                  onPressed: () {
+                    final sel = _front.selection;
+                    final text = _front.text;
+                    final start = sel.start;
+                    final end = sel.end;
+                    if (!sel.isValid || start == end) return;
+                    final next = ClozeRenderer.wrapSelection(text, start, end);
+                    _front.value = TextEditingValue(
+                      text: next,
+                      selection: TextSelection.collapsed(offset: next.length),
+                    );
+                  },
+                  child: const Text(AppStrings.flashcardsWrapCloze),
+                ),
+              ),
               Text(
                 AppStrings.flashcardsClozeHint,
                 style: Theme.of(context).textTheme.bodySmall,
               ),
             ],
-            const SizedBox(height: ColonySpacing.sm),
-            TextField(
-              controller: _front,
-              minLines: 2,
-              maxLines: 6,
-              decoration: const InputDecoration(
-                labelText: AppStrings.flashcardsFront,
-              ),
-            ),
             const SizedBox(height: ColonySpacing.sm),
             TextField(
               controller: _back,
@@ -145,31 +157,6 @@ class _FlashcardEditorSheetState extends ConsumerState<FlashcardEditorSheet> {
                 labelText: AppStrings.flashcardsBack,
               ),
             ),
-            const SizedBox(height: ColonySpacing.sm),
-            TextField(
-              controller: _extra,
-              decoration: const InputDecoration(
-                labelText: AppStrings.flashcardsExtra,
-              ),
-            ),
-            const SizedBox(height: ColonySpacing.sm),
-            TextField(
-              controller: _tags,
-              decoration: const InputDecoration(
-                labelText: AppStrings.flashcardsTags,
-              ),
-            ),
-            if (widget.existing == null &&
-                (_kind == FlashcardKind.basic ||
-                    _kind == FlashcardKind.reverse)) ...[
-              const SizedBox(height: ColonySpacing.sm),
-              SwitchListTile.adaptive(
-                contentPadding: EdgeInsets.zero,
-                title: const Text(AppStrings.flashcardsBidirectional),
-                value: _bidirectional || _kind == FlashcardKind.reverse,
-                onChanged: (value) => setState(() => _bidirectional = value),
-              ),
-            ],
             const SizedBox(height: ColonySpacing.md),
             Text(
               AppStrings.flashcardsCaptureHint,
@@ -202,15 +189,31 @@ class _FlashcardEditorSheetState extends ConsumerState<FlashcardEditorSheet> {
               OutlinedButton(
                 onPressed: () async {
                   final existing = widget.existing!;
+                  final updated = existing.copyWith(
+                    front: _front.text,
+                    back: _back.text,
+                    extra: _extra.text,
+                    tags: _tags.text
+                        .split(',')
+                        .map((t) => t.trim())
+                        .where((t) => t.isNotEmpty)
+                        .toList(),
+                    areaId: _areaId,
+                    clearArea: _areaId == null,
+                    clearExtra: _extra.text.trim().isEmpty,
+                  );
+                  await ref
+                      .read(flashcardControllerProvider.notifier)
+                      .updateCard(updated);
                   if (existing.scheduleMode ==
                       FlashcardScheduleMode.scheduled) {
                     await ref
                         .read(flashcardControllerProvider.notifier)
-                        .unscheduleCard(existing);
+                        .unscheduleCard(updated);
                   } else {
                     await ref
                         .read(flashcardControllerProvider.notifier)
-                        .scheduleCard(existing);
+                        .scheduleCard(updated);
                   }
                   if (context.mounted) Navigator.of(context).pop();
                 },
@@ -222,6 +225,64 @@ class _FlashcardEditorSheetState extends ConsumerState<FlashcardEditorSheet> {
                 ),
               ),
             ],
+            const SizedBox(height: ColonySpacing.md),
+            Theme(
+              data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+              child: ExpansionTile(
+                tilePadding: EdgeInsets.zero,
+                title: const Text(AppStrings.flashcardsAdvanced),
+                children: [
+                  DropdownButtonFormField<FlashcardKind>(
+                    // ignore: deprecated_member_use
+                    value: _kind,
+                    decoration: const InputDecoration(
+                      labelText: AppStrings.flashcardsKind,
+                    ),
+                    items: [
+                      for (final kind in FlashcardKind.values)
+                        DropdownMenuItem(
+                          value: kind,
+                          child: Text(AppStrings.flashcardKindLabel(kind)),
+                        ),
+                    ],
+                    onChanged: widget.existing == null
+                        ? (value) => setState(() => _kind = value ?? _kind)
+                        : null,
+                  ),
+                  const SizedBox(height: ColonySpacing.sm),
+                  KnowledgeAreaTypeahead(
+                    areas: candidates,
+                    placements: placements,
+                    selectedId: _areaId,
+                    onSelected: (id) => setState(() => _areaId = id),
+                  ),
+                  const SizedBox(height: ColonySpacing.sm),
+                  TextField(
+                    controller: _extra,
+                    decoration: const InputDecoration(
+                      labelText: AppStrings.flashcardsExtra,
+                    ),
+                  ),
+                  const SizedBox(height: ColonySpacing.sm),
+                  TextField(
+                    controller: _tags,
+                    decoration: const InputDecoration(
+                      labelText: AppStrings.flashcardsTags,
+                    ),
+                  ),
+                  if (widget.existing == null &&
+                      (_kind == FlashcardKind.basic ||
+                          _kind == FlashcardKind.reverse))
+                    SwitchListTile.adaptive(
+                      contentPadding: EdgeInsets.zero,
+                      title: const Text(AppStrings.flashcardsBidirectional),
+                      value: _bidirectional || _kind == FlashcardKind.reverse,
+                      onChanged: (value) =>
+                          setState(() => _bidirectional = value),
+                    ),
+                ],
+              ),
+            ),
           ],
         ),
       ),
@@ -243,7 +304,7 @@ class _FlashcardEditorSheetState extends ConsumerState<FlashcardEditorSheet> {
         final created =
             await ref.read(flashcardControllerProvider.notifier).createCard(
                   deckId: widget.deckId,
-                  areaId: widget.areaId,
+                  areaId: _areaId,
                   front: _front.text,
                   back: _back.text,
                   kind: _kind,
@@ -268,6 +329,8 @@ class _FlashcardEditorSheetState extends ConsumerState<FlashcardEditorSheet> {
                 back: _back.text,
                 extra: _extra.text,
                 tags: tags,
+                areaId: _areaId,
+                clearArea: _areaId == null,
                 clearExtra: _extra.text.trim().isEmpty,
               ),
             );

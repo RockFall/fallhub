@@ -8,6 +8,8 @@ import '../../../app/localization/app_strings.dart';
 import '../../../core/providers/app_providers.dart';
 import '../../pawn/application/pawn_providers.dart';
 import '../../quests/application/quest_providers.dart';
+import '../../flashcards/application/flashcard_providers.dart';
+import '../../flashcards/presentation/widgets/flashcard_due_hero.dart';
 import '../../pawn/presentation/widgets/check_in_sheet.dart';
 
 class ColonyScreen extends ConsumerWidget {
@@ -107,6 +109,16 @@ class ColonyScreen extends ConsumerWidget {
               ),
             ],
           ),
+        ),
+        const SizedBox(height: ColonySpacing.lg),
+        FlashcardDueHero(
+          digest: ref.watch(flashcardTodayDigestProvider),
+          onStudy: () => context.go('/flashcards/study'),
+          onPractice: () =>
+              context.go('/flashcards/study?mode=practice&saved=1'),
+          onLater: () => context.go('/flashcards/study?later=1'),
+          onTimebox: (minutes) =>
+              context.go('/flashcards/study?minutes=$minutes'),
         ),
         const SizedBox(height: ColonySpacing.lg),
         _ActiveQuestsPanel(),

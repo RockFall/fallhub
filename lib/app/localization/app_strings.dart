@@ -644,7 +644,7 @@ abstract final class AppStrings {
   static const flashcardsTitle = 'Flashcards';
   static const flashcardsSubtitle =
       'Mapa de conhecimento e repetição espaçada — local, sem conta.';
-  static const flashcardsStudyNow = 'Estudar agora';
+  static const flashcardsStudyNow = 'Estudar (espaçado)';
   static const flashcardsStudyDeck = 'Estudar baralho';
   static const flashcardsStudyArea = 'Estudar área';
   static const flashcardsDue = 'A revisar';
@@ -730,8 +730,8 @@ abstract final class AppStrings {
   static const flashcardsUnscheduled = 'Guardados';
   static const flashcardsPractice = 'Praticar';
   static const flashcardsPracticeNow = 'Praticar agora';
-  static const flashcardsPracticeDeck = 'Praticar baralho';
-  static const flashcardsPracticeArea = 'Praticar área';
+  static const flashcardsPracticeDeck = 'Praticar (sem fila)';
+  static const flashcardsPracticeArea = 'Praticar (sem fila)';
   static const flashcardsPracticeSaved = 'Praticar guardados';
   static const flashcardsPracticeDone = 'Prática encerrada.';
   static const flashcardsPracticeDoneHint =
@@ -764,6 +764,41 @@ abstract final class AppStrings {
   static const flashcardsPlacementParent = 'Outra prateleira';
   static const flashcardsTodayDigestHelp =
       'O número é o que a sessão vai servir hoje, já com os limites do baralho.';
+  static const flashcardsStudySpaced = 'Estudar (espaçado)';
+  static const flashcardsPracticeNoQueue = 'Praticar (sem fila)';
+  static const flashcardsSessionBucketsHint = 'nesta sessão';
+  static const flashcardsTimebox = 'Limite de tempo';
+  static const flashcardsTimebox5 = '5 min';
+  static const flashcardsTimebox10 = '10 min';
+  static const flashcardsTimebox20 = '20 min';
+  static const flashcardsTimeboxDone = 'Tempo esgotado.';
+  static const flashcardsTimeboxDoneHint =
+      'A fila permanece. Volte quando quiser continuar.';
+  static const flashcardsQuickDeck = 'Caixa rápida';
+  static const flashcardsDismissDisclaimer = 'Entendi';
+  static const flashcardsFilterAll = 'Tudo';
+  static const flashcardsFilterDue = 'Com fila';
+  static const flashcardsFilterFragile = 'Frágil';
+  static const flashcardsHasBridge = 'Também em outras prateleiras';
+  static const flashcardsRemovePlacement = 'Remover desta prateleira';
+  static const flashcardsNewLeafHere = 'Nova folha aqui';
+  static const flashcardsAreaSearch = 'Buscar prateleira';
+  static const flashcardsAreaNone = 'Sem área';
+  static const flashcardsWrapCloze = 'Envolver seleção em lacuna';
+  static const flashcardsSeedAncestorsHint =
+      'Selecionar um ramo cria os ancestrais automaticamente.';
+  static const flashcardsNextDue = 'Próxima';
+  static const flashcardsNextDueNow = 'agora';
+  static const flashcardsStudyResearch = 'Estudar este foco';
+  static const flashcardsNewCardFromResearch = 'Novo cartão deste nó';
+  static const flashcardsSrsNotEvidence =
+      'Revisar cartões não demonstra o nó de pesquisa.';
+  static const flashcardsLearningToday = 'Aprendizado hoje';
+  static const flashcardsMapExpand = 'Expandir';
+  static const flashcardsMapCollapse = 'Recolher';
+  static const flashcardsCaptureArea = 'Prateleira';
+  static const flashcardsDueLaterAction = 'Revisar passos de hoje';
+  static const flashcardsRemaining = 'Restam nesta fila';
 
   static String flashcardsHeroStudyCount(int count) => count == 1
       ? '1 cartão agora'
@@ -772,6 +807,19 @@ abstract final class AppStrings {
   static String flashcardsMinutes(int minutes) => '~$minutes min';
 
   static String flashcardsProgress(int current, int total) => '$current/$total';
+
+  static String flashcardsSessionBuckets({
+    required int learning,
+    required int review,
+    required int news,
+  }) {
+    return '$learning aprendendo · $review revisar · $news novos nesta sessão';
+  }
+
+  static String flashcardsNextDueIn(String interval) => 'próxima: $interval';
+
+  static String flashcardsRemainingCount(int count) =>
+      count == 1 ? 'Resta 1 cartão' : 'Restam $count cartões';
 
   static String researchKnowledgeLinkLabel(ResearchKnowledgeLinkKind kind) =>
       switch (kind) {

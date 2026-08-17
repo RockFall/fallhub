@@ -197,17 +197,112 @@ void main() {
     );
   });
 
-  test('practice queue does not require due SRS and marks session mode', () {
-    final saved = card('p').copyWith(
+  test('practice queue includes scheduled cards and skips suspended', () {
+    final scheduled = card('s');
+    final saved = card('u').copyWith(
       scheduleMode: FlashcardScheduleMode.unscheduled,
     );
+    final frozen = card('x', suspended: true);
     final queue = StudyQueuePolicy.buildPracticeQueue(
-      cards: [saved],
+      cards: [scheduled, saved, frozen],
       srsByCard: const {},
-      limit: 5,
+      limit: 10,
     );
-    expect(queue, hasLength(1));
-    expect(queue.single.sessionMode, FlashcardStudySessionMode.practice);
+    expect(queue.map((c) => c.card.id.value), ['s', 'u']);
+    expect(queue.first.sessionMode, FlashcardStudySessionMode.practice);
+  });
+
+  test('heat counts a card whose area lives only on the deck', () {
+    final area = KnowledgeArea.create(
+      id: EntityId('area'),
+      profileId: profile,
+      title: 'Folha',
+      createdAt: now,
+    );
+    final deckEntity = FlashcardDeck.create(
+      id: deck,
+      profileId: profile,
+      title: 'Folha',
+      createdAt: now,
+      areaId: area.id,
+    );
+    final orphan = card('orphan');
+    final heat = StudyQueuePolicy.heatByArea(
+      cards: [orphan],
+      srsByCard: {
+        orphan.id: FlashcardSrsState.fresh(cardId: orphan.id, createdAt: now),
+      },
+      logs: const [],
+      now: now,
+      areas: [area],
+      decks: [deckEntity],
+    );
+    expect(heat[area.id]?.cardCount, 1);
+    expect(heat[area.id]?.dueCount, 1);
+  });
+
+  test('cloze wrapSelection inserts the next index', () {
+    expect(
+      ClozeRenderer.wrapSelection('A capital de França', 13, 19),
+      'A capital de {{c1::França}}',
+    );
+    expect(
+      ClozeRenderer.wrapSelection('A capital de {{c1::França}} é Paris', 30, 35),
+      'A capital de {{c1::França}} é {{c2::Paris}}',
+    );
+  });
+
+  test('effective area falls back to the deck and stays visible in ancestors', () {
+    final music = KnowledgeArea.create(
+      id: EntityId('music'),
+      profileId: profile,
+      title: 'Música',
+      createdAt: now,
+    );
+    final theory = KnowledgeArea.create(
+      id: EntityId('theory'),
+      profileId: profile,
+      parentId: music.id,
+      title: 'Teoria',
+      createdAt: now,
+    );
+    final deckEntity = FlashcardDeck.create(
+      id: deck,
+      profileId: profile,
+      title: 'Música',
+      createdAt: now,
+      areaId: music.id,
+    );
+    final orphan = card('orphan');
+    expect(
+      FlashcardAreaPolicy.effectiveAreaId(orphan, deck: deckEntity),
+      music.id,
+    );
+    expect(
+      FlashcardAreaPolicy.isVisibleInArea(
+        card: orphan,
+        rootId: music.id,
+        areas: [music, theory],
+        deck: deckEntity,
+      ),
+      isTrue,
+    );
+    expect(
+      FlashcardAreaPolicy.canSpecialize(
+        deckAreaId: music.id,
+        cardAreaId: theory.id,
+        areas: [music, theory],
+      ),
+      isTrue,
+    );
+    expect(
+      FlashcardAreaPolicy.canSpecialize(
+        deckAreaId: theory.id,
+        cardAreaId: music.id,
+        areas: [music, theory],
+      ),
+      isFalse,
+    );
   });
 
   test('today digest caps the session and separates later / unscheduled', () {
@@ -244,6 +339,8 @@ void main() {
     );
     expect(digest.dueNowTotal, 2);
     expect(digest.cappedForSession, 1);
+    expect(digest.sessionByBucket.newCount, 1);
+    expect(digest.sessionByBucket.learningCount, 0);
     expect(digest.limitDeferred, 1);
     expect(digest.dueLaterToday, 1);
     expect(digest.unscheduledCount, 1);
@@ -282,6 +379,75 @@ void main() {
         now: now,
       ),
       isEmpty,
+    );
+  });
+
+  test('Tropicalismo cards are visible from Music and from Brazil', () {
+    final music = KnowledgeArea.create(
+      id: EntityId('music'),
+      profileId: profile,
+      title: 'Música',
+      createdAt: now,
+    );
+    final trop = KnowledgeArea.create(
+      id: EntityId('trop'),
+      profileId: profile,
+      parentId: music.id,
+      title: 'Tropicalismo',
+      createdAt: now,
+    );
+    final brazil = KnowledgeArea.create(
+      id: EntityId('br'),
+      profileId: profile,
+      title: 'História do Brasil',
+      createdAt: now,
+    );
+    final areas = [music, trop, brazil];
+    final placements = [
+      KnowledgeAreaPlacement(
+        areaId: trop.id,
+        parentAreaId: brazil.id,
+        linkedAt: now,
+      ),
+    ];
+    final tropCard = card('trop', area: trop.id);
+    expect(
+      StudyQueuePolicy.cardsInArea(
+        cards: [tropCard],
+        rootId: music.id,
+        areas: areas,
+        placements: placements,
+      ),
+      [tropCard],
+    );
+    expect(
+      StudyQueuePolicy.cardsInArea(
+        cards: [tropCard],
+        rootId: brazil.id,
+        areas: areas,
+        placements: placements,
+      ),
+      [tropCard],
+    );
+  });
+
+  test('nextDuePhrase and forecast labels stay human', () {
+    expect(StudyQueuePolicy.nextDuePhrase(null, now), isNull);
+    expect(
+      StudyQueuePolicy.nextDuePhrase(
+        FlashcardSrsState.fresh(cardId: EntityId('n'), createdAt: now),
+        now,
+      ),
+      isNull,
+    );
+    expect(
+      StudyQueuePolicy.formatDueAt(now.add(const Duration(days: 3)), now),
+      '3 d',
+    );
+    expect(StudyQueuePolicy.formatDueAt(now, now), 'agora');
+    expect(
+      StudyQueuePolicy.forecastDayLabels(DateTime.utc(2026, 8, 17, 12)),
+      ['seg', 'ter', 'qua', 'qui', 'sex', 'sáb', 'dom'],
     );
   });
 

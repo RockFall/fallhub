@@ -5,135 +5,277 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../app/localization/app_strings.dart';
+import '../../../core/providers/app_providers.dart';
+import '../application/flashcard_controllers.dart';
 import '../application/flashcard_providers.dart';
 import 'widgets/create_flashcard_deck_sheet.dart';
 import 'widgets/create_knowledge_area_sheet.dart';
 import 'widgets/flashcard_due_hero.dart';
+import 'widgets/flashcard_editor_sheet.dart';
 import 'widgets/flashcards_disclaimer_banner.dart';
 import 'widgets/knowledge_map_view.dart';
 import 'widgets/seed_knowledge_catalog_sheet.dart';
 
-class FlashcardsHubScreen extends ConsumerWidget {
-  const FlashcardsHubScreen({super.key});
+class FlashcardsHubScreen extends ConsumerStatefulWidget {
+  const FlashcardsHubScreen({super.key, this.openCapture = false});
+
+  final bool openCapture;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<FlashcardsHubScreen> createState() =>
+      _FlashcardsHubScreenState();
+}
+
+class _FlashcardsHubScreenState extends ConsumerState<FlashcardsHubScreen> {
+  var _filter = KnowledgeMapFilter.all;
+  var _captureOpened = false;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.openCapture) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted || _captureOpened) return;
+        _captureOpened = true;
+        _capture();
+      });
+    }
+  }
+
+  Future<void> _capture() async {
+    final decks = ref.read(flashcardDecksProvider).asData?.value ?? const [];
+    var deck = mostRecentFlashcardDeck(decks);
+    deck ??= await ref.read(flashcardControllerProvider.notifier).createDeck(
+          title: AppStrings.flashcardsQuickDeck,
+        );
+    if (deck == null || !mounted) return;
+    await FlashcardEditorSheet.show(
+      context,
+      deckId: deck.id,
+      areaId: deck.areaId,
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final digest = ref.watch(flashcardTodayDigestProvider);
     final forest = ref.watch(knowledgeForestProvider);
     final heat = ref.watch(flashcardHeatProvider);
     final decksAsync = ref.watch(flashcardDecksProvider);
     final cardsAsync = ref.watch(flashcardsProvider);
+    final srs = ref.watch(flashcardSrsProvider).asData?.value ?? const {};
+    final now = ref.watch(clockProvider)();
     final areas = ref.watch(knowledgeAreasProvider).asData?.value ?? const [];
+    final placements =
+        ref.watch(knowledgePlacementsProvider).asData?.value ?? const [];
     final query = ref.watch(flashcardSearchQueryProvider);
     final forecast = ref.watch(flashcardForecastProvider);
     final searching = query.trim().isNotEmpty;
     final decks = decksAsync.asData?.value ?? const [];
     final visibleDecks = decks.where((d) => !d.isArchived).toList();
     final isEmpty = visibleDecks.isEmpty && forest.isEmpty;
+    final labels = StudyQueuePolicy.forecastDayLabels(now);
 
-    return Padding(
-      padding: const EdgeInsets.all(ColonySpacing.lg),
-      child: ListView(
-        children: [
-          Text(
-            AppStrings.flashcardsTitle,
-            style: Theme.of(context).textTheme.headlineMedium,
-          ),
-          const SizedBox(height: ColonySpacing.sm),
-          Text(
-            AppStrings.flashcardsSubtitle,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: ColonyColors.textMuted,
-                ),
-          ),
-          const SizedBox(height: ColonySpacing.md),
-          const FlashcardsDisclaimerBanner(),
-          const SizedBox(height: ColonySpacing.md),
-          FlashcardDueHero(
-            digest: digest,
-            onStudy: () => context.go('/flashcards/study'),
-            onPractice: () => context.go('/flashcards/study?mode=practice'),
-          ),
-          const SizedBox(height: ColonySpacing.md),
-          SearchBar(
-            hintText: AppStrings.flashcardsSearchHint,
-            leading: const Icon(Icons.search),
-            onChanged: ref.read(flashcardSearchQueryProvider.notifier).set,
-          ),
-          const SizedBox(height: ColonySpacing.lg),
-          if (searching)
-            _SearchResults(
-              query: query,
-              areas: areas,
-              decks: visibleDecks,
-              cards: cardsAsync.asData?.value ?? const [],
-            )
-          else if (isEmpty)
-            const _EmptyFlashcards()
-          else ...[
-            ColonyPanel(
-              title: AppStrings.flashcardsMapTitle,
-              icon: Icons.map_outlined,
-              actions: [
-                TextButton(
-                  onPressed: () => SeedKnowledgeCatalogSheet.show(context),
-                  child: const Text(AppStrings.flashcardsSeedMap),
-                ),
-                IconButton(
-                  tooltip: AppStrings.flashcardsNewArea,
-                  onPressed: () => CreateKnowledgeAreaSheet.show(context),
-                  icon: const Icon(Icons.add),
-                ),
-              ],
-              child: KnowledgeMapView(forest: forest, heat: heat),
-            ),
-            const SizedBox(height: ColonySpacing.md),
-            ColonyPanel(
-              title: AppStrings.flashcardsForecast,
-              icon: Icons.calendar_view_week_outlined,
-              child: _ForecastBar(values: forecast),
-            ),
-            const SizedBox(height: ColonySpacing.md),
-            ColonyPanel(
-              title: AppStrings.flashcardsDecksTitle,
-              icon: Icons.style_outlined,
-              actions: [
-                TextButton(
-                  onPressed: () => CreateFlashcardDeckSheet.show(context),
-                  child: const Text(AppStrings.flashcardsNewDeck),
-                ),
-              ],
-              child: decksAsync.when(
-                loading: () => const LinearProgressIndicator(),
-                error: (_, _) => Text(AppStrings.errorGeneric),
-                data: (_) {
-                  final cards = cardsAsync.asData?.value ?? const [];
-                  if (visibleDecks.isEmpty) {
-                    return Text(AppStrings.flashcardsEmpty);
-                  }
-                  return Column(
-                    children: [
-                      for (final deck in visibleDecks)
-                        ListTile(
-                          contentPadding: EdgeInsets.zero,
-                          title: Text(deck.title),
-                          subtitle: Text(
-                            '${cards.where((c) => c.deckId == deck.id).length} ${AppStrings.flashcardsCards.toLowerCase()}',
-                          ),
-                          trailing: const Icon(Icons.chevron_right),
-                          onTap: () =>
-                              context.go('/flashcards/decks/${deck.id.value}'),
-                        ),
-                    ],
-                  );
-                },
+    return Semantics(
+      container: true,
+      identifier: 'flashcards.hub',
+      label: AppStrings.flashcardsTitle,
+      child: Scaffold(
+        floatingActionButton: FloatingActionButton.extended(
+          onPressed: _capture,
+          icon: const Icon(Icons.add),
+          label: const Text(AppStrings.flashcardsNewCard),
+        ),
+        body: Padding(
+          padding: const EdgeInsets.all(ColonySpacing.lg),
+          child: ListView(
+            children: [
+              Text(
+                AppStrings.flashcardsTitle,
+                style: Theme.of(context).textTheme.headlineMedium,
               ),
-            ),
-          ],
-        ],
+              const SizedBox(height: ColonySpacing.sm),
+              Text(
+                AppStrings.flashcardsSubtitle,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: ColonyColors.textMuted,
+                    ),
+              ),
+              const SizedBox(height: ColonySpacing.md),
+              const FlashcardsDisclaimerBanner(),
+              const SizedBox(height: ColonySpacing.md),
+              FlashcardDueHero(
+                digest: digest,
+                onStudy: () => context.go('/flashcards/study'),
+                onPractice: () =>
+                    context.go('/flashcards/study?mode=practice&saved=1'),
+                onLater: () => context.go('/flashcards/study?later=1'),
+                onTimebox: (minutes) =>
+                    context.go('/flashcards/study?minutes=$minutes'),
+              ),
+              const SizedBox(height: ColonySpacing.md),
+              SearchBar(
+                hintText: AppStrings.flashcardsSearchHint,
+                leading: const Icon(Icons.search),
+                onChanged: ref.read(flashcardSearchQueryProvider.notifier).set,
+              ),
+              const SizedBox(height: ColonySpacing.lg),
+              if (searching)
+                _SearchResults(
+                  query: query,
+                  areas: areas,
+                  placements: placements,
+                  decks: visibleDecks,
+                  cards: cardsAsync.asData?.value ?? const [],
+                )
+              else if (isEmpty)
+                const _EmptyFlashcards()
+              else ...[
+                ColonyPanel(
+                  title: AppStrings.flashcardsMapTitle,
+                  icon: Icons.map_outlined,
+                  actions: [
+                    TextButton(
+                      onPressed: () => SeedKnowledgeCatalogSheet.show(context),
+                      child: const Text(AppStrings.flashcardsSeedMap),
+                    ),
+                    IconButton(
+                      tooltip: AppStrings.flashcardsNewArea,
+                      onPressed: () => CreateKnowledgeAreaSheet.show(context),
+                      icon: const Icon(Icons.add),
+                    ),
+                  ],
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Wrap(
+                        spacing: ColonySpacing.sm,
+                        children: [
+                          ChoiceChip(
+                            label: const Text(AppStrings.flashcardsFilterAll),
+                            selected: _filter == KnowledgeMapFilter.all,
+                            onSelected: (_) => setState(
+                              () => _filter = KnowledgeMapFilter.all,
+                            ),
+                          ),
+                          ChoiceChip(
+                            label: const Text(AppStrings.flashcardsFilterDue),
+                            selected: _filter == KnowledgeMapFilter.due,
+                            onSelected: (_) => setState(
+                              () => _filter = KnowledgeMapFilter.due,
+                            ),
+                          ),
+                          ChoiceChip(
+                            label:
+                                const Text(AppStrings.flashcardsFilterFragile),
+                            selected: _filter == KnowledgeMapFilter.fragile,
+                            onSelected: (_) => setState(
+                              () => _filter = KnowledgeMapFilter.fragile,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: ColonySpacing.sm),
+                      KnowledgeMapView(
+                        forest: forest,
+                        heat: heat,
+                        placements: placements,
+                        filter: _filter,
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: ColonySpacing.md),
+                ColonyPanel(
+                  title: AppStrings.flashcardsForecast,
+                  icon: Icons.calendar_view_week_outlined,
+                  child: _ForecastBar(values: forecast, labels: labels),
+                ),
+                const SizedBox(height: ColonySpacing.md),
+                ColonyPanel(
+                  title: AppStrings.flashcardsDecksTitle,
+                  icon: Icons.style_outlined,
+                  actions: [
+                    TextButton(
+                      onPressed: () => CreateFlashcardDeckSheet.show(context),
+                      child: const Text(AppStrings.flashcardsNewDeck),
+                    ),
+                  ],
+                  child: decksAsync.when(
+                    loading: () => const LinearProgressIndicator(),
+                    error: (_, _) => Text(AppStrings.errorGeneric),
+                    data: (_) {
+                      final cards = cardsAsync.asData?.value ?? const [];
+                      if (visibleDecks.isEmpty) {
+                        return Text(AppStrings.flashcardsEmpty);
+                      }
+                      return Column(
+                        children: [
+                          for (final deck in visibleDecks)
+                            ListTile(
+                              contentPadding: EdgeInsets.zero,
+                              title: Text(deck.title),
+                              subtitle: Text(
+                                _deckSubtitle(
+                                  deck: deck,
+                                  cards: cards,
+                                  srs: srs,
+                                  now: now,
+                                ),
+                              ),
+                              trailing: const Icon(Icons.chevron_right),
+                              onTap: () => context
+                                  .go('/flashcards/decks/${deck.id.value}'),
+                            ),
+                        ],
+                      );
+                    },
+                  ),
+                ),
+                const SizedBox(height: 72),
+              ],
+            ],
+          ),
+        ),
       ),
     );
   }
+}
+
+String _deckSubtitle({
+  required FlashcardDeck deck,
+  required List<Flashcard> cards,
+  required Map<EntityId, FlashcardSrsState> srs,
+  required DateTime now,
+}) {
+  final inDeck = cards.where((c) => c.deckId == deck.id).toList();
+  final count =
+      '${inDeck.length} ${AppStrings.flashcardsCards.toLowerCase()}';
+  DateTime? nextDue;
+  var hasLeech = false;
+  var saved = 0;
+  for (final card in inDeck) {
+    if (card.scheduleMode == FlashcardScheduleMode.unscheduled) {
+      saved += 1;
+      continue;
+    }
+    final state = srs[card.id];
+    if (state?.leech == true) hasLeech = true;
+    final due = state?.dueAt;
+    if (due != null && (nextDue == null || due.isBefore(nextDue))) {
+      nextDue = due;
+    }
+  }
+  final extra = <String>[
+    if (nextDue != null)
+      AppStrings.flashcardsNextDueIn(
+        StudyQueuePolicy.formatDueAt(nextDue, now),
+      ),
+    if (saved > 0) AppStrings.flashcardsUnscheduled,
+    if (hasLeech) AppStrings.flashcardsLeechBadge,
+  ];
+  if (extra.isEmpty) return count;
+  return '$count · ${extra.join(' · ')}';
 }
 
 class _EmptyFlashcards extends StatelessWidget {
@@ -180,23 +322,31 @@ class _SearchResults extends StatelessWidget {
   const _SearchResults({
     required this.query,
     required this.areas,
+    required this.placements,
     required this.decks,
     required this.cards,
   });
 
   final String query;
   final List<KnowledgeArea> areas;
+  final List<KnowledgeAreaPlacement> placements;
   final List<FlashcardDeck> decks;
   final List<Flashcard> cards;
 
   @override
   Widget build(BuildContext context) {
-    final q = query.trim().toLowerCase();
     final areaHits = areas
-        .where((a) => a.title.toLowerCase().contains(q))
+        .where(
+          (a) => KnowledgeAreaPolicy.matchesQuery(
+            area: a,
+            query: query,
+            areas: areas,
+            placements: placements,
+          ),
+        )
         .toList();
     final deckHits = decks
-        .where((d) => d.title.toLowerCase().contains(q))
+        .where((d) => d.title.toLowerCase().contains(query.trim().toLowerCase()))
         .toList();
     final cardHits =
         cards.where((c) => FlashcardSearch.matches(c, query)).take(20).toList();
@@ -263,8 +413,9 @@ class _SearchResults extends StatelessWidget {
                     contentPadding: EdgeInsets.zero,
                     title: Text(card.front, maxLines: 2),
                     subtitle: Text(AppStrings.flashcardKindLabel(card.kind)),
-                    onTap: () =>
-                        context.go('/flashcards/decks/${card.deckId.value}'),
+                    onTap: () => context.go(
+                      '/flashcards/study?mode=practice&cardId=${card.id.value}',
+                    ),
                   ),
               ],
             ),
@@ -276,9 +427,10 @@ class _SearchResults extends StatelessWidget {
 }
 
 class _ForecastBar extends StatelessWidget {
-  const _ForecastBar({required this.values});
+  const _ForecastBar({required this.values, required this.labels});
 
   final List<int> values;
+  final List<String> labels;
 
   @override
   Widget build(BuildContext context) {
@@ -286,23 +438,30 @@ class _ForecastBar extends StatelessWidget {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
-        for (final value in values)
+        for (var i = 0; i < values.length; i++)
           Expanded(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 2),
               child: Column(
                 children: [
                   Text(
-                    '$value',
+                    '${values[i]}',
                     style: Theme.of(context).textTheme.labelSmall,
                   ),
                   const SizedBox(height: 4),
                   Container(
-                    height: 8 + (36 * value / max),
+                    height: 8 + (36 * values[i] / max),
                     decoration: BoxDecoration(
                       color: ColonyColors.accentCyan.withValues(alpha: 0.7),
                       borderRadius: BorderRadius.circular(ColonyRadii.lg),
                     ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    i < labels.length ? labels[i] : '',
+                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                          color: ColonyColors.textMuted,
+                        ),
                   ),
                 ],
               ),

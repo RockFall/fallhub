@@ -78,7 +78,7 @@ class KnowledgeArea extends Equatable {
       description:
           clearDescription ? null : (description ?? this.description),
       iconKey: iconKey ?? this.iconKey,
-      catalogKey: this.catalogKey,
+      catalogKey: catalogKey,
       sortOrder: sortOrder ?? this.sortOrder,
       createdAt: createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
@@ -278,6 +278,51 @@ abstract final class KnowledgeAreaPolicy {
       labels.add(chain.reversed.join(' · '));
     }
     return labels.toSet().toList()..sort();
+  }
+
+  static List<KnowledgeArea> extraParentsOf({
+    required EntityId areaId,
+    required List<KnowledgeArea> areas,
+    required List<KnowledgeAreaPlacement> placements,
+  }) {
+    final byId = {for (final area in areas) area.id: area};
+    final area = byId[areaId];
+    final extraIds = <EntityId>{
+      for (final placement in placements)
+        if (placement.areaId == areaId) placement.parentAreaId,
+    };
+    extraIds.remove(area?.parentId);
+    extraIds.remove(areaId);
+    return [
+      for (final id in extraIds)
+        if (byId[id] != null) byId[id]!,
+    ]..sort(
+        (a, b) => a.title.toLowerCase().compareTo(b.title.toLowerCase()),
+      );
+  }
+
+  static bool hasSecondaryPlacement({
+    required EntityId areaId,
+    required List<KnowledgeAreaPlacement> placements,
+  }) {
+    return placements.any((p) => p.areaId == areaId);
+  }
+
+  static bool matchesQuery({
+    required KnowledgeArea area,
+    required String query,
+    required List<KnowledgeArea> areas,
+    List<KnowledgeAreaPlacement> placements = const [],
+  }) {
+    final q = query.trim().toLowerCase();
+    if (q.isEmpty) return true;
+    if (area.title.toLowerCase().contains(q)) return true;
+    if ((area.description ?? '').toLowerCase().contains(q)) return true;
+    return pathsTo(
+      areaId: area.id,
+      areas: areas,
+      placements: placements,
+    ).any((path) => path.toLowerCase().contains(q));
   }
 
   static void assertPlacementAcyclic({

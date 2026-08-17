@@ -1,6 +1,6 @@
 # Plano de evolução — Flashcards, SRS e mapa de conhecimento
 
-**Status:** planejamento. Nenhuma destas fatias foi implementada neste documento.  
+**Status:** implementado neste ciclo (fatias 0–10). Sem bump de schema.  
 **Agentes:** [UX](agents/AGENT_FLASHCARD_UX.md) · [Espaçado](agents/AGENT_SPACED_LEARNING.md) · [Taxonomia](agents/AGENT_KNOWLEDGE_TAXONOMY.md)  
 **Âncoras:** spec §5.6, §22, §72; ADR-017, ADR-036, ADR-037.
 
