@@ -50,10 +50,10 @@ features/<name>/
 | 2 | Pawn, needs, check-in, daily review | concluído |
 | 3 | Work grid, schedule | concluído |
 | 4 | Quests, projects, decisions, weekly review | concluído |
-| 5 | Research tree MVP | concluído (Iters 15–18; links quest↔research Iter 24) |
+| 5 | Research tree MVP | concluído (Iters 15–18; links quest↔research Iter 24; flashcards+SRS ADR-036) |
 | 6 | Finance ledger manual (§23) | MVP avançado+ (CSV apply Iter 107; plan→apply) |
-| 7 | Health local (§45) | MVP+ (appointments Iter 111; DB v33 / export v29) |
-| 8 | Inventory / relations | Zone↔Trip+Home↔Inv+Commitment↔Quest+Packing ✅ (DB v33 / export v29) |
+| 7 | Health local (§45) | MVP+ (appointments Iter 111; DB v34 / export v30) |
+| 8 | Inventory / relations | Zone↔Trip+Home↔Inv+Commitment↔Quest+Packing ✅ (DB v34 / export v30) |
 | 9 | Sync e backup | Stub local ✅ (outbox Iter 78; remote defer) |
 | 10 | Integrações | MVP stub ICS ✅ (Iter 86; DB v30 / export v27); Health Connect defer |
 | 11 | IA e Storyteller | MVP rules digest ✅ (Iter 87); LLM remoto defer |

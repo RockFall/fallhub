@@ -194,7 +194,7 @@ void main() {
     );
 
     final before = await repos.export.buildSnapshot();
-    expect(before.version, 29);
+    expect(before.version, 30);
     expect(before.questPrerequisiteLinks, hasLength(1));
 
     await repos.restore.restore(before);
@@ -255,7 +255,7 @@ void main() {
     );
 
     final before = await repos.export.buildSnapshot();
-    expect(before.version, 29);
+    expect(before.version, 30);
     expect(before.checkIns, hasLength(1));
     expect(before.dailyReviews, hasLength(1));
     expect(before.moodFactors, hasLength(2));
@@ -308,7 +308,7 @@ void main() {
     );
 
     final before = await repos.export.buildSnapshot();
-    expect(before.version, 29);
+    expect(before.version, 30);
     expect(before.weeklyReviews, hasLength(1));
 
     await repos.restore.restore(before);
@@ -361,7 +361,7 @@ void main() {
     expect(accepted.acceptedAt, isNotNull);
 
     final before = await repos.export.buildSnapshot();
-    expect(before.version, 29);
+    expect(before.version, 30);
     expect(before.quests.single.acceptanceAssumptions, ['Premissa A']);
 
     await repos.restore.restore(before);
@@ -412,7 +412,7 @@ void main() {
     );
 
     final before = await repos.export.buildSnapshot();
-    expect(before.version, 29);
+    expect(before.version, 30);
     expect(before.researchNodes, hasLength(1));
 
     await repos.restore.restore(before);
@@ -472,7 +472,7 @@ void main() {
     );
 
     final before = await repos.export.buildSnapshot();
-    expect(before.version, 29);
+    expect(before.version, 30);
     expect(before.learningSessions, hasLength(1));
     expect(before.researchEvidence, hasLength(1));
 
@@ -488,7 +488,7 @@ void main() {
     await repos.restore.restore(snapshot);
 
     final after = await repos.export.buildSnapshot();
-    expect(after.version, 29);
+    expect(after.version, 30);
     expect(after.financialEntities, isEmpty);
     expect(after.financialAccounts, isEmpty);
     expect(after.transactions, isEmpty);
@@ -545,7 +545,7 @@ void main() {
     );
 
     final before = await repos.export.buildSnapshot();
-    expect(before.version, 29);
+    expect(before.version, 30);
     expect(before.financialEntities, hasLength(1));
     expect(before.financialAccounts, hasLength(1));
     expect(before.transactions, hasLength(1));
@@ -593,7 +593,7 @@ void main() {
     expect(conditions.single.status, HealthConditionStatus.monitoring);
 
     final after = await repos.export.buildSnapshot();
-    expect(after.version, 29);
+    expect(after.version, 30);
     expect(after.symptomEntries, isEmpty);
   });
 
@@ -934,7 +934,7 @@ void main() {
     );
 
     final before = await repos.export.buildSnapshot();
-    expect(before.version, 29);
+    expect(before.version, 30);
     expect(before.questResearchLinks, hasLength(1));
     expect(before.questResearchLinks.first.questId, quest.id);
     expect(before.questResearchLinks.first.researchNodeId, node.id);
@@ -971,7 +971,7 @@ void main() {
     );
 
     final before = await repos.export.buildSnapshot();
-    expect(before.version, 29);
+    expect(before.version, 30);
     expect(before.symptomEntries, hasLength(1));
 
     await repos.restore.restore(before);
@@ -1001,7 +1001,7 @@ void main() {
     );
 
     final before = await repos.export.buildSnapshot();
-    expect(before.version, 29);
+    expect(before.version, 30);
     expect(before.inventoryItems, hasLength(1));
 
     await repos.restore.restore(before);
@@ -1031,7 +1031,7 @@ void main() {
     );
 
     final before = await repos.export.buildSnapshot();
-    expect(before.version, 29);
+    expect(before.version, 30);
     expect(before.people, hasLength(1));
 
     await repos.restore.restore(before);
@@ -1061,7 +1061,7 @@ void main() {
     );
 
     final before = await repos.export.buildSnapshot();
-    expect(before.version, 29);
+    expect(before.version, 30);
     expect(before.categoryBudgets, hasLength(1));
 
     await repos.restore.restore(before);

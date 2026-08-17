@@ -79,7 +79,7 @@ Loop termina quando todas marcadas ✅. Pit stop recalcula fase atual.
 | 5 | Pesquisa e skills | ✅ MVP | rubricas, trilhas (defer) |
 | 6 | Finanças locais | ✅ MVP avançado+ | budget+CSV ✅; polish → 59/63 |
 | 7 | Saúde local | ✅ MVP utilizável | exams/appointments defer |
-| 8 | Inventário, relações, casa | ✅ MVP utilizável | Packing trip↔inv ✅ (DB v33 / export v29) |
+| 8 | Inventário, relações, casa | ✅ MVP utilizável | Packing trip↔inv ✅; flashcards+SRS ✅ (DB v34 / export v30) |
 | 9 | Sync e backup | ⏳ MVP stub | outbox+noop+snackbar ✅ Iter 114; remote defer |
 | 10 | Integrações | ✅ MVP stub ICS | Iter 86; Health Connect/Open Finance defer |
 | 11 | IA e Storyteller | ✅ MVP rules digest | Iter 87 NarrativeDigest rules_v1; LLM defer |

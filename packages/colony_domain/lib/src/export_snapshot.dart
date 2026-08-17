@@ -38,6 +38,8 @@ import 'organization.dart';
 import 'home_maintenance.dart';
 import 'quest_inventory.dart';
 import 'trip_inventory.dart';
+import 'knowledge_area.dart';
+import 'flashcard.dart';
 import 'schedule_block.dart';
 import 'task.dart';
 import 'weekly_review.dart';
@@ -104,6 +106,11 @@ class ExportSnapshot extends Equatable {
     this.zoneTripLinks = const [],
     this.healthAppointments = const [],
     this.tripInventoryLinks = const [],
+    this.knowledgeAreas = const [],
+    this.flashcardDecks = const [],
+    this.flashcards = const [],
+    this.flashcardSrs = const [],
+    this.flashcardReviewLogs = const [],
   });
 
   final DateTime exportedAt;
@@ -153,6 +160,11 @@ class ExportSnapshot extends Equatable {
   final List<ZoneTripLink> zoneTripLinks;
   final List<HealthAppointment> healthAppointments;
   final List<TripInventoryLink> tripInventoryLinks;
+  final List<KnowledgeArea> knowledgeAreas;
+  final List<FlashcardDeck> flashcardDecks;
+  final List<Flashcard> flashcards;
+  final List<FlashcardSrsState> flashcardSrs;
+  final List<FlashcardReviewLog> flashcardReviewLogs;
 
   Map<String, int> get entityCounts => {
         'tasks': tasks.length,
@@ -191,6 +203,11 @@ class ExportSnapshot extends Equatable {
         'zone_trip_links': zoneTripLinks.length,
         'health_appointments': healthAppointments.length,
         'trip_inventory_links': tripInventoryLinks.length,
+        'knowledge_areas': knowledgeAreas.length,
+        'flashcard_decks': flashcardDecks.length,
+        'flashcards': flashcards.length,
+        'flashcard_srs': flashcardSrs.length,
+        'flashcard_review_logs': flashcardReviewLogs.length,
       };
 
   static ExportSnapshot fromJsonString(String source) {
@@ -209,7 +226,7 @@ class ExportSnapshot extends Equatable {
 
   static ExportSnapshot fromJson(Map<String, dynamic> json) {
     final version = _requireInt(json, 'version');
-    if (version < 1 || version > 29) {
+    if (version < 1 || version > 30) {
       throw ExportSnapshotException('Versão de export não suportada: $version');
     }
 
@@ -398,6 +415,24 @@ class ExportSnapshot extends Equatable {
       tripInventoryLinks: version >= 29
           ? _parseList(json['trip_inventory_links'], _parseTripInventoryLink)
           : <TripInventoryLink>[],
+      knowledgeAreas: version >= 30
+          ? _parseList(json['knowledge_areas'], _parseKnowledgeArea(profileId))
+          : <KnowledgeArea>[],
+      flashcardDecks: version >= 30
+          ? _parseList(json['flashcard_decks'], _parseFlashcardDeck(profileId))
+          : <FlashcardDeck>[],
+      flashcards: version >= 30
+          ? _parseList(json['flashcards'], _parseFlashcard(profileId))
+          : <Flashcard>[],
+      flashcardSrs: version >= 30
+          ? _parseList(json['flashcard_srs'], _parseFlashcardSrs)
+          : <FlashcardSrsState>[],
+      flashcardReviewLogs: version >= 30
+          ? _parseList(
+              json['flashcard_review_logs'],
+              _parseFlashcardReviewLog,
+            )
+          : <FlashcardReviewLog>[],
     );
   }
 
@@ -1069,6 +1104,114 @@ class ExportSnapshot extends Equatable {
     );
   }
 
+  static KnowledgeArea Function(Map<String, dynamic>) _parseKnowledgeArea(
+    EntityId profileId,
+  ) {
+    return (json) {
+      return KnowledgeArea(
+        id: EntityId(_requireString(json, 'id')),
+        profileId: profileId,
+        parentId: json['parent_id'] == null
+            ? null
+            : EntityId(_requireString(json, 'parent_id')),
+        title: _requireString(json, 'title'),
+        slug: _requireString(json, 'slug'),
+        description: json['description'] as String?,
+        iconKey: json['icon_key'] as String?,
+        catalogKey: json['catalog_key'] as String?,
+        sortOrder: _requireInt(json, 'sort_order'),
+        createdAt: _parseDateTime(_requireString(json, 'created_at')),
+        updatedAt: _parseDateTime(_requireString(json, 'updated_at')),
+      );
+    };
+  }
+
+  static FlashcardDeck Function(Map<String, dynamic>) _parseFlashcardDeck(
+    EntityId profileId,
+  ) {
+    return (json) {
+      return FlashcardDeck(
+        id: EntityId(_requireString(json, 'id')),
+        profileId: profileId,
+        areaId: json['area_id'] == null
+            ? null
+            : EntityId(_requireString(json, 'area_id')),
+        researchNodeId: json['research_node_id'] == null
+            ? null
+            : EntityId(_requireString(json, 'research_node_id')),
+        title: _requireString(json, 'title'),
+        description: json['description'] as String?,
+        newLimitPerDay: _requireInt(json, 'new_limit_per_day'),
+        reviewLimitPerDay: _requireInt(json, 'review_limit_per_day'),
+        archivedAt: json['archived_at'] == null
+            ? null
+            : _parseDateTime(json['archived_at'] as String),
+        createdAt: _parseDateTime(_requireString(json, 'created_at')),
+        updatedAt: _parseDateTime(_requireString(json, 'updated_at')),
+        version: json['version'] as int? ?? 1,
+      );
+    };
+  }
+
+  static Flashcard Function(Map<String, dynamic>) _parseFlashcard(
+    EntityId profileId,
+  ) {
+    return (json) {
+      return Flashcard(
+        id: EntityId(_requireString(json, 'id')),
+        profileId: profileId,
+        deckId: EntityId(_requireString(json, 'deck_id')),
+        areaId: json['area_id'] == null
+            ? null
+            : EntityId(_requireString(json, 'area_id')),
+        kind: FlashcardKind.values.byName(_requireString(json, 'kind')),
+        front: _requireString(json, 'front'),
+        back: json['back'] as String? ?? '',
+        extra: json['extra'] as String?,
+        tags: _parseStringList(json['tags']),
+        clozeIndex: json['cloze_index'] as int?,
+        reverseOfId: json['reverse_of_id'] == null
+            ? null
+            : EntityId(_requireString(json, 'reverse_of_id')),
+        suspended: json['suspended'] as bool? ?? false,
+        createdAt: _parseDateTime(_requireString(json, 'created_at')),
+        updatedAt: _parseDateTime(_requireString(json, 'updated_at')),
+        version: json['version'] as int? ?? 1,
+      );
+    };
+  }
+
+  static FlashcardSrsState _parseFlashcardSrs(Map<String, dynamic> json) {
+    return FlashcardSrsState(
+      cardId: EntityId(_requireString(json, 'card_id')),
+      status: FlashcardSrsStatus.values.byName(_requireString(json, 'status')),
+      easeFactor: (json['ease_factor'] as num).toDouble(),
+      intervalDays: (json['interval_days'] as num).toDouble(),
+      repetitions: _requireInt(json, 'repetitions'),
+      lapses: _requireInt(json, 'lapses'),
+      learningStepIndex: _requireInt(json, 'learning_step_index'),
+      leech: json['leech'] as bool? ?? false,
+      dueAt: _parseDateTime(_requireString(json, 'due_at')),
+      lastReviewedAt: json['last_reviewed_at'] == null
+          ? null
+          : _parseDateTime(json['last_reviewed_at'] as String),
+    );
+  }
+
+  static FlashcardReviewLog _parseFlashcardReviewLog(Map<String, dynamic> json) {
+    return FlashcardReviewLog(
+      id: EntityId(_requireString(json, 'id')),
+      cardId: EntityId(_requireString(json, 'card_id')),
+      reviewedAt: _parseDateTime(_requireString(json, 'reviewed_at')),
+      rating: FlashcardRating.values.byName(_requireString(json, 'rating')),
+      intervalDaysBefore: (json['interval_days_before'] as num).toDouble(),
+      intervalDaysAfter: (json['interval_days_after'] as num).toDouble(),
+      easeBefore: (json['ease_before'] as num).toDouble(),
+      easeAfter: (json['ease_after'] as num).toDouble(),
+      durationMs: json['duration_ms'] as int?,
+    );
+  }
+
   static HealthAppointment Function(Map<String, dynamic>)
       _parseHealthAppointment(EntityId profileId) {
     return (json) {
@@ -1303,6 +1446,12 @@ class ExportSnapshot extends Equatable {
           healthAppointments.map(_healthAppointmentJson).toList(),
       'trip_inventory_links':
           tripInventoryLinks.map(_tripInventoryLinkJson).toList(),
+      'knowledge_areas': knowledgeAreas.map(_knowledgeAreaJson).toList(),
+      'flashcard_decks': flashcardDecks.map(_flashcardDeckJson).toList(),
+      'flashcards': flashcards.map(_flashcardJson).toList(),
+      'flashcard_srs': flashcardSrs.map(_flashcardSrsJson).toList(),
+      'flashcard_review_logs':
+          flashcardReviewLogs.map(_flashcardReviewLogJson).toList(),
     };
   }
 
@@ -1745,6 +1894,79 @@ class ExportSnapshot extends Equatable {
         'linked_at': link.linkedAt.toUtc().toIso8601String(),
       };
 
+  static Map<String, Object?> _knowledgeAreaJson(KnowledgeArea area) => {
+        'id': area.id.value,
+        if (area.parentId != null) 'parent_id': area.parentId!.value,
+        'title': area.title,
+        'slug': area.slug,
+        if (area.description != null) 'description': area.description,
+        if (area.iconKey != null) 'icon_key': area.iconKey,
+        if (area.catalogKey != null) 'catalog_key': area.catalogKey,
+        'sort_order': area.sortOrder,
+        'created_at': area.createdAt.toUtc().toIso8601String(),
+        'updated_at': area.updatedAt.toUtc().toIso8601String(),
+      };
+
+  static Map<String, Object?> _flashcardDeckJson(FlashcardDeck deck) => {
+        'id': deck.id.value,
+        if (deck.areaId != null) 'area_id': deck.areaId!.value,
+        if (deck.researchNodeId != null)
+          'research_node_id': deck.researchNodeId!.value,
+        'title': deck.title,
+        if (deck.description != null) 'description': deck.description,
+        'new_limit_per_day': deck.newLimitPerDay,
+        'review_limit_per_day': deck.reviewLimitPerDay,
+        if (deck.archivedAt != null)
+          'archived_at': deck.archivedAt!.toUtc().toIso8601String(),
+        'created_at': deck.createdAt.toUtc().toIso8601String(),
+        'updated_at': deck.updatedAt.toUtc().toIso8601String(),
+        'version': deck.version,
+      };
+
+  static Map<String, Object?> _flashcardJson(Flashcard card) => {
+        'id': card.id.value,
+        'deck_id': card.deckId.value,
+        if (card.areaId != null) 'area_id': card.areaId!.value,
+        'kind': card.kind.name,
+        'front': card.front,
+        'back': card.back,
+        if (card.extra != null) 'extra': card.extra,
+        'tags': card.tags,
+        if (card.clozeIndex != null) 'cloze_index': card.clozeIndex,
+        if (card.reverseOfId != null) 'reverse_of_id': card.reverseOfId!.value,
+        'suspended': card.suspended,
+        'created_at': card.createdAt.toUtc().toIso8601String(),
+        'updated_at': card.updatedAt.toUtc().toIso8601String(),
+        'version': card.version,
+      };
+
+  static Map<String, Object?> _flashcardSrsJson(FlashcardSrsState srs) => {
+        'card_id': srs.cardId.value,
+        'status': srs.status.name,
+        'ease_factor': srs.easeFactor,
+        'interval_days': srs.intervalDays,
+        'repetitions': srs.repetitions,
+        'lapses': srs.lapses,
+        'learning_step_index': srs.learningStepIndex,
+        'leech': srs.leech,
+        'due_at': srs.dueAt.toUtc().toIso8601String(),
+        if (srs.lastReviewedAt != null)
+          'last_reviewed_at': srs.lastReviewedAt!.toUtc().toIso8601String(),
+      };
+
+  static Map<String, Object?> _flashcardReviewLogJson(FlashcardReviewLog log) =>
+      {
+        'id': log.id.value,
+        'card_id': log.cardId.value,
+        'reviewed_at': log.reviewedAt.toUtc().toIso8601String(),
+        'rating': log.rating.name,
+        'interval_days_before': log.intervalDaysBefore,
+        'interval_days_after': log.intervalDaysAfter,
+        'ease_before': log.easeBefore,
+        'ease_after': log.easeAfter,
+        if (log.durationMs != null) 'duration_ms': log.durationMs,
+      };
+
   static Map<String, Object?> _healthAppointmentJson(HealthAppointment a) => {
         'id': a.id.value,
         'title': a.title,
@@ -1864,5 +2086,10 @@ class ExportSnapshot extends Equatable {
         zoneTripLinks,
         healthAppointments,
         tripInventoryLinks,
+        knowledgeAreas,
+        flashcardDecks,
+        flashcards,
+        flashcardSrs,
+        flashcardReviewLogs,
       ];
 }

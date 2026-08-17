@@ -108,6 +108,9 @@ enum AggregateType {
   contextZone,
   integrationConsent,
   externalCalendarEvent,
+  knowledgeArea,
+  flashcardDeck,
+  flashcard,
   domainEvent,
 }
 
@@ -189,6 +192,14 @@ enum EventType {
   integrationConsentGranted,
   integrationConsentRevoked,
   externalCalendarEventsImported,
+  knowledgeAreaCreated,
+  knowledgeAreaUpdated,
+  flashcardDeckCreated,
+  flashcardDeckUpdated,
+  flashcardCreated,
+  flashcardUpdated,
+  flashcardReviewed,
+  flashcardCatalogSeeded,
 }
 
 enum UndoActionType {

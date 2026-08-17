@@ -208,6 +208,14 @@ class ChronicleScreen extends ConsumerWidget {
       EventType.externalCalendarEventsImported => 'Eventos ICS importados',
       EventType.healthAppointmentCreated => 'Consulta registrada',
       EventType.healthAppointmentUpdated => 'Consulta atualizada',
+      EventType.knowledgeAreaCreated => 'Área de conhecimento criada',
+      EventType.knowledgeAreaUpdated => 'Área de conhecimento atualizada',
+      EventType.flashcardDeckCreated => 'Baralho criado',
+      EventType.flashcardDeckUpdated => 'Baralho atualizado',
+      EventType.flashcardCreated => 'Flashcard criado',
+      EventType.flashcardUpdated => 'Flashcard atualizado',
+      EventType.flashcardReviewed => 'Flashcard revisado',
+      EventType.flashcardCatalogSeeded => 'Mapa de conhecimento semeado',
       _ => event.eventType.name,
     };
   }

@@ -12,6 +12,7 @@ import 'widgets/research_prerequisite_picker_sheet.dart';
 import 'widgets/research_sessions_panel.dart';
 import 'widgets/research_evidence_panel.dart';
 import 'widgets/research_linked_quests_panel.dart';
+import '../../flashcards/presentation/widgets/research_flashcard_decks_panel.dart';
 
 class ResearchNodeDetailScreen extends ConsumerWidget {
   const ResearchNodeDetailScreen({super.key, required this.nodeId});
@@ -183,6 +184,8 @@ class ResearchNodeDetailScreen extends ConsumerWidget {
             ],
             const SizedBox(height: ColonySpacing.md),
             ResearchLinkedQuestsPanel(node: node),
+            const SizedBox(height: ColonySpacing.md),
+            ResearchFlashcardDecksPanel(nodeId: nodeId),
             const SizedBox(height: ColonySpacing.md),
             ResearchSessionsPanel(nodeId: nodeId),
             const SizedBox(height: ColonySpacing.md),

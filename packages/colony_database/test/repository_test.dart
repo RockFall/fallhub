@@ -933,7 +933,7 @@ void main() {
     expect(linked.single.name, 'Mochila');
 
     final snapshot = await repos.export.buildSnapshot();
-    expect(snapshot.version, 29);
+    expect(snapshot.version, 30);
     expect(snapshot.tripInventoryLinks, hasLength(1));
 
     await repos.trips.unlinkInventoryItem(
@@ -968,7 +968,7 @@ void main() {
     expect(linked.single.title, 'Lisboa');
 
     final snapshot = await repos.export.buildSnapshot();
-    expect(snapshot.version, 29);
+    expect(snapshot.version, 30);
     expect(snapshot.zoneTripLinks, hasLength(1));
 
     await repos.contextZones.unlinkTrip(zoneId: zone.id, tripId: trip.id);
@@ -1007,7 +1007,7 @@ void main() {
     expect(linked, hasLength(1));
 
     final snapshot = await repos.export.buildSnapshot();
-    expect(snapshot.version, 29);
+    expect(snapshot.version, 30);
     expect(snapshot.questInventoryLinks, hasLength(1));
 
     await repos.inventory.unlinkQuest(
@@ -1056,7 +1056,7 @@ void main() {
     expect(memberships.first.id, org.id);
 
     final snapshot = await repos.export.buildSnapshot();
-    expect(snapshot.version, 29);
+    expect(snapshot.version, 30);
     expect(snapshot.personOrganizationLinks, hasLength(1));
     expect(snapshot.personOrganizationLinks.first.role, 'colega');
 

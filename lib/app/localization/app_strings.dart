@@ -635,6 +635,97 @@ abstract final class AppStrings {
       };
 
   static const newResearchNode = 'Novo nó';
+  static const flashcardsTitle = 'Flashcards';
+  static const flashcardsSubtitle =
+      'Mapa de conhecimento e repetição espaçada — local, sem conta.';
+  static const flashcardsStudyNow = 'Estudar agora';
+  static const flashcardsStudyDeck = 'Estudar baralho';
+  static const flashcardsStudyArea = 'Estudar área';
+  static const flashcardsDue = 'A revisar';
+  static const flashcardsNew = 'Novos';
+  static const flashcardsLearning = 'Aprendendo';
+  static const flashcardsEmpty =
+      'Nenhum cartão ainda. Crie um baralho ou semeie o mapa.';
+  static const flashcardsEmptyHint =
+      'Conhecimento não precisa virar cartão. Use o mapa para áreas e revise só o que importa.';
+  static const flashcardsSearchHint = 'Buscar cartões, baralhos ou áreas';
+  static const flashcardsNoResults = 'Nada corresponde à busca.';
+  static const flashcardsMapTitle = 'Mapa de conhecimento';
+  static const flashcardsMapEmpty = 'Nenhuma área no mapa.';
+  static const flashcardsSeedMap = 'Semeiar áreas';
+  static const flashcardsSeedMapHint =
+      'Escolha domínios. Nada é criado sem o seu ok.';
+  static const flashcardsSeedApply = 'Adicionar selecionadas';
+  static const flashcardsDecksTitle = 'Baralhos';
+  static const flashcardsNewDeck = 'Novo baralho';
+  static const flashcardsNewCard = 'Novo cartão';
+  static const flashcardsNewArea = 'Nova área';
+  static const flashcardsDeckTitle = 'Nome do baralho';
+  static const flashcardsDeckTitleRequired = 'Informe o nome do baralho';
+  static const flashcardsAreaTitle = 'Nome da área';
+  static const flashcardsAreaTitleRequired = 'Informe o nome da área';
+  static const flashcardsParentArea = 'Área pai (opcional)';
+  static const flashcardsNoParent = 'Raiz do mapa';
+  static const flashcardsLinkedResearch = 'Pesquisa vinculada (opcional)';
+  static const flashcardsNoResearch = 'Sem vínculo';
+  static const flashcardsNewLimit = 'Novos por dia';
+  static const flashcardsReviewLimit = 'Revisões por dia';
+  static const flashcardsKind = 'Tipo';
+  static const flashcardsFront = 'Frente';
+  static const flashcardsBack = 'Verso';
+  static const flashcardsExtra = 'Nota extra (opcional)';
+  static const flashcardsTags = 'Tags (vírgula)';
+  static const flashcardsBidirectional = 'Também criar o inverso';
+  static const flashcardsClozeHint =
+      'Use {{c1::resposta}} para lacunas. Cada cN vira um cartão.';
+  static const flashcardsNotFound = 'Não encontrado.';
+  static const flashcardsReveal = 'Toque para revelar';
+  static const flashcardsAgain = 'De novo';
+  static const flashcardsHard = 'Difícil';
+  static const flashcardsGood = 'Bom';
+  static const flashcardsEasy = 'Fácil';
+  static const flashcardsUndo = 'Desfazer última';
+  static const flashcardsBury = 'Adiar para amanhã';
+  static const flashcardsSuspend = 'Suspender';
+  static const flashcardsUnsuspend = 'Reativar';
+  static const flashcardsDone = 'Tudo revisado por hoje.';
+  static const flashcardsDoneHint =
+      'Volte amanhã — o intervalo cresce quando a lembrança é estável.';
+  static const flashcardsLeech =
+      'Sanguessuga: este cartão foi suspenso após muitos lapsos.';
+  static const flashcardsForecast = 'Previsão (7 dias)';
+  static const flashcardsRetention = 'Retenção recente';
+  static const flashcardsCards = 'Cartões';
+  static const flashcardsSubareas = 'Subáreas';
+  static const flashcardsNoCards = 'Nenhum cartão neste baralho.';
+  static const flashcardsEditCard = 'Editar cartão';
+  static const flashcardsBrowse = 'Cartões';
+  static const flashcardsSuspended = 'Suspenso';
+  static const flashcardsLeechBadge = 'Sanguessuga';
+  static const flashcardsDisclaimer =
+      'Repetição espaçada é prática local. Não substitui evidência de pesquisa.';
+  static const flashcardsLinkedDecks = 'Baralhos de flashcards';
+  static const flashcardsNoLinkedDecks = 'Nenhum baralho vinculado a este nó.';
+  static const flashcardsCreateLinkedDeck = 'Criar baralho deste nó';
+  static const flashcardsArchiveDeck = 'Arquivar baralho';
+  static const flashcardsUnarchiveDeck = 'Desarquivar baralho';
+  static const flashcardsEditArea = 'Editar área';
+  static const flashcardsEditDeck = 'Editar baralho';
+  static const flashcardsNoDecks = 'Nenhum baralho nesta área.';
+  static const flashcardsKeyboardHint = 'Espaço revela · 1–4 avalia';
+  static const flashcardsLimitsHint =
+      'Limites valem só para este baralho, no dia local.';
+  static const flashcardsEmptyCta = 'Começar pelo mapa ou por um baralho';
+
+  static String flashcardKindLabel(FlashcardKind kind) => switch (kind) {
+        FlashcardKind.basic => 'Básico',
+        FlashcardKind.reverse => 'Inverso',
+        FlashcardKind.cloze => 'Lacuna',
+        FlashcardKind.freeRecall => 'Recordação livre',
+        FlashcardKind.exercise => 'Exercício',
+        FlashcardKind.repertoire => 'Repertório',
+      };
+
   static const researchListEmpty = 'Nenhum nó de pesquisa ainda.';
   static const researchListEmptyHint =
       'Organize conhecimentos e habilidades com pré-requisitos.';
@@ -1377,6 +1468,11 @@ abstract final class AppStrings {
       'symptom_entries' => 'Registros de sintomas',
       'inventory_items' => 'Itens de inventário',
       'people' => 'Pessoas',
+      'knowledge_areas' => 'Áreas de conhecimento',
+      'flashcard_decks' => 'Baralhos',
+      'flashcards' => 'Flashcards',
+      'flashcard_srs' => 'Estados SRS',
+      'flashcard_review_logs' => 'Revisões de flashcards',
       _ => key,
     };
     return '$label: $count';

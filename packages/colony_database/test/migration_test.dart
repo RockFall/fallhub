@@ -700,6 +700,57 @@ void main() {
       expect(listed, hasLength(1));
     });
 
+    test('v33 to v34 adds flashcard and knowledge map tables', () async {
+      final db = await openMigratedFrom(
+        33,
+        seed: (sqlite) {
+          seedProfile(sqlite);
+        },
+      );
+      addTearDown(() async {
+        await db.close();
+      });
+
+      final repos = ColonyRepositories.create(
+        db,
+        idGenerator: FixedIdGenerator([
+          'area-1',
+          'event-1',
+          'deck-1',
+          'event-2',
+          'card-1',
+          'event-3',
+          'log-1',
+          'event-4',
+        ]),
+        clock: () => DateTime.utc(2026, 8, 17, 12),
+      );
+
+      final profile = (await repos.profiles.getActive())!;
+      final area = await repos.flashcards.createArea(
+        profileId: profile.id,
+        title: 'Linguagens',
+      );
+      final deck = await repos.flashcards.createDeck(
+        profileId: profile.id,
+        title: 'Vocabulário',
+        areaId: area.id,
+      );
+      final cards = await repos.flashcards.createCard(
+        profileId: profile.id,
+        deckId: deck.id,
+        areaId: area.id,
+        front: 'Bonjour',
+        back: 'Olá',
+      );
+      expect(cards, hasLength(1));
+      final listed = await repos.flashcards.listCards(profile.id);
+      expect(listed.single.front, 'Bonjour');
+      final srs = await repos.flashcards.listSrs(profile.id);
+      expect(srs, hasLength(1));
+      expect(srs.single.status, FlashcardSrsStatus.newCard);
+    });
+
     test('v31 to v32 adds health_appointments table', () async {
       final db = await openMigratedFrom(
         31,
