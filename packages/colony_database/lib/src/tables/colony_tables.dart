@@ -799,3 +799,142 @@ class ExternalCalendarEvents extends Table {
   @override
   Set<Column<Object>> get primaryKey => {id};
 }
+
+@DataClassName('KnowledgeAreaRow')
+class KnowledgeAreas extends Table {
+  @override
+  String get tableName => 'knowledge_areas';
+
+  TextColumn get id => text()();
+  TextColumn get profileId => text().references(Profiles, #id)();
+  TextColumn get parentId => text().nullable()();
+  TextColumn get title => text()();
+  TextColumn get slug => text()();
+  TextColumn get description => text().nullable()();
+  TextColumn get iconKey => text().nullable()();
+  TextColumn get catalogKey => text().nullable()();
+  IntColumn get sortOrder => integer().withDefault(const Constant(0))();
+  IntColumn get createdAt => integer()();
+  IntColumn get updatedAt => integer()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+}
+
+@DataClassName('FlashcardDeckRow')
+class FlashcardDecks extends Table {
+  @override
+  String get tableName => 'flashcard_decks';
+
+  TextColumn get id => text()();
+  TextColumn get profileId => text().references(Profiles, #id)();
+  TextColumn get areaId => text().nullable()();
+  TextColumn get researchNodeId => text().nullable()();
+  TextColumn get title => text()();
+  TextColumn get description => text().nullable()();
+  IntColumn get newLimitPerDay => integer().withDefault(const Constant(20))();
+  IntColumn get reviewLimitPerDay =>
+      integer().withDefault(const Constant(200))();
+  IntColumn get archivedAt => integer().nullable()();
+  IntColumn get createdAt => integer()();
+  IntColumn get updatedAt => integer()();
+  IntColumn get version => integer().withDefault(const Constant(1))();
+
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+}
+
+@DataClassName('FlashcardRow')
+class Flashcards extends Table {
+  @override
+  String get tableName => 'flashcards';
+
+  TextColumn get id => text()();
+  TextColumn get profileId => text().references(Profiles, #id)();
+  TextColumn get deckId => text().references(FlashcardDecks, #id)();
+  TextColumn get areaId => text().nullable()();
+  TextColumn get kind => text()();
+  TextColumn get front => text()();
+  TextColumn get back => text().withDefault(const Constant(''))();
+  TextColumn get extra => text().nullable()();
+  TextColumn get tagsJson => text().withDefault(const Constant('[]'))();
+  IntColumn get clozeIndex => integer().nullable()();
+  TextColumn get reverseOfId => text().nullable()();
+  TextColumn get scheduleMode =>
+      text().withDefault(const Constant('scheduled'))();
+  BoolColumn get suspended => boolean().withDefault(const Constant(false))();
+  IntColumn get createdAt => integer()();
+  IntColumn get updatedAt => integer()();
+  IntColumn get version => integer().withDefault(const Constant(1))();
+
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+}
+
+@DataClassName('FlashcardSrsRow')
+class FlashcardSrs extends Table {
+  @override
+  String get tableName => 'flashcard_srs';
+
+  TextColumn get cardId => text().references(Flashcards, #id)();
+  TextColumn get status => text()();
+  RealColumn get easeFactor => real().withDefault(const Constant(2.5))();
+  RealColumn get intervalDays => real().withDefault(const Constant(0))();
+  IntColumn get repetitions => integer().withDefault(const Constant(0))();
+  IntColumn get lapses => integer().withDefault(const Constant(0))();
+  IntColumn get learningStepIndex => integer().withDefault(const Constant(0))();
+  BoolColumn get leech => boolean().withDefault(const Constant(false))();
+  IntColumn get dueAt => integer()();
+  IntColumn get lastReviewedAt => integer().nullable()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {cardId};
+}
+
+@DataClassName('FlashcardReviewLogRow')
+class FlashcardReviewLogs extends Table {
+  @override
+  String get tableName => 'flashcard_review_logs';
+
+  TextColumn get id => text()();
+  TextColumn get cardId => text().references(Flashcards, #id)();
+  IntColumn get reviewedAt => integer()();
+  TextColumn get rating => text()();
+  RealColumn get intervalDaysBefore => real()();
+  RealColumn get intervalDaysAfter => real()();
+  RealColumn get easeBefore => real()();
+  RealColumn get easeAfter => real()();
+  IntColumn get durationMs => integer().nullable()();
+  TextColumn get reviewKind => text().withDefault(const Constant('srs'))();
+
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+}
+
+@DataClassName('KnowledgeAreaPlacementRow')
+class KnowledgeAreaPlacements extends Table {
+  @override
+  String get tableName => 'knowledge_area_placements';
+
+  TextColumn get areaId => text().references(KnowledgeAreas, #id)();
+  TextColumn get parentAreaId => text().references(KnowledgeAreas, #id)();
+  IntColumn get linkedAt => integer()();
+  TextColumn get catalogKey => text().nullable()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {areaId, parentAreaId};
+}
+
+@DataClassName('ResearchKnowledgeLinkRow')
+class ResearchKnowledgeLinks extends Table {
+  @override
+  String get tableName => 'research_knowledge_links';
+
+  TextColumn get researchNodeId => text().references(ResearchNodes, #id)();
+  TextColumn get areaId => text().references(KnowledgeAreas, #id)();
+  TextColumn get kind => text()();
+  IntColumn get linkedAt => integer()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {researchNodeId, areaId};
+}

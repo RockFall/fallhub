@@ -1,4 +1,5 @@
 import 'package:colony_design_system/colony_design_system.dart';
+import 'package:colony_domain/colony_domain.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -28,6 +29,10 @@ import '../../features/quests/presentation/quest_detail_screen.dart';
 import '../../features/decisions/presentation/decision_list_screen.dart';
 import '../../features/research/presentation/research_list_screen.dart';
 import '../../features/research/presentation/research_node_detail_screen.dart';
+import '../../features/flashcards/presentation/flashcards_hub_screen.dart';
+import '../../features/flashcards/presentation/flashcard_deck_screen.dart';
+import '../../features/flashcards/presentation/knowledge_area_screen.dart';
+import '../../features/flashcards/presentation/study_session_screen.dart';
 import '../../features/finance/presentation/finance_ledger_screen.dart';
 import '../../features/health/presentation/health_screen.dart';
 import '../../features/inventory/presentation/inventory_screen.dart';
@@ -181,6 +186,36 @@ final routerProvider = Provider<GoRouter>((ref) {
             ],
           ),
           GoRoute(
+            path: '/flashcards',
+            builder: (context, state) => const FlashcardsHubScreen(),
+            routes: [
+              GoRoute(
+                path: 'study',
+                builder: (context, state) => StudySessionScreen(
+                  deckId: state.uri.queryParameters['deckId'],
+                  areaId: state.uri.queryParameters['areaId'],
+                  cardId: state.uri.queryParameters['cardId'],
+                  mode: state.uri.queryParameters['mode'] == 'practice'
+                      ? FlashcardStudySessionMode.practice
+                      : FlashcardStudySessionMode.scheduled,
+                ),
+              ),
+              GoRoute(
+                path: 'areas/:id',
+                builder: (context, state) => KnowledgeAreaScreen(
+                  areaId: state.pathParameters['id']!,
+                  viaAreaId: state.uri.queryParameters['via'],
+                ),
+              ),
+              GoRoute(
+                path: 'decks/:id',
+                builder: (context, state) => FlashcardDeckScreen(
+                  deckId: state.pathParameters['id']!,
+                ),
+              ),
+            ],
+          ),
+          GoRoute(
             path: '/resources/finance',
             builder: (context, state) => const FinanceLedgerScreen(),
           ),
@@ -269,6 +304,9 @@ class _AppShellState extends ConsumerState<AppShell> {
   @override
   Widget build(BuildContext context) {
     final location = GoRouterState.of(context).uri.toString();
+    if (GoRouterState.of(context).uri.path.startsWith('/flashcards/study')) {
+      return Scaffold(body: widget.child);
+    }
     final undo = ref.watch(undoControllerProvider);
     final compact = _isCompact(context);
 
@@ -407,6 +445,11 @@ class _AppShellState extends ConsumerState<AppShell> {
           onSelected: () => context.go('/relations/commitments'),
         ),
         ColonyFloatMenuItem(
+          icon: Icons.style_outlined,
+          label: AppStrings.flashcardsTitle,
+          onSelected: () => context.go('/flashcards'),
+        ),
+        ColonyFloatMenuItem(
           icon: Icons.science_outlined,
           label: AppStrings.research,
           onSelected: () => context.go('/research'),
@@ -455,6 +498,7 @@ class _AppShellState extends ConsumerState<AppShell> {
         location.startsWith('/projects') ||
         location.startsWith('/decisions') ||
         location.startsWith('/research') ||
+        location.startsWith('/flashcards') ||
         location.startsWith('/resources') ||
         location.startsWith('/settings') ||
         location.startsWith('/relations')) {

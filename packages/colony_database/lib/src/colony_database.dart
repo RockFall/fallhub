@@ -59,12 +59,19 @@ part 'colony_database.g.dart';
   TripInventory,
   IntegrationConsents,
   ExternalCalendarEvents,
+  KnowledgeAreas,
+  FlashcardDecks,
+  Flashcards,
+  FlashcardSrs,
+  FlashcardReviewLogs,
+  KnowledgeAreaPlacements,
+  ResearchKnowledgeLinks,
 ])
 class ColonyDatabase extends _$ColonyDatabase {
   ColonyDatabase(super.e);
 
   @override
-  int get schemaVersion => 33;
+  int get schemaVersion => 35;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -191,6 +198,21 @@ class ColonyDatabase extends _$ColonyDatabase {
           }
           if (from < 33) {
             await m.createTable(tripInventory);
+          }
+          if (from < 34) {
+            await m.createTable(knowledgeAreas);
+            await m.createTable(flashcardDecks);
+            await m.createTable(flashcards);
+            await m.createTable(flashcardSrs);
+            await m.createTable(flashcardReviewLogs);
+          }
+          if (from >= 34 && from < 35) {
+            await m.addColumn(flashcards, flashcards.scheduleMode);
+            await m.addColumn(flashcardReviewLogs, flashcardReviewLogs.reviewKind);
+          }
+          if (from < 35) {
+            await m.createTable(knowledgeAreaPlacements);
+            await m.createTable(researchKnowledgeLinks);
           }
         },
       );
@@ -1750,6 +1772,236 @@ class ColonyMappers {
       importedAt: event.importedAt.millisecondsSinceEpoch,
       createdAt: event.createdAt.millisecondsSinceEpoch,
       updatedAt: event.updatedAt.millisecondsSinceEpoch,
+    );
+  }
+
+  static domain.KnowledgeArea toKnowledgeArea(KnowledgeAreaRow row) {
+    return domain.KnowledgeArea(
+      id: domain.EntityId(row.id),
+      profileId: domain.EntityId(row.profileId),
+      parentId: row.parentId == null ? null : domain.EntityId(row.parentId!),
+      title: row.title,
+      slug: row.slug,
+      description: row.description,
+      iconKey: row.iconKey,
+      catalogKey: row.catalogKey,
+      sortOrder: row.sortOrder,
+      createdAt: DateTime.fromMillisecondsSinceEpoch(row.createdAt, isUtc: true),
+      updatedAt: DateTime.fromMillisecondsSinceEpoch(row.updatedAt, isUtc: true),
+    );
+  }
+
+  static KnowledgeAreasCompanion fromKnowledgeArea(domain.KnowledgeArea area) {
+    return KnowledgeAreasCompanion.insert(
+      id: area.id.value,
+      profileId: area.profileId.value,
+      parentId: Value(area.parentId?.value),
+      title: area.title,
+      slug: area.slug,
+      description: Value(area.description),
+      iconKey: Value(area.iconKey),
+      catalogKey: Value(area.catalogKey),
+      sortOrder: Value(area.sortOrder),
+      createdAt: area.createdAt.millisecondsSinceEpoch,
+      updatedAt: area.updatedAt.millisecondsSinceEpoch,
+    );
+  }
+
+  static domain.FlashcardDeck toFlashcardDeck(FlashcardDeckRow row) {
+    return domain.FlashcardDeck(
+      id: domain.EntityId(row.id),
+      profileId: domain.EntityId(row.profileId),
+      areaId: row.areaId == null ? null : domain.EntityId(row.areaId!),
+      researchNodeId: row.researchNodeId == null
+          ? null
+          : domain.EntityId(row.researchNodeId!),
+      title: row.title,
+      description: row.description,
+      newLimitPerDay: row.newLimitPerDay,
+      reviewLimitPerDay: row.reviewLimitPerDay,
+      archivedAt: row.archivedAt == null
+          ? null
+          : DateTime.fromMillisecondsSinceEpoch(row.archivedAt!, isUtc: true),
+      createdAt: DateTime.fromMillisecondsSinceEpoch(row.createdAt, isUtc: true),
+      updatedAt: DateTime.fromMillisecondsSinceEpoch(row.updatedAt, isUtc: true),
+      version: row.version,
+    );
+  }
+
+  static FlashcardDecksCompanion fromFlashcardDeck(domain.FlashcardDeck deck) {
+    return FlashcardDecksCompanion.insert(
+      id: deck.id.value,
+      profileId: deck.profileId.value,
+      areaId: Value(deck.areaId?.value),
+      researchNodeId: Value(deck.researchNodeId?.value),
+      title: deck.title,
+      description: Value(deck.description),
+      newLimitPerDay: Value(deck.newLimitPerDay),
+      reviewLimitPerDay: Value(deck.reviewLimitPerDay),
+      archivedAt: Value(deck.archivedAt?.millisecondsSinceEpoch),
+      createdAt: deck.createdAt.millisecondsSinceEpoch,
+      updatedAt: deck.updatedAt.millisecondsSinceEpoch,
+      version: Value(deck.version),
+    );
+  }
+
+  static domain.Flashcard toFlashcard(FlashcardRow row) {
+    final tags = (jsonDecode(row.tagsJson) as List<dynamic>)
+        .map((e) => e.toString())
+        .toList();
+    return domain.Flashcard(
+      id: domain.EntityId(row.id),
+      profileId: domain.EntityId(row.profileId),
+      deckId: domain.EntityId(row.deckId),
+      areaId: row.areaId == null ? null : domain.EntityId(row.areaId!),
+      kind: domain.FlashcardKind.values.byName(row.kind),
+      front: row.front,
+      back: row.back,
+      extra: row.extra,
+      tags: tags,
+      clozeIndex: row.clozeIndex,
+      reverseOfId:
+          row.reverseOfId == null ? null : domain.EntityId(row.reverseOfId!),
+      scheduleMode: domain.FlashcardScheduleMode.values.byName(row.scheduleMode),
+      suspended: row.suspended,
+      createdAt: DateTime.fromMillisecondsSinceEpoch(row.createdAt, isUtc: true),
+      updatedAt: DateTime.fromMillisecondsSinceEpoch(row.updatedAt, isUtc: true),
+      version: row.version,
+    );
+  }
+
+  static FlashcardsCompanion fromFlashcard(domain.Flashcard card) {
+    return FlashcardsCompanion.insert(
+      id: card.id.value,
+      profileId: card.profileId.value,
+      deckId: card.deckId.value,
+      areaId: Value(card.areaId?.value),
+      kind: card.kind.name,
+      front: card.front,
+      back: Value(card.back),
+      extra: Value(card.extra),
+      tagsJson: Value(jsonEncode(card.tags)),
+      clozeIndex: Value(card.clozeIndex),
+      reverseOfId: Value(card.reverseOfId?.value),
+      scheduleMode: Value(card.scheduleMode.name),
+      suspended: Value(card.suspended),
+      createdAt: card.createdAt.millisecondsSinceEpoch,
+      updatedAt: card.updatedAt.millisecondsSinceEpoch,
+      version: Value(card.version),
+    );
+  }
+
+  static domain.FlashcardSrsState toFlashcardSrs(FlashcardSrsRow row) {
+    return domain.FlashcardSrsState(
+      cardId: domain.EntityId(row.cardId),
+      status: domain.FlashcardSrsStatus.values.byName(row.status),
+      easeFactor: row.easeFactor,
+      intervalDays: row.intervalDays,
+      repetitions: row.repetitions,
+      lapses: row.lapses,
+      learningStepIndex: row.learningStepIndex,
+      leech: row.leech,
+      dueAt: DateTime.fromMillisecondsSinceEpoch(row.dueAt, isUtc: true),
+      lastReviewedAt: row.lastReviewedAt == null
+          ? null
+          : DateTime.fromMillisecondsSinceEpoch(
+              row.lastReviewedAt!,
+              isUtc: true,
+            ),
+    );
+  }
+
+  static FlashcardSrsCompanion fromFlashcardSrs(domain.FlashcardSrsState srs) {
+    return FlashcardSrsCompanion.insert(
+      cardId: srs.cardId.value,
+      status: srs.status.name,
+      easeFactor: Value(srs.easeFactor),
+      intervalDays: Value(srs.intervalDays),
+      repetitions: Value(srs.repetitions),
+      lapses: Value(srs.lapses),
+      learningStepIndex: Value(srs.learningStepIndex),
+      leech: Value(srs.leech),
+      dueAt: srs.dueAt.millisecondsSinceEpoch,
+      lastReviewedAt: Value(srs.lastReviewedAt?.millisecondsSinceEpoch),
+    );
+  }
+
+  static domain.FlashcardReviewLog toFlashcardReviewLog(
+    FlashcardReviewLogRow row,
+  ) {
+    return domain.FlashcardReviewLog(
+      id: domain.EntityId(row.id),
+      cardId: domain.EntityId(row.cardId),
+      reviewedAt:
+          DateTime.fromMillisecondsSinceEpoch(row.reviewedAt, isUtc: true),
+      rating: domain.FlashcardRating.values.byName(row.rating),
+      intervalDaysBefore: row.intervalDaysBefore,
+      intervalDaysAfter: row.intervalDaysAfter,
+      easeBefore: row.easeBefore,
+      easeAfter: row.easeAfter,
+      durationMs: row.durationMs,
+      reviewKind: domain.FlashcardReviewKind.values.byName(row.reviewKind),
+    );
+  }
+
+  static FlashcardReviewLogsCompanion fromFlashcardReviewLog(
+    domain.FlashcardReviewLog log,
+  ) {
+    return FlashcardReviewLogsCompanion.insert(
+      id: log.id.value,
+      cardId: log.cardId.value,
+      reviewedAt: log.reviewedAt.millisecondsSinceEpoch,
+      rating: log.rating.name,
+      intervalDaysBefore: log.intervalDaysBefore,
+      intervalDaysAfter: log.intervalDaysAfter,
+      easeBefore: log.easeBefore,
+      easeAfter: log.easeAfter,
+      durationMs: Value(log.durationMs),
+      reviewKind: Value(log.reviewKind.name),
+    );
+  }
+
+  static domain.KnowledgeAreaPlacement toKnowledgeAreaPlacement(
+    KnowledgeAreaPlacementRow row,
+  ) {
+    return domain.KnowledgeAreaPlacement(
+      areaId: domain.EntityId(row.areaId),
+      parentAreaId: domain.EntityId(row.parentAreaId),
+      linkedAt: DateTime.fromMillisecondsSinceEpoch(row.linkedAt, isUtc: true),
+      catalogKey: row.catalogKey,
+    );
+  }
+
+  static KnowledgeAreaPlacementsCompanion fromKnowledgeAreaPlacement(
+    domain.KnowledgeAreaPlacement placement,
+  ) {
+    return KnowledgeAreaPlacementsCompanion.insert(
+      areaId: placement.areaId.value,
+      parentAreaId: placement.parentAreaId.value,
+      linkedAt: placement.linkedAt.millisecondsSinceEpoch,
+      catalogKey: Value(placement.catalogKey),
+    );
+  }
+
+  static domain.ResearchKnowledgeLink toResearchKnowledgeLink(
+    ResearchKnowledgeLinkRow row,
+  ) {
+    return domain.ResearchKnowledgeLink(
+      researchNodeId: domain.EntityId(row.researchNodeId),
+      areaId: domain.EntityId(row.areaId),
+      kind: domain.ResearchKnowledgeLinkKind.values.byName(row.kind),
+      linkedAt: DateTime.fromMillisecondsSinceEpoch(row.linkedAt, isUtc: true),
+    );
+  }
+
+  static ResearchKnowledgeLinksCompanion fromResearchKnowledgeLink(
+    domain.ResearchKnowledgeLink link,
+  ) {
+    return ResearchKnowledgeLinksCompanion.insert(
+      researchNodeId: link.researchNodeId.value,
+      areaId: link.areaId.value,
+      kind: link.kind.name,
+      linkedAt: link.linkedAt.millisecondsSinceEpoch,
     );
   }
 }

@@ -26775,6 +26775,4221 @@ class ExternalCalendarEventsCompanion
   }
 }
 
+class $KnowledgeAreasTable extends KnowledgeAreas
+    with TableInfo<$KnowledgeAreasTable, KnowledgeAreaRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $KnowledgeAreasTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _profileIdMeta = const VerificationMeta(
+    'profileId',
+  );
+  @override
+  late final GeneratedColumn<String> profileId = GeneratedColumn<String>(
+    'profile_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES profiles (id)',
+    ),
+  );
+  static const VerificationMeta _parentIdMeta = const VerificationMeta(
+    'parentId',
+  );
+  @override
+  late final GeneratedColumn<String> parentId = GeneratedColumn<String>(
+    'parent_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _titleMeta = const VerificationMeta('title');
+  @override
+  late final GeneratedColumn<String> title = GeneratedColumn<String>(
+    'title',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _slugMeta = const VerificationMeta('slug');
+  @override
+  late final GeneratedColumn<String> slug = GeneratedColumn<String>(
+    'slug',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _descriptionMeta = const VerificationMeta(
+    'description',
+  );
+  @override
+  late final GeneratedColumn<String> description = GeneratedColumn<String>(
+    'description',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _iconKeyMeta = const VerificationMeta(
+    'iconKey',
+  );
+  @override
+  late final GeneratedColumn<String> iconKey = GeneratedColumn<String>(
+    'icon_key',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _catalogKeyMeta = const VerificationMeta(
+    'catalogKey',
+  );
+  @override
+  late final GeneratedColumn<String> catalogKey = GeneratedColumn<String>(
+    'catalog_key',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _sortOrderMeta = const VerificationMeta(
+    'sortOrder',
+  );
+  @override
+  late final GeneratedColumn<int> sortOrder = GeneratedColumn<int>(
+    'sort_order',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<int> createdAt = GeneratedColumn<int>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<int> updatedAt = GeneratedColumn<int>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    profileId,
+    parentId,
+    title,
+    slug,
+    description,
+    iconKey,
+    catalogKey,
+    sortOrder,
+    createdAt,
+    updatedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'knowledge_areas';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<KnowledgeAreaRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('profile_id')) {
+      context.handle(
+        _profileIdMeta,
+        profileId.isAcceptableOrUnknown(data['profile_id']!, _profileIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_profileIdMeta);
+    }
+    if (data.containsKey('parent_id')) {
+      context.handle(
+        _parentIdMeta,
+        parentId.isAcceptableOrUnknown(data['parent_id']!, _parentIdMeta),
+      );
+    }
+    if (data.containsKey('title')) {
+      context.handle(
+        _titleMeta,
+        title.isAcceptableOrUnknown(data['title']!, _titleMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_titleMeta);
+    }
+    if (data.containsKey('slug')) {
+      context.handle(
+        _slugMeta,
+        slug.isAcceptableOrUnknown(data['slug']!, _slugMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_slugMeta);
+    }
+    if (data.containsKey('description')) {
+      context.handle(
+        _descriptionMeta,
+        description.isAcceptableOrUnknown(
+          data['description']!,
+          _descriptionMeta,
+        ),
+      );
+    }
+    if (data.containsKey('icon_key')) {
+      context.handle(
+        _iconKeyMeta,
+        iconKey.isAcceptableOrUnknown(data['icon_key']!, _iconKeyMeta),
+      );
+    }
+    if (data.containsKey('catalog_key')) {
+      context.handle(
+        _catalogKeyMeta,
+        catalogKey.isAcceptableOrUnknown(data['catalog_key']!, _catalogKeyMeta),
+      );
+    }
+    if (data.containsKey('sort_order')) {
+      context.handle(
+        _sortOrderMeta,
+        sortOrder.isAcceptableOrUnknown(data['sort_order']!, _sortOrderMeta),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  KnowledgeAreaRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return KnowledgeAreaRow(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      profileId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}profile_id'],
+      )!,
+      parentId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}parent_id'],
+      ),
+      title: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}title'],
+      )!,
+      slug: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}slug'],
+      )!,
+      description: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}description'],
+      ),
+      iconKey: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}icon_key'],
+      ),
+      catalogKey: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}catalog_key'],
+      ),
+      sortOrder: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}sort_order'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}updated_at'],
+      )!,
+    );
+  }
+
+  @override
+  $KnowledgeAreasTable createAlias(String alias) {
+    return $KnowledgeAreasTable(attachedDatabase, alias);
+  }
+}
+
+class KnowledgeAreaRow extends DataClass
+    implements Insertable<KnowledgeAreaRow> {
+  final String id;
+  final String profileId;
+  final String? parentId;
+  final String title;
+  final String slug;
+  final String? description;
+  final String? iconKey;
+  final String? catalogKey;
+  final int sortOrder;
+  final int createdAt;
+  final int updatedAt;
+  const KnowledgeAreaRow({
+    required this.id,
+    required this.profileId,
+    this.parentId,
+    required this.title,
+    required this.slug,
+    this.description,
+    this.iconKey,
+    this.catalogKey,
+    required this.sortOrder,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['profile_id'] = Variable<String>(profileId);
+    if (!nullToAbsent || parentId != null) {
+      map['parent_id'] = Variable<String>(parentId);
+    }
+    map['title'] = Variable<String>(title);
+    map['slug'] = Variable<String>(slug);
+    if (!nullToAbsent || description != null) {
+      map['description'] = Variable<String>(description);
+    }
+    if (!nullToAbsent || iconKey != null) {
+      map['icon_key'] = Variable<String>(iconKey);
+    }
+    if (!nullToAbsent || catalogKey != null) {
+      map['catalog_key'] = Variable<String>(catalogKey);
+    }
+    map['sort_order'] = Variable<int>(sortOrder);
+    map['created_at'] = Variable<int>(createdAt);
+    map['updated_at'] = Variable<int>(updatedAt);
+    return map;
+  }
+
+  KnowledgeAreasCompanion toCompanion(bool nullToAbsent) {
+    return KnowledgeAreasCompanion(
+      id: Value(id),
+      profileId: Value(profileId),
+      parentId: parentId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(parentId),
+      title: Value(title),
+      slug: Value(slug),
+      description: description == null && nullToAbsent
+          ? const Value.absent()
+          : Value(description),
+      iconKey: iconKey == null && nullToAbsent
+          ? const Value.absent()
+          : Value(iconKey),
+      catalogKey: catalogKey == null && nullToAbsent
+          ? const Value.absent()
+          : Value(catalogKey),
+      sortOrder: Value(sortOrder),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+    );
+  }
+
+  factory KnowledgeAreaRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return KnowledgeAreaRow(
+      id: serializer.fromJson<String>(json['id']),
+      profileId: serializer.fromJson<String>(json['profileId']),
+      parentId: serializer.fromJson<String?>(json['parentId']),
+      title: serializer.fromJson<String>(json['title']),
+      slug: serializer.fromJson<String>(json['slug']),
+      description: serializer.fromJson<String?>(json['description']),
+      iconKey: serializer.fromJson<String?>(json['iconKey']),
+      catalogKey: serializer.fromJson<String?>(json['catalogKey']),
+      sortOrder: serializer.fromJson<int>(json['sortOrder']),
+      createdAt: serializer.fromJson<int>(json['createdAt']),
+      updatedAt: serializer.fromJson<int>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'profileId': serializer.toJson<String>(profileId),
+      'parentId': serializer.toJson<String?>(parentId),
+      'title': serializer.toJson<String>(title),
+      'slug': serializer.toJson<String>(slug),
+      'description': serializer.toJson<String?>(description),
+      'iconKey': serializer.toJson<String?>(iconKey),
+      'catalogKey': serializer.toJson<String?>(catalogKey),
+      'sortOrder': serializer.toJson<int>(sortOrder),
+      'createdAt': serializer.toJson<int>(createdAt),
+      'updatedAt': serializer.toJson<int>(updatedAt),
+    };
+  }
+
+  KnowledgeAreaRow copyWith({
+    String? id,
+    String? profileId,
+    Value<String?> parentId = const Value.absent(),
+    String? title,
+    String? slug,
+    Value<String?> description = const Value.absent(),
+    Value<String?> iconKey = const Value.absent(),
+    Value<String?> catalogKey = const Value.absent(),
+    int? sortOrder,
+    int? createdAt,
+    int? updatedAt,
+  }) => KnowledgeAreaRow(
+    id: id ?? this.id,
+    profileId: profileId ?? this.profileId,
+    parentId: parentId.present ? parentId.value : this.parentId,
+    title: title ?? this.title,
+    slug: slug ?? this.slug,
+    description: description.present ? description.value : this.description,
+    iconKey: iconKey.present ? iconKey.value : this.iconKey,
+    catalogKey: catalogKey.present ? catalogKey.value : this.catalogKey,
+    sortOrder: sortOrder ?? this.sortOrder,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+  );
+  KnowledgeAreaRow copyWithCompanion(KnowledgeAreasCompanion data) {
+    return KnowledgeAreaRow(
+      id: data.id.present ? data.id.value : this.id,
+      profileId: data.profileId.present ? data.profileId.value : this.profileId,
+      parentId: data.parentId.present ? data.parentId.value : this.parentId,
+      title: data.title.present ? data.title.value : this.title,
+      slug: data.slug.present ? data.slug.value : this.slug,
+      description: data.description.present
+          ? data.description.value
+          : this.description,
+      iconKey: data.iconKey.present ? data.iconKey.value : this.iconKey,
+      catalogKey: data.catalogKey.present
+          ? data.catalogKey.value
+          : this.catalogKey,
+      sortOrder: data.sortOrder.present ? data.sortOrder.value : this.sortOrder,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('KnowledgeAreaRow(')
+          ..write('id: $id, ')
+          ..write('profileId: $profileId, ')
+          ..write('parentId: $parentId, ')
+          ..write('title: $title, ')
+          ..write('slug: $slug, ')
+          ..write('description: $description, ')
+          ..write('iconKey: $iconKey, ')
+          ..write('catalogKey: $catalogKey, ')
+          ..write('sortOrder: $sortOrder, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    profileId,
+    parentId,
+    title,
+    slug,
+    description,
+    iconKey,
+    catalogKey,
+    sortOrder,
+    createdAt,
+    updatedAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is KnowledgeAreaRow &&
+          other.id == this.id &&
+          other.profileId == this.profileId &&
+          other.parentId == this.parentId &&
+          other.title == this.title &&
+          other.slug == this.slug &&
+          other.description == this.description &&
+          other.iconKey == this.iconKey &&
+          other.catalogKey == this.catalogKey &&
+          other.sortOrder == this.sortOrder &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt);
+}
+
+class KnowledgeAreasCompanion extends UpdateCompanion<KnowledgeAreaRow> {
+  final Value<String> id;
+  final Value<String> profileId;
+  final Value<String?> parentId;
+  final Value<String> title;
+  final Value<String> slug;
+  final Value<String?> description;
+  final Value<String?> iconKey;
+  final Value<String?> catalogKey;
+  final Value<int> sortOrder;
+  final Value<int> createdAt;
+  final Value<int> updatedAt;
+  final Value<int> rowid;
+  const KnowledgeAreasCompanion({
+    this.id = const Value.absent(),
+    this.profileId = const Value.absent(),
+    this.parentId = const Value.absent(),
+    this.title = const Value.absent(),
+    this.slug = const Value.absent(),
+    this.description = const Value.absent(),
+    this.iconKey = const Value.absent(),
+    this.catalogKey = const Value.absent(),
+    this.sortOrder = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  KnowledgeAreasCompanion.insert({
+    required String id,
+    required String profileId,
+    this.parentId = const Value.absent(),
+    required String title,
+    required String slug,
+    this.description = const Value.absent(),
+    this.iconKey = const Value.absent(),
+    this.catalogKey = const Value.absent(),
+    this.sortOrder = const Value.absent(),
+    required int createdAt,
+    required int updatedAt,
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       profileId = Value(profileId),
+       title = Value(title),
+       slug = Value(slug),
+       createdAt = Value(createdAt),
+       updatedAt = Value(updatedAt);
+  static Insertable<KnowledgeAreaRow> custom({
+    Expression<String>? id,
+    Expression<String>? profileId,
+    Expression<String>? parentId,
+    Expression<String>? title,
+    Expression<String>? slug,
+    Expression<String>? description,
+    Expression<String>? iconKey,
+    Expression<String>? catalogKey,
+    Expression<int>? sortOrder,
+    Expression<int>? createdAt,
+    Expression<int>? updatedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (profileId != null) 'profile_id': profileId,
+      if (parentId != null) 'parent_id': parentId,
+      if (title != null) 'title': title,
+      if (slug != null) 'slug': slug,
+      if (description != null) 'description': description,
+      if (iconKey != null) 'icon_key': iconKey,
+      if (catalogKey != null) 'catalog_key': catalogKey,
+      if (sortOrder != null) 'sort_order': sortOrder,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  KnowledgeAreasCompanion copyWith({
+    Value<String>? id,
+    Value<String>? profileId,
+    Value<String?>? parentId,
+    Value<String>? title,
+    Value<String>? slug,
+    Value<String?>? description,
+    Value<String?>? iconKey,
+    Value<String?>? catalogKey,
+    Value<int>? sortOrder,
+    Value<int>? createdAt,
+    Value<int>? updatedAt,
+    Value<int>? rowid,
+  }) {
+    return KnowledgeAreasCompanion(
+      id: id ?? this.id,
+      profileId: profileId ?? this.profileId,
+      parentId: parentId ?? this.parentId,
+      title: title ?? this.title,
+      slug: slug ?? this.slug,
+      description: description ?? this.description,
+      iconKey: iconKey ?? this.iconKey,
+      catalogKey: catalogKey ?? this.catalogKey,
+      sortOrder: sortOrder ?? this.sortOrder,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (profileId.present) {
+      map['profile_id'] = Variable<String>(profileId.value);
+    }
+    if (parentId.present) {
+      map['parent_id'] = Variable<String>(parentId.value);
+    }
+    if (title.present) {
+      map['title'] = Variable<String>(title.value);
+    }
+    if (slug.present) {
+      map['slug'] = Variable<String>(slug.value);
+    }
+    if (description.present) {
+      map['description'] = Variable<String>(description.value);
+    }
+    if (iconKey.present) {
+      map['icon_key'] = Variable<String>(iconKey.value);
+    }
+    if (catalogKey.present) {
+      map['catalog_key'] = Variable<String>(catalogKey.value);
+    }
+    if (sortOrder.present) {
+      map['sort_order'] = Variable<int>(sortOrder.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<int>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<int>(updatedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('KnowledgeAreasCompanion(')
+          ..write('id: $id, ')
+          ..write('profileId: $profileId, ')
+          ..write('parentId: $parentId, ')
+          ..write('title: $title, ')
+          ..write('slug: $slug, ')
+          ..write('description: $description, ')
+          ..write('iconKey: $iconKey, ')
+          ..write('catalogKey: $catalogKey, ')
+          ..write('sortOrder: $sortOrder, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $FlashcardDecksTable extends FlashcardDecks
+    with TableInfo<$FlashcardDecksTable, FlashcardDeckRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $FlashcardDecksTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _profileIdMeta = const VerificationMeta(
+    'profileId',
+  );
+  @override
+  late final GeneratedColumn<String> profileId = GeneratedColumn<String>(
+    'profile_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES profiles (id)',
+    ),
+  );
+  static const VerificationMeta _areaIdMeta = const VerificationMeta('areaId');
+  @override
+  late final GeneratedColumn<String> areaId = GeneratedColumn<String>(
+    'area_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _researchNodeIdMeta = const VerificationMeta(
+    'researchNodeId',
+  );
+  @override
+  late final GeneratedColumn<String> researchNodeId = GeneratedColumn<String>(
+    'research_node_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _titleMeta = const VerificationMeta('title');
+  @override
+  late final GeneratedColumn<String> title = GeneratedColumn<String>(
+    'title',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _descriptionMeta = const VerificationMeta(
+    'description',
+  );
+  @override
+  late final GeneratedColumn<String> description = GeneratedColumn<String>(
+    'description',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _newLimitPerDayMeta = const VerificationMeta(
+    'newLimitPerDay',
+  );
+  @override
+  late final GeneratedColumn<int> newLimitPerDay = GeneratedColumn<int>(
+    'new_limit_per_day',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(20),
+  );
+  static const VerificationMeta _reviewLimitPerDayMeta = const VerificationMeta(
+    'reviewLimitPerDay',
+  );
+  @override
+  late final GeneratedColumn<int> reviewLimitPerDay = GeneratedColumn<int>(
+    'review_limit_per_day',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(200),
+  );
+  static const VerificationMeta _archivedAtMeta = const VerificationMeta(
+    'archivedAt',
+  );
+  @override
+  late final GeneratedColumn<int> archivedAt = GeneratedColumn<int>(
+    'archived_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<int> createdAt = GeneratedColumn<int>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<int> updatedAt = GeneratedColumn<int>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _versionMeta = const VerificationMeta(
+    'version',
+  );
+  @override
+  late final GeneratedColumn<int> version = GeneratedColumn<int>(
+    'version',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(1),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    profileId,
+    areaId,
+    researchNodeId,
+    title,
+    description,
+    newLimitPerDay,
+    reviewLimitPerDay,
+    archivedAt,
+    createdAt,
+    updatedAt,
+    version,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'flashcard_decks';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<FlashcardDeckRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('profile_id')) {
+      context.handle(
+        _profileIdMeta,
+        profileId.isAcceptableOrUnknown(data['profile_id']!, _profileIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_profileIdMeta);
+    }
+    if (data.containsKey('area_id')) {
+      context.handle(
+        _areaIdMeta,
+        areaId.isAcceptableOrUnknown(data['area_id']!, _areaIdMeta),
+      );
+    }
+    if (data.containsKey('research_node_id')) {
+      context.handle(
+        _researchNodeIdMeta,
+        researchNodeId.isAcceptableOrUnknown(
+          data['research_node_id']!,
+          _researchNodeIdMeta,
+        ),
+      );
+    }
+    if (data.containsKey('title')) {
+      context.handle(
+        _titleMeta,
+        title.isAcceptableOrUnknown(data['title']!, _titleMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_titleMeta);
+    }
+    if (data.containsKey('description')) {
+      context.handle(
+        _descriptionMeta,
+        description.isAcceptableOrUnknown(
+          data['description']!,
+          _descriptionMeta,
+        ),
+      );
+    }
+    if (data.containsKey('new_limit_per_day')) {
+      context.handle(
+        _newLimitPerDayMeta,
+        newLimitPerDay.isAcceptableOrUnknown(
+          data['new_limit_per_day']!,
+          _newLimitPerDayMeta,
+        ),
+      );
+    }
+    if (data.containsKey('review_limit_per_day')) {
+      context.handle(
+        _reviewLimitPerDayMeta,
+        reviewLimitPerDay.isAcceptableOrUnknown(
+          data['review_limit_per_day']!,
+          _reviewLimitPerDayMeta,
+        ),
+      );
+    }
+    if (data.containsKey('archived_at')) {
+      context.handle(
+        _archivedAtMeta,
+        archivedAt.isAcceptableOrUnknown(data['archived_at']!, _archivedAtMeta),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    if (data.containsKey('version')) {
+      context.handle(
+        _versionMeta,
+        version.isAcceptableOrUnknown(data['version']!, _versionMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  FlashcardDeckRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return FlashcardDeckRow(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      profileId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}profile_id'],
+      )!,
+      areaId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}area_id'],
+      ),
+      researchNodeId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}research_node_id'],
+      ),
+      title: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}title'],
+      )!,
+      description: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}description'],
+      ),
+      newLimitPerDay: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}new_limit_per_day'],
+      )!,
+      reviewLimitPerDay: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}review_limit_per_day'],
+      )!,
+      archivedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}archived_at'],
+      ),
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}updated_at'],
+      )!,
+      version: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}version'],
+      )!,
+    );
+  }
+
+  @override
+  $FlashcardDecksTable createAlias(String alias) {
+    return $FlashcardDecksTable(attachedDatabase, alias);
+  }
+}
+
+class FlashcardDeckRow extends DataClass
+    implements Insertable<FlashcardDeckRow> {
+  final String id;
+  final String profileId;
+  final String? areaId;
+  final String? researchNodeId;
+  final String title;
+  final String? description;
+  final int newLimitPerDay;
+  final int reviewLimitPerDay;
+  final int? archivedAt;
+  final int createdAt;
+  final int updatedAt;
+  final int version;
+  const FlashcardDeckRow({
+    required this.id,
+    required this.profileId,
+    this.areaId,
+    this.researchNodeId,
+    required this.title,
+    this.description,
+    required this.newLimitPerDay,
+    required this.reviewLimitPerDay,
+    this.archivedAt,
+    required this.createdAt,
+    required this.updatedAt,
+    required this.version,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['profile_id'] = Variable<String>(profileId);
+    if (!nullToAbsent || areaId != null) {
+      map['area_id'] = Variable<String>(areaId);
+    }
+    if (!nullToAbsent || researchNodeId != null) {
+      map['research_node_id'] = Variable<String>(researchNodeId);
+    }
+    map['title'] = Variable<String>(title);
+    if (!nullToAbsent || description != null) {
+      map['description'] = Variable<String>(description);
+    }
+    map['new_limit_per_day'] = Variable<int>(newLimitPerDay);
+    map['review_limit_per_day'] = Variable<int>(reviewLimitPerDay);
+    if (!nullToAbsent || archivedAt != null) {
+      map['archived_at'] = Variable<int>(archivedAt);
+    }
+    map['created_at'] = Variable<int>(createdAt);
+    map['updated_at'] = Variable<int>(updatedAt);
+    map['version'] = Variable<int>(version);
+    return map;
+  }
+
+  FlashcardDecksCompanion toCompanion(bool nullToAbsent) {
+    return FlashcardDecksCompanion(
+      id: Value(id),
+      profileId: Value(profileId),
+      areaId: areaId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(areaId),
+      researchNodeId: researchNodeId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(researchNodeId),
+      title: Value(title),
+      description: description == null && nullToAbsent
+          ? const Value.absent()
+          : Value(description),
+      newLimitPerDay: Value(newLimitPerDay),
+      reviewLimitPerDay: Value(reviewLimitPerDay),
+      archivedAt: archivedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(archivedAt),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+      version: Value(version),
+    );
+  }
+
+  factory FlashcardDeckRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return FlashcardDeckRow(
+      id: serializer.fromJson<String>(json['id']),
+      profileId: serializer.fromJson<String>(json['profileId']),
+      areaId: serializer.fromJson<String?>(json['areaId']),
+      researchNodeId: serializer.fromJson<String?>(json['researchNodeId']),
+      title: serializer.fromJson<String>(json['title']),
+      description: serializer.fromJson<String?>(json['description']),
+      newLimitPerDay: serializer.fromJson<int>(json['newLimitPerDay']),
+      reviewLimitPerDay: serializer.fromJson<int>(json['reviewLimitPerDay']),
+      archivedAt: serializer.fromJson<int?>(json['archivedAt']),
+      createdAt: serializer.fromJson<int>(json['createdAt']),
+      updatedAt: serializer.fromJson<int>(json['updatedAt']),
+      version: serializer.fromJson<int>(json['version']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'profileId': serializer.toJson<String>(profileId),
+      'areaId': serializer.toJson<String?>(areaId),
+      'researchNodeId': serializer.toJson<String?>(researchNodeId),
+      'title': serializer.toJson<String>(title),
+      'description': serializer.toJson<String?>(description),
+      'newLimitPerDay': serializer.toJson<int>(newLimitPerDay),
+      'reviewLimitPerDay': serializer.toJson<int>(reviewLimitPerDay),
+      'archivedAt': serializer.toJson<int?>(archivedAt),
+      'createdAt': serializer.toJson<int>(createdAt),
+      'updatedAt': serializer.toJson<int>(updatedAt),
+      'version': serializer.toJson<int>(version),
+    };
+  }
+
+  FlashcardDeckRow copyWith({
+    String? id,
+    String? profileId,
+    Value<String?> areaId = const Value.absent(),
+    Value<String?> researchNodeId = const Value.absent(),
+    String? title,
+    Value<String?> description = const Value.absent(),
+    int? newLimitPerDay,
+    int? reviewLimitPerDay,
+    Value<int?> archivedAt = const Value.absent(),
+    int? createdAt,
+    int? updatedAt,
+    int? version,
+  }) => FlashcardDeckRow(
+    id: id ?? this.id,
+    profileId: profileId ?? this.profileId,
+    areaId: areaId.present ? areaId.value : this.areaId,
+    researchNodeId: researchNodeId.present
+        ? researchNodeId.value
+        : this.researchNodeId,
+    title: title ?? this.title,
+    description: description.present ? description.value : this.description,
+    newLimitPerDay: newLimitPerDay ?? this.newLimitPerDay,
+    reviewLimitPerDay: reviewLimitPerDay ?? this.reviewLimitPerDay,
+    archivedAt: archivedAt.present ? archivedAt.value : this.archivedAt,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+    version: version ?? this.version,
+  );
+  FlashcardDeckRow copyWithCompanion(FlashcardDecksCompanion data) {
+    return FlashcardDeckRow(
+      id: data.id.present ? data.id.value : this.id,
+      profileId: data.profileId.present ? data.profileId.value : this.profileId,
+      areaId: data.areaId.present ? data.areaId.value : this.areaId,
+      researchNodeId: data.researchNodeId.present
+          ? data.researchNodeId.value
+          : this.researchNodeId,
+      title: data.title.present ? data.title.value : this.title,
+      description: data.description.present
+          ? data.description.value
+          : this.description,
+      newLimitPerDay: data.newLimitPerDay.present
+          ? data.newLimitPerDay.value
+          : this.newLimitPerDay,
+      reviewLimitPerDay: data.reviewLimitPerDay.present
+          ? data.reviewLimitPerDay.value
+          : this.reviewLimitPerDay,
+      archivedAt: data.archivedAt.present
+          ? data.archivedAt.value
+          : this.archivedAt,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+      version: data.version.present ? data.version.value : this.version,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('FlashcardDeckRow(')
+          ..write('id: $id, ')
+          ..write('profileId: $profileId, ')
+          ..write('areaId: $areaId, ')
+          ..write('researchNodeId: $researchNodeId, ')
+          ..write('title: $title, ')
+          ..write('description: $description, ')
+          ..write('newLimitPerDay: $newLimitPerDay, ')
+          ..write('reviewLimitPerDay: $reviewLimitPerDay, ')
+          ..write('archivedAt: $archivedAt, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('version: $version')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    profileId,
+    areaId,
+    researchNodeId,
+    title,
+    description,
+    newLimitPerDay,
+    reviewLimitPerDay,
+    archivedAt,
+    createdAt,
+    updatedAt,
+    version,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is FlashcardDeckRow &&
+          other.id == this.id &&
+          other.profileId == this.profileId &&
+          other.areaId == this.areaId &&
+          other.researchNodeId == this.researchNodeId &&
+          other.title == this.title &&
+          other.description == this.description &&
+          other.newLimitPerDay == this.newLimitPerDay &&
+          other.reviewLimitPerDay == this.reviewLimitPerDay &&
+          other.archivedAt == this.archivedAt &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt &&
+          other.version == this.version);
+}
+
+class FlashcardDecksCompanion extends UpdateCompanion<FlashcardDeckRow> {
+  final Value<String> id;
+  final Value<String> profileId;
+  final Value<String?> areaId;
+  final Value<String?> researchNodeId;
+  final Value<String> title;
+  final Value<String?> description;
+  final Value<int> newLimitPerDay;
+  final Value<int> reviewLimitPerDay;
+  final Value<int?> archivedAt;
+  final Value<int> createdAt;
+  final Value<int> updatedAt;
+  final Value<int> version;
+  final Value<int> rowid;
+  const FlashcardDecksCompanion({
+    this.id = const Value.absent(),
+    this.profileId = const Value.absent(),
+    this.areaId = const Value.absent(),
+    this.researchNodeId = const Value.absent(),
+    this.title = const Value.absent(),
+    this.description = const Value.absent(),
+    this.newLimitPerDay = const Value.absent(),
+    this.reviewLimitPerDay = const Value.absent(),
+    this.archivedAt = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.version = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  FlashcardDecksCompanion.insert({
+    required String id,
+    required String profileId,
+    this.areaId = const Value.absent(),
+    this.researchNodeId = const Value.absent(),
+    required String title,
+    this.description = const Value.absent(),
+    this.newLimitPerDay = const Value.absent(),
+    this.reviewLimitPerDay = const Value.absent(),
+    this.archivedAt = const Value.absent(),
+    required int createdAt,
+    required int updatedAt,
+    this.version = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       profileId = Value(profileId),
+       title = Value(title),
+       createdAt = Value(createdAt),
+       updatedAt = Value(updatedAt);
+  static Insertable<FlashcardDeckRow> custom({
+    Expression<String>? id,
+    Expression<String>? profileId,
+    Expression<String>? areaId,
+    Expression<String>? researchNodeId,
+    Expression<String>? title,
+    Expression<String>? description,
+    Expression<int>? newLimitPerDay,
+    Expression<int>? reviewLimitPerDay,
+    Expression<int>? archivedAt,
+    Expression<int>? createdAt,
+    Expression<int>? updatedAt,
+    Expression<int>? version,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (profileId != null) 'profile_id': profileId,
+      if (areaId != null) 'area_id': areaId,
+      if (researchNodeId != null) 'research_node_id': researchNodeId,
+      if (title != null) 'title': title,
+      if (description != null) 'description': description,
+      if (newLimitPerDay != null) 'new_limit_per_day': newLimitPerDay,
+      if (reviewLimitPerDay != null) 'review_limit_per_day': reviewLimitPerDay,
+      if (archivedAt != null) 'archived_at': archivedAt,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (version != null) 'version': version,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  FlashcardDecksCompanion copyWith({
+    Value<String>? id,
+    Value<String>? profileId,
+    Value<String?>? areaId,
+    Value<String?>? researchNodeId,
+    Value<String>? title,
+    Value<String?>? description,
+    Value<int>? newLimitPerDay,
+    Value<int>? reviewLimitPerDay,
+    Value<int?>? archivedAt,
+    Value<int>? createdAt,
+    Value<int>? updatedAt,
+    Value<int>? version,
+    Value<int>? rowid,
+  }) {
+    return FlashcardDecksCompanion(
+      id: id ?? this.id,
+      profileId: profileId ?? this.profileId,
+      areaId: areaId ?? this.areaId,
+      researchNodeId: researchNodeId ?? this.researchNodeId,
+      title: title ?? this.title,
+      description: description ?? this.description,
+      newLimitPerDay: newLimitPerDay ?? this.newLimitPerDay,
+      reviewLimitPerDay: reviewLimitPerDay ?? this.reviewLimitPerDay,
+      archivedAt: archivedAt ?? this.archivedAt,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      version: version ?? this.version,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (profileId.present) {
+      map['profile_id'] = Variable<String>(profileId.value);
+    }
+    if (areaId.present) {
+      map['area_id'] = Variable<String>(areaId.value);
+    }
+    if (researchNodeId.present) {
+      map['research_node_id'] = Variable<String>(researchNodeId.value);
+    }
+    if (title.present) {
+      map['title'] = Variable<String>(title.value);
+    }
+    if (description.present) {
+      map['description'] = Variable<String>(description.value);
+    }
+    if (newLimitPerDay.present) {
+      map['new_limit_per_day'] = Variable<int>(newLimitPerDay.value);
+    }
+    if (reviewLimitPerDay.present) {
+      map['review_limit_per_day'] = Variable<int>(reviewLimitPerDay.value);
+    }
+    if (archivedAt.present) {
+      map['archived_at'] = Variable<int>(archivedAt.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<int>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<int>(updatedAt.value);
+    }
+    if (version.present) {
+      map['version'] = Variable<int>(version.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('FlashcardDecksCompanion(')
+          ..write('id: $id, ')
+          ..write('profileId: $profileId, ')
+          ..write('areaId: $areaId, ')
+          ..write('researchNodeId: $researchNodeId, ')
+          ..write('title: $title, ')
+          ..write('description: $description, ')
+          ..write('newLimitPerDay: $newLimitPerDay, ')
+          ..write('reviewLimitPerDay: $reviewLimitPerDay, ')
+          ..write('archivedAt: $archivedAt, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('version: $version, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $FlashcardsTable extends Flashcards
+    with TableInfo<$FlashcardsTable, FlashcardRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $FlashcardsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _profileIdMeta = const VerificationMeta(
+    'profileId',
+  );
+  @override
+  late final GeneratedColumn<String> profileId = GeneratedColumn<String>(
+    'profile_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES profiles (id)',
+    ),
+  );
+  static const VerificationMeta _deckIdMeta = const VerificationMeta('deckId');
+  @override
+  late final GeneratedColumn<String> deckId = GeneratedColumn<String>(
+    'deck_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES flashcard_decks (id)',
+    ),
+  );
+  static const VerificationMeta _areaIdMeta = const VerificationMeta('areaId');
+  @override
+  late final GeneratedColumn<String> areaId = GeneratedColumn<String>(
+    'area_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _kindMeta = const VerificationMeta('kind');
+  @override
+  late final GeneratedColumn<String> kind = GeneratedColumn<String>(
+    'kind',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _frontMeta = const VerificationMeta('front');
+  @override
+  late final GeneratedColumn<String> front = GeneratedColumn<String>(
+    'front',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _backMeta = const VerificationMeta('back');
+  @override
+  late final GeneratedColumn<String> back = GeneratedColumn<String>(
+    'back',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(''),
+  );
+  static const VerificationMeta _extraMeta = const VerificationMeta('extra');
+  @override
+  late final GeneratedColumn<String> extra = GeneratedColumn<String>(
+    'extra',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _tagsJsonMeta = const VerificationMeta(
+    'tagsJson',
+  );
+  @override
+  late final GeneratedColumn<String> tagsJson = GeneratedColumn<String>(
+    'tags_json',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('[]'),
+  );
+  static const VerificationMeta _clozeIndexMeta = const VerificationMeta(
+    'clozeIndex',
+  );
+  @override
+  late final GeneratedColumn<int> clozeIndex = GeneratedColumn<int>(
+    'cloze_index',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _reverseOfIdMeta = const VerificationMeta(
+    'reverseOfId',
+  );
+  @override
+  late final GeneratedColumn<String> reverseOfId = GeneratedColumn<String>(
+    'reverse_of_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _scheduleModeMeta = const VerificationMeta(
+    'scheduleMode',
+  );
+  @override
+  late final GeneratedColumn<String> scheduleMode = GeneratedColumn<String>(
+    'schedule_mode',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('scheduled'),
+  );
+  static const VerificationMeta _suspendedMeta = const VerificationMeta(
+    'suspended',
+  );
+  @override
+  late final GeneratedColumn<bool> suspended = GeneratedColumn<bool>(
+    'suspended',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("suspended" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<int> createdAt = GeneratedColumn<int>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<int> updatedAt = GeneratedColumn<int>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _versionMeta = const VerificationMeta(
+    'version',
+  );
+  @override
+  late final GeneratedColumn<int> version = GeneratedColumn<int>(
+    'version',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(1),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    profileId,
+    deckId,
+    areaId,
+    kind,
+    front,
+    back,
+    extra,
+    tagsJson,
+    clozeIndex,
+    reverseOfId,
+    scheduleMode,
+    suspended,
+    createdAt,
+    updatedAt,
+    version,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'flashcards';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<FlashcardRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('profile_id')) {
+      context.handle(
+        _profileIdMeta,
+        profileId.isAcceptableOrUnknown(data['profile_id']!, _profileIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_profileIdMeta);
+    }
+    if (data.containsKey('deck_id')) {
+      context.handle(
+        _deckIdMeta,
+        deckId.isAcceptableOrUnknown(data['deck_id']!, _deckIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_deckIdMeta);
+    }
+    if (data.containsKey('area_id')) {
+      context.handle(
+        _areaIdMeta,
+        areaId.isAcceptableOrUnknown(data['area_id']!, _areaIdMeta),
+      );
+    }
+    if (data.containsKey('kind')) {
+      context.handle(
+        _kindMeta,
+        kind.isAcceptableOrUnknown(data['kind']!, _kindMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_kindMeta);
+    }
+    if (data.containsKey('front')) {
+      context.handle(
+        _frontMeta,
+        front.isAcceptableOrUnknown(data['front']!, _frontMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_frontMeta);
+    }
+    if (data.containsKey('back')) {
+      context.handle(
+        _backMeta,
+        back.isAcceptableOrUnknown(data['back']!, _backMeta),
+      );
+    }
+    if (data.containsKey('extra')) {
+      context.handle(
+        _extraMeta,
+        extra.isAcceptableOrUnknown(data['extra']!, _extraMeta),
+      );
+    }
+    if (data.containsKey('tags_json')) {
+      context.handle(
+        _tagsJsonMeta,
+        tagsJson.isAcceptableOrUnknown(data['tags_json']!, _tagsJsonMeta),
+      );
+    }
+    if (data.containsKey('cloze_index')) {
+      context.handle(
+        _clozeIndexMeta,
+        clozeIndex.isAcceptableOrUnknown(data['cloze_index']!, _clozeIndexMeta),
+      );
+    }
+    if (data.containsKey('reverse_of_id')) {
+      context.handle(
+        _reverseOfIdMeta,
+        reverseOfId.isAcceptableOrUnknown(
+          data['reverse_of_id']!,
+          _reverseOfIdMeta,
+        ),
+      );
+    }
+    if (data.containsKey('schedule_mode')) {
+      context.handle(
+        _scheduleModeMeta,
+        scheduleMode.isAcceptableOrUnknown(
+          data['schedule_mode']!,
+          _scheduleModeMeta,
+        ),
+      );
+    }
+    if (data.containsKey('suspended')) {
+      context.handle(
+        _suspendedMeta,
+        suspended.isAcceptableOrUnknown(data['suspended']!, _suspendedMeta),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    if (data.containsKey('version')) {
+      context.handle(
+        _versionMeta,
+        version.isAcceptableOrUnknown(data['version']!, _versionMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  FlashcardRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return FlashcardRow(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      profileId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}profile_id'],
+      )!,
+      deckId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}deck_id'],
+      )!,
+      areaId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}area_id'],
+      ),
+      kind: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}kind'],
+      )!,
+      front: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}front'],
+      )!,
+      back: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}back'],
+      )!,
+      extra: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}extra'],
+      ),
+      tagsJson: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}tags_json'],
+      )!,
+      clozeIndex: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}cloze_index'],
+      ),
+      reverseOfId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}reverse_of_id'],
+      ),
+      scheduleMode: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}schedule_mode'],
+      )!,
+      suspended: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}suspended'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}updated_at'],
+      )!,
+      version: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}version'],
+      )!,
+    );
+  }
+
+  @override
+  $FlashcardsTable createAlias(String alias) {
+    return $FlashcardsTable(attachedDatabase, alias);
+  }
+}
+
+class FlashcardRow extends DataClass implements Insertable<FlashcardRow> {
+  final String id;
+  final String profileId;
+  final String deckId;
+  final String? areaId;
+  final String kind;
+  final String front;
+  final String back;
+  final String? extra;
+  final String tagsJson;
+  final int? clozeIndex;
+  final String? reverseOfId;
+  final String scheduleMode;
+  final bool suspended;
+  final int createdAt;
+  final int updatedAt;
+  final int version;
+  const FlashcardRow({
+    required this.id,
+    required this.profileId,
+    required this.deckId,
+    this.areaId,
+    required this.kind,
+    required this.front,
+    required this.back,
+    this.extra,
+    required this.tagsJson,
+    this.clozeIndex,
+    this.reverseOfId,
+    required this.scheduleMode,
+    required this.suspended,
+    required this.createdAt,
+    required this.updatedAt,
+    required this.version,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['profile_id'] = Variable<String>(profileId);
+    map['deck_id'] = Variable<String>(deckId);
+    if (!nullToAbsent || areaId != null) {
+      map['area_id'] = Variable<String>(areaId);
+    }
+    map['kind'] = Variable<String>(kind);
+    map['front'] = Variable<String>(front);
+    map['back'] = Variable<String>(back);
+    if (!nullToAbsent || extra != null) {
+      map['extra'] = Variable<String>(extra);
+    }
+    map['tags_json'] = Variable<String>(tagsJson);
+    if (!nullToAbsent || clozeIndex != null) {
+      map['cloze_index'] = Variable<int>(clozeIndex);
+    }
+    if (!nullToAbsent || reverseOfId != null) {
+      map['reverse_of_id'] = Variable<String>(reverseOfId);
+    }
+    map['schedule_mode'] = Variable<String>(scheduleMode);
+    map['suspended'] = Variable<bool>(suspended);
+    map['created_at'] = Variable<int>(createdAt);
+    map['updated_at'] = Variable<int>(updatedAt);
+    map['version'] = Variable<int>(version);
+    return map;
+  }
+
+  FlashcardsCompanion toCompanion(bool nullToAbsent) {
+    return FlashcardsCompanion(
+      id: Value(id),
+      profileId: Value(profileId),
+      deckId: Value(deckId),
+      areaId: areaId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(areaId),
+      kind: Value(kind),
+      front: Value(front),
+      back: Value(back),
+      extra: extra == null && nullToAbsent
+          ? const Value.absent()
+          : Value(extra),
+      tagsJson: Value(tagsJson),
+      clozeIndex: clozeIndex == null && nullToAbsent
+          ? const Value.absent()
+          : Value(clozeIndex),
+      reverseOfId: reverseOfId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(reverseOfId),
+      scheduleMode: Value(scheduleMode),
+      suspended: Value(suspended),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+      version: Value(version),
+    );
+  }
+
+  factory FlashcardRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return FlashcardRow(
+      id: serializer.fromJson<String>(json['id']),
+      profileId: serializer.fromJson<String>(json['profileId']),
+      deckId: serializer.fromJson<String>(json['deckId']),
+      areaId: serializer.fromJson<String?>(json['areaId']),
+      kind: serializer.fromJson<String>(json['kind']),
+      front: serializer.fromJson<String>(json['front']),
+      back: serializer.fromJson<String>(json['back']),
+      extra: serializer.fromJson<String?>(json['extra']),
+      tagsJson: serializer.fromJson<String>(json['tagsJson']),
+      clozeIndex: serializer.fromJson<int?>(json['clozeIndex']),
+      reverseOfId: serializer.fromJson<String?>(json['reverseOfId']),
+      scheduleMode: serializer.fromJson<String>(json['scheduleMode']),
+      suspended: serializer.fromJson<bool>(json['suspended']),
+      createdAt: serializer.fromJson<int>(json['createdAt']),
+      updatedAt: serializer.fromJson<int>(json['updatedAt']),
+      version: serializer.fromJson<int>(json['version']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'profileId': serializer.toJson<String>(profileId),
+      'deckId': serializer.toJson<String>(deckId),
+      'areaId': serializer.toJson<String?>(areaId),
+      'kind': serializer.toJson<String>(kind),
+      'front': serializer.toJson<String>(front),
+      'back': serializer.toJson<String>(back),
+      'extra': serializer.toJson<String?>(extra),
+      'tagsJson': serializer.toJson<String>(tagsJson),
+      'clozeIndex': serializer.toJson<int?>(clozeIndex),
+      'reverseOfId': serializer.toJson<String?>(reverseOfId),
+      'scheduleMode': serializer.toJson<String>(scheduleMode),
+      'suspended': serializer.toJson<bool>(suspended),
+      'createdAt': serializer.toJson<int>(createdAt),
+      'updatedAt': serializer.toJson<int>(updatedAt),
+      'version': serializer.toJson<int>(version),
+    };
+  }
+
+  FlashcardRow copyWith({
+    String? id,
+    String? profileId,
+    String? deckId,
+    Value<String?> areaId = const Value.absent(),
+    String? kind,
+    String? front,
+    String? back,
+    Value<String?> extra = const Value.absent(),
+    String? tagsJson,
+    Value<int?> clozeIndex = const Value.absent(),
+    Value<String?> reverseOfId = const Value.absent(),
+    String? scheduleMode,
+    bool? suspended,
+    int? createdAt,
+    int? updatedAt,
+    int? version,
+  }) => FlashcardRow(
+    id: id ?? this.id,
+    profileId: profileId ?? this.profileId,
+    deckId: deckId ?? this.deckId,
+    areaId: areaId.present ? areaId.value : this.areaId,
+    kind: kind ?? this.kind,
+    front: front ?? this.front,
+    back: back ?? this.back,
+    extra: extra.present ? extra.value : this.extra,
+    tagsJson: tagsJson ?? this.tagsJson,
+    clozeIndex: clozeIndex.present ? clozeIndex.value : this.clozeIndex,
+    reverseOfId: reverseOfId.present ? reverseOfId.value : this.reverseOfId,
+    scheduleMode: scheduleMode ?? this.scheduleMode,
+    suspended: suspended ?? this.suspended,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+    version: version ?? this.version,
+  );
+  FlashcardRow copyWithCompanion(FlashcardsCompanion data) {
+    return FlashcardRow(
+      id: data.id.present ? data.id.value : this.id,
+      profileId: data.profileId.present ? data.profileId.value : this.profileId,
+      deckId: data.deckId.present ? data.deckId.value : this.deckId,
+      areaId: data.areaId.present ? data.areaId.value : this.areaId,
+      kind: data.kind.present ? data.kind.value : this.kind,
+      front: data.front.present ? data.front.value : this.front,
+      back: data.back.present ? data.back.value : this.back,
+      extra: data.extra.present ? data.extra.value : this.extra,
+      tagsJson: data.tagsJson.present ? data.tagsJson.value : this.tagsJson,
+      clozeIndex: data.clozeIndex.present
+          ? data.clozeIndex.value
+          : this.clozeIndex,
+      reverseOfId: data.reverseOfId.present
+          ? data.reverseOfId.value
+          : this.reverseOfId,
+      scheduleMode: data.scheduleMode.present
+          ? data.scheduleMode.value
+          : this.scheduleMode,
+      suspended: data.suspended.present ? data.suspended.value : this.suspended,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+      version: data.version.present ? data.version.value : this.version,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('FlashcardRow(')
+          ..write('id: $id, ')
+          ..write('profileId: $profileId, ')
+          ..write('deckId: $deckId, ')
+          ..write('areaId: $areaId, ')
+          ..write('kind: $kind, ')
+          ..write('front: $front, ')
+          ..write('back: $back, ')
+          ..write('extra: $extra, ')
+          ..write('tagsJson: $tagsJson, ')
+          ..write('clozeIndex: $clozeIndex, ')
+          ..write('reverseOfId: $reverseOfId, ')
+          ..write('scheduleMode: $scheduleMode, ')
+          ..write('suspended: $suspended, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('version: $version')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    profileId,
+    deckId,
+    areaId,
+    kind,
+    front,
+    back,
+    extra,
+    tagsJson,
+    clozeIndex,
+    reverseOfId,
+    scheduleMode,
+    suspended,
+    createdAt,
+    updatedAt,
+    version,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is FlashcardRow &&
+          other.id == this.id &&
+          other.profileId == this.profileId &&
+          other.deckId == this.deckId &&
+          other.areaId == this.areaId &&
+          other.kind == this.kind &&
+          other.front == this.front &&
+          other.back == this.back &&
+          other.extra == this.extra &&
+          other.tagsJson == this.tagsJson &&
+          other.clozeIndex == this.clozeIndex &&
+          other.reverseOfId == this.reverseOfId &&
+          other.scheduleMode == this.scheduleMode &&
+          other.suspended == this.suspended &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt &&
+          other.version == this.version);
+}
+
+class FlashcardsCompanion extends UpdateCompanion<FlashcardRow> {
+  final Value<String> id;
+  final Value<String> profileId;
+  final Value<String> deckId;
+  final Value<String?> areaId;
+  final Value<String> kind;
+  final Value<String> front;
+  final Value<String> back;
+  final Value<String?> extra;
+  final Value<String> tagsJson;
+  final Value<int?> clozeIndex;
+  final Value<String?> reverseOfId;
+  final Value<String> scheduleMode;
+  final Value<bool> suspended;
+  final Value<int> createdAt;
+  final Value<int> updatedAt;
+  final Value<int> version;
+  final Value<int> rowid;
+  const FlashcardsCompanion({
+    this.id = const Value.absent(),
+    this.profileId = const Value.absent(),
+    this.deckId = const Value.absent(),
+    this.areaId = const Value.absent(),
+    this.kind = const Value.absent(),
+    this.front = const Value.absent(),
+    this.back = const Value.absent(),
+    this.extra = const Value.absent(),
+    this.tagsJson = const Value.absent(),
+    this.clozeIndex = const Value.absent(),
+    this.reverseOfId = const Value.absent(),
+    this.scheduleMode = const Value.absent(),
+    this.suspended = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.version = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  FlashcardsCompanion.insert({
+    required String id,
+    required String profileId,
+    required String deckId,
+    this.areaId = const Value.absent(),
+    required String kind,
+    required String front,
+    this.back = const Value.absent(),
+    this.extra = const Value.absent(),
+    this.tagsJson = const Value.absent(),
+    this.clozeIndex = const Value.absent(),
+    this.reverseOfId = const Value.absent(),
+    this.scheduleMode = const Value.absent(),
+    this.suspended = const Value.absent(),
+    required int createdAt,
+    required int updatedAt,
+    this.version = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       profileId = Value(profileId),
+       deckId = Value(deckId),
+       kind = Value(kind),
+       front = Value(front),
+       createdAt = Value(createdAt),
+       updatedAt = Value(updatedAt);
+  static Insertable<FlashcardRow> custom({
+    Expression<String>? id,
+    Expression<String>? profileId,
+    Expression<String>? deckId,
+    Expression<String>? areaId,
+    Expression<String>? kind,
+    Expression<String>? front,
+    Expression<String>? back,
+    Expression<String>? extra,
+    Expression<String>? tagsJson,
+    Expression<int>? clozeIndex,
+    Expression<String>? reverseOfId,
+    Expression<String>? scheduleMode,
+    Expression<bool>? suspended,
+    Expression<int>? createdAt,
+    Expression<int>? updatedAt,
+    Expression<int>? version,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (profileId != null) 'profile_id': profileId,
+      if (deckId != null) 'deck_id': deckId,
+      if (areaId != null) 'area_id': areaId,
+      if (kind != null) 'kind': kind,
+      if (front != null) 'front': front,
+      if (back != null) 'back': back,
+      if (extra != null) 'extra': extra,
+      if (tagsJson != null) 'tags_json': tagsJson,
+      if (clozeIndex != null) 'cloze_index': clozeIndex,
+      if (reverseOfId != null) 'reverse_of_id': reverseOfId,
+      if (scheduleMode != null) 'schedule_mode': scheduleMode,
+      if (suspended != null) 'suspended': suspended,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (version != null) 'version': version,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  FlashcardsCompanion copyWith({
+    Value<String>? id,
+    Value<String>? profileId,
+    Value<String>? deckId,
+    Value<String?>? areaId,
+    Value<String>? kind,
+    Value<String>? front,
+    Value<String>? back,
+    Value<String?>? extra,
+    Value<String>? tagsJson,
+    Value<int?>? clozeIndex,
+    Value<String?>? reverseOfId,
+    Value<String>? scheduleMode,
+    Value<bool>? suspended,
+    Value<int>? createdAt,
+    Value<int>? updatedAt,
+    Value<int>? version,
+    Value<int>? rowid,
+  }) {
+    return FlashcardsCompanion(
+      id: id ?? this.id,
+      profileId: profileId ?? this.profileId,
+      deckId: deckId ?? this.deckId,
+      areaId: areaId ?? this.areaId,
+      kind: kind ?? this.kind,
+      front: front ?? this.front,
+      back: back ?? this.back,
+      extra: extra ?? this.extra,
+      tagsJson: tagsJson ?? this.tagsJson,
+      clozeIndex: clozeIndex ?? this.clozeIndex,
+      reverseOfId: reverseOfId ?? this.reverseOfId,
+      scheduleMode: scheduleMode ?? this.scheduleMode,
+      suspended: suspended ?? this.suspended,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      version: version ?? this.version,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (profileId.present) {
+      map['profile_id'] = Variable<String>(profileId.value);
+    }
+    if (deckId.present) {
+      map['deck_id'] = Variable<String>(deckId.value);
+    }
+    if (areaId.present) {
+      map['area_id'] = Variable<String>(areaId.value);
+    }
+    if (kind.present) {
+      map['kind'] = Variable<String>(kind.value);
+    }
+    if (front.present) {
+      map['front'] = Variable<String>(front.value);
+    }
+    if (back.present) {
+      map['back'] = Variable<String>(back.value);
+    }
+    if (extra.present) {
+      map['extra'] = Variable<String>(extra.value);
+    }
+    if (tagsJson.present) {
+      map['tags_json'] = Variable<String>(tagsJson.value);
+    }
+    if (clozeIndex.present) {
+      map['cloze_index'] = Variable<int>(clozeIndex.value);
+    }
+    if (reverseOfId.present) {
+      map['reverse_of_id'] = Variable<String>(reverseOfId.value);
+    }
+    if (scheduleMode.present) {
+      map['schedule_mode'] = Variable<String>(scheduleMode.value);
+    }
+    if (suspended.present) {
+      map['suspended'] = Variable<bool>(suspended.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<int>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<int>(updatedAt.value);
+    }
+    if (version.present) {
+      map['version'] = Variable<int>(version.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('FlashcardsCompanion(')
+          ..write('id: $id, ')
+          ..write('profileId: $profileId, ')
+          ..write('deckId: $deckId, ')
+          ..write('areaId: $areaId, ')
+          ..write('kind: $kind, ')
+          ..write('front: $front, ')
+          ..write('back: $back, ')
+          ..write('extra: $extra, ')
+          ..write('tagsJson: $tagsJson, ')
+          ..write('clozeIndex: $clozeIndex, ')
+          ..write('reverseOfId: $reverseOfId, ')
+          ..write('scheduleMode: $scheduleMode, ')
+          ..write('suspended: $suspended, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('version: $version, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $FlashcardSrsTable extends FlashcardSrs
+    with TableInfo<$FlashcardSrsTable, FlashcardSrsRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $FlashcardSrsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _cardIdMeta = const VerificationMeta('cardId');
+  @override
+  late final GeneratedColumn<String> cardId = GeneratedColumn<String>(
+    'card_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES flashcards (id)',
+    ),
+  );
+  static const VerificationMeta _statusMeta = const VerificationMeta('status');
+  @override
+  late final GeneratedColumn<String> status = GeneratedColumn<String>(
+    'status',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _easeFactorMeta = const VerificationMeta(
+    'easeFactor',
+  );
+  @override
+  late final GeneratedColumn<double> easeFactor = GeneratedColumn<double>(
+    'ease_factor',
+    aliasedName,
+    false,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(2.5),
+  );
+  static const VerificationMeta _intervalDaysMeta = const VerificationMeta(
+    'intervalDays',
+  );
+  @override
+  late final GeneratedColumn<double> intervalDays = GeneratedColumn<double>(
+    'interval_days',
+    aliasedName,
+    false,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _repetitionsMeta = const VerificationMeta(
+    'repetitions',
+  );
+  @override
+  late final GeneratedColumn<int> repetitions = GeneratedColumn<int>(
+    'repetitions',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _lapsesMeta = const VerificationMeta('lapses');
+  @override
+  late final GeneratedColumn<int> lapses = GeneratedColumn<int>(
+    'lapses',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _learningStepIndexMeta = const VerificationMeta(
+    'learningStepIndex',
+  );
+  @override
+  late final GeneratedColumn<int> learningStepIndex = GeneratedColumn<int>(
+    'learning_step_index',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _leechMeta = const VerificationMeta('leech');
+  @override
+  late final GeneratedColumn<bool> leech = GeneratedColumn<bool>(
+    'leech',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("leech" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _dueAtMeta = const VerificationMeta('dueAt');
+  @override
+  late final GeneratedColumn<int> dueAt = GeneratedColumn<int>(
+    'due_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _lastReviewedAtMeta = const VerificationMeta(
+    'lastReviewedAt',
+  );
+  @override
+  late final GeneratedColumn<int> lastReviewedAt = GeneratedColumn<int>(
+    'last_reviewed_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    cardId,
+    status,
+    easeFactor,
+    intervalDays,
+    repetitions,
+    lapses,
+    learningStepIndex,
+    leech,
+    dueAt,
+    lastReviewedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'flashcard_srs';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<FlashcardSrsRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('card_id')) {
+      context.handle(
+        _cardIdMeta,
+        cardId.isAcceptableOrUnknown(data['card_id']!, _cardIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_cardIdMeta);
+    }
+    if (data.containsKey('status')) {
+      context.handle(
+        _statusMeta,
+        status.isAcceptableOrUnknown(data['status']!, _statusMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_statusMeta);
+    }
+    if (data.containsKey('ease_factor')) {
+      context.handle(
+        _easeFactorMeta,
+        easeFactor.isAcceptableOrUnknown(data['ease_factor']!, _easeFactorMeta),
+      );
+    }
+    if (data.containsKey('interval_days')) {
+      context.handle(
+        _intervalDaysMeta,
+        intervalDays.isAcceptableOrUnknown(
+          data['interval_days']!,
+          _intervalDaysMeta,
+        ),
+      );
+    }
+    if (data.containsKey('repetitions')) {
+      context.handle(
+        _repetitionsMeta,
+        repetitions.isAcceptableOrUnknown(
+          data['repetitions']!,
+          _repetitionsMeta,
+        ),
+      );
+    }
+    if (data.containsKey('lapses')) {
+      context.handle(
+        _lapsesMeta,
+        lapses.isAcceptableOrUnknown(data['lapses']!, _lapsesMeta),
+      );
+    }
+    if (data.containsKey('learning_step_index')) {
+      context.handle(
+        _learningStepIndexMeta,
+        learningStepIndex.isAcceptableOrUnknown(
+          data['learning_step_index']!,
+          _learningStepIndexMeta,
+        ),
+      );
+    }
+    if (data.containsKey('leech')) {
+      context.handle(
+        _leechMeta,
+        leech.isAcceptableOrUnknown(data['leech']!, _leechMeta),
+      );
+    }
+    if (data.containsKey('due_at')) {
+      context.handle(
+        _dueAtMeta,
+        dueAt.isAcceptableOrUnknown(data['due_at']!, _dueAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_dueAtMeta);
+    }
+    if (data.containsKey('last_reviewed_at')) {
+      context.handle(
+        _lastReviewedAtMeta,
+        lastReviewedAt.isAcceptableOrUnknown(
+          data['last_reviewed_at']!,
+          _lastReviewedAtMeta,
+        ),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {cardId};
+  @override
+  FlashcardSrsRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return FlashcardSrsRow(
+      cardId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}card_id'],
+      )!,
+      status: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}status'],
+      )!,
+      easeFactor: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}ease_factor'],
+      )!,
+      intervalDays: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}interval_days'],
+      )!,
+      repetitions: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}repetitions'],
+      )!,
+      lapses: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}lapses'],
+      )!,
+      learningStepIndex: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}learning_step_index'],
+      )!,
+      leech: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}leech'],
+      )!,
+      dueAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}due_at'],
+      )!,
+      lastReviewedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}last_reviewed_at'],
+      ),
+    );
+  }
+
+  @override
+  $FlashcardSrsTable createAlias(String alias) {
+    return $FlashcardSrsTable(attachedDatabase, alias);
+  }
+}
+
+class FlashcardSrsRow extends DataClass implements Insertable<FlashcardSrsRow> {
+  final String cardId;
+  final String status;
+  final double easeFactor;
+  final double intervalDays;
+  final int repetitions;
+  final int lapses;
+  final int learningStepIndex;
+  final bool leech;
+  final int dueAt;
+  final int? lastReviewedAt;
+  const FlashcardSrsRow({
+    required this.cardId,
+    required this.status,
+    required this.easeFactor,
+    required this.intervalDays,
+    required this.repetitions,
+    required this.lapses,
+    required this.learningStepIndex,
+    required this.leech,
+    required this.dueAt,
+    this.lastReviewedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['card_id'] = Variable<String>(cardId);
+    map['status'] = Variable<String>(status);
+    map['ease_factor'] = Variable<double>(easeFactor);
+    map['interval_days'] = Variable<double>(intervalDays);
+    map['repetitions'] = Variable<int>(repetitions);
+    map['lapses'] = Variable<int>(lapses);
+    map['learning_step_index'] = Variable<int>(learningStepIndex);
+    map['leech'] = Variable<bool>(leech);
+    map['due_at'] = Variable<int>(dueAt);
+    if (!nullToAbsent || lastReviewedAt != null) {
+      map['last_reviewed_at'] = Variable<int>(lastReviewedAt);
+    }
+    return map;
+  }
+
+  FlashcardSrsCompanion toCompanion(bool nullToAbsent) {
+    return FlashcardSrsCompanion(
+      cardId: Value(cardId),
+      status: Value(status),
+      easeFactor: Value(easeFactor),
+      intervalDays: Value(intervalDays),
+      repetitions: Value(repetitions),
+      lapses: Value(lapses),
+      learningStepIndex: Value(learningStepIndex),
+      leech: Value(leech),
+      dueAt: Value(dueAt),
+      lastReviewedAt: lastReviewedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(lastReviewedAt),
+    );
+  }
+
+  factory FlashcardSrsRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return FlashcardSrsRow(
+      cardId: serializer.fromJson<String>(json['cardId']),
+      status: serializer.fromJson<String>(json['status']),
+      easeFactor: serializer.fromJson<double>(json['easeFactor']),
+      intervalDays: serializer.fromJson<double>(json['intervalDays']),
+      repetitions: serializer.fromJson<int>(json['repetitions']),
+      lapses: serializer.fromJson<int>(json['lapses']),
+      learningStepIndex: serializer.fromJson<int>(json['learningStepIndex']),
+      leech: serializer.fromJson<bool>(json['leech']),
+      dueAt: serializer.fromJson<int>(json['dueAt']),
+      lastReviewedAt: serializer.fromJson<int?>(json['lastReviewedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'cardId': serializer.toJson<String>(cardId),
+      'status': serializer.toJson<String>(status),
+      'easeFactor': serializer.toJson<double>(easeFactor),
+      'intervalDays': serializer.toJson<double>(intervalDays),
+      'repetitions': serializer.toJson<int>(repetitions),
+      'lapses': serializer.toJson<int>(lapses),
+      'learningStepIndex': serializer.toJson<int>(learningStepIndex),
+      'leech': serializer.toJson<bool>(leech),
+      'dueAt': serializer.toJson<int>(dueAt),
+      'lastReviewedAt': serializer.toJson<int?>(lastReviewedAt),
+    };
+  }
+
+  FlashcardSrsRow copyWith({
+    String? cardId,
+    String? status,
+    double? easeFactor,
+    double? intervalDays,
+    int? repetitions,
+    int? lapses,
+    int? learningStepIndex,
+    bool? leech,
+    int? dueAt,
+    Value<int?> lastReviewedAt = const Value.absent(),
+  }) => FlashcardSrsRow(
+    cardId: cardId ?? this.cardId,
+    status: status ?? this.status,
+    easeFactor: easeFactor ?? this.easeFactor,
+    intervalDays: intervalDays ?? this.intervalDays,
+    repetitions: repetitions ?? this.repetitions,
+    lapses: lapses ?? this.lapses,
+    learningStepIndex: learningStepIndex ?? this.learningStepIndex,
+    leech: leech ?? this.leech,
+    dueAt: dueAt ?? this.dueAt,
+    lastReviewedAt: lastReviewedAt.present
+        ? lastReviewedAt.value
+        : this.lastReviewedAt,
+  );
+  FlashcardSrsRow copyWithCompanion(FlashcardSrsCompanion data) {
+    return FlashcardSrsRow(
+      cardId: data.cardId.present ? data.cardId.value : this.cardId,
+      status: data.status.present ? data.status.value : this.status,
+      easeFactor: data.easeFactor.present
+          ? data.easeFactor.value
+          : this.easeFactor,
+      intervalDays: data.intervalDays.present
+          ? data.intervalDays.value
+          : this.intervalDays,
+      repetitions: data.repetitions.present
+          ? data.repetitions.value
+          : this.repetitions,
+      lapses: data.lapses.present ? data.lapses.value : this.lapses,
+      learningStepIndex: data.learningStepIndex.present
+          ? data.learningStepIndex.value
+          : this.learningStepIndex,
+      leech: data.leech.present ? data.leech.value : this.leech,
+      dueAt: data.dueAt.present ? data.dueAt.value : this.dueAt,
+      lastReviewedAt: data.lastReviewedAt.present
+          ? data.lastReviewedAt.value
+          : this.lastReviewedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('FlashcardSrsRow(')
+          ..write('cardId: $cardId, ')
+          ..write('status: $status, ')
+          ..write('easeFactor: $easeFactor, ')
+          ..write('intervalDays: $intervalDays, ')
+          ..write('repetitions: $repetitions, ')
+          ..write('lapses: $lapses, ')
+          ..write('learningStepIndex: $learningStepIndex, ')
+          ..write('leech: $leech, ')
+          ..write('dueAt: $dueAt, ')
+          ..write('lastReviewedAt: $lastReviewedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    cardId,
+    status,
+    easeFactor,
+    intervalDays,
+    repetitions,
+    lapses,
+    learningStepIndex,
+    leech,
+    dueAt,
+    lastReviewedAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is FlashcardSrsRow &&
+          other.cardId == this.cardId &&
+          other.status == this.status &&
+          other.easeFactor == this.easeFactor &&
+          other.intervalDays == this.intervalDays &&
+          other.repetitions == this.repetitions &&
+          other.lapses == this.lapses &&
+          other.learningStepIndex == this.learningStepIndex &&
+          other.leech == this.leech &&
+          other.dueAt == this.dueAt &&
+          other.lastReviewedAt == this.lastReviewedAt);
+}
+
+class FlashcardSrsCompanion extends UpdateCompanion<FlashcardSrsRow> {
+  final Value<String> cardId;
+  final Value<String> status;
+  final Value<double> easeFactor;
+  final Value<double> intervalDays;
+  final Value<int> repetitions;
+  final Value<int> lapses;
+  final Value<int> learningStepIndex;
+  final Value<bool> leech;
+  final Value<int> dueAt;
+  final Value<int?> lastReviewedAt;
+  final Value<int> rowid;
+  const FlashcardSrsCompanion({
+    this.cardId = const Value.absent(),
+    this.status = const Value.absent(),
+    this.easeFactor = const Value.absent(),
+    this.intervalDays = const Value.absent(),
+    this.repetitions = const Value.absent(),
+    this.lapses = const Value.absent(),
+    this.learningStepIndex = const Value.absent(),
+    this.leech = const Value.absent(),
+    this.dueAt = const Value.absent(),
+    this.lastReviewedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  FlashcardSrsCompanion.insert({
+    required String cardId,
+    required String status,
+    this.easeFactor = const Value.absent(),
+    this.intervalDays = const Value.absent(),
+    this.repetitions = const Value.absent(),
+    this.lapses = const Value.absent(),
+    this.learningStepIndex = const Value.absent(),
+    this.leech = const Value.absent(),
+    required int dueAt,
+    this.lastReviewedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : cardId = Value(cardId),
+       status = Value(status),
+       dueAt = Value(dueAt);
+  static Insertable<FlashcardSrsRow> custom({
+    Expression<String>? cardId,
+    Expression<String>? status,
+    Expression<double>? easeFactor,
+    Expression<double>? intervalDays,
+    Expression<int>? repetitions,
+    Expression<int>? lapses,
+    Expression<int>? learningStepIndex,
+    Expression<bool>? leech,
+    Expression<int>? dueAt,
+    Expression<int>? lastReviewedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (cardId != null) 'card_id': cardId,
+      if (status != null) 'status': status,
+      if (easeFactor != null) 'ease_factor': easeFactor,
+      if (intervalDays != null) 'interval_days': intervalDays,
+      if (repetitions != null) 'repetitions': repetitions,
+      if (lapses != null) 'lapses': lapses,
+      if (learningStepIndex != null) 'learning_step_index': learningStepIndex,
+      if (leech != null) 'leech': leech,
+      if (dueAt != null) 'due_at': dueAt,
+      if (lastReviewedAt != null) 'last_reviewed_at': lastReviewedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  FlashcardSrsCompanion copyWith({
+    Value<String>? cardId,
+    Value<String>? status,
+    Value<double>? easeFactor,
+    Value<double>? intervalDays,
+    Value<int>? repetitions,
+    Value<int>? lapses,
+    Value<int>? learningStepIndex,
+    Value<bool>? leech,
+    Value<int>? dueAt,
+    Value<int?>? lastReviewedAt,
+    Value<int>? rowid,
+  }) {
+    return FlashcardSrsCompanion(
+      cardId: cardId ?? this.cardId,
+      status: status ?? this.status,
+      easeFactor: easeFactor ?? this.easeFactor,
+      intervalDays: intervalDays ?? this.intervalDays,
+      repetitions: repetitions ?? this.repetitions,
+      lapses: lapses ?? this.lapses,
+      learningStepIndex: learningStepIndex ?? this.learningStepIndex,
+      leech: leech ?? this.leech,
+      dueAt: dueAt ?? this.dueAt,
+      lastReviewedAt: lastReviewedAt ?? this.lastReviewedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (cardId.present) {
+      map['card_id'] = Variable<String>(cardId.value);
+    }
+    if (status.present) {
+      map['status'] = Variable<String>(status.value);
+    }
+    if (easeFactor.present) {
+      map['ease_factor'] = Variable<double>(easeFactor.value);
+    }
+    if (intervalDays.present) {
+      map['interval_days'] = Variable<double>(intervalDays.value);
+    }
+    if (repetitions.present) {
+      map['repetitions'] = Variable<int>(repetitions.value);
+    }
+    if (lapses.present) {
+      map['lapses'] = Variable<int>(lapses.value);
+    }
+    if (learningStepIndex.present) {
+      map['learning_step_index'] = Variable<int>(learningStepIndex.value);
+    }
+    if (leech.present) {
+      map['leech'] = Variable<bool>(leech.value);
+    }
+    if (dueAt.present) {
+      map['due_at'] = Variable<int>(dueAt.value);
+    }
+    if (lastReviewedAt.present) {
+      map['last_reviewed_at'] = Variable<int>(lastReviewedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('FlashcardSrsCompanion(')
+          ..write('cardId: $cardId, ')
+          ..write('status: $status, ')
+          ..write('easeFactor: $easeFactor, ')
+          ..write('intervalDays: $intervalDays, ')
+          ..write('repetitions: $repetitions, ')
+          ..write('lapses: $lapses, ')
+          ..write('learningStepIndex: $learningStepIndex, ')
+          ..write('leech: $leech, ')
+          ..write('dueAt: $dueAt, ')
+          ..write('lastReviewedAt: $lastReviewedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $FlashcardReviewLogsTable extends FlashcardReviewLogs
+    with TableInfo<$FlashcardReviewLogsTable, FlashcardReviewLogRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $FlashcardReviewLogsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _cardIdMeta = const VerificationMeta('cardId');
+  @override
+  late final GeneratedColumn<String> cardId = GeneratedColumn<String>(
+    'card_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES flashcards (id)',
+    ),
+  );
+  static const VerificationMeta _reviewedAtMeta = const VerificationMeta(
+    'reviewedAt',
+  );
+  @override
+  late final GeneratedColumn<int> reviewedAt = GeneratedColumn<int>(
+    'reviewed_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _ratingMeta = const VerificationMeta('rating');
+  @override
+  late final GeneratedColumn<String> rating = GeneratedColumn<String>(
+    'rating',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _intervalDaysBeforeMeta =
+      const VerificationMeta('intervalDaysBefore');
+  @override
+  late final GeneratedColumn<double> intervalDaysBefore =
+      GeneratedColumn<double>(
+        'interval_days_before',
+        aliasedName,
+        false,
+        type: DriftSqlType.double,
+        requiredDuringInsert: true,
+      );
+  static const VerificationMeta _intervalDaysAfterMeta = const VerificationMeta(
+    'intervalDaysAfter',
+  );
+  @override
+  late final GeneratedColumn<double> intervalDaysAfter =
+      GeneratedColumn<double>(
+        'interval_days_after',
+        aliasedName,
+        false,
+        type: DriftSqlType.double,
+        requiredDuringInsert: true,
+      );
+  static const VerificationMeta _easeBeforeMeta = const VerificationMeta(
+    'easeBefore',
+  );
+  @override
+  late final GeneratedColumn<double> easeBefore = GeneratedColumn<double>(
+    'ease_before',
+    aliasedName,
+    false,
+    type: DriftSqlType.double,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _easeAfterMeta = const VerificationMeta(
+    'easeAfter',
+  );
+  @override
+  late final GeneratedColumn<double> easeAfter = GeneratedColumn<double>(
+    'ease_after',
+    aliasedName,
+    false,
+    type: DriftSqlType.double,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _durationMsMeta = const VerificationMeta(
+    'durationMs',
+  );
+  @override
+  late final GeneratedColumn<int> durationMs = GeneratedColumn<int>(
+    'duration_ms',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _reviewKindMeta = const VerificationMeta(
+    'reviewKind',
+  );
+  @override
+  late final GeneratedColumn<String> reviewKind = GeneratedColumn<String>(
+    'review_kind',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('srs'),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    cardId,
+    reviewedAt,
+    rating,
+    intervalDaysBefore,
+    intervalDaysAfter,
+    easeBefore,
+    easeAfter,
+    durationMs,
+    reviewKind,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'flashcard_review_logs';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<FlashcardReviewLogRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('card_id')) {
+      context.handle(
+        _cardIdMeta,
+        cardId.isAcceptableOrUnknown(data['card_id']!, _cardIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_cardIdMeta);
+    }
+    if (data.containsKey('reviewed_at')) {
+      context.handle(
+        _reviewedAtMeta,
+        reviewedAt.isAcceptableOrUnknown(data['reviewed_at']!, _reviewedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_reviewedAtMeta);
+    }
+    if (data.containsKey('rating')) {
+      context.handle(
+        _ratingMeta,
+        rating.isAcceptableOrUnknown(data['rating']!, _ratingMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_ratingMeta);
+    }
+    if (data.containsKey('interval_days_before')) {
+      context.handle(
+        _intervalDaysBeforeMeta,
+        intervalDaysBefore.isAcceptableOrUnknown(
+          data['interval_days_before']!,
+          _intervalDaysBeforeMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_intervalDaysBeforeMeta);
+    }
+    if (data.containsKey('interval_days_after')) {
+      context.handle(
+        _intervalDaysAfterMeta,
+        intervalDaysAfter.isAcceptableOrUnknown(
+          data['interval_days_after']!,
+          _intervalDaysAfterMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_intervalDaysAfterMeta);
+    }
+    if (data.containsKey('ease_before')) {
+      context.handle(
+        _easeBeforeMeta,
+        easeBefore.isAcceptableOrUnknown(data['ease_before']!, _easeBeforeMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_easeBeforeMeta);
+    }
+    if (data.containsKey('ease_after')) {
+      context.handle(
+        _easeAfterMeta,
+        easeAfter.isAcceptableOrUnknown(data['ease_after']!, _easeAfterMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_easeAfterMeta);
+    }
+    if (data.containsKey('duration_ms')) {
+      context.handle(
+        _durationMsMeta,
+        durationMs.isAcceptableOrUnknown(data['duration_ms']!, _durationMsMeta),
+      );
+    }
+    if (data.containsKey('review_kind')) {
+      context.handle(
+        _reviewKindMeta,
+        reviewKind.isAcceptableOrUnknown(data['review_kind']!, _reviewKindMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  FlashcardReviewLogRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return FlashcardReviewLogRow(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      cardId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}card_id'],
+      )!,
+      reviewedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}reviewed_at'],
+      )!,
+      rating: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}rating'],
+      )!,
+      intervalDaysBefore: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}interval_days_before'],
+      )!,
+      intervalDaysAfter: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}interval_days_after'],
+      )!,
+      easeBefore: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}ease_before'],
+      )!,
+      easeAfter: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}ease_after'],
+      )!,
+      durationMs: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}duration_ms'],
+      ),
+      reviewKind: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}review_kind'],
+      )!,
+    );
+  }
+
+  @override
+  $FlashcardReviewLogsTable createAlias(String alias) {
+    return $FlashcardReviewLogsTable(attachedDatabase, alias);
+  }
+}
+
+class FlashcardReviewLogRow extends DataClass
+    implements Insertable<FlashcardReviewLogRow> {
+  final String id;
+  final String cardId;
+  final int reviewedAt;
+  final String rating;
+  final double intervalDaysBefore;
+  final double intervalDaysAfter;
+  final double easeBefore;
+  final double easeAfter;
+  final int? durationMs;
+  final String reviewKind;
+  const FlashcardReviewLogRow({
+    required this.id,
+    required this.cardId,
+    required this.reviewedAt,
+    required this.rating,
+    required this.intervalDaysBefore,
+    required this.intervalDaysAfter,
+    required this.easeBefore,
+    required this.easeAfter,
+    this.durationMs,
+    required this.reviewKind,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['card_id'] = Variable<String>(cardId);
+    map['reviewed_at'] = Variable<int>(reviewedAt);
+    map['rating'] = Variable<String>(rating);
+    map['interval_days_before'] = Variable<double>(intervalDaysBefore);
+    map['interval_days_after'] = Variable<double>(intervalDaysAfter);
+    map['ease_before'] = Variable<double>(easeBefore);
+    map['ease_after'] = Variable<double>(easeAfter);
+    if (!nullToAbsent || durationMs != null) {
+      map['duration_ms'] = Variable<int>(durationMs);
+    }
+    map['review_kind'] = Variable<String>(reviewKind);
+    return map;
+  }
+
+  FlashcardReviewLogsCompanion toCompanion(bool nullToAbsent) {
+    return FlashcardReviewLogsCompanion(
+      id: Value(id),
+      cardId: Value(cardId),
+      reviewedAt: Value(reviewedAt),
+      rating: Value(rating),
+      intervalDaysBefore: Value(intervalDaysBefore),
+      intervalDaysAfter: Value(intervalDaysAfter),
+      easeBefore: Value(easeBefore),
+      easeAfter: Value(easeAfter),
+      durationMs: durationMs == null && nullToAbsent
+          ? const Value.absent()
+          : Value(durationMs),
+      reviewKind: Value(reviewKind),
+    );
+  }
+
+  factory FlashcardReviewLogRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return FlashcardReviewLogRow(
+      id: serializer.fromJson<String>(json['id']),
+      cardId: serializer.fromJson<String>(json['cardId']),
+      reviewedAt: serializer.fromJson<int>(json['reviewedAt']),
+      rating: serializer.fromJson<String>(json['rating']),
+      intervalDaysBefore: serializer.fromJson<double>(
+        json['intervalDaysBefore'],
+      ),
+      intervalDaysAfter: serializer.fromJson<double>(json['intervalDaysAfter']),
+      easeBefore: serializer.fromJson<double>(json['easeBefore']),
+      easeAfter: serializer.fromJson<double>(json['easeAfter']),
+      durationMs: serializer.fromJson<int?>(json['durationMs']),
+      reviewKind: serializer.fromJson<String>(json['reviewKind']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'cardId': serializer.toJson<String>(cardId),
+      'reviewedAt': serializer.toJson<int>(reviewedAt),
+      'rating': serializer.toJson<String>(rating),
+      'intervalDaysBefore': serializer.toJson<double>(intervalDaysBefore),
+      'intervalDaysAfter': serializer.toJson<double>(intervalDaysAfter),
+      'easeBefore': serializer.toJson<double>(easeBefore),
+      'easeAfter': serializer.toJson<double>(easeAfter),
+      'durationMs': serializer.toJson<int?>(durationMs),
+      'reviewKind': serializer.toJson<String>(reviewKind),
+    };
+  }
+
+  FlashcardReviewLogRow copyWith({
+    String? id,
+    String? cardId,
+    int? reviewedAt,
+    String? rating,
+    double? intervalDaysBefore,
+    double? intervalDaysAfter,
+    double? easeBefore,
+    double? easeAfter,
+    Value<int?> durationMs = const Value.absent(),
+    String? reviewKind,
+  }) => FlashcardReviewLogRow(
+    id: id ?? this.id,
+    cardId: cardId ?? this.cardId,
+    reviewedAt: reviewedAt ?? this.reviewedAt,
+    rating: rating ?? this.rating,
+    intervalDaysBefore: intervalDaysBefore ?? this.intervalDaysBefore,
+    intervalDaysAfter: intervalDaysAfter ?? this.intervalDaysAfter,
+    easeBefore: easeBefore ?? this.easeBefore,
+    easeAfter: easeAfter ?? this.easeAfter,
+    durationMs: durationMs.present ? durationMs.value : this.durationMs,
+    reviewKind: reviewKind ?? this.reviewKind,
+  );
+  FlashcardReviewLogRow copyWithCompanion(FlashcardReviewLogsCompanion data) {
+    return FlashcardReviewLogRow(
+      id: data.id.present ? data.id.value : this.id,
+      cardId: data.cardId.present ? data.cardId.value : this.cardId,
+      reviewedAt: data.reviewedAt.present
+          ? data.reviewedAt.value
+          : this.reviewedAt,
+      rating: data.rating.present ? data.rating.value : this.rating,
+      intervalDaysBefore: data.intervalDaysBefore.present
+          ? data.intervalDaysBefore.value
+          : this.intervalDaysBefore,
+      intervalDaysAfter: data.intervalDaysAfter.present
+          ? data.intervalDaysAfter.value
+          : this.intervalDaysAfter,
+      easeBefore: data.easeBefore.present
+          ? data.easeBefore.value
+          : this.easeBefore,
+      easeAfter: data.easeAfter.present ? data.easeAfter.value : this.easeAfter,
+      durationMs: data.durationMs.present
+          ? data.durationMs.value
+          : this.durationMs,
+      reviewKind: data.reviewKind.present
+          ? data.reviewKind.value
+          : this.reviewKind,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('FlashcardReviewLogRow(')
+          ..write('id: $id, ')
+          ..write('cardId: $cardId, ')
+          ..write('reviewedAt: $reviewedAt, ')
+          ..write('rating: $rating, ')
+          ..write('intervalDaysBefore: $intervalDaysBefore, ')
+          ..write('intervalDaysAfter: $intervalDaysAfter, ')
+          ..write('easeBefore: $easeBefore, ')
+          ..write('easeAfter: $easeAfter, ')
+          ..write('durationMs: $durationMs, ')
+          ..write('reviewKind: $reviewKind')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    cardId,
+    reviewedAt,
+    rating,
+    intervalDaysBefore,
+    intervalDaysAfter,
+    easeBefore,
+    easeAfter,
+    durationMs,
+    reviewKind,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is FlashcardReviewLogRow &&
+          other.id == this.id &&
+          other.cardId == this.cardId &&
+          other.reviewedAt == this.reviewedAt &&
+          other.rating == this.rating &&
+          other.intervalDaysBefore == this.intervalDaysBefore &&
+          other.intervalDaysAfter == this.intervalDaysAfter &&
+          other.easeBefore == this.easeBefore &&
+          other.easeAfter == this.easeAfter &&
+          other.durationMs == this.durationMs &&
+          other.reviewKind == this.reviewKind);
+}
+
+class FlashcardReviewLogsCompanion
+    extends UpdateCompanion<FlashcardReviewLogRow> {
+  final Value<String> id;
+  final Value<String> cardId;
+  final Value<int> reviewedAt;
+  final Value<String> rating;
+  final Value<double> intervalDaysBefore;
+  final Value<double> intervalDaysAfter;
+  final Value<double> easeBefore;
+  final Value<double> easeAfter;
+  final Value<int?> durationMs;
+  final Value<String> reviewKind;
+  final Value<int> rowid;
+  const FlashcardReviewLogsCompanion({
+    this.id = const Value.absent(),
+    this.cardId = const Value.absent(),
+    this.reviewedAt = const Value.absent(),
+    this.rating = const Value.absent(),
+    this.intervalDaysBefore = const Value.absent(),
+    this.intervalDaysAfter = const Value.absent(),
+    this.easeBefore = const Value.absent(),
+    this.easeAfter = const Value.absent(),
+    this.durationMs = const Value.absent(),
+    this.reviewKind = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  FlashcardReviewLogsCompanion.insert({
+    required String id,
+    required String cardId,
+    required int reviewedAt,
+    required String rating,
+    required double intervalDaysBefore,
+    required double intervalDaysAfter,
+    required double easeBefore,
+    required double easeAfter,
+    this.durationMs = const Value.absent(),
+    this.reviewKind = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       cardId = Value(cardId),
+       reviewedAt = Value(reviewedAt),
+       rating = Value(rating),
+       intervalDaysBefore = Value(intervalDaysBefore),
+       intervalDaysAfter = Value(intervalDaysAfter),
+       easeBefore = Value(easeBefore),
+       easeAfter = Value(easeAfter);
+  static Insertable<FlashcardReviewLogRow> custom({
+    Expression<String>? id,
+    Expression<String>? cardId,
+    Expression<int>? reviewedAt,
+    Expression<String>? rating,
+    Expression<double>? intervalDaysBefore,
+    Expression<double>? intervalDaysAfter,
+    Expression<double>? easeBefore,
+    Expression<double>? easeAfter,
+    Expression<int>? durationMs,
+    Expression<String>? reviewKind,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (cardId != null) 'card_id': cardId,
+      if (reviewedAt != null) 'reviewed_at': reviewedAt,
+      if (rating != null) 'rating': rating,
+      if (intervalDaysBefore != null)
+        'interval_days_before': intervalDaysBefore,
+      if (intervalDaysAfter != null) 'interval_days_after': intervalDaysAfter,
+      if (easeBefore != null) 'ease_before': easeBefore,
+      if (easeAfter != null) 'ease_after': easeAfter,
+      if (durationMs != null) 'duration_ms': durationMs,
+      if (reviewKind != null) 'review_kind': reviewKind,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  FlashcardReviewLogsCompanion copyWith({
+    Value<String>? id,
+    Value<String>? cardId,
+    Value<int>? reviewedAt,
+    Value<String>? rating,
+    Value<double>? intervalDaysBefore,
+    Value<double>? intervalDaysAfter,
+    Value<double>? easeBefore,
+    Value<double>? easeAfter,
+    Value<int?>? durationMs,
+    Value<String>? reviewKind,
+    Value<int>? rowid,
+  }) {
+    return FlashcardReviewLogsCompanion(
+      id: id ?? this.id,
+      cardId: cardId ?? this.cardId,
+      reviewedAt: reviewedAt ?? this.reviewedAt,
+      rating: rating ?? this.rating,
+      intervalDaysBefore: intervalDaysBefore ?? this.intervalDaysBefore,
+      intervalDaysAfter: intervalDaysAfter ?? this.intervalDaysAfter,
+      easeBefore: easeBefore ?? this.easeBefore,
+      easeAfter: easeAfter ?? this.easeAfter,
+      durationMs: durationMs ?? this.durationMs,
+      reviewKind: reviewKind ?? this.reviewKind,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (cardId.present) {
+      map['card_id'] = Variable<String>(cardId.value);
+    }
+    if (reviewedAt.present) {
+      map['reviewed_at'] = Variable<int>(reviewedAt.value);
+    }
+    if (rating.present) {
+      map['rating'] = Variable<String>(rating.value);
+    }
+    if (intervalDaysBefore.present) {
+      map['interval_days_before'] = Variable<double>(intervalDaysBefore.value);
+    }
+    if (intervalDaysAfter.present) {
+      map['interval_days_after'] = Variable<double>(intervalDaysAfter.value);
+    }
+    if (easeBefore.present) {
+      map['ease_before'] = Variable<double>(easeBefore.value);
+    }
+    if (easeAfter.present) {
+      map['ease_after'] = Variable<double>(easeAfter.value);
+    }
+    if (durationMs.present) {
+      map['duration_ms'] = Variable<int>(durationMs.value);
+    }
+    if (reviewKind.present) {
+      map['review_kind'] = Variable<String>(reviewKind.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('FlashcardReviewLogsCompanion(')
+          ..write('id: $id, ')
+          ..write('cardId: $cardId, ')
+          ..write('reviewedAt: $reviewedAt, ')
+          ..write('rating: $rating, ')
+          ..write('intervalDaysBefore: $intervalDaysBefore, ')
+          ..write('intervalDaysAfter: $intervalDaysAfter, ')
+          ..write('easeBefore: $easeBefore, ')
+          ..write('easeAfter: $easeAfter, ')
+          ..write('durationMs: $durationMs, ')
+          ..write('reviewKind: $reviewKind, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $KnowledgeAreaPlacementsTable extends KnowledgeAreaPlacements
+    with TableInfo<$KnowledgeAreaPlacementsTable, KnowledgeAreaPlacementRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $KnowledgeAreaPlacementsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _areaIdMeta = const VerificationMeta('areaId');
+  @override
+  late final GeneratedColumn<String> areaId = GeneratedColumn<String>(
+    'area_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES knowledge_areas (id)',
+    ),
+  );
+  static const VerificationMeta _parentAreaIdMeta = const VerificationMeta(
+    'parentAreaId',
+  );
+  @override
+  late final GeneratedColumn<String> parentAreaId = GeneratedColumn<String>(
+    'parent_area_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES knowledge_areas (id)',
+    ),
+  );
+  static const VerificationMeta _linkedAtMeta = const VerificationMeta(
+    'linkedAt',
+  );
+  @override
+  late final GeneratedColumn<int> linkedAt = GeneratedColumn<int>(
+    'linked_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _catalogKeyMeta = const VerificationMeta(
+    'catalogKey',
+  );
+  @override
+  late final GeneratedColumn<String> catalogKey = GeneratedColumn<String>(
+    'catalog_key',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    areaId,
+    parentAreaId,
+    linkedAt,
+    catalogKey,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'knowledge_area_placements';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<KnowledgeAreaPlacementRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('area_id')) {
+      context.handle(
+        _areaIdMeta,
+        areaId.isAcceptableOrUnknown(data['area_id']!, _areaIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_areaIdMeta);
+    }
+    if (data.containsKey('parent_area_id')) {
+      context.handle(
+        _parentAreaIdMeta,
+        parentAreaId.isAcceptableOrUnknown(
+          data['parent_area_id']!,
+          _parentAreaIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_parentAreaIdMeta);
+    }
+    if (data.containsKey('linked_at')) {
+      context.handle(
+        _linkedAtMeta,
+        linkedAt.isAcceptableOrUnknown(data['linked_at']!, _linkedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_linkedAtMeta);
+    }
+    if (data.containsKey('catalog_key')) {
+      context.handle(
+        _catalogKeyMeta,
+        catalogKey.isAcceptableOrUnknown(data['catalog_key']!, _catalogKeyMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {areaId, parentAreaId};
+  @override
+  KnowledgeAreaPlacementRow map(
+    Map<String, dynamic> data, {
+    String? tablePrefix,
+  }) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return KnowledgeAreaPlacementRow(
+      areaId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}area_id'],
+      )!,
+      parentAreaId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}parent_area_id'],
+      )!,
+      linkedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}linked_at'],
+      )!,
+      catalogKey: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}catalog_key'],
+      ),
+    );
+  }
+
+  @override
+  $KnowledgeAreaPlacementsTable createAlias(String alias) {
+    return $KnowledgeAreaPlacementsTable(attachedDatabase, alias);
+  }
+}
+
+class KnowledgeAreaPlacementRow extends DataClass
+    implements Insertable<KnowledgeAreaPlacementRow> {
+  final String areaId;
+  final String parentAreaId;
+  final int linkedAt;
+  final String? catalogKey;
+  const KnowledgeAreaPlacementRow({
+    required this.areaId,
+    required this.parentAreaId,
+    required this.linkedAt,
+    this.catalogKey,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['area_id'] = Variable<String>(areaId);
+    map['parent_area_id'] = Variable<String>(parentAreaId);
+    map['linked_at'] = Variable<int>(linkedAt);
+    if (!nullToAbsent || catalogKey != null) {
+      map['catalog_key'] = Variable<String>(catalogKey);
+    }
+    return map;
+  }
+
+  KnowledgeAreaPlacementsCompanion toCompanion(bool nullToAbsent) {
+    return KnowledgeAreaPlacementsCompanion(
+      areaId: Value(areaId),
+      parentAreaId: Value(parentAreaId),
+      linkedAt: Value(linkedAt),
+      catalogKey: catalogKey == null && nullToAbsent
+          ? const Value.absent()
+          : Value(catalogKey),
+    );
+  }
+
+  factory KnowledgeAreaPlacementRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return KnowledgeAreaPlacementRow(
+      areaId: serializer.fromJson<String>(json['areaId']),
+      parentAreaId: serializer.fromJson<String>(json['parentAreaId']),
+      linkedAt: serializer.fromJson<int>(json['linkedAt']),
+      catalogKey: serializer.fromJson<String?>(json['catalogKey']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'areaId': serializer.toJson<String>(areaId),
+      'parentAreaId': serializer.toJson<String>(parentAreaId),
+      'linkedAt': serializer.toJson<int>(linkedAt),
+      'catalogKey': serializer.toJson<String?>(catalogKey),
+    };
+  }
+
+  KnowledgeAreaPlacementRow copyWith({
+    String? areaId,
+    String? parentAreaId,
+    int? linkedAt,
+    Value<String?> catalogKey = const Value.absent(),
+  }) => KnowledgeAreaPlacementRow(
+    areaId: areaId ?? this.areaId,
+    parentAreaId: parentAreaId ?? this.parentAreaId,
+    linkedAt: linkedAt ?? this.linkedAt,
+    catalogKey: catalogKey.present ? catalogKey.value : this.catalogKey,
+  );
+  KnowledgeAreaPlacementRow copyWithCompanion(
+    KnowledgeAreaPlacementsCompanion data,
+  ) {
+    return KnowledgeAreaPlacementRow(
+      areaId: data.areaId.present ? data.areaId.value : this.areaId,
+      parentAreaId: data.parentAreaId.present
+          ? data.parentAreaId.value
+          : this.parentAreaId,
+      linkedAt: data.linkedAt.present ? data.linkedAt.value : this.linkedAt,
+      catalogKey: data.catalogKey.present
+          ? data.catalogKey.value
+          : this.catalogKey,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('KnowledgeAreaPlacementRow(')
+          ..write('areaId: $areaId, ')
+          ..write('parentAreaId: $parentAreaId, ')
+          ..write('linkedAt: $linkedAt, ')
+          ..write('catalogKey: $catalogKey')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(areaId, parentAreaId, linkedAt, catalogKey);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is KnowledgeAreaPlacementRow &&
+          other.areaId == this.areaId &&
+          other.parentAreaId == this.parentAreaId &&
+          other.linkedAt == this.linkedAt &&
+          other.catalogKey == this.catalogKey);
+}
+
+class KnowledgeAreaPlacementsCompanion
+    extends UpdateCompanion<KnowledgeAreaPlacementRow> {
+  final Value<String> areaId;
+  final Value<String> parentAreaId;
+  final Value<int> linkedAt;
+  final Value<String?> catalogKey;
+  final Value<int> rowid;
+  const KnowledgeAreaPlacementsCompanion({
+    this.areaId = const Value.absent(),
+    this.parentAreaId = const Value.absent(),
+    this.linkedAt = const Value.absent(),
+    this.catalogKey = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  KnowledgeAreaPlacementsCompanion.insert({
+    required String areaId,
+    required String parentAreaId,
+    required int linkedAt,
+    this.catalogKey = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : areaId = Value(areaId),
+       parentAreaId = Value(parentAreaId),
+       linkedAt = Value(linkedAt);
+  static Insertable<KnowledgeAreaPlacementRow> custom({
+    Expression<String>? areaId,
+    Expression<String>? parentAreaId,
+    Expression<int>? linkedAt,
+    Expression<String>? catalogKey,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (areaId != null) 'area_id': areaId,
+      if (parentAreaId != null) 'parent_area_id': parentAreaId,
+      if (linkedAt != null) 'linked_at': linkedAt,
+      if (catalogKey != null) 'catalog_key': catalogKey,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  KnowledgeAreaPlacementsCompanion copyWith({
+    Value<String>? areaId,
+    Value<String>? parentAreaId,
+    Value<int>? linkedAt,
+    Value<String?>? catalogKey,
+    Value<int>? rowid,
+  }) {
+    return KnowledgeAreaPlacementsCompanion(
+      areaId: areaId ?? this.areaId,
+      parentAreaId: parentAreaId ?? this.parentAreaId,
+      linkedAt: linkedAt ?? this.linkedAt,
+      catalogKey: catalogKey ?? this.catalogKey,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (areaId.present) {
+      map['area_id'] = Variable<String>(areaId.value);
+    }
+    if (parentAreaId.present) {
+      map['parent_area_id'] = Variable<String>(parentAreaId.value);
+    }
+    if (linkedAt.present) {
+      map['linked_at'] = Variable<int>(linkedAt.value);
+    }
+    if (catalogKey.present) {
+      map['catalog_key'] = Variable<String>(catalogKey.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('KnowledgeAreaPlacementsCompanion(')
+          ..write('areaId: $areaId, ')
+          ..write('parentAreaId: $parentAreaId, ')
+          ..write('linkedAt: $linkedAt, ')
+          ..write('catalogKey: $catalogKey, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $ResearchKnowledgeLinksTable extends ResearchKnowledgeLinks
+    with TableInfo<$ResearchKnowledgeLinksTable, ResearchKnowledgeLinkRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $ResearchKnowledgeLinksTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _researchNodeIdMeta = const VerificationMeta(
+    'researchNodeId',
+  );
+  @override
+  late final GeneratedColumn<String> researchNodeId = GeneratedColumn<String>(
+    'research_node_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES research_nodes (id)',
+    ),
+  );
+  static const VerificationMeta _areaIdMeta = const VerificationMeta('areaId');
+  @override
+  late final GeneratedColumn<String> areaId = GeneratedColumn<String>(
+    'area_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES knowledge_areas (id)',
+    ),
+  );
+  static const VerificationMeta _kindMeta = const VerificationMeta('kind');
+  @override
+  late final GeneratedColumn<String> kind = GeneratedColumn<String>(
+    'kind',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _linkedAtMeta = const VerificationMeta(
+    'linkedAt',
+  );
+  @override
+  late final GeneratedColumn<int> linkedAt = GeneratedColumn<int>(
+    'linked_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    researchNodeId,
+    areaId,
+    kind,
+    linkedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'research_knowledge_links';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<ResearchKnowledgeLinkRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('research_node_id')) {
+      context.handle(
+        _researchNodeIdMeta,
+        researchNodeId.isAcceptableOrUnknown(
+          data['research_node_id']!,
+          _researchNodeIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_researchNodeIdMeta);
+    }
+    if (data.containsKey('area_id')) {
+      context.handle(
+        _areaIdMeta,
+        areaId.isAcceptableOrUnknown(data['area_id']!, _areaIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_areaIdMeta);
+    }
+    if (data.containsKey('kind')) {
+      context.handle(
+        _kindMeta,
+        kind.isAcceptableOrUnknown(data['kind']!, _kindMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_kindMeta);
+    }
+    if (data.containsKey('linked_at')) {
+      context.handle(
+        _linkedAtMeta,
+        linkedAt.isAcceptableOrUnknown(data['linked_at']!, _linkedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_linkedAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {researchNodeId, areaId};
+  @override
+  ResearchKnowledgeLinkRow map(
+    Map<String, dynamic> data, {
+    String? tablePrefix,
+  }) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return ResearchKnowledgeLinkRow(
+      researchNodeId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}research_node_id'],
+      )!,
+      areaId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}area_id'],
+      )!,
+      kind: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}kind'],
+      )!,
+      linkedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}linked_at'],
+      )!,
+    );
+  }
+
+  @override
+  $ResearchKnowledgeLinksTable createAlias(String alias) {
+    return $ResearchKnowledgeLinksTable(attachedDatabase, alias);
+  }
+}
+
+class ResearchKnowledgeLinkRow extends DataClass
+    implements Insertable<ResearchKnowledgeLinkRow> {
+  final String researchNodeId;
+  final String areaId;
+  final String kind;
+  final int linkedAt;
+  const ResearchKnowledgeLinkRow({
+    required this.researchNodeId,
+    required this.areaId,
+    required this.kind,
+    required this.linkedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['research_node_id'] = Variable<String>(researchNodeId);
+    map['area_id'] = Variable<String>(areaId);
+    map['kind'] = Variable<String>(kind);
+    map['linked_at'] = Variable<int>(linkedAt);
+    return map;
+  }
+
+  ResearchKnowledgeLinksCompanion toCompanion(bool nullToAbsent) {
+    return ResearchKnowledgeLinksCompanion(
+      researchNodeId: Value(researchNodeId),
+      areaId: Value(areaId),
+      kind: Value(kind),
+      linkedAt: Value(linkedAt),
+    );
+  }
+
+  factory ResearchKnowledgeLinkRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return ResearchKnowledgeLinkRow(
+      researchNodeId: serializer.fromJson<String>(json['researchNodeId']),
+      areaId: serializer.fromJson<String>(json['areaId']),
+      kind: serializer.fromJson<String>(json['kind']),
+      linkedAt: serializer.fromJson<int>(json['linkedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'researchNodeId': serializer.toJson<String>(researchNodeId),
+      'areaId': serializer.toJson<String>(areaId),
+      'kind': serializer.toJson<String>(kind),
+      'linkedAt': serializer.toJson<int>(linkedAt),
+    };
+  }
+
+  ResearchKnowledgeLinkRow copyWith({
+    String? researchNodeId,
+    String? areaId,
+    String? kind,
+    int? linkedAt,
+  }) => ResearchKnowledgeLinkRow(
+    researchNodeId: researchNodeId ?? this.researchNodeId,
+    areaId: areaId ?? this.areaId,
+    kind: kind ?? this.kind,
+    linkedAt: linkedAt ?? this.linkedAt,
+  );
+  ResearchKnowledgeLinkRow copyWithCompanion(
+    ResearchKnowledgeLinksCompanion data,
+  ) {
+    return ResearchKnowledgeLinkRow(
+      researchNodeId: data.researchNodeId.present
+          ? data.researchNodeId.value
+          : this.researchNodeId,
+      areaId: data.areaId.present ? data.areaId.value : this.areaId,
+      kind: data.kind.present ? data.kind.value : this.kind,
+      linkedAt: data.linkedAt.present ? data.linkedAt.value : this.linkedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ResearchKnowledgeLinkRow(')
+          ..write('researchNodeId: $researchNodeId, ')
+          ..write('areaId: $areaId, ')
+          ..write('kind: $kind, ')
+          ..write('linkedAt: $linkedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(researchNodeId, areaId, kind, linkedAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is ResearchKnowledgeLinkRow &&
+          other.researchNodeId == this.researchNodeId &&
+          other.areaId == this.areaId &&
+          other.kind == this.kind &&
+          other.linkedAt == this.linkedAt);
+}
+
+class ResearchKnowledgeLinksCompanion
+    extends UpdateCompanion<ResearchKnowledgeLinkRow> {
+  final Value<String> researchNodeId;
+  final Value<String> areaId;
+  final Value<String> kind;
+  final Value<int> linkedAt;
+  final Value<int> rowid;
+  const ResearchKnowledgeLinksCompanion({
+    this.researchNodeId = const Value.absent(),
+    this.areaId = const Value.absent(),
+    this.kind = const Value.absent(),
+    this.linkedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  ResearchKnowledgeLinksCompanion.insert({
+    required String researchNodeId,
+    required String areaId,
+    required String kind,
+    required int linkedAt,
+    this.rowid = const Value.absent(),
+  }) : researchNodeId = Value(researchNodeId),
+       areaId = Value(areaId),
+       kind = Value(kind),
+       linkedAt = Value(linkedAt);
+  static Insertable<ResearchKnowledgeLinkRow> custom({
+    Expression<String>? researchNodeId,
+    Expression<String>? areaId,
+    Expression<String>? kind,
+    Expression<int>? linkedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (researchNodeId != null) 'research_node_id': researchNodeId,
+      if (areaId != null) 'area_id': areaId,
+      if (kind != null) 'kind': kind,
+      if (linkedAt != null) 'linked_at': linkedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  ResearchKnowledgeLinksCompanion copyWith({
+    Value<String>? researchNodeId,
+    Value<String>? areaId,
+    Value<String>? kind,
+    Value<int>? linkedAt,
+    Value<int>? rowid,
+  }) {
+    return ResearchKnowledgeLinksCompanion(
+      researchNodeId: researchNodeId ?? this.researchNodeId,
+      areaId: areaId ?? this.areaId,
+      kind: kind ?? this.kind,
+      linkedAt: linkedAt ?? this.linkedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (researchNodeId.present) {
+      map['research_node_id'] = Variable<String>(researchNodeId.value);
+    }
+    if (areaId.present) {
+      map['area_id'] = Variable<String>(areaId.value);
+    }
+    if (kind.present) {
+      map['kind'] = Variable<String>(kind.value);
+    }
+    if (linkedAt.present) {
+      map['linked_at'] = Variable<int>(linkedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ResearchKnowledgeLinksCompanion(')
+          ..write('researchNodeId: $researchNodeId, ')
+          ..write('areaId: $areaId, ')
+          ..write('kind: $kind, ')
+          ..write('linkedAt: $linkedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$ColonyDatabase extends GeneratedDatabase {
   _$ColonyDatabase(QueryExecutor e) : super(e);
   $ColonyDatabaseManager get managers => $ColonyDatabaseManager(this);
@@ -26849,6 +31064,16 @@ abstract class _$ColonyDatabase extends GeneratedDatabase {
       $IntegrationConsentsTable(this);
   late final $ExternalCalendarEventsTable externalCalendarEvents =
       $ExternalCalendarEventsTable(this);
+  late final $KnowledgeAreasTable knowledgeAreas = $KnowledgeAreasTable(this);
+  late final $FlashcardDecksTable flashcardDecks = $FlashcardDecksTable(this);
+  late final $FlashcardsTable flashcards = $FlashcardsTable(this);
+  late final $FlashcardSrsTable flashcardSrs = $FlashcardSrsTable(this);
+  late final $FlashcardReviewLogsTable flashcardReviewLogs =
+      $FlashcardReviewLogsTable(this);
+  late final $KnowledgeAreaPlacementsTable knowledgeAreaPlacements =
+      $KnowledgeAreaPlacementsTable(this);
+  late final $ResearchKnowledgeLinksTable researchKnowledgeLinks =
+      $ResearchKnowledgeLinksTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -26901,6 +31126,13 @@ abstract class _$ColonyDatabase extends GeneratedDatabase {
     tripInventory,
     integrationConsents,
     externalCalendarEvents,
+    knowledgeAreas,
+    flashcardDecks,
+    flashcards,
+    flashcardSrs,
+    flashcardReviewLogs,
+    knowledgeAreaPlacements,
+    researchKnowledgeLinks,
   ];
 }
 
@@ -27621,6 +31853,68 @@ final class $$ProfilesTableReferences
     final cache = $_typedResult.readTableOrNull(
       _externalCalendarEventsRefsTable($_db),
     );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$KnowledgeAreasTable, List<KnowledgeAreaRow>>
+  _knowledgeAreasRefsTable(_$ColonyDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.knowledgeAreas,
+        aliasName: $_aliasNameGenerator(
+          db.profiles.id,
+          db.knowledgeAreas.profileId,
+        ),
+      );
+
+  $$KnowledgeAreasTableProcessedTableManager get knowledgeAreasRefs {
+    final manager = $$KnowledgeAreasTableTableManager(
+      $_db,
+      $_db.knowledgeAreas,
+    ).filter((f) => f.profileId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_knowledgeAreasRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$FlashcardDecksTable, List<FlashcardDeckRow>>
+  _flashcardDecksRefsTable(_$ColonyDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.flashcardDecks,
+        aliasName: $_aliasNameGenerator(
+          db.profiles.id,
+          db.flashcardDecks.profileId,
+        ),
+      );
+
+  $$FlashcardDecksTableProcessedTableManager get flashcardDecksRefs {
+    final manager = $$FlashcardDecksTableTableManager(
+      $_db,
+      $_db.flashcardDecks,
+    ).filter((f) => f.profileId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_flashcardDecksRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$FlashcardsTable, List<FlashcardRow>>
+  _flashcardsRefsTable(_$ColonyDatabase db) => MultiTypedResultKey.fromTable(
+    db.flashcards,
+    aliasName: $_aliasNameGenerator(db.profiles.id, db.flashcards.profileId),
+  );
+
+  $$FlashcardsTableProcessedTableManager get flashcardsRefs {
+    final manager = $$FlashcardsTableTableManager(
+      $_db,
+      $_db.flashcards,
+    ).filter((f) => f.profileId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_flashcardsRefsTable($_db));
     return ProcessedTableManager(
       manager.$state.copyWith(prefetchedData: cache),
     );
@@ -28460,6 +32754,81 @@ class $$ProfilesTableFilterComposer
                     $removeJoinBuilderFromRootComposer,
               ),
         );
+    return f(composer);
+  }
+
+  Expression<bool> knowledgeAreasRefs(
+    Expression<bool> Function($$KnowledgeAreasTableFilterComposer f) f,
+  ) {
+    final $$KnowledgeAreasTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.knowledgeAreas,
+      getReferencedColumn: (t) => t.profileId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$KnowledgeAreasTableFilterComposer(
+            $db: $db,
+            $table: $db.knowledgeAreas,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> flashcardDecksRefs(
+    Expression<bool> Function($$FlashcardDecksTableFilterComposer f) f,
+  ) {
+    final $$FlashcardDecksTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.flashcardDecks,
+      getReferencedColumn: (t) => t.profileId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$FlashcardDecksTableFilterComposer(
+            $db: $db,
+            $table: $db.flashcardDecks,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> flashcardsRefs(
+    Expression<bool> Function($$FlashcardsTableFilterComposer f) f,
+  ) {
+    final $$FlashcardsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.flashcards,
+      getReferencedColumn: (t) => t.profileId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$FlashcardsTableFilterComposer(
+            $db: $db,
+            $table: $db.flashcards,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
     return f(composer);
   }
 }
@@ -29352,6 +33721,81 @@ class $$ProfilesTableAnnotationComposer
         );
     return f(composer);
   }
+
+  Expression<T> knowledgeAreasRefs<T extends Object>(
+    Expression<T> Function($$KnowledgeAreasTableAnnotationComposer a) f,
+  ) {
+    final $$KnowledgeAreasTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.knowledgeAreas,
+      getReferencedColumn: (t) => t.profileId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$KnowledgeAreasTableAnnotationComposer(
+            $db: $db,
+            $table: $db.knowledgeAreas,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<T> flashcardDecksRefs<T extends Object>(
+    Expression<T> Function($$FlashcardDecksTableAnnotationComposer a) f,
+  ) {
+    final $$FlashcardDecksTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.flashcardDecks,
+      getReferencedColumn: (t) => t.profileId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$FlashcardDecksTableAnnotationComposer(
+            $db: $db,
+            $table: $db.flashcardDecks,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<T> flashcardsRefs<T extends Object>(
+    Expression<T> Function($$FlashcardsTableAnnotationComposer a) f,
+  ) {
+    final $$FlashcardsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.flashcards,
+      getReferencedColumn: (t) => t.profileId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$FlashcardsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.flashcards,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
 }
 
 class $$ProfilesTableTableManager
@@ -29399,6 +33843,9 @@ class $$ProfilesTableTableManager
             bool contextZonesRefs,
             bool integrationConsentsRefs,
             bool externalCalendarEventsRefs,
+            bool knowledgeAreasRefs,
+            bool flashcardDecksRefs,
+            bool flashcardsRefs,
           })
         > {
   $$ProfilesTableTableManager(_$ColonyDatabase db, $ProfilesTable table)
@@ -29505,6 +33952,9 @@ class $$ProfilesTableTableManager
                 contextZonesRefs = false,
                 integrationConsentsRefs = false,
                 externalCalendarEventsRefs = false,
+                knowledgeAreasRefs = false,
+                flashcardDecksRefs = false,
+                flashcardsRefs = false,
               }) {
                 return PrefetchHooks(
                   db: db,
@@ -29540,6 +33990,9 @@ class $$ProfilesTableTableManager
                     if (contextZonesRefs) db.contextZones,
                     if (integrationConsentsRefs) db.integrationConsents,
                     if (externalCalendarEventsRefs) db.externalCalendarEvents,
+                    if (knowledgeAreasRefs) db.knowledgeAreas,
+                    if (flashcardDecksRefs) db.flashcardDecks,
+                    if (flashcardsRefs) db.flashcards,
                   ],
                   addJoins: null,
                   getPrefetchedDataCallback: (items) async {
@@ -30195,6 +34648,69 @@ class $$ProfilesTableTableManager
                               ),
                           typedResults: items,
                         ),
+                      if (knowledgeAreasRefs)
+                        await $_getPrefetchedData<
+                          Profile,
+                          $ProfilesTable,
+                          KnowledgeAreaRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$ProfilesTableReferences
+                              ._knowledgeAreasRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$ProfilesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).knowledgeAreasRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.profileId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (flashcardDecksRefs)
+                        await $_getPrefetchedData<
+                          Profile,
+                          $ProfilesTable,
+                          FlashcardDeckRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$ProfilesTableReferences
+                              ._flashcardDecksRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$ProfilesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).flashcardDecksRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.profileId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (flashcardsRefs)
+                        await $_getPrefetchedData<
+                          Profile,
+                          $ProfilesTable,
+                          FlashcardRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$ProfilesTableReferences
+                              ._flashcardsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$ProfilesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).flashcardsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.profileId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
                     ];
                   },
                 );
@@ -30247,6 +34763,9 @@ typedef $$ProfilesTableProcessedTableManager =
         bool contextZonesRefs,
         bool integrationConsentsRefs,
         bool externalCalendarEventsRefs,
+        bool knowledgeAreasRefs,
+        bool flashcardDecksRefs,
+        bool flashcardsRefs,
       })
     >;
 typedef $$DomainEventsTableCreateCompanionBuilder =
@@ -38671,6 +43190,34 @@ final class $$ResearchNodesTableReferences
       manager.$state.copyWith(prefetchedData: cache),
     );
   }
+
+  static MultiTypedResultKey<
+    $ResearchKnowledgeLinksTable,
+    List<ResearchKnowledgeLinkRow>
+  >
+  _researchKnowledgeLinksRefsTable(_$ColonyDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.researchKnowledgeLinks,
+        aliasName: $_aliasNameGenerator(
+          db.researchNodes.id,
+          db.researchKnowledgeLinks.researchNodeId,
+        ),
+      );
+
+  $$ResearchKnowledgeLinksTableProcessedTableManager
+  get researchKnowledgeLinksRefs {
+    final manager = $$ResearchKnowledgeLinksTableTableManager(
+      $_db,
+      $_db.researchKnowledgeLinks,
+    ).filter((f) => f.researchNodeId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _researchKnowledgeLinksRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
 }
 
 class $$ResearchNodesTableFilterComposer
@@ -38817,6 +43364,32 @@ class $$ResearchNodesTableFilterComposer
               }) => $$ResearchEvidenceItemsTableFilterComposer(
                 $db: $db,
                 $table: $db.researchEvidenceItems,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+
+  Expression<bool> researchKnowledgeLinksRefs(
+    Expression<bool> Function($$ResearchKnowledgeLinksTableFilterComposer f) f,
+  ) {
+    final $$ResearchKnowledgeLinksTableFilterComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.researchKnowledgeLinks,
+          getReferencedColumn: (t) => t.researchNodeId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$ResearchKnowledgeLinksTableFilterComposer(
+                $db: $db,
+                $table: $db.researchKnowledgeLinks,
                 $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
                 joinBuilder: joinBuilder,
                 $removeJoinBuilderFromRootComposer:
@@ -39043,6 +43616,32 @@ class $$ResearchNodesTableAnnotationComposer
         );
     return f(composer);
   }
+
+  Expression<T> researchKnowledgeLinksRefs<T extends Object>(
+    Expression<T> Function($$ResearchKnowledgeLinksTableAnnotationComposer a) f,
+  ) {
+    final $$ResearchKnowledgeLinksTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.researchKnowledgeLinks,
+          getReferencedColumn: (t) => t.researchNodeId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$ResearchKnowledgeLinksTableAnnotationComposer(
+                $db: $db,
+                $table: $db.researchKnowledgeLinks,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
 }
 
 class $$ResearchNodesTableTableManager
@@ -39063,6 +43662,7 @@ class $$ResearchNodesTableTableManager
             bool questResearchRefs,
             bool learningSessionsRefs,
             bool researchEvidenceItemsRefs,
+            bool researchKnowledgeLinksRefs,
           })
         > {
   $$ResearchNodesTableTableManager(
@@ -39144,6 +43744,7 @@ class $$ResearchNodesTableTableManager
                 questResearchRefs = false,
                 learningSessionsRefs = false,
                 researchEvidenceItemsRefs = false,
+                researchKnowledgeLinksRefs = false,
               }) {
                 return PrefetchHooks(
                   db: db,
@@ -39151,6 +43752,7 @@ class $$ResearchNodesTableTableManager
                     if (questResearchRefs) db.questResearch,
                     if (learningSessionsRefs) db.learningSessions,
                     if (researchEvidenceItemsRefs) db.researchEvidenceItems,
+                    if (researchKnowledgeLinksRefs) db.researchKnowledgeLinks,
                   ],
                   addJoins:
                       <
@@ -39251,6 +43853,27 @@ class $$ResearchNodesTableTableManager
                               ),
                           typedResults: items,
                         ),
+                      if (researchKnowledgeLinksRefs)
+                        await $_getPrefetchedData<
+                          ResearchNode,
+                          $ResearchNodesTable,
+                          ResearchKnowledgeLinkRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$ResearchNodesTableReferences
+                              ._researchKnowledgeLinksRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$ResearchNodesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).researchKnowledgeLinksRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.researchNodeId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
                     ];
                   },
                 );
@@ -39276,6 +43899,7 @@ typedef $$ResearchNodesTableProcessedTableManager =
         bool questResearchRefs,
         bool learningSessionsRefs,
         bool researchEvidenceItemsRefs,
+        bool researchKnowledgeLinksRefs,
       })
     >;
 typedef $$ResearchPrerequisitesTableCreateCompanionBuilder =
@@ -53015,6 +57639,3666 @@ typedef $$ExternalCalendarEventsTableProcessedTableManager =
       ExternalCalendarEventRow,
       PrefetchHooks Function({bool profileId})
     >;
+typedef $$KnowledgeAreasTableCreateCompanionBuilder =
+    KnowledgeAreasCompanion Function({
+      required String id,
+      required String profileId,
+      Value<String?> parentId,
+      required String title,
+      required String slug,
+      Value<String?> description,
+      Value<String?> iconKey,
+      Value<String?> catalogKey,
+      Value<int> sortOrder,
+      required int createdAt,
+      required int updatedAt,
+      Value<int> rowid,
+    });
+typedef $$KnowledgeAreasTableUpdateCompanionBuilder =
+    KnowledgeAreasCompanion Function({
+      Value<String> id,
+      Value<String> profileId,
+      Value<String?> parentId,
+      Value<String> title,
+      Value<String> slug,
+      Value<String?> description,
+      Value<String?> iconKey,
+      Value<String?> catalogKey,
+      Value<int> sortOrder,
+      Value<int> createdAt,
+      Value<int> updatedAt,
+      Value<int> rowid,
+    });
+
+final class $$KnowledgeAreasTableReferences
+    extends
+        BaseReferences<
+          _$ColonyDatabase,
+          $KnowledgeAreasTable,
+          KnowledgeAreaRow
+        > {
+  $$KnowledgeAreasTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $ProfilesTable _profileIdTable(_$ColonyDatabase db) =>
+      db.profiles.createAlias(
+        $_aliasNameGenerator(db.knowledgeAreas.profileId, db.profiles.id),
+      );
+
+  $$ProfilesTableProcessedTableManager get profileId {
+    final $_column = $_itemColumn<String>('profile_id')!;
+
+    final manager = $$ProfilesTableTableManager(
+      $_db,
+      $_db.profiles,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_profileIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static MultiTypedResultKey<
+    $ResearchKnowledgeLinksTable,
+    List<ResearchKnowledgeLinkRow>
+  >
+  _researchKnowledgeLinksRefsTable(_$ColonyDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.researchKnowledgeLinks,
+        aliasName: $_aliasNameGenerator(
+          db.knowledgeAreas.id,
+          db.researchKnowledgeLinks.areaId,
+        ),
+      );
+
+  $$ResearchKnowledgeLinksTableProcessedTableManager
+  get researchKnowledgeLinksRefs {
+    final manager = $$ResearchKnowledgeLinksTableTableManager(
+      $_db,
+      $_db.researchKnowledgeLinks,
+    ).filter((f) => f.areaId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _researchKnowledgeLinksRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+}
+
+class $$KnowledgeAreasTableFilterComposer
+    extends Composer<_$ColonyDatabase, $KnowledgeAreasTable> {
+  $$KnowledgeAreasTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get parentId => $composableBuilder(
+    column: $table.parentId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get title => $composableBuilder(
+    column: $table.title,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get slug => $composableBuilder(
+    column: $table.slug,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get description => $composableBuilder(
+    column: $table.description,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get iconKey => $composableBuilder(
+    column: $table.iconKey,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get catalogKey => $composableBuilder(
+    column: $table.catalogKey,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get sortOrder => $composableBuilder(
+    column: $table.sortOrder,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$ProfilesTableFilterComposer get profileId {
+    final $$ProfilesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.profileId,
+      referencedTable: $db.profiles,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProfilesTableFilterComposer(
+            $db: $db,
+            $table: $db.profiles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  Expression<bool> researchKnowledgeLinksRefs(
+    Expression<bool> Function($$ResearchKnowledgeLinksTableFilterComposer f) f,
+  ) {
+    final $$ResearchKnowledgeLinksTableFilterComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.researchKnowledgeLinks,
+          getReferencedColumn: (t) => t.areaId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$ResearchKnowledgeLinksTableFilterComposer(
+                $db: $db,
+                $table: $db.researchKnowledgeLinks,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+}
+
+class $$KnowledgeAreasTableOrderingComposer
+    extends Composer<_$ColonyDatabase, $KnowledgeAreasTable> {
+  $$KnowledgeAreasTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get parentId => $composableBuilder(
+    column: $table.parentId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get title => $composableBuilder(
+    column: $table.title,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get slug => $composableBuilder(
+    column: $table.slug,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get description => $composableBuilder(
+    column: $table.description,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get iconKey => $composableBuilder(
+    column: $table.iconKey,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get catalogKey => $composableBuilder(
+    column: $table.catalogKey,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get sortOrder => $composableBuilder(
+    column: $table.sortOrder,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$ProfilesTableOrderingComposer get profileId {
+    final $$ProfilesTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.profileId,
+      referencedTable: $db.profiles,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProfilesTableOrderingComposer(
+            $db: $db,
+            $table: $db.profiles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$KnowledgeAreasTableAnnotationComposer
+    extends Composer<_$ColonyDatabase, $KnowledgeAreasTable> {
+  $$KnowledgeAreasTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get parentId =>
+      $composableBuilder(column: $table.parentId, builder: (column) => column);
+
+  GeneratedColumn<String> get title =>
+      $composableBuilder(column: $table.title, builder: (column) => column);
+
+  GeneratedColumn<String> get slug =>
+      $composableBuilder(column: $table.slug, builder: (column) => column);
+
+  GeneratedColumn<String> get description => $composableBuilder(
+    column: $table.description,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get iconKey =>
+      $composableBuilder(column: $table.iconKey, builder: (column) => column);
+
+  GeneratedColumn<String> get catalogKey => $composableBuilder(
+    column: $table.catalogKey,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get sortOrder =>
+      $composableBuilder(column: $table.sortOrder, builder: (column) => column);
+
+  GeneratedColumn<int> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<int> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  $$ProfilesTableAnnotationComposer get profileId {
+    final $$ProfilesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.profileId,
+      referencedTable: $db.profiles,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProfilesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.profiles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  Expression<T> researchKnowledgeLinksRefs<T extends Object>(
+    Expression<T> Function($$ResearchKnowledgeLinksTableAnnotationComposer a) f,
+  ) {
+    final $$ResearchKnowledgeLinksTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.researchKnowledgeLinks,
+          getReferencedColumn: (t) => t.areaId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$ResearchKnowledgeLinksTableAnnotationComposer(
+                $db: $db,
+                $table: $db.researchKnowledgeLinks,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+}
+
+class $$KnowledgeAreasTableTableManager
+    extends
+        RootTableManager<
+          _$ColonyDatabase,
+          $KnowledgeAreasTable,
+          KnowledgeAreaRow,
+          $$KnowledgeAreasTableFilterComposer,
+          $$KnowledgeAreasTableOrderingComposer,
+          $$KnowledgeAreasTableAnnotationComposer,
+          $$KnowledgeAreasTableCreateCompanionBuilder,
+          $$KnowledgeAreasTableUpdateCompanionBuilder,
+          (KnowledgeAreaRow, $$KnowledgeAreasTableReferences),
+          KnowledgeAreaRow,
+          PrefetchHooks Function({
+            bool profileId,
+            bool researchKnowledgeLinksRefs,
+          })
+        > {
+  $$KnowledgeAreasTableTableManager(
+    _$ColonyDatabase db,
+    $KnowledgeAreasTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$KnowledgeAreasTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$KnowledgeAreasTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$KnowledgeAreasTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> profileId = const Value.absent(),
+                Value<String?> parentId = const Value.absent(),
+                Value<String> title = const Value.absent(),
+                Value<String> slug = const Value.absent(),
+                Value<String?> description = const Value.absent(),
+                Value<String?> iconKey = const Value.absent(),
+                Value<String?> catalogKey = const Value.absent(),
+                Value<int> sortOrder = const Value.absent(),
+                Value<int> createdAt = const Value.absent(),
+                Value<int> updatedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => KnowledgeAreasCompanion(
+                id: id,
+                profileId: profileId,
+                parentId: parentId,
+                title: title,
+                slug: slug,
+                description: description,
+                iconKey: iconKey,
+                catalogKey: catalogKey,
+                sortOrder: sortOrder,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String profileId,
+                Value<String?> parentId = const Value.absent(),
+                required String title,
+                required String slug,
+                Value<String?> description = const Value.absent(),
+                Value<String?> iconKey = const Value.absent(),
+                Value<String?> catalogKey = const Value.absent(),
+                Value<int> sortOrder = const Value.absent(),
+                required int createdAt,
+                required int updatedAt,
+                Value<int> rowid = const Value.absent(),
+              }) => KnowledgeAreasCompanion.insert(
+                id: id,
+                profileId: profileId,
+                parentId: parentId,
+                title: title,
+                slug: slug,
+                description: description,
+                iconKey: iconKey,
+                catalogKey: catalogKey,
+                sortOrder: sortOrder,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$KnowledgeAreasTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback:
+              ({profileId = false, researchKnowledgeLinksRefs = false}) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [
+                    if (researchKnowledgeLinksRefs) db.researchKnowledgeLinks,
+                  ],
+                  addJoins:
+                      <
+                        T extends TableManagerState<
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic
+                        >
+                      >(state) {
+                        if (profileId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.profileId,
+                                    referencedTable:
+                                        $$KnowledgeAreasTableReferences
+                                            ._profileIdTable(db),
+                                    referencedColumn:
+                                        $$KnowledgeAreasTableReferences
+                                            ._profileIdTable(db)
+                                            .id,
+                                  )
+                                  as T;
+                        }
+
+                        return state;
+                      },
+                  getPrefetchedDataCallback: (items) async {
+                    return [
+                      if (researchKnowledgeLinksRefs)
+                        await $_getPrefetchedData<
+                          KnowledgeAreaRow,
+                          $KnowledgeAreasTable,
+                          ResearchKnowledgeLinkRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$KnowledgeAreasTableReferences
+                              ._researchKnowledgeLinksRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$KnowledgeAreasTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).researchKnowledgeLinksRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.areaId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                    ];
+                  },
+                );
+              },
+        ),
+      );
+}
+
+typedef $$KnowledgeAreasTableProcessedTableManager =
+    ProcessedTableManager<
+      _$ColonyDatabase,
+      $KnowledgeAreasTable,
+      KnowledgeAreaRow,
+      $$KnowledgeAreasTableFilterComposer,
+      $$KnowledgeAreasTableOrderingComposer,
+      $$KnowledgeAreasTableAnnotationComposer,
+      $$KnowledgeAreasTableCreateCompanionBuilder,
+      $$KnowledgeAreasTableUpdateCompanionBuilder,
+      (KnowledgeAreaRow, $$KnowledgeAreasTableReferences),
+      KnowledgeAreaRow,
+      PrefetchHooks Function({bool profileId, bool researchKnowledgeLinksRefs})
+    >;
+typedef $$FlashcardDecksTableCreateCompanionBuilder =
+    FlashcardDecksCompanion Function({
+      required String id,
+      required String profileId,
+      Value<String?> areaId,
+      Value<String?> researchNodeId,
+      required String title,
+      Value<String?> description,
+      Value<int> newLimitPerDay,
+      Value<int> reviewLimitPerDay,
+      Value<int?> archivedAt,
+      required int createdAt,
+      required int updatedAt,
+      Value<int> version,
+      Value<int> rowid,
+    });
+typedef $$FlashcardDecksTableUpdateCompanionBuilder =
+    FlashcardDecksCompanion Function({
+      Value<String> id,
+      Value<String> profileId,
+      Value<String?> areaId,
+      Value<String?> researchNodeId,
+      Value<String> title,
+      Value<String?> description,
+      Value<int> newLimitPerDay,
+      Value<int> reviewLimitPerDay,
+      Value<int?> archivedAt,
+      Value<int> createdAt,
+      Value<int> updatedAt,
+      Value<int> version,
+      Value<int> rowid,
+    });
+
+final class $$FlashcardDecksTableReferences
+    extends
+        BaseReferences<
+          _$ColonyDatabase,
+          $FlashcardDecksTable,
+          FlashcardDeckRow
+        > {
+  $$FlashcardDecksTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $ProfilesTable _profileIdTable(_$ColonyDatabase db) =>
+      db.profiles.createAlias(
+        $_aliasNameGenerator(db.flashcardDecks.profileId, db.profiles.id),
+      );
+
+  $$ProfilesTableProcessedTableManager get profileId {
+    final $_column = $_itemColumn<String>('profile_id')!;
+
+    final manager = $$ProfilesTableTableManager(
+      $_db,
+      $_db.profiles,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_profileIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static MultiTypedResultKey<$FlashcardsTable, List<FlashcardRow>>
+  _flashcardsRefsTable(_$ColonyDatabase db) => MultiTypedResultKey.fromTable(
+    db.flashcards,
+    aliasName: $_aliasNameGenerator(db.flashcardDecks.id, db.flashcards.deckId),
+  );
+
+  $$FlashcardsTableProcessedTableManager get flashcardsRefs {
+    final manager = $$FlashcardsTableTableManager(
+      $_db,
+      $_db.flashcards,
+    ).filter((f) => f.deckId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_flashcardsRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+}
+
+class $$FlashcardDecksTableFilterComposer
+    extends Composer<_$ColonyDatabase, $FlashcardDecksTable> {
+  $$FlashcardDecksTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get areaId => $composableBuilder(
+    column: $table.areaId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get researchNodeId => $composableBuilder(
+    column: $table.researchNodeId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get title => $composableBuilder(
+    column: $table.title,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get description => $composableBuilder(
+    column: $table.description,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get newLimitPerDay => $composableBuilder(
+    column: $table.newLimitPerDay,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get reviewLimitPerDay => $composableBuilder(
+    column: $table.reviewLimitPerDay,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get archivedAt => $composableBuilder(
+    column: $table.archivedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get version => $composableBuilder(
+    column: $table.version,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$ProfilesTableFilterComposer get profileId {
+    final $$ProfilesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.profileId,
+      referencedTable: $db.profiles,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProfilesTableFilterComposer(
+            $db: $db,
+            $table: $db.profiles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  Expression<bool> flashcardsRefs(
+    Expression<bool> Function($$FlashcardsTableFilterComposer f) f,
+  ) {
+    final $$FlashcardsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.flashcards,
+      getReferencedColumn: (t) => t.deckId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$FlashcardsTableFilterComposer(
+            $db: $db,
+            $table: $db.flashcards,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $$FlashcardDecksTableOrderingComposer
+    extends Composer<_$ColonyDatabase, $FlashcardDecksTable> {
+  $$FlashcardDecksTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get areaId => $composableBuilder(
+    column: $table.areaId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get researchNodeId => $composableBuilder(
+    column: $table.researchNodeId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get title => $composableBuilder(
+    column: $table.title,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get description => $composableBuilder(
+    column: $table.description,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get newLimitPerDay => $composableBuilder(
+    column: $table.newLimitPerDay,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get reviewLimitPerDay => $composableBuilder(
+    column: $table.reviewLimitPerDay,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get archivedAt => $composableBuilder(
+    column: $table.archivedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get version => $composableBuilder(
+    column: $table.version,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$ProfilesTableOrderingComposer get profileId {
+    final $$ProfilesTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.profileId,
+      referencedTable: $db.profiles,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProfilesTableOrderingComposer(
+            $db: $db,
+            $table: $db.profiles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$FlashcardDecksTableAnnotationComposer
+    extends Composer<_$ColonyDatabase, $FlashcardDecksTable> {
+  $$FlashcardDecksTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get areaId =>
+      $composableBuilder(column: $table.areaId, builder: (column) => column);
+
+  GeneratedColumn<String> get researchNodeId => $composableBuilder(
+    column: $table.researchNodeId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get title =>
+      $composableBuilder(column: $table.title, builder: (column) => column);
+
+  GeneratedColumn<String> get description => $composableBuilder(
+    column: $table.description,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get newLimitPerDay => $composableBuilder(
+    column: $table.newLimitPerDay,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get reviewLimitPerDay => $composableBuilder(
+    column: $table.reviewLimitPerDay,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get archivedAt => $composableBuilder(
+    column: $table.archivedAt,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<int> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  GeneratedColumn<int> get version =>
+      $composableBuilder(column: $table.version, builder: (column) => column);
+
+  $$ProfilesTableAnnotationComposer get profileId {
+    final $$ProfilesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.profileId,
+      referencedTable: $db.profiles,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProfilesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.profiles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  Expression<T> flashcardsRefs<T extends Object>(
+    Expression<T> Function($$FlashcardsTableAnnotationComposer a) f,
+  ) {
+    final $$FlashcardsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.flashcards,
+      getReferencedColumn: (t) => t.deckId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$FlashcardsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.flashcards,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $$FlashcardDecksTableTableManager
+    extends
+        RootTableManager<
+          _$ColonyDatabase,
+          $FlashcardDecksTable,
+          FlashcardDeckRow,
+          $$FlashcardDecksTableFilterComposer,
+          $$FlashcardDecksTableOrderingComposer,
+          $$FlashcardDecksTableAnnotationComposer,
+          $$FlashcardDecksTableCreateCompanionBuilder,
+          $$FlashcardDecksTableUpdateCompanionBuilder,
+          (FlashcardDeckRow, $$FlashcardDecksTableReferences),
+          FlashcardDeckRow,
+          PrefetchHooks Function({bool profileId, bool flashcardsRefs})
+        > {
+  $$FlashcardDecksTableTableManager(
+    _$ColonyDatabase db,
+    $FlashcardDecksTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$FlashcardDecksTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$FlashcardDecksTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$FlashcardDecksTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> profileId = const Value.absent(),
+                Value<String?> areaId = const Value.absent(),
+                Value<String?> researchNodeId = const Value.absent(),
+                Value<String> title = const Value.absent(),
+                Value<String?> description = const Value.absent(),
+                Value<int> newLimitPerDay = const Value.absent(),
+                Value<int> reviewLimitPerDay = const Value.absent(),
+                Value<int?> archivedAt = const Value.absent(),
+                Value<int> createdAt = const Value.absent(),
+                Value<int> updatedAt = const Value.absent(),
+                Value<int> version = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => FlashcardDecksCompanion(
+                id: id,
+                profileId: profileId,
+                areaId: areaId,
+                researchNodeId: researchNodeId,
+                title: title,
+                description: description,
+                newLimitPerDay: newLimitPerDay,
+                reviewLimitPerDay: reviewLimitPerDay,
+                archivedAt: archivedAt,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                version: version,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String profileId,
+                Value<String?> areaId = const Value.absent(),
+                Value<String?> researchNodeId = const Value.absent(),
+                required String title,
+                Value<String?> description = const Value.absent(),
+                Value<int> newLimitPerDay = const Value.absent(),
+                Value<int> reviewLimitPerDay = const Value.absent(),
+                Value<int?> archivedAt = const Value.absent(),
+                required int createdAt,
+                required int updatedAt,
+                Value<int> version = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => FlashcardDecksCompanion.insert(
+                id: id,
+                profileId: profileId,
+                areaId: areaId,
+                researchNodeId: researchNodeId,
+                title: title,
+                description: description,
+                newLimitPerDay: newLimitPerDay,
+                reviewLimitPerDay: reviewLimitPerDay,
+                archivedAt: archivedAt,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                version: version,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$FlashcardDecksTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({profileId = false, flashcardsRefs = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [if (flashcardsRefs) db.flashcards],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (profileId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.profileId,
+                                referencedTable: $$FlashcardDecksTableReferences
+                                    ._profileIdTable(db),
+                                referencedColumn:
+                                    $$FlashcardDecksTableReferences
+                                        ._profileIdTable(db)
+                                        .id,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [
+                  if (flashcardsRefs)
+                    await $_getPrefetchedData<
+                      FlashcardDeckRow,
+                      $FlashcardDecksTable,
+                      FlashcardRow
+                    >(
+                      currentTable: table,
+                      referencedTable: $$FlashcardDecksTableReferences
+                          ._flashcardsRefsTable(db),
+                      managerFromTypedResult: (p0) =>
+                          $$FlashcardDecksTableReferences(
+                            db,
+                            table,
+                            p0,
+                          ).flashcardsRefs,
+                      referencedItemsForCurrentItem: (item, referencedItems) =>
+                          referencedItems.where((e) => e.deckId == item.id),
+                      typedResults: items,
+                    ),
+                ];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$FlashcardDecksTableProcessedTableManager =
+    ProcessedTableManager<
+      _$ColonyDatabase,
+      $FlashcardDecksTable,
+      FlashcardDeckRow,
+      $$FlashcardDecksTableFilterComposer,
+      $$FlashcardDecksTableOrderingComposer,
+      $$FlashcardDecksTableAnnotationComposer,
+      $$FlashcardDecksTableCreateCompanionBuilder,
+      $$FlashcardDecksTableUpdateCompanionBuilder,
+      (FlashcardDeckRow, $$FlashcardDecksTableReferences),
+      FlashcardDeckRow,
+      PrefetchHooks Function({bool profileId, bool flashcardsRefs})
+    >;
+typedef $$FlashcardsTableCreateCompanionBuilder =
+    FlashcardsCompanion Function({
+      required String id,
+      required String profileId,
+      required String deckId,
+      Value<String?> areaId,
+      required String kind,
+      required String front,
+      Value<String> back,
+      Value<String?> extra,
+      Value<String> tagsJson,
+      Value<int?> clozeIndex,
+      Value<String?> reverseOfId,
+      Value<String> scheduleMode,
+      Value<bool> suspended,
+      required int createdAt,
+      required int updatedAt,
+      Value<int> version,
+      Value<int> rowid,
+    });
+typedef $$FlashcardsTableUpdateCompanionBuilder =
+    FlashcardsCompanion Function({
+      Value<String> id,
+      Value<String> profileId,
+      Value<String> deckId,
+      Value<String?> areaId,
+      Value<String> kind,
+      Value<String> front,
+      Value<String> back,
+      Value<String?> extra,
+      Value<String> tagsJson,
+      Value<int?> clozeIndex,
+      Value<String?> reverseOfId,
+      Value<String> scheduleMode,
+      Value<bool> suspended,
+      Value<int> createdAt,
+      Value<int> updatedAt,
+      Value<int> version,
+      Value<int> rowid,
+    });
+
+final class $$FlashcardsTableReferences
+    extends BaseReferences<_$ColonyDatabase, $FlashcardsTable, FlashcardRow> {
+  $$FlashcardsTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static $ProfilesTable _profileIdTable(_$ColonyDatabase db) =>
+      db.profiles.createAlias(
+        $_aliasNameGenerator(db.flashcards.profileId, db.profiles.id),
+      );
+
+  $$ProfilesTableProcessedTableManager get profileId {
+    final $_column = $_itemColumn<String>('profile_id')!;
+
+    final manager = $$ProfilesTableTableManager(
+      $_db,
+      $_db.profiles,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_profileIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $FlashcardDecksTable _deckIdTable(_$ColonyDatabase db) =>
+      db.flashcardDecks.createAlias(
+        $_aliasNameGenerator(db.flashcards.deckId, db.flashcardDecks.id),
+      );
+
+  $$FlashcardDecksTableProcessedTableManager get deckId {
+    final $_column = $_itemColumn<String>('deck_id')!;
+
+    final manager = $$FlashcardDecksTableTableManager(
+      $_db,
+      $_db.flashcardDecks,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_deckIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static MultiTypedResultKey<$FlashcardSrsTable, List<FlashcardSrsRow>>
+  _flashcardSrsRefsTable(_$ColonyDatabase db) => MultiTypedResultKey.fromTable(
+    db.flashcardSrs,
+    aliasName: $_aliasNameGenerator(db.flashcards.id, db.flashcardSrs.cardId),
+  );
+
+  $$FlashcardSrsTableProcessedTableManager get flashcardSrsRefs {
+    final manager = $$FlashcardSrsTableTableManager(
+      $_db,
+      $_db.flashcardSrs,
+    ).filter((f) => f.cardId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_flashcardSrsRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<
+    $FlashcardReviewLogsTable,
+    List<FlashcardReviewLogRow>
+  >
+  _flashcardReviewLogsRefsTable(_$ColonyDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.flashcardReviewLogs,
+        aliasName: $_aliasNameGenerator(
+          db.flashcards.id,
+          db.flashcardReviewLogs.cardId,
+        ),
+      );
+
+  $$FlashcardReviewLogsTableProcessedTableManager get flashcardReviewLogsRefs {
+    final manager = $$FlashcardReviewLogsTableTableManager(
+      $_db,
+      $_db.flashcardReviewLogs,
+    ).filter((f) => f.cardId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _flashcardReviewLogsRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+}
+
+class $$FlashcardsTableFilterComposer
+    extends Composer<_$ColonyDatabase, $FlashcardsTable> {
+  $$FlashcardsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get areaId => $composableBuilder(
+    column: $table.areaId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get kind => $composableBuilder(
+    column: $table.kind,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get front => $composableBuilder(
+    column: $table.front,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get back => $composableBuilder(
+    column: $table.back,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get extra => $composableBuilder(
+    column: $table.extra,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get tagsJson => $composableBuilder(
+    column: $table.tagsJson,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get clozeIndex => $composableBuilder(
+    column: $table.clozeIndex,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get reverseOfId => $composableBuilder(
+    column: $table.reverseOfId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get scheduleMode => $composableBuilder(
+    column: $table.scheduleMode,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get suspended => $composableBuilder(
+    column: $table.suspended,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get version => $composableBuilder(
+    column: $table.version,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$ProfilesTableFilterComposer get profileId {
+    final $$ProfilesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.profileId,
+      referencedTable: $db.profiles,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProfilesTableFilterComposer(
+            $db: $db,
+            $table: $db.profiles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$FlashcardDecksTableFilterComposer get deckId {
+    final $$FlashcardDecksTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.deckId,
+      referencedTable: $db.flashcardDecks,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$FlashcardDecksTableFilterComposer(
+            $db: $db,
+            $table: $db.flashcardDecks,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  Expression<bool> flashcardSrsRefs(
+    Expression<bool> Function($$FlashcardSrsTableFilterComposer f) f,
+  ) {
+    final $$FlashcardSrsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.flashcardSrs,
+      getReferencedColumn: (t) => t.cardId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$FlashcardSrsTableFilterComposer(
+            $db: $db,
+            $table: $db.flashcardSrs,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> flashcardReviewLogsRefs(
+    Expression<bool> Function($$FlashcardReviewLogsTableFilterComposer f) f,
+  ) {
+    final $$FlashcardReviewLogsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.flashcardReviewLogs,
+      getReferencedColumn: (t) => t.cardId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$FlashcardReviewLogsTableFilterComposer(
+            $db: $db,
+            $table: $db.flashcardReviewLogs,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $$FlashcardsTableOrderingComposer
+    extends Composer<_$ColonyDatabase, $FlashcardsTable> {
+  $$FlashcardsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get areaId => $composableBuilder(
+    column: $table.areaId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get kind => $composableBuilder(
+    column: $table.kind,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get front => $composableBuilder(
+    column: $table.front,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get back => $composableBuilder(
+    column: $table.back,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get extra => $composableBuilder(
+    column: $table.extra,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get tagsJson => $composableBuilder(
+    column: $table.tagsJson,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get clozeIndex => $composableBuilder(
+    column: $table.clozeIndex,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get reverseOfId => $composableBuilder(
+    column: $table.reverseOfId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get scheduleMode => $composableBuilder(
+    column: $table.scheduleMode,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get suspended => $composableBuilder(
+    column: $table.suspended,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get version => $composableBuilder(
+    column: $table.version,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$ProfilesTableOrderingComposer get profileId {
+    final $$ProfilesTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.profileId,
+      referencedTable: $db.profiles,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProfilesTableOrderingComposer(
+            $db: $db,
+            $table: $db.profiles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$FlashcardDecksTableOrderingComposer get deckId {
+    final $$FlashcardDecksTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.deckId,
+      referencedTable: $db.flashcardDecks,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$FlashcardDecksTableOrderingComposer(
+            $db: $db,
+            $table: $db.flashcardDecks,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$FlashcardsTableAnnotationComposer
+    extends Composer<_$ColonyDatabase, $FlashcardsTable> {
+  $$FlashcardsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get areaId =>
+      $composableBuilder(column: $table.areaId, builder: (column) => column);
+
+  GeneratedColumn<String> get kind =>
+      $composableBuilder(column: $table.kind, builder: (column) => column);
+
+  GeneratedColumn<String> get front =>
+      $composableBuilder(column: $table.front, builder: (column) => column);
+
+  GeneratedColumn<String> get back =>
+      $composableBuilder(column: $table.back, builder: (column) => column);
+
+  GeneratedColumn<String> get extra =>
+      $composableBuilder(column: $table.extra, builder: (column) => column);
+
+  GeneratedColumn<String> get tagsJson =>
+      $composableBuilder(column: $table.tagsJson, builder: (column) => column);
+
+  GeneratedColumn<int> get clozeIndex => $composableBuilder(
+    column: $table.clozeIndex,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get reverseOfId => $composableBuilder(
+    column: $table.reverseOfId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get scheduleMode => $composableBuilder(
+    column: $table.scheduleMode,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get suspended =>
+      $composableBuilder(column: $table.suspended, builder: (column) => column);
+
+  GeneratedColumn<int> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<int> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  GeneratedColumn<int> get version =>
+      $composableBuilder(column: $table.version, builder: (column) => column);
+
+  $$ProfilesTableAnnotationComposer get profileId {
+    final $$ProfilesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.profileId,
+      referencedTable: $db.profiles,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProfilesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.profiles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$FlashcardDecksTableAnnotationComposer get deckId {
+    final $$FlashcardDecksTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.deckId,
+      referencedTable: $db.flashcardDecks,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$FlashcardDecksTableAnnotationComposer(
+            $db: $db,
+            $table: $db.flashcardDecks,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  Expression<T> flashcardSrsRefs<T extends Object>(
+    Expression<T> Function($$FlashcardSrsTableAnnotationComposer a) f,
+  ) {
+    final $$FlashcardSrsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.flashcardSrs,
+      getReferencedColumn: (t) => t.cardId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$FlashcardSrsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.flashcardSrs,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<T> flashcardReviewLogsRefs<T extends Object>(
+    Expression<T> Function($$FlashcardReviewLogsTableAnnotationComposer a) f,
+  ) {
+    final $$FlashcardReviewLogsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.flashcardReviewLogs,
+          getReferencedColumn: (t) => t.cardId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$FlashcardReviewLogsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.flashcardReviewLogs,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+}
+
+class $$FlashcardsTableTableManager
+    extends
+        RootTableManager<
+          _$ColonyDatabase,
+          $FlashcardsTable,
+          FlashcardRow,
+          $$FlashcardsTableFilterComposer,
+          $$FlashcardsTableOrderingComposer,
+          $$FlashcardsTableAnnotationComposer,
+          $$FlashcardsTableCreateCompanionBuilder,
+          $$FlashcardsTableUpdateCompanionBuilder,
+          (FlashcardRow, $$FlashcardsTableReferences),
+          FlashcardRow,
+          PrefetchHooks Function({
+            bool profileId,
+            bool deckId,
+            bool flashcardSrsRefs,
+            bool flashcardReviewLogsRefs,
+          })
+        > {
+  $$FlashcardsTableTableManager(_$ColonyDatabase db, $FlashcardsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$FlashcardsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$FlashcardsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$FlashcardsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> profileId = const Value.absent(),
+                Value<String> deckId = const Value.absent(),
+                Value<String?> areaId = const Value.absent(),
+                Value<String> kind = const Value.absent(),
+                Value<String> front = const Value.absent(),
+                Value<String> back = const Value.absent(),
+                Value<String?> extra = const Value.absent(),
+                Value<String> tagsJson = const Value.absent(),
+                Value<int?> clozeIndex = const Value.absent(),
+                Value<String?> reverseOfId = const Value.absent(),
+                Value<String> scheduleMode = const Value.absent(),
+                Value<bool> suspended = const Value.absent(),
+                Value<int> createdAt = const Value.absent(),
+                Value<int> updatedAt = const Value.absent(),
+                Value<int> version = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => FlashcardsCompanion(
+                id: id,
+                profileId: profileId,
+                deckId: deckId,
+                areaId: areaId,
+                kind: kind,
+                front: front,
+                back: back,
+                extra: extra,
+                tagsJson: tagsJson,
+                clozeIndex: clozeIndex,
+                reverseOfId: reverseOfId,
+                scheduleMode: scheduleMode,
+                suspended: suspended,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                version: version,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String profileId,
+                required String deckId,
+                Value<String?> areaId = const Value.absent(),
+                required String kind,
+                required String front,
+                Value<String> back = const Value.absent(),
+                Value<String?> extra = const Value.absent(),
+                Value<String> tagsJson = const Value.absent(),
+                Value<int?> clozeIndex = const Value.absent(),
+                Value<String?> reverseOfId = const Value.absent(),
+                Value<String> scheduleMode = const Value.absent(),
+                Value<bool> suspended = const Value.absent(),
+                required int createdAt,
+                required int updatedAt,
+                Value<int> version = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => FlashcardsCompanion.insert(
+                id: id,
+                profileId: profileId,
+                deckId: deckId,
+                areaId: areaId,
+                kind: kind,
+                front: front,
+                back: back,
+                extra: extra,
+                tagsJson: tagsJson,
+                clozeIndex: clozeIndex,
+                reverseOfId: reverseOfId,
+                scheduleMode: scheduleMode,
+                suspended: suspended,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                version: version,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$FlashcardsTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback:
+              ({
+                profileId = false,
+                deckId = false,
+                flashcardSrsRefs = false,
+                flashcardReviewLogsRefs = false,
+              }) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [
+                    if (flashcardSrsRefs) db.flashcardSrs,
+                    if (flashcardReviewLogsRefs) db.flashcardReviewLogs,
+                  ],
+                  addJoins:
+                      <
+                        T extends TableManagerState<
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic
+                        >
+                      >(state) {
+                        if (profileId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.profileId,
+                                    referencedTable: $$FlashcardsTableReferences
+                                        ._profileIdTable(db),
+                                    referencedColumn:
+                                        $$FlashcardsTableReferences
+                                            ._profileIdTable(db)
+                                            .id,
+                                  )
+                                  as T;
+                        }
+                        if (deckId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.deckId,
+                                    referencedTable: $$FlashcardsTableReferences
+                                        ._deckIdTable(db),
+                                    referencedColumn:
+                                        $$FlashcardsTableReferences
+                                            ._deckIdTable(db)
+                                            .id,
+                                  )
+                                  as T;
+                        }
+
+                        return state;
+                      },
+                  getPrefetchedDataCallback: (items) async {
+                    return [
+                      if (flashcardSrsRefs)
+                        await $_getPrefetchedData<
+                          FlashcardRow,
+                          $FlashcardsTable,
+                          FlashcardSrsRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$FlashcardsTableReferences
+                              ._flashcardSrsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$FlashcardsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).flashcardSrsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.cardId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (flashcardReviewLogsRefs)
+                        await $_getPrefetchedData<
+                          FlashcardRow,
+                          $FlashcardsTable,
+                          FlashcardReviewLogRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$FlashcardsTableReferences
+                              ._flashcardReviewLogsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$FlashcardsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).flashcardReviewLogsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.cardId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                    ];
+                  },
+                );
+              },
+        ),
+      );
+}
+
+typedef $$FlashcardsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$ColonyDatabase,
+      $FlashcardsTable,
+      FlashcardRow,
+      $$FlashcardsTableFilterComposer,
+      $$FlashcardsTableOrderingComposer,
+      $$FlashcardsTableAnnotationComposer,
+      $$FlashcardsTableCreateCompanionBuilder,
+      $$FlashcardsTableUpdateCompanionBuilder,
+      (FlashcardRow, $$FlashcardsTableReferences),
+      FlashcardRow,
+      PrefetchHooks Function({
+        bool profileId,
+        bool deckId,
+        bool flashcardSrsRefs,
+        bool flashcardReviewLogsRefs,
+      })
+    >;
+typedef $$FlashcardSrsTableCreateCompanionBuilder =
+    FlashcardSrsCompanion Function({
+      required String cardId,
+      required String status,
+      Value<double> easeFactor,
+      Value<double> intervalDays,
+      Value<int> repetitions,
+      Value<int> lapses,
+      Value<int> learningStepIndex,
+      Value<bool> leech,
+      required int dueAt,
+      Value<int?> lastReviewedAt,
+      Value<int> rowid,
+    });
+typedef $$FlashcardSrsTableUpdateCompanionBuilder =
+    FlashcardSrsCompanion Function({
+      Value<String> cardId,
+      Value<String> status,
+      Value<double> easeFactor,
+      Value<double> intervalDays,
+      Value<int> repetitions,
+      Value<int> lapses,
+      Value<int> learningStepIndex,
+      Value<bool> leech,
+      Value<int> dueAt,
+      Value<int?> lastReviewedAt,
+      Value<int> rowid,
+    });
+
+final class $$FlashcardSrsTableReferences
+    extends
+        BaseReferences<_$ColonyDatabase, $FlashcardSrsTable, FlashcardSrsRow> {
+  $$FlashcardSrsTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static $FlashcardsTable _cardIdTable(_$ColonyDatabase db) =>
+      db.flashcards.createAlias(
+        $_aliasNameGenerator(db.flashcardSrs.cardId, db.flashcards.id),
+      );
+
+  $$FlashcardsTableProcessedTableManager get cardId {
+    final $_column = $_itemColumn<String>('card_id')!;
+
+    final manager = $$FlashcardsTableTableManager(
+      $_db,
+      $_db.flashcards,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_cardIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$FlashcardSrsTableFilterComposer
+    extends Composer<_$ColonyDatabase, $FlashcardSrsTable> {
+  $$FlashcardSrsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get status => $composableBuilder(
+    column: $table.status,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get easeFactor => $composableBuilder(
+    column: $table.easeFactor,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get intervalDays => $composableBuilder(
+    column: $table.intervalDays,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get repetitions => $composableBuilder(
+    column: $table.repetitions,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get lapses => $composableBuilder(
+    column: $table.lapses,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get learningStepIndex => $composableBuilder(
+    column: $table.learningStepIndex,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get leech => $composableBuilder(
+    column: $table.leech,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get dueAt => $composableBuilder(
+    column: $table.dueAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get lastReviewedAt => $composableBuilder(
+    column: $table.lastReviewedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$FlashcardsTableFilterComposer get cardId {
+    final $$FlashcardsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.cardId,
+      referencedTable: $db.flashcards,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$FlashcardsTableFilterComposer(
+            $db: $db,
+            $table: $db.flashcards,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$FlashcardSrsTableOrderingComposer
+    extends Composer<_$ColonyDatabase, $FlashcardSrsTable> {
+  $$FlashcardSrsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get status => $composableBuilder(
+    column: $table.status,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get easeFactor => $composableBuilder(
+    column: $table.easeFactor,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get intervalDays => $composableBuilder(
+    column: $table.intervalDays,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get repetitions => $composableBuilder(
+    column: $table.repetitions,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get lapses => $composableBuilder(
+    column: $table.lapses,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get learningStepIndex => $composableBuilder(
+    column: $table.learningStepIndex,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get leech => $composableBuilder(
+    column: $table.leech,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get dueAt => $composableBuilder(
+    column: $table.dueAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get lastReviewedAt => $composableBuilder(
+    column: $table.lastReviewedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$FlashcardsTableOrderingComposer get cardId {
+    final $$FlashcardsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.cardId,
+      referencedTable: $db.flashcards,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$FlashcardsTableOrderingComposer(
+            $db: $db,
+            $table: $db.flashcards,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$FlashcardSrsTableAnnotationComposer
+    extends Composer<_$ColonyDatabase, $FlashcardSrsTable> {
+  $$FlashcardSrsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get status =>
+      $composableBuilder(column: $table.status, builder: (column) => column);
+
+  GeneratedColumn<double> get easeFactor => $composableBuilder(
+    column: $table.easeFactor,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<double> get intervalDays => $composableBuilder(
+    column: $table.intervalDays,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get repetitions => $composableBuilder(
+    column: $table.repetitions,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get lapses =>
+      $composableBuilder(column: $table.lapses, builder: (column) => column);
+
+  GeneratedColumn<int> get learningStepIndex => $composableBuilder(
+    column: $table.learningStepIndex,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get leech =>
+      $composableBuilder(column: $table.leech, builder: (column) => column);
+
+  GeneratedColumn<int> get dueAt =>
+      $composableBuilder(column: $table.dueAt, builder: (column) => column);
+
+  GeneratedColumn<int> get lastReviewedAt => $composableBuilder(
+    column: $table.lastReviewedAt,
+    builder: (column) => column,
+  );
+
+  $$FlashcardsTableAnnotationComposer get cardId {
+    final $$FlashcardsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.cardId,
+      referencedTable: $db.flashcards,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$FlashcardsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.flashcards,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$FlashcardSrsTableTableManager
+    extends
+        RootTableManager<
+          _$ColonyDatabase,
+          $FlashcardSrsTable,
+          FlashcardSrsRow,
+          $$FlashcardSrsTableFilterComposer,
+          $$FlashcardSrsTableOrderingComposer,
+          $$FlashcardSrsTableAnnotationComposer,
+          $$FlashcardSrsTableCreateCompanionBuilder,
+          $$FlashcardSrsTableUpdateCompanionBuilder,
+          (FlashcardSrsRow, $$FlashcardSrsTableReferences),
+          FlashcardSrsRow,
+          PrefetchHooks Function({bool cardId})
+        > {
+  $$FlashcardSrsTableTableManager(_$ColonyDatabase db, $FlashcardSrsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$FlashcardSrsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$FlashcardSrsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$FlashcardSrsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> cardId = const Value.absent(),
+                Value<String> status = const Value.absent(),
+                Value<double> easeFactor = const Value.absent(),
+                Value<double> intervalDays = const Value.absent(),
+                Value<int> repetitions = const Value.absent(),
+                Value<int> lapses = const Value.absent(),
+                Value<int> learningStepIndex = const Value.absent(),
+                Value<bool> leech = const Value.absent(),
+                Value<int> dueAt = const Value.absent(),
+                Value<int?> lastReviewedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => FlashcardSrsCompanion(
+                cardId: cardId,
+                status: status,
+                easeFactor: easeFactor,
+                intervalDays: intervalDays,
+                repetitions: repetitions,
+                lapses: lapses,
+                learningStepIndex: learningStepIndex,
+                leech: leech,
+                dueAt: dueAt,
+                lastReviewedAt: lastReviewedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String cardId,
+                required String status,
+                Value<double> easeFactor = const Value.absent(),
+                Value<double> intervalDays = const Value.absent(),
+                Value<int> repetitions = const Value.absent(),
+                Value<int> lapses = const Value.absent(),
+                Value<int> learningStepIndex = const Value.absent(),
+                Value<bool> leech = const Value.absent(),
+                required int dueAt,
+                Value<int?> lastReviewedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => FlashcardSrsCompanion.insert(
+                cardId: cardId,
+                status: status,
+                easeFactor: easeFactor,
+                intervalDays: intervalDays,
+                repetitions: repetitions,
+                lapses: lapses,
+                learningStepIndex: learningStepIndex,
+                leech: leech,
+                dueAt: dueAt,
+                lastReviewedAt: lastReviewedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$FlashcardSrsTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({cardId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (cardId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.cardId,
+                                referencedTable: $$FlashcardSrsTableReferences
+                                    ._cardIdTable(db),
+                                referencedColumn: $$FlashcardSrsTableReferences
+                                    ._cardIdTable(db)
+                                    .id,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$FlashcardSrsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$ColonyDatabase,
+      $FlashcardSrsTable,
+      FlashcardSrsRow,
+      $$FlashcardSrsTableFilterComposer,
+      $$FlashcardSrsTableOrderingComposer,
+      $$FlashcardSrsTableAnnotationComposer,
+      $$FlashcardSrsTableCreateCompanionBuilder,
+      $$FlashcardSrsTableUpdateCompanionBuilder,
+      (FlashcardSrsRow, $$FlashcardSrsTableReferences),
+      FlashcardSrsRow,
+      PrefetchHooks Function({bool cardId})
+    >;
+typedef $$FlashcardReviewLogsTableCreateCompanionBuilder =
+    FlashcardReviewLogsCompanion Function({
+      required String id,
+      required String cardId,
+      required int reviewedAt,
+      required String rating,
+      required double intervalDaysBefore,
+      required double intervalDaysAfter,
+      required double easeBefore,
+      required double easeAfter,
+      Value<int?> durationMs,
+      Value<String> reviewKind,
+      Value<int> rowid,
+    });
+typedef $$FlashcardReviewLogsTableUpdateCompanionBuilder =
+    FlashcardReviewLogsCompanion Function({
+      Value<String> id,
+      Value<String> cardId,
+      Value<int> reviewedAt,
+      Value<String> rating,
+      Value<double> intervalDaysBefore,
+      Value<double> intervalDaysAfter,
+      Value<double> easeBefore,
+      Value<double> easeAfter,
+      Value<int?> durationMs,
+      Value<String> reviewKind,
+      Value<int> rowid,
+    });
+
+final class $$FlashcardReviewLogsTableReferences
+    extends
+        BaseReferences<
+          _$ColonyDatabase,
+          $FlashcardReviewLogsTable,
+          FlashcardReviewLogRow
+        > {
+  $$FlashcardReviewLogsTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $FlashcardsTable _cardIdTable(_$ColonyDatabase db) =>
+      db.flashcards.createAlias(
+        $_aliasNameGenerator(db.flashcardReviewLogs.cardId, db.flashcards.id),
+      );
+
+  $$FlashcardsTableProcessedTableManager get cardId {
+    final $_column = $_itemColumn<String>('card_id')!;
+
+    final manager = $$FlashcardsTableTableManager(
+      $_db,
+      $_db.flashcards,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_cardIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$FlashcardReviewLogsTableFilterComposer
+    extends Composer<_$ColonyDatabase, $FlashcardReviewLogsTable> {
+  $$FlashcardReviewLogsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get reviewedAt => $composableBuilder(
+    column: $table.reviewedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get rating => $composableBuilder(
+    column: $table.rating,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get intervalDaysBefore => $composableBuilder(
+    column: $table.intervalDaysBefore,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get intervalDaysAfter => $composableBuilder(
+    column: $table.intervalDaysAfter,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get easeBefore => $composableBuilder(
+    column: $table.easeBefore,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get easeAfter => $composableBuilder(
+    column: $table.easeAfter,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get durationMs => $composableBuilder(
+    column: $table.durationMs,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get reviewKind => $composableBuilder(
+    column: $table.reviewKind,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$FlashcardsTableFilterComposer get cardId {
+    final $$FlashcardsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.cardId,
+      referencedTable: $db.flashcards,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$FlashcardsTableFilterComposer(
+            $db: $db,
+            $table: $db.flashcards,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$FlashcardReviewLogsTableOrderingComposer
+    extends Composer<_$ColonyDatabase, $FlashcardReviewLogsTable> {
+  $$FlashcardReviewLogsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get reviewedAt => $composableBuilder(
+    column: $table.reviewedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get rating => $composableBuilder(
+    column: $table.rating,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get intervalDaysBefore => $composableBuilder(
+    column: $table.intervalDaysBefore,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get intervalDaysAfter => $composableBuilder(
+    column: $table.intervalDaysAfter,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get easeBefore => $composableBuilder(
+    column: $table.easeBefore,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get easeAfter => $composableBuilder(
+    column: $table.easeAfter,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get durationMs => $composableBuilder(
+    column: $table.durationMs,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get reviewKind => $composableBuilder(
+    column: $table.reviewKind,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$FlashcardsTableOrderingComposer get cardId {
+    final $$FlashcardsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.cardId,
+      referencedTable: $db.flashcards,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$FlashcardsTableOrderingComposer(
+            $db: $db,
+            $table: $db.flashcards,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$FlashcardReviewLogsTableAnnotationComposer
+    extends Composer<_$ColonyDatabase, $FlashcardReviewLogsTable> {
+  $$FlashcardReviewLogsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<int> get reviewedAt => $composableBuilder(
+    column: $table.reviewedAt,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get rating =>
+      $composableBuilder(column: $table.rating, builder: (column) => column);
+
+  GeneratedColumn<double> get intervalDaysBefore => $composableBuilder(
+    column: $table.intervalDaysBefore,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<double> get intervalDaysAfter => $composableBuilder(
+    column: $table.intervalDaysAfter,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<double> get easeBefore => $composableBuilder(
+    column: $table.easeBefore,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<double> get easeAfter =>
+      $composableBuilder(column: $table.easeAfter, builder: (column) => column);
+
+  GeneratedColumn<int> get durationMs => $composableBuilder(
+    column: $table.durationMs,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get reviewKind => $composableBuilder(
+    column: $table.reviewKind,
+    builder: (column) => column,
+  );
+
+  $$FlashcardsTableAnnotationComposer get cardId {
+    final $$FlashcardsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.cardId,
+      referencedTable: $db.flashcards,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$FlashcardsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.flashcards,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$FlashcardReviewLogsTableTableManager
+    extends
+        RootTableManager<
+          _$ColonyDatabase,
+          $FlashcardReviewLogsTable,
+          FlashcardReviewLogRow,
+          $$FlashcardReviewLogsTableFilterComposer,
+          $$FlashcardReviewLogsTableOrderingComposer,
+          $$FlashcardReviewLogsTableAnnotationComposer,
+          $$FlashcardReviewLogsTableCreateCompanionBuilder,
+          $$FlashcardReviewLogsTableUpdateCompanionBuilder,
+          (FlashcardReviewLogRow, $$FlashcardReviewLogsTableReferences),
+          FlashcardReviewLogRow,
+          PrefetchHooks Function({bool cardId})
+        > {
+  $$FlashcardReviewLogsTableTableManager(
+    _$ColonyDatabase db,
+    $FlashcardReviewLogsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$FlashcardReviewLogsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$FlashcardReviewLogsTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$FlashcardReviewLogsTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> cardId = const Value.absent(),
+                Value<int> reviewedAt = const Value.absent(),
+                Value<String> rating = const Value.absent(),
+                Value<double> intervalDaysBefore = const Value.absent(),
+                Value<double> intervalDaysAfter = const Value.absent(),
+                Value<double> easeBefore = const Value.absent(),
+                Value<double> easeAfter = const Value.absent(),
+                Value<int?> durationMs = const Value.absent(),
+                Value<String> reviewKind = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => FlashcardReviewLogsCompanion(
+                id: id,
+                cardId: cardId,
+                reviewedAt: reviewedAt,
+                rating: rating,
+                intervalDaysBefore: intervalDaysBefore,
+                intervalDaysAfter: intervalDaysAfter,
+                easeBefore: easeBefore,
+                easeAfter: easeAfter,
+                durationMs: durationMs,
+                reviewKind: reviewKind,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String cardId,
+                required int reviewedAt,
+                required String rating,
+                required double intervalDaysBefore,
+                required double intervalDaysAfter,
+                required double easeBefore,
+                required double easeAfter,
+                Value<int?> durationMs = const Value.absent(),
+                Value<String> reviewKind = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => FlashcardReviewLogsCompanion.insert(
+                id: id,
+                cardId: cardId,
+                reviewedAt: reviewedAt,
+                rating: rating,
+                intervalDaysBefore: intervalDaysBefore,
+                intervalDaysAfter: intervalDaysAfter,
+                easeBefore: easeBefore,
+                easeAfter: easeAfter,
+                durationMs: durationMs,
+                reviewKind: reviewKind,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$FlashcardReviewLogsTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({cardId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (cardId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.cardId,
+                                referencedTable:
+                                    $$FlashcardReviewLogsTableReferences
+                                        ._cardIdTable(db),
+                                referencedColumn:
+                                    $$FlashcardReviewLogsTableReferences
+                                        ._cardIdTable(db)
+                                        .id,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$FlashcardReviewLogsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$ColonyDatabase,
+      $FlashcardReviewLogsTable,
+      FlashcardReviewLogRow,
+      $$FlashcardReviewLogsTableFilterComposer,
+      $$FlashcardReviewLogsTableOrderingComposer,
+      $$FlashcardReviewLogsTableAnnotationComposer,
+      $$FlashcardReviewLogsTableCreateCompanionBuilder,
+      $$FlashcardReviewLogsTableUpdateCompanionBuilder,
+      (FlashcardReviewLogRow, $$FlashcardReviewLogsTableReferences),
+      FlashcardReviewLogRow,
+      PrefetchHooks Function({bool cardId})
+    >;
+typedef $$KnowledgeAreaPlacementsTableCreateCompanionBuilder =
+    KnowledgeAreaPlacementsCompanion Function({
+      required String areaId,
+      required String parentAreaId,
+      required int linkedAt,
+      Value<String?> catalogKey,
+      Value<int> rowid,
+    });
+typedef $$KnowledgeAreaPlacementsTableUpdateCompanionBuilder =
+    KnowledgeAreaPlacementsCompanion Function({
+      Value<String> areaId,
+      Value<String> parentAreaId,
+      Value<int> linkedAt,
+      Value<String?> catalogKey,
+      Value<int> rowid,
+    });
+
+final class $$KnowledgeAreaPlacementsTableReferences
+    extends
+        BaseReferences<
+          _$ColonyDatabase,
+          $KnowledgeAreaPlacementsTable,
+          KnowledgeAreaPlacementRow
+        > {
+  $$KnowledgeAreaPlacementsTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $KnowledgeAreasTable _areaIdTable(_$ColonyDatabase db) =>
+      db.knowledgeAreas.createAlias(
+        $_aliasNameGenerator(
+          db.knowledgeAreaPlacements.areaId,
+          db.knowledgeAreas.id,
+        ),
+      );
+
+  $$KnowledgeAreasTableProcessedTableManager get areaId {
+    final $_column = $_itemColumn<String>('area_id')!;
+
+    final manager = $$KnowledgeAreasTableTableManager(
+      $_db,
+      $_db.knowledgeAreas,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_areaIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $KnowledgeAreasTable _parentAreaIdTable(_$ColonyDatabase db) =>
+      db.knowledgeAreas.createAlias(
+        $_aliasNameGenerator(
+          db.knowledgeAreaPlacements.parentAreaId,
+          db.knowledgeAreas.id,
+        ),
+      );
+
+  $$KnowledgeAreasTableProcessedTableManager get parentAreaId {
+    final $_column = $_itemColumn<String>('parent_area_id')!;
+
+    final manager = $$KnowledgeAreasTableTableManager(
+      $_db,
+      $_db.knowledgeAreas,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_parentAreaIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$KnowledgeAreaPlacementsTableFilterComposer
+    extends Composer<_$ColonyDatabase, $KnowledgeAreaPlacementsTable> {
+  $$KnowledgeAreaPlacementsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get linkedAt => $composableBuilder(
+    column: $table.linkedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get catalogKey => $composableBuilder(
+    column: $table.catalogKey,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$KnowledgeAreasTableFilterComposer get areaId {
+    final $$KnowledgeAreasTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.areaId,
+      referencedTable: $db.knowledgeAreas,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$KnowledgeAreasTableFilterComposer(
+            $db: $db,
+            $table: $db.knowledgeAreas,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$KnowledgeAreasTableFilterComposer get parentAreaId {
+    final $$KnowledgeAreasTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.parentAreaId,
+      referencedTable: $db.knowledgeAreas,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$KnowledgeAreasTableFilterComposer(
+            $db: $db,
+            $table: $db.knowledgeAreas,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$KnowledgeAreaPlacementsTableOrderingComposer
+    extends Composer<_$ColonyDatabase, $KnowledgeAreaPlacementsTable> {
+  $$KnowledgeAreaPlacementsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get linkedAt => $composableBuilder(
+    column: $table.linkedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get catalogKey => $composableBuilder(
+    column: $table.catalogKey,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$KnowledgeAreasTableOrderingComposer get areaId {
+    final $$KnowledgeAreasTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.areaId,
+      referencedTable: $db.knowledgeAreas,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$KnowledgeAreasTableOrderingComposer(
+            $db: $db,
+            $table: $db.knowledgeAreas,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$KnowledgeAreasTableOrderingComposer get parentAreaId {
+    final $$KnowledgeAreasTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.parentAreaId,
+      referencedTable: $db.knowledgeAreas,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$KnowledgeAreasTableOrderingComposer(
+            $db: $db,
+            $table: $db.knowledgeAreas,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$KnowledgeAreaPlacementsTableAnnotationComposer
+    extends Composer<_$ColonyDatabase, $KnowledgeAreaPlacementsTable> {
+  $$KnowledgeAreaPlacementsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get linkedAt =>
+      $composableBuilder(column: $table.linkedAt, builder: (column) => column);
+
+  GeneratedColumn<String> get catalogKey => $composableBuilder(
+    column: $table.catalogKey,
+    builder: (column) => column,
+  );
+
+  $$KnowledgeAreasTableAnnotationComposer get areaId {
+    final $$KnowledgeAreasTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.areaId,
+      referencedTable: $db.knowledgeAreas,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$KnowledgeAreasTableAnnotationComposer(
+            $db: $db,
+            $table: $db.knowledgeAreas,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$KnowledgeAreasTableAnnotationComposer get parentAreaId {
+    final $$KnowledgeAreasTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.parentAreaId,
+      referencedTable: $db.knowledgeAreas,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$KnowledgeAreasTableAnnotationComposer(
+            $db: $db,
+            $table: $db.knowledgeAreas,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$KnowledgeAreaPlacementsTableTableManager
+    extends
+        RootTableManager<
+          _$ColonyDatabase,
+          $KnowledgeAreaPlacementsTable,
+          KnowledgeAreaPlacementRow,
+          $$KnowledgeAreaPlacementsTableFilterComposer,
+          $$KnowledgeAreaPlacementsTableOrderingComposer,
+          $$KnowledgeAreaPlacementsTableAnnotationComposer,
+          $$KnowledgeAreaPlacementsTableCreateCompanionBuilder,
+          $$KnowledgeAreaPlacementsTableUpdateCompanionBuilder,
+          (KnowledgeAreaPlacementRow, $$KnowledgeAreaPlacementsTableReferences),
+          KnowledgeAreaPlacementRow,
+          PrefetchHooks Function({bool areaId, bool parentAreaId})
+        > {
+  $$KnowledgeAreaPlacementsTableTableManager(
+    _$ColonyDatabase db,
+    $KnowledgeAreaPlacementsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$KnowledgeAreaPlacementsTableFilterComposer(
+                $db: db,
+                $table: table,
+              ),
+          createOrderingComposer: () =>
+              $$KnowledgeAreaPlacementsTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$KnowledgeAreaPlacementsTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> areaId = const Value.absent(),
+                Value<String> parentAreaId = const Value.absent(),
+                Value<int> linkedAt = const Value.absent(),
+                Value<String?> catalogKey = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => KnowledgeAreaPlacementsCompanion(
+                areaId: areaId,
+                parentAreaId: parentAreaId,
+                linkedAt: linkedAt,
+                catalogKey: catalogKey,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String areaId,
+                required String parentAreaId,
+                required int linkedAt,
+                Value<String?> catalogKey = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => KnowledgeAreaPlacementsCompanion.insert(
+                areaId: areaId,
+                parentAreaId: parentAreaId,
+                linkedAt: linkedAt,
+                catalogKey: catalogKey,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$KnowledgeAreaPlacementsTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({areaId = false, parentAreaId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (areaId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.areaId,
+                                referencedTable:
+                                    $$KnowledgeAreaPlacementsTableReferences
+                                        ._areaIdTable(db),
+                                referencedColumn:
+                                    $$KnowledgeAreaPlacementsTableReferences
+                                        ._areaIdTable(db)
+                                        .id,
+                              )
+                              as T;
+                    }
+                    if (parentAreaId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.parentAreaId,
+                                referencedTable:
+                                    $$KnowledgeAreaPlacementsTableReferences
+                                        ._parentAreaIdTable(db),
+                                referencedColumn:
+                                    $$KnowledgeAreaPlacementsTableReferences
+                                        ._parentAreaIdTable(db)
+                                        .id,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$KnowledgeAreaPlacementsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$ColonyDatabase,
+      $KnowledgeAreaPlacementsTable,
+      KnowledgeAreaPlacementRow,
+      $$KnowledgeAreaPlacementsTableFilterComposer,
+      $$KnowledgeAreaPlacementsTableOrderingComposer,
+      $$KnowledgeAreaPlacementsTableAnnotationComposer,
+      $$KnowledgeAreaPlacementsTableCreateCompanionBuilder,
+      $$KnowledgeAreaPlacementsTableUpdateCompanionBuilder,
+      (KnowledgeAreaPlacementRow, $$KnowledgeAreaPlacementsTableReferences),
+      KnowledgeAreaPlacementRow,
+      PrefetchHooks Function({bool areaId, bool parentAreaId})
+    >;
+typedef $$ResearchKnowledgeLinksTableCreateCompanionBuilder =
+    ResearchKnowledgeLinksCompanion Function({
+      required String researchNodeId,
+      required String areaId,
+      required String kind,
+      required int linkedAt,
+      Value<int> rowid,
+    });
+typedef $$ResearchKnowledgeLinksTableUpdateCompanionBuilder =
+    ResearchKnowledgeLinksCompanion Function({
+      Value<String> researchNodeId,
+      Value<String> areaId,
+      Value<String> kind,
+      Value<int> linkedAt,
+      Value<int> rowid,
+    });
+
+final class $$ResearchKnowledgeLinksTableReferences
+    extends
+        BaseReferences<
+          _$ColonyDatabase,
+          $ResearchKnowledgeLinksTable,
+          ResearchKnowledgeLinkRow
+        > {
+  $$ResearchKnowledgeLinksTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $ResearchNodesTable _researchNodeIdTable(_$ColonyDatabase db) =>
+      db.researchNodes.createAlias(
+        $_aliasNameGenerator(
+          db.researchKnowledgeLinks.researchNodeId,
+          db.researchNodes.id,
+        ),
+      );
+
+  $$ResearchNodesTableProcessedTableManager get researchNodeId {
+    final $_column = $_itemColumn<String>('research_node_id')!;
+
+    final manager = $$ResearchNodesTableTableManager(
+      $_db,
+      $_db.researchNodes,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_researchNodeIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $KnowledgeAreasTable _areaIdTable(_$ColonyDatabase db) =>
+      db.knowledgeAreas.createAlias(
+        $_aliasNameGenerator(
+          db.researchKnowledgeLinks.areaId,
+          db.knowledgeAreas.id,
+        ),
+      );
+
+  $$KnowledgeAreasTableProcessedTableManager get areaId {
+    final $_column = $_itemColumn<String>('area_id')!;
+
+    final manager = $$KnowledgeAreasTableTableManager(
+      $_db,
+      $_db.knowledgeAreas,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_areaIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$ResearchKnowledgeLinksTableFilterComposer
+    extends Composer<_$ColonyDatabase, $ResearchKnowledgeLinksTable> {
+  $$ResearchKnowledgeLinksTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get kind => $composableBuilder(
+    column: $table.kind,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get linkedAt => $composableBuilder(
+    column: $table.linkedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$ResearchNodesTableFilterComposer get researchNodeId {
+    final $$ResearchNodesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.researchNodeId,
+      referencedTable: $db.researchNodes,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ResearchNodesTableFilterComposer(
+            $db: $db,
+            $table: $db.researchNodes,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$KnowledgeAreasTableFilterComposer get areaId {
+    final $$KnowledgeAreasTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.areaId,
+      referencedTable: $db.knowledgeAreas,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$KnowledgeAreasTableFilterComposer(
+            $db: $db,
+            $table: $db.knowledgeAreas,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$ResearchKnowledgeLinksTableOrderingComposer
+    extends Composer<_$ColonyDatabase, $ResearchKnowledgeLinksTable> {
+  $$ResearchKnowledgeLinksTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get kind => $composableBuilder(
+    column: $table.kind,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get linkedAt => $composableBuilder(
+    column: $table.linkedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$ResearchNodesTableOrderingComposer get researchNodeId {
+    final $$ResearchNodesTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.researchNodeId,
+      referencedTable: $db.researchNodes,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ResearchNodesTableOrderingComposer(
+            $db: $db,
+            $table: $db.researchNodes,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$KnowledgeAreasTableOrderingComposer get areaId {
+    final $$KnowledgeAreasTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.areaId,
+      referencedTable: $db.knowledgeAreas,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$KnowledgeAreasTableOrderingComposer(
+            $db: $db,
+            $table: $db.knowledgeAreas,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$ResearchKnowledgeLinksTableAnnotationComposer
+    extends Composer<_$ColonyDatabase, $ResearchKnowledgeLinksTable> {
+  $$ResearchKnowledgeLinksTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get kind =>
+      $composableBuilder(column: $table.kind, builder: (column) => column);
+
+  GeneratedColumn<int> get linkedAt =>
+      $composableBuilder(column: $table.linkedAt, builder: (column) => column);
+
+  $$ResearchNodesTableAnnotationComposer get researchNodeId {
+    final $$ResearchNodesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.researchNodeId,
+      referencedTable: $db.researchNodes,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ResearchNodesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.researchNodes,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$KnowledgeAreasTableAnnotationComposer get areaId {
+    final $$KnowledgeAreasTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.areaId,
+      referencedTable: $db.knowledgeAreas,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$KnowledgeAreasTableAnnotationComposer(
+            $db: $db,
+            $table: $db.knowledgeAreas,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$ResearchKnowledgeLinksTableTableManager
+    extends
+        RootTableManager<
+          _$ColonyDatabase,
+          $ResearchKnowledgeLinksTable,
+          ResearchKnowledgeLinkRow,
+          $$ResearchKnowledgeLinksTableFilterComposer,
+          $$ResearchKnowledgeLinksTableOrderingComposer,
+          $$ResearchKnowledgeLinksTableAnnotationComposer,
+          $$ResearchKnowledgeLinksTableCreateCompanionBuilder,
+          $$ResearchKnowledgeLinksTableUpdateCompanionBuilder,
+          (ResearchKnowledgeLinkRow, $$ResearchKnowledgeLinksTableReferences),
+          ResearchKnowledgeLinkRow,
+          PrefetchHooks Function({bool researchNodeId, bool areaId})
+        > {
+  $$ResearchKnowledgeLinksTableTableManager(
+    _$ColonyDatabase db,
+    $ResearchKnowledgeLinksTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$ResearchKnowledgeLinksTableFilterComposer(
+                $db: db,
+                $table: table,
+              ),
+          createOrderingComposer: () =>
+              $$ResearchKnowledgeLinksTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$ResearchKnowledgeLinksTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> researchNodeId = const Value.absent(),
+                Value<String> areaId = const Value.absent(),
+                Value<String> kind = const Value.absent(),
+                Value<int> linkedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => ResearchKnowledgeLinksCompanion(
+                researchNodeId: researchNodeId,
+                areaId: areaId,
+                kind: kind,
+                linkedAt: linkedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String researchNodeId,
+                required String areaId,
+                required String kind,
+                required int linkedAt,
+                Value<int> rowid = const Value.absent(),
+              }) => ResearchKnowledgeLinksCompanion.insert(
+                researchNodeId: researchNodeId,
+                areaId: areaId,
+                kind: kind,
+                linkedAt: linkedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$ResearchKnowledgeLinksTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({researchNodeId = false, areaId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (researchNodeId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.researchNodeId,
+                                referencedTable:
+                                    $$ResearchKnowledgeLinksTableReferences
+                                        ._researchNodeIdTable(db),
+                                referencedColumn:
+                                    $$ResearchKnowledgeLinksTableReferences
+                                        ._researchNodeIdTable(db)
+                                        .id,
+                              )
+                              as T;
+                    }
+                    if (areaId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.areaId,
+                                referencedTable:
+                                    $$ResearchKnowledgeLinksTableReferences
+                                        ._areaIdTable(db),
+                                referencedColumn:
+                                    $$ResearchKnowledgeLinksTableReferences
+                                        ._areaIdTable(db)
+                                        .id,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$ResearchKnowledgeLinksTableProcessedTableManager =
+    ProcessedTableManager<
+      _$ColonyDatabase,
+      $ResearchKnowledgeLinksTable,
+      ResearchKnowledgeLinkRow,
+      $$ResearchKnowledgeLinksTableFilterComposer,
+      $$ResearchKnowledgeLinksTableOrderingComposer,
+      $$ResearchKnowledgeLinksTableAnnotationComposer,
+      $$ResearchKnowledgeLinksTableCreateCompanionBuilder,
+      $$ResearchKnowledgeLinksTableUpdateCompanionBuilder,
+      (ResearchKnowledgeLinkRow, $$ResearchKnowledgeLinksTableReferences),
+      ResearchKnowledgeLinkRow,
+      PrefetchHooks Function({bool researchNodeId, bool areaId})
+    >;
 
 class $ColonyDatabaseManager {
   final _$ColonyDatabase _db;
@@ -53115,5 +61399,25 @@ class $ColonyDatabaseManager {
       $$ExternalCalendarEventsTableTableManager(
         _db,
         _db.externalCalendarEvents,
+      );
+  $$KnowledgeAreasTableTableManager get knowledgeAreas =>
+      $$KnowledgeAreasTableTableManager(_db, _db.knowledgeAreas);
+  $$FlashcardDecksTableTableManager get flashcardDecks =>
+      $$FlashcardDecksTableTableManager(_db, _db.flashcardDecks);
+  $$FlashcardsTableTableManager get flashcards =>
+      $$FlashcardsTableTableManager(_db, _db.flashcards);
+  $$FlashcardSrsTableTableManager get flashcardSrs =>
+      $$FlashcardSrsTableTableManager(_db, _db.flashcardSrs);
+  $$FlashcardReviewLogsTableTableManager get flashcardReviewLogs =>
+      $$FlashcardReviewLogsTableTableManager(_db, _db.flashcardReviewLogs);
+  $$KnowledgeAreaPlacementsTableTableManager get knowledgeAreaPlacements =>
+      $$KnowledgeAreaPlacementsTableTableManager(
+        _db,
+        _db.knowledgeAreaPlacements,
+      );
+  $$ResearchKnowledgeLinksTableTableManager get researchKnowledgeLinks =>
+      $$ResearchKnowledgeLinksTableTableManager(
+        _db,
+        _db.researchKnowledgeLinks,
       );
 }

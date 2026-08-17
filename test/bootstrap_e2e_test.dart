@@ -16,6 +16,7 @@ import 'package:fallhub/features/quests/presentation/quest_board_screen.dart';
 import 'package:fallhub/features/relations/presentation/people_screen.dart';
 import 'package:fallhub/features/relations/presentation/organizations_screen.dart';
 import 'package:fallhub/features/relations/presentation/commitments_screen.dart';
+import 'package:fallhub/features/flashcards/presentation/flashcards_hub_screen.dart';
 import 'package:fallhub/features/research/presentation/research_list_screen.dart';
 import 'package:fallhub/features/travel/presentation/travel_screen.dart';
 import 'package:fallhub/features/home/presentation/home_maintenance_screen.dart';
@@ -31,7 +32,7 @@ Future<void> _flushDisposeTimers(WidgetTester tester) async {
 
 void main() {
   testWidgets(
-      'bootstrap: DB + routing opens colony, finance, health, inventory, travel, home, zones, people, organizations, commitments, integrations, research, quests',
+      'bootstrap: DB + routing opens colony, finance, health, inventory, travel, home, zones, people, organizations, commitments, integrations, research, quests, flashcards',
       (tester) async {
     tester.view.physicalSize = const Size(1100, 1600);
     tester.view.devicePixelRatio = 1.0;
@@ -119,6 +120,10 @@ void main() {
         GoRoute(
           path: '/quests',
           builder: (_, __) => const Scaffold(body: QuestBoardScreen()),
+        ),
+        GoRoute(
+          path: '/flashcards',
+          builder: (_, __) => const Scaffold(body: FlashcardsHubScreen()),
         ),
       ],
     );
@@ -214,6 +219,12 @@ void main() {
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 500));
     expect(find.text(AppStrings.questBoardEmpty), findsOneWidget);
+
+    router.go('/flashcards');
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 500));
+    expect(find.text(AppStrings.flashcardsEmpty), findsOneWidget);
+    expect(find.text(AppStrings.flashcardsStudyNow), findsOneWidget);
 
     await _flushDisposeTimers(tester);
     await db.close();

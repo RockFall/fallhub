@@ -47,19 +47,20 @@ Export snapshots v1–v4 permitem backup offline, mas o app só implementava **e
 | **v27** | + `zone_trip_links` | Zone↔Trip N:N (ADR-031) |
 | **v28** | + `health_appointments` | Health appointment stub (ADR-023) |
 | **v29** | + `trip_inventory_links` | Packing list stub trip↔inventory (§26.1) |
+| **v30** | + `knowledge_areas`, `flashcard_decks`, `flashcards`, `flashcard_srs`, `flashcard_review_logs` | Flashcards + SRS (ADR-036) |
 
 Chaves transversais (presentes em export v26+ completo, default `[]` se ausentes em backups antigos):
 `work_priorities`, `bills`, `schedule_blocks`, `need_definitions`, `need_readings`, `check_ins`.
 
-Versões **> 29** ou **< 1** rejeitadas com erro parseável; **nenhuma mutação** no banco.
+Versões **> 30** ou **< 1** rejeitadas com erro parseável; **nenhuma mutação** no banco.
 
 ### Ordem FK-safe
 
 **Delete (filhos primeiro):**
-`sync_operations` → `device_identities` → `external_calendar_events` → `integration_consents` → `zone_trips` → `trip_inventory` → `context_zones` → `commitments` → `quest_inventory` → `home_maintenance_tasks` → `person_organizations` → `organizations` → `trips` → `person_interactions` → `category_budgets` → `people` → `inventory_items` → `health_appointments` → `symptom_entries` → `health_conditions` → `ledger_transactions` → `financial_accounts` → `financial_entities` → `quest_decisions` → `quest_prerequisites` → `research_evidence` → `learning_sessions` → `research_prerequisites` → `quest_research` → `quest_projects` → `mood_factors` → `need_readings` → `tasks` → `domain_events` → `check_ins` → `daily_reviews` → `weekly_reviews` → `schedule_blocks` → `bills` → `work_priorities` → `decision_records` → `quests` → `research_nodes` → `projects` → `need_definitions` → `preferences` → `profiles`
+`flashcard_review_logs` → `flashcard_srs` → `flashcards` → `flashcard_decks` → `knowledge_areas` → `sync_operations` → `device_identities` → `external_calendar_events` → `integration_consents` → `zone_trips` → `trip_inventory` → `context_zones` → `commitments` → `quest_inventory` → `home_maintenance_tasks` → `person_organizations` → `organizations` → `trips` → `person_interactions` → `category_budgets` → `people` → `inventory_items` → `health_appointments` → `symptom_entries` → `health_conditions` → `ledger_transactions` → `financial_accounts` → `financial_entities` → `quest_decisions` → `quest_prerequisites` → `research_evidence` → `learning_sessions` → `research_prerequisites` → `quest_research` → `quest_projects` → `mood_factors` → `need_readings` → `tasks` → `domain_events` → `check_ins` → `daily_reviews` → `weekly_reviews` → `schedule_blocks` → `bills` → `work_priorities` → `decision_records` → `quests` → `research_nodes` → `projects` → `need_definitions` → `preferences` → `profiles`
 
 **Insert:**
-`profiles` → `preferences` → `need_definitions` → `quests` / `projects` / `decision_records` / `research_nodes` / `financial_entities` → `financial_accounts` → `ledger_transactions` → `health_conditions` → `symptom_entries` → `health_appointments` → `inventory_items` → `people` → `person_interactions` → `category_budgets` → `trips` → `organizations` → `person_organization_links` → `home_maintenance_tasks` → `quest_inventory_links` → `trip_inventory_links` → `commitments` → `context_zones` → `zone_trip_links` → `integration_consents` → `external_calendar_events` → `learning_sessions` / `research_evidence` → `tasks` / `domain_events` / `bills` / `schedule_blocks` / `check_ins` / `mood_factors` / `daily_reviews` / `weekly_reviews` / `need_readings` → `quest_projects` / `quest_decisions` / `quest_prerequisites` / `research_prerequisite_links` / `quest_research_links` → `work_priorities`
+`profiles` → `preferences` → `need_definitions` → `quests` / `projects` / `decision_records` / `research_nodes` / `knowledge_areas` / `flashcard_decks` / `flashcards` / `flashcard_srs` / `flashcard_review_logs` / `financial_entities` → `financial_accounts` → `ledger_transactions` → `health_conditions` → `symptom_entries` → `health_appointments` → `inventory_items` → `people` → `person_interactions` → `category_budgets` → `trips` → `organizations` → `person_organization_links` → `home_maintenance_tasks` → `quest_inventory_links` → `trip_inventory_links` → `commitments` → `context_zones` → `zone_trip_links` → `integration_consents` → `external_calendar_events` → `learning_sessions` / `research_evidence` → `tasks` / `domain_events` / `bills` / `schedule_blocks` / `check_ins` / `mood_factors` / `daily_reviews` / `weekly_reviews` / `need_readings` → `quest_projects` / `quest_decisions` / `quest_prerequisites` / `research_prerequisite_links` / `quest_research_links` → `work_priorities`
 
 ### UX (Configurações)
 1. Selecionar arquivo JSON (`file_picker`)

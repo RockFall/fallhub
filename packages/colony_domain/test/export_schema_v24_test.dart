@@ -49,6 +49,13 @@ const exportV24RequiredKeys = <String>{
   'zone_trip_links',
   'health_appointments',
   'trip_inventory_links',
+  'knowledge_areas',
+  'flashcard_decks',
+  'flashcards',
+  'flashcard_srs',
+  'flashcard_review_logs',
+  'knowledge_area_placements',
+  'research_knowledge_links',
 };
 
 void main() {
