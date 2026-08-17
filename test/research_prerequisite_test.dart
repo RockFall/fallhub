@@ -70,10 +70,24 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(find.text('Fundamentos'), findsWidgets);
+    expect(find.text('Avançado'), findsOneWidget);
     expect(find.text(AppStrings.researchStartFocus), findsOneWidget);
 
     await tester.tap(find.text(AppStrings.researchStartFocus));
+    await tester.pumpAndSettle();
+
+    expect(find.text(AppStrings.researchBlockedPrerequisites), findsOneWidget);
+
+    var sawPrerequisite = false;
+    for (var i = 0; i < 12; i++) {
+      if (find.text('Fundamentos').evaluate().isNotEmpty) {
+        sawPrerequisite = true;
+        break;
+      }
+      await tester.drag(find.byType(ListView), const Offset(0, -400));
+      await tester.pump();
+    }
+    expect(sawPrerequisite, isTrue);
     await tester.pumpAndSettle();
 
     expect(find.text(AppStrings.researchBlockedPrerequisites), findsOneWidget);
