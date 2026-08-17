@@ -93,7 +93,19 @@ fallhub/
 | iOS / macOS / Linux | Compilam; UX prioriza Android |
 | Web         | Não suportada na v1 (SQLite local) |
 
-## Build Android (APK debug)
+## Testar no celular (sem desktop)
+
+O GitHub Actions gera um APK debug e publica sempre no mesmo link:
+
+**[fallhub-sideload.apk](https://github.com/RockFall/fallhub/releases/download/sideload-latest/fallhub-sideload.apk)**
+
+No Android: abra o link → permitir instalação → instalar. Confira o commit em **Configurações → Build de teste**.
+
+Guia completo: [`docs/dev/SIDELOAD.md`](docs/dev/SIDELOAD.md) · ADR-035
+
+Disparo manual (GitHub no celular): **Actions → sideload_apk → Run workflow**.
+
+## Build Android (APK debug, máquina local)
 
 ```bash
 flutter build apk --debug

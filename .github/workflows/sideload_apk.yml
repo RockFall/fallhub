@@ -1,0 +1,114 @@
+name: sideload_apk
+
+# APK de teste instalável no celular, sem desktop.
+# Download estável: https://github.com/RockFall/fallhub/releases/download/sideload-latest/fallhub-sideload.apk
+on:
+  workflow_dispatch:
+  push:
+    branches: [master]
+  pull_request:
+
+concurrency:
+  group: sideload-apk
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Resolve dependencies
+        run: flutter pub get
+
+      - name: Build debug APK
+        env:
+          GIT_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+          GIT_REF: ${{ github.head_ref || github.ref_name }}
+        run: |
+          flutter build apk --debug \
+            --dart-define="GIT_SHA=${GIT_SHA}" \
+            --dart-define="GIT_REF=${GIT_REF}" \
+            --dart-define="BUILD_TIME=$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+
+      - name: Stage APK
+        run: |
+          mkdir -p dist
+          cp build/app/outputs/flutter-apk/app-debug.apk dist/fallhub-sideload.apk
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: fallhub-sideload
+          path: dist/fallhub-sideload.apk
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Publish rolling release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: sideload-latest
+          name: Sideload — APK de teste
+          target_commitish: ${{ github.event.pull_request.head.sha || github.sha }}
+          prerelease: true
+          make_latest: false
+          files: dist/fallhub-sideload.apk
+          fail_on_unmatched_files: true
+          overwrite_files: true
+          body: |
+            APK debug para testar no celular **sem desktop**.
+
+            - **Baixar:** [fallhub-sideload.apk](https://github.com/RockFall/fallhub/releases/download/sideload-latest/fallhub-sideload.apk)
+            - Commit: `${{ github.event.pull_request.head.sha || github.sha }}`
+            - Ref: `${{ github.head_ref || github.ref_name }}`
+            - Workflow: `${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}`
+            ${{ github.event.pull_request.number && format('- PR: #{0}', github.event.pull_request.number) || '' }}
+
+            Guia: `docs/dev/SIDELOAD.md`
+
+            Este release é rolling (sempre o último build). Não é uma versão de loja.
+
+      - name: Comment PR with download link
+        if: github.event_name == 'pull_request'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          SHA: ${{ github.event.pull_request.head.sha }}
+          REF: ${{ github.head_ref }}
+        run: |
+          BODY=$(cat <<EOF
+          <!-- sideload-apk -->
+          ## APK de teste (celular)
+
+          Build deste PR publicado no release rolling \`sideload-latest\`.
+
+          **[Baixar fallhub-sideload.apk](https://github.com/RockFall/fallhub/releases/download/sideload-latest/fallhub-sideload.apk)**
+
+          Commit \`${SHA:0:7}\` · branch \`${REF}\`
+
+          No Android: abra o link → permitir instalação desta origem → instalar. Confira em **Configurações → Build de teste**.
+
+          Se outro PR publicou depois, dispare de novo **Actions → sideload_apk → Run workflow** neste branch.
+          EOF
+          )
+          EXISTING=$(gh api "repos/${GITHUB_REPOSITORY}/issues/${PR_NUMBER}/comments" \
+            --jq '.[] | select(.body | contains("<!-- sideload-apk -->")) | .id' | head -n 1)
+          if [ -n "$EXISTING" ]; then
+            gh api -X PATCH "repos/${GITHUB_REPOSITORY}/issues/comments/${EXISTING}" -f body="$BODY"
+          else
+            gh pr comment "$PR_NUMBER" --body "$BODY"
+          fi
