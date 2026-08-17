@@ -74,6 +74,9 @@ void main() {
     expect(find.text(AppStrings.flashcardsDisclaimer), findsOneWidget);
     expect(find.text(AppStrings.flashcardsNewCard), findsOneWidget);
     expect(find.byType(Semantics), findsWidgets);
+    expect(find.text(AppStrings.flashcardsImportJson), findsWidgets);
+    expect(find.textContaining('areaPath'), findsWidgets);
+    expect(find.textContaining('ainda não há categorias'), findsOneWidget);
 
     await _flushDisposeTimers(tester);
   });
@@ -146,6 +149,87 @@ void main() {
         AppStrings.flashcardsSessionBuckets(learning: 0, review: 0, news: 1),
       ),
       findsOneWidget,
+    );
+
+    await _flushDisposeTimers(tester);
+  });
+
+  testWidgets('import prompt lists live shelves and JSON upload creates cards', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(800, 1800);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    final now = DateTime.utc(2026, 8, 17, 12);
+    final db = ColonyDatabase.inMemory();
+    addTearDown(db.close);
+    final repos = ColonyRepositories.create(
+      db,
+      idGenerator: FixedIdGenerator([
+        for (var i = 1; i <= 120; i++) 'id-$i',
+      ]),
+      clock: () => now,
+    );
+    final profile = await repos.profiles.create(
+      colonyName: 'Test',
+      displayName: 'Caio',
+      timezone: 'UTC',
+      locale: 'pt_BR',
+      baseCurrency: 'BRL',
+    );
+    await repos.preferences.save(
+      AppPreferences.defaults().copyWith(onboardingCompleted: true),
+    );
+    await repos.flashcards.seedCatalog(
+      profileId: profile.id,
+      keys: const ['arts.music.tropicalismo'],
+    );
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          databaseProvider.overrideWithValue(db),
+          clockProvider.overrideWithValue(() => now),
+        ],
+        child: MaterialApp(
+          theme: ColonyTheme.dark(),
+          home: const Scaffold(body: FlashcardsHubScreen()),
+        ),
+      ),
+    );
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 500));
+
+    await tester.tap(find.text('IMPORTAR JSON'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+
+    expect(find.textContaining('Tropicalismo'), findsWidgets);
+    expect(find.textContaining('CATEGORIAS JÁ EXISTENTES'), findsWidgets);
+    expect(find.textContaining('inventar ramos novos'), findsWidgets);
+
+    await tester.enterText(
+      find.byKey(const Key('flashcards.import.json')),
+      '''
+{"cards":[{"front":"ODD","back":"Operational Design Domain","deck":"AV","areaPath":["Engenharia","ODD"]}]}
+''',
+    );
+    await tester.tap(find.text(AppStrings.flashcardsImportPreview));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+
+    expect(find.text(AppStrings.flashcardsImportConfirm), findsOneWidget);
+    await tester.tap(find.text(AppStrings.flashcardsImportConfirm));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 800));
+
+    expect(find.textContaining(AppStrings.flashcardsImportDone), findsWidgets);
+    expect(await repos.flashcards.listCards(profile.id), hasLength(1));
+    expect(
+      (await repos.flashcards.listDecks(profile.id)).map((d) => d.title),
+      contains('AV'),
     );
 
     await _flushDisposeTimers(tester);

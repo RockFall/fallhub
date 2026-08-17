@@ -71,6 +71,14 @@ class FlashcardSearchQuery extends Notifier<String> {
   void set(String query) => state = query;
 }
 
+final flashcardJsonPromptProvider = Provider<String>((ref) {
+  return FlashcardJsonPromptBuilder.build(
+    areas: ref.watch(knowledgeAreasProvider).asData?.value ?? const [],
+    placements: ref.watch(knowledgePlacementsProvider).asData?.value ?? const [],
+    decks: ref.watch(flashcardDecksProvider).asData?.value ?? const [],
+  );
+});
+
 final flashcardTodayDigestProvider = Provider<FlashcardTodayDigest>((ref) {
   final cards = ref.watch(flashcardsProvider).asData?.value ?? const [];
   final srs = ref.watch(flashcardSrsProvider).asData?.value ?? const {};

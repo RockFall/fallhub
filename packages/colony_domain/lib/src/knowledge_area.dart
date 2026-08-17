@@ -222,8 +222,25 @@ abstract final class KnowledgeAreaPolicy {
     return out;
   }
 
+  static KnowledgeArea? childNamed({
+    required EntityId? parentId,
+    required String title,
+    required List<KnowledgeArea> areas,
+    List<KnowledgeAreaPlacement> placements = const [],
+  }) {
+    final needle = title.trim().toLowerCase();
+    for (final child in childrenOf(
+      parentId: parentId,
+      areas: areas,
+      placements: placements,
+    )) {
+      if (child.title.trim().toLowerCase() == needle) return child;
+    }
+    return null;
+  }
+
   static List<KnowledgeArea> childrenOf({
-    required EntityId parentId,
+    required EntityId? parentId,
     required List<KnowledgeArea> areas,
     List<KnowledgeAreaPlacement> placements = const [],
   }) {

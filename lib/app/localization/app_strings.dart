@@ -799,6 +799,45 @@ abstract final class AppStrings {
   static const flashcardsCaptureArea = 'Prateleira';
   static const flashcardsDueLaterAction = 'Revisar passos de hoje';
   static const flashcardsRemaining = 'Restam nesta fila';
+  static const flashcardsImportJson = 'Importar JSON';
+  static const flashcardsImportJsonHint =
+      'Copie o prompt para uma IA, cole o JSON gerado e carregue os cartões no mapa.';
+  static const flashcardsImportPromptTitle = 'Prompt para a IA';
+  static const flashcardsImportCopyPrompt = 'Copiar prompt';
+  static const flashcardsImportCopied = 'Prompt copiado.';
+  static const flashcardsImportPaste = 'Colar JSON';
+  static const flashcardsImportPasteHint = '{ "version": 1, "cards": [ ... ] }';
+  static const flashcardsImportPickFile = 'Escolher ficheiro';
+  static const flashcardsImportPreview = 'Pré-visualizar';
+  static const flashcardsImportConfirm = 'Importar agora';
+  static const flashcardsImportEmpty = 'Cole ou escolha um JSON para continuar.';
+  static const flashcardsImportInvalid = 'JSON inválido';
+  static const flashcardsImportDone = 'Importação concluída.';
+  static const flashcardsImportPromptLive =
+      'Este texto muda quando você cria ou ativa categorias e baralhos.';
+  static const flashcardsImportNothingToDo =
+      'Nada a criar: os cartões já existem com o mesmo verso.';
+
+  static String flashcardsImportPlanSummary({
+    required int create,
+    required int skip,
+    required int overwrite,
+    required int areas,
+    required int decks,
+  }) {
+    return '$create novos · $overwrite atualizados · $skip iguais · '
+        '$areas áreas · $decks baralhos';
+  }
+
+  static String flashcardsImportResultSummary(FlashcardJsonImportResult result) {
+    return flashcardsImportPlanSummary(
+      create: result.createdCards,
+      skip: result.skippedCards,
+      overwrite: result.overwrittenCards,
+      areas: result.createdAreas,
+      decks: result.createdDecks,
+    );
+  }
 
   static String flashcardsHeroStudyCount(int count) => count == 1
       ? '1 cartão agora'

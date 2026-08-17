@@ -2,6 +2,7 @@ import 'package:colony_domain/colony_domain.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/providers/app_providers.dart';
+import 'flashcard_providers.dart';
 
 class FlashcardController extends AsyncNotifier<void> {
   @override
@@ -233,6 +234,28 @@ class FlashcardController extends AsyncNotifier<void> {
   Future<void> undoPractice(FlashcardReviewLog log) {
     return _run(() {
       return ref.read(repositoriesProvider).flashcards.undoPractice(log);
+    });
+  }
+
+  FlashcardJsonImportPlan previewJson(String source) {
+    final document = FlashcardJsonCodec.parse(source);
+    return FlashcardJsonImportPolicy.plan(
+      document: document,
+      areas: ref.read(knowledgeAreasProvider).asData?.value ?? const [],
+      placements: ref.read(knowledgePlacementsProvider).asData?.value ?? const [],
+      decks: ref.read(flashcardDecksProvider).asData?.value ?? const [],
+      cards: ref.read(flashcardsProvider).asData?.value ?? const [],
+    );
+  }
+
+  Future<FlashcardJsonImportResult?> importJson(String source) {
+    return _run(() async {
+      final profile = await ref.read(profileProvider.future);
+      if (profile == null) throw StateError('Perfil não configurado');
+      return ref.read(repositoriesProvider).flashcards.importJson(
+            profileId: profile.id,
+            source: source,
+          );
     });
   }
 }

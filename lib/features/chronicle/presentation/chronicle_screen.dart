@@ -219,6 +219,7 @@ class ChronicleScreen extends ConsumerWidget {
       EventType.flashcardScheduled => 'Flashcard programado',
       EventType.flashcardUnscheduled => 'Flashcard guardado',
       EventType.flashcardCatalogSeeded => 'Mapa de conhecimento semeado',
+      EventType.flashcardJsonImported => 'Flashcards importados de JSON',
       EventType.knowledgeAreaPlacementAdded => 'Área colocada em outra prateleira',
       EventType.knowledgeAreaPlacementRemoved => 'Colocação de área removida',
       EventType.researchKnowledgeLinked => 'Pesquisa ligada à área',

@@ -13,13 +13,19 @@ import 'widgets/create_knowledge_area_sheet.dart';
 import 'widgets/flashcard_due_hero.dart';
 import 'widgets/flashcard_editor_sheet.dart';
 import 'widgets/flashcards_disclaimer_banner.dart';
+import 'widgets/import_flashcards_json_sheet.dart';
 import 'widgets/knowledge_map_view.dart';
 import 'widgets/seed_knowledge_catalog_sheet.dart';
 
 class FlashcardsHubScreen extends ConsumerStatefulWidget {
-  const FlashcardsHubScreen({super.key, this.openCapture = false});
+  const FlashcardsHubScreen({
+    super.key,
+    this.openCapture = false,
+    this.openImport = false,
+  });
 
   final bool openCapture;
+  final bool openImport;
 
   @override
   ConsumerState<FlashcardsHubScreen> createState() =>
@@ -29,6 +35,7 @@ class FlashcardsHubScreen extends ConsumerStatefulWidget {
 class _FlashcardsHubScreenState extends ConsumerState<FlashcardsHubScreen> {
   var _filter = KnowledgeMapFilter.all;
   var _captureOpened = false;
+  var _importOpened = false;
 
   @override
   void initState() {
@@ -38,6 +45,13 @@ class _FlashcardsHubScreenState extends ConsumerState<FlashcardsHubScreen> {
         if (!mounted || _captureOpened) return;
         _captureOpened = true;
         _capture();
+      });
+    }
+    if (widget.openImport) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted || _importOpened) return;
+        _importOpened = true;
+        ImportFlashcardsJsonSheet.show(context);
       });
     }
   }
@@ -104,6 +118,16 @@ class _FlashcardsHubScreenState extends ConsumerState<FlashcardsHubScreen> {
               const SizedBox(height: ColonySpacing.md),
               const FlashcardsDisclaimerBanner(),
               const SizedBox(height: ColonySpacing.md),
+              if (!searching)
+                ColonyPanel(
+                  title: AppStrings.flashcardsImportJson,
+                  icon: Icons.upload_file_outlined,
+                  collapsible: true,
+                  initiallyExpanded: widget.openImport || isEmpty,
+                  helpText: AppStrings.flashcardsImportJsonHint,
+                  child: const ImportFlashcardsJsonPanel(),
+                ),
+              if (!searching) const SizedBox(height: ColonySpacing.md),
               FlashcardDueHero(
                 digest: digest,
                 onStudy: () => context.go('/flashcards/study'),
@@ -311,6 +335,12 @@ class _EmptyFlashcards extends StatelessWidget {
             onPressed: () => CreateFlashcardDeckSheet.show(context),
             icon: const Icon(Icons.add),
             label: const Text(AppStrings.flashcardsNewDeck),
+          ),
+          const SizedBox(height: ColonySpacing.sm),
+          OutlinedButton.icon(
+            onPressed: () => ImportFlashcardsJsonSheet.show(context),
+            icon: const Icon(Icons.upload_file_outlined),
+            label: const Text(AppStrings.flashcardsImportJson),
           ),
         ],
       ),

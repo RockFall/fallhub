@@ -5607,6 +5607,155 @@ class FlashcardRepository {
       );
     });
   }
+
+  Future<FlashcardJsonImportResult> importJson({
+    required EntityId profileId,
+    required String source,
+  }) async {
+    final document = FlashcardJsonCodec.parse(source);
+    final areas = await listAreas(profileId);
+    final placements = await listPlacements(profileId);
+    final decks = await listDecks(profileId);
+    final cards = await listCards(profileId);
+    final plan = FlashcardJsonImportPolicy.plan(
+      document: document,
+      areas: areas,
+      placements: placements,
+      decks: decks,
+      cards: cards,
+    );
+
+    final areaIds = <String, EntityId>{};
+    var createdAreas = 0;
+    var createdDecks = 0;
+    var createdCards = 0;
+    var skippedCards = 0;
+    var overwrittenCards = 0;
+
+    Future<EntityId?> areaIdFor(List<String> path) async {
+      if (path.isEmpty) return null;
+      return areaIds[FlashcardJsonImportPolicy.pathKey(path)];
+    }
+
+    for (final step in plan.areas) {
+      final key = FlashcardJsonImportPolicy.pathKey(step.path);
+      if (step.existingId != null) {
+        areaIds[key] = step.existingId!;
+        continue;
+      }
+      final parentId = await areaIdFor(step.parentPath);
+      final created = await createArea(
+        profileId: profileId,
+        title: step.title,
+        parentId: parentId,
+        description: step.description,
+        catalogKey: step.catalogKey,
+      );
+      areaIds[key] = created.id;
+      createdAreas += 1;
+    }
+
+    for (final step in plan.placements) {
+      final areaId = await areaIdFor(step.areaPath);
+      final parentId = await areaIdFor(step.parentPath);
+      if (areaId == null || parentId == null || areaId == parentId) continue;
+      try {
+        await addPlacement(areaId: areaId, parentAreaId: parentId);
+      } on KnowledgeAreaCycleException {
+        continue;
+      }
+    }
+
+    final deckIds = <String, EntityId>{
+      for (final deck in decks)
+        if (!deck.isArchived)
+          FlashcardJsonCodec.normalizeText(deck.title): deck.id,
+    };
+    for (final step in plan.decks) {
+      final key = FlashcardJsonCodec.normalizeText(step.title);
+      if (step.existingId != null) {
+        deckIds[key] = step.existingId!;
+        continue;
+      }
+      final created = await createDeck(
+        profileId: profileId,
+        title: step.title,
+        areaId: await areaIdFor(step.areaPath),
+      );
+      deckIds[key] = created.id;
+      createdDecks += 1;
+    }
+
+    final byId = {for (final card in cards) card.id: card};
+    for (final step in plan.cards) {
+      final deckId =
+          deckIds[FlashcardJsonCodec.normalizeText(step.card.deckTitle)];
+      if (deckId == null) {
+        throw FlashcardJsonException(
+          'Baralho não resolvido: ${step.card.deckTitle}',
+        );
+      }
+      final areaId = await areaIdFor(step.card.areaPath);
+      switch (step.action) {
+        case FlashcardJsonCardActionKind.skip:
+          skippedCards += 1;
+          break;
+        case FlashcardJsonCardActionKind.overwrite:
+          for (final id in step.existingIds) {
+            final current = byId[id];
+            if (current == null) continue;
+            await updateCard(
+              current.copyWith(
+                back: step.card.back,
+                extra: step.card.extra,
+                tags: step.card.tags,
+                areaId: areaId ?? current.areaId,
+                clearExtra: (step.card.extra ?? '').trim().isEmpty,
+              ),
+            );
+          }
+          overwrittenCards += 1;
+          break;
+        case FlashcardJsonCardActionKind.create:
+          final created = await createCard(
+            profileId: profileId,
+            deckId: deckId,
+            front: step.card.front,
+            back: step.card.back,
+            kind: step.card.kind,
+            areaId: areaId,
+            extra: step.card.extra,
+            tags: step.card.tags,
+            bidirectional: step.card.bidirectional,
+            scheduleMode: step.card.scheduleMode,
+          );
+          createdCards += created.length;
+          break;
+      }
+    }
+
+    await _events.record(
+      aggregateType: AggregateType.flashcard,
+      aggregateId: profileId,
+      eventType: EventType.flashcardJsonImported,
+      payload: {
+        'created': createdCards,
+        'skipped': skippedCards,
+        'overwritten': overwrittenCards,
+        'areas': createdAreas,
+        'decks': createdDecks,
+      },
+      sourceType: SourceType.import,
+    );
+
+    return FlashcardJsonImportResult(
+      createdCards: createdCards,
+      skippedCards: skippedCards,
+      overwrittenCards: overwrittenCards,
+      createdAreas: createdAreas,
+      createdDecks: createdDecks,
+    );
+  }
 }
 
 class ColonyRepositories {

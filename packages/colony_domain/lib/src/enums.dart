@@ -203,6 +203,7 @@ enum EventType {
   flashcardScheduled,
   flashcardUnscheduled,
   flashcardCatalogSeeded,
+  flashcardJsonImported,
   knowledgeAreaPlacementAdded,
   knowledgeAreaPlacementRemoved,
   researchKnowledgeLinked,

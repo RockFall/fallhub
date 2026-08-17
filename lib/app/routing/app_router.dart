@@ -189,6 +189,7 @@ final routerProvider = Provider<GoRouter>((ref) {
             path: '/flashcards',
             builder: (context, state) => FlashcardsHubScreen(
               openCapture: state.uri.queryParameters['capture'] == '1',
+              openImport: state.uri.queryParameters['import'] == '1',
             ),
             routes: [
               GoRoute(

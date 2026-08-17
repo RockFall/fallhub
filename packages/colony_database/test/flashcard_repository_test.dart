@@ -180,4 +180,49 @@ void main() {
       contains(trop.id),
     );
   });
+
+  test('importJson creates shelves, skips clones and overwrites answers', () async {
+    final created = await profile();
+    const source = '''
+{
+  "cards": [
+    {
+      "front": "ODD",
+      "back": "Operational Design Domain",
+      "deck": "AV",
+      "areaPath": ["Engenharia", "Automotiva", "Carros autônomos", "ODD"]
+    }
+  ]
+}
+''';
+    final first = await repos.flashcards.importJson(
+      profileId: created.id,
+      source: source,
+    );
+    expect(first.createdCards, 1);
+    expect(first.createdDecks, 1);
+    expect(first.createdAreas, greaterThanOrEqualTo(4));
+
+    final second = await repos.flashcards.importJson(
+      profileId: created.id,
+      source: source,
+    );
+    expect(second.skippedCards, 1);
+    expect(second.createdCards, 0);
+    expect(await repos.flashcards.listCards(created.id), hasLength(1));
+
+    final third = await repos.flashcards.importJson(
+      profileId: created.id,
+      source: '''
+{"cards":[{"front":"ODD","back":"Domínio operacional de desenho","deck":"AV"}]}
+''',
+    );
+    expect(third.overwrittenCards, 1);
+    expect((await repos.flashcards.listCards(created.id)).single.back,
+        'Domínio operacional de desenho');
+    final odd = (await repos.flashcards.listAreas(created.id)).firstWhere(
+      (a) => a.title.startsWith('ODD'),
+    );
+    expect(odd.catalogKey, 'engineering.automotive.autonomous.odd');
+  });
 }

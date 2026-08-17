@@ -244,4 +244,35 @@ abstract final class KnowledgeAreaCatalog {
     walk(nodes ?? entries);
     return out;
   }
+
+  /// Root-to-leaf titles, e.g. `Linguagens > Português`.
+  static List<String> labeledTitlePaths() {
+    final out = <String>[];
+    void walk(KnowledgeCatalogEntry entry, List<String> prefix) {
+      final path = [...prefix, entry.title];
+      out.add(path.join(' > '));
+      for (final child in entry.children) {
+        walk(child, path);
+      }
+    }
+
+    for (final root in entries) {
+      walk(root, const []);
+    }
+    return out;
+  }
+
+  static KnowledgeCatalogEntry? childNamed(
+    KnowledgeCatalogEntry? parent,
+    String title,
+  ) {
+    final haystack = parent?.children ?? entries;
+    final needle = title.trim().toLowerCase();
+    for (final entry in haystack) {
+      final t = entry.title.toLowerCase();
+      if (t == needle) return entry;
+      if (t.startsWith('$needle ') || t.startsWith('$needle (')) return entry;
+    }
+    return null;
+  }
 }
