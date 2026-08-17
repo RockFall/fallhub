@@ -19,6 +19,7 @@ import '../../../core/providers/app_providers.dart';
 import '../../../core/providers/feature_controllers.dart';
 
 import 'widgets/restore_preview_sheet.dart';
+import 'widgets/sideload_build_panel.dart';
 
 
 
@@ -177,6 +178,10 @@ class SettingsScreen extends ConsumerWidget {
             label: const Text(AppStrings.restoreData),
 
           ),
+
+          const SizedBox(height: ColonySpacing.lg),
+
+          const SideloadBuildPanel(),
 
         ],
 

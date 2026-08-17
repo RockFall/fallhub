@@ -88,3 +88,5 @@ flutter run -d android
 ```
 
 `tool/test_all` executa `flutter analyze` (0 erros; infos/warnings não bloqueiam), `flutter test` (app), `flutter test packages/colony_domain` e `flutter test packages/colony_database` — gate Definition of Done.
+
+APK de teste no celular (sem desktop): workflow `sideload_apk` → [`docs/dev/SIDELOAD.md`](docs/dev/SIDELOAD.md).

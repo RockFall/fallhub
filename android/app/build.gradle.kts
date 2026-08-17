@@ -30,11 +30,23 @@ android {
         versionName = flutter.versionName
     }
 
+    // Keystore estável de sideload (ADR-035). Não é chave de Play Store.
+    signingConfigs {
+        create("sideload") {
+            storeFile = file("../keystore/sideload.keystore")
+            storePassword = "fallhub-sideload"
+            keyAlias = "sideload"
+            keyPassword = "fallhub-sideload"
+        }
+    }
+
     buildTypes {
+        getByName("debug") {
+            signingConfig = signingConfigs.getByName("sideload")
+        }
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig = signingConfigs.getByName("debug")
+            // TODO: Add your own signing config for a Play Store release.
+            signingConfig = signingConfigs.getByName("sideload")
         }
     }
 }

@@ -233,6 +233,12 @@ abstract final class AppStrings {
   static const restoreCancel = 'Cancelar';
   static const restoreSuccess = 'Backup restaurado com sucesso';
   static const restoreInvalidFile = 'Arquivo de backup inválido';
+  static const sideloadBuildTitle = 'Build de teste';
+  static const sideloadBuildLocal =
+      'Build local — não veio do GitHub Actions.';
+  static const sideloadBuildCommit = 'Commit';
+  static const sideloadBuildRef = 'Ref';
+  static const sideloadBuildTime = 'Gerado em';
   static const restoreVersionLabel = 'Versão do export';
   static const restoreExportedAt = 'Exportado em';
   static const restoreEntityCounts = 'Conteúdo';

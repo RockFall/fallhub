@@ -6,8 +6,10 @@
 GeneratedPluginRegistrant.java
 .cxx/
 
-# Remember to never publicly share your keystore.
+# Remember to never publicly share your Play Store keystore.
 # See https://flutter.dev/to/reference-keystore
 key.properties
 **/*.keystore
 **/*.jks
+# Sideload CI key (ADR-035) — versioned on purpose so updates stay in-place.
+!keystore/sideload.keystore

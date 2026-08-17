@@ -1,23 +1,22 @@
-name: test_all
-
-on:
-  push:
-    branches: [main]
-  pull_request:
-
-jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: subosito/flutter-action@v2
-        with:
-          channel: stable
-          cache: true
-
-      - name: Run test_all
-        run: |
-          chmod +x tool/test_all.sh
-          ./tool/test_all.sh
-
+name: test_all
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Run test_all
+        run: |
+          chmod +x tool/test_all.sh
+          ./tool/test_all.sh

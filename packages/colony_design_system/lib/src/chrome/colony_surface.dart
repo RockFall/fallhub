@@ -90,6 +90,8 @@ class ColonySurface extends StatelessWidget {
       clipBehavior: clipBehavior,
       decoration: decoration,
       padding: padding,
+      // ListTile looks up the nearest Material; without one inside this
+      // decorated box, Flutter asserts that ink/background would be hidden.
       child: Material(
         type: MaterialType.transparency,
         child: child,
