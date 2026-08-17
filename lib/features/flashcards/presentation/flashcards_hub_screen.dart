@@ -123,7 +123,7 @@ class _FlashcardsHubScreenState extends ConsumerState<FlashcardsHubScreen> {
                   title: AppStrings.flashcardsImportJson,
                   icon: Icons.upload_file_outlined,
                   collapsible: true,
-                  initiallyExpanded: widget.openImport || isEmpty,
+                  initiallyExpanded: true,
                   helpText: AppStrings.flashcardsImportJsonHint,
                   child: const ImportFlashcardsJsonPanel(),
                 ),

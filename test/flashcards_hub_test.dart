@@ -202,10 +202,6 @@ void main() {
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 500));
 
-    await tester.tap(find.text('IMPORTAR JSON'));
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 300));
-
     expect(find.textContaining('Tropicalismo'), findsWidgets);
     expect(find.textContaining('CATEGORIAS JÁ EXISTENTES'), findsWidgets);
     expect(find.textContaining('inventar ramos novos'), findsWidgets);
