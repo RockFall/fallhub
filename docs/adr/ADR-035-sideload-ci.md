@@ -8,7 +8,7 @@ O desenvolvimento passa a ser guiado pela interface remota (Cursor) sem um deskt
 
 ## Decisão
 1. **GitHub Actions** (`sideload_apk.yml`) gera um APK debug a cada push em `master`, PR e `workflow_dispatch`.
-2. Publica um **release rolling** `sideload-latest` com o asset estável `fallhub-sideload.apk`.
+2. Publica um **release rolling** `sideload-latest` com o asset estável `fallhub-sideload.apk` (ABI `arm64-v8a`, para o download caber no celular).
 3. URL de download permanente:
    `https://github.com/RockFall/fallhub/releases/download/sideload-latest/fallhub-sideload.apk`
 4. **Keystore de sideload versionado** (`android/keystore/sideload.keystore`) para o Android aceitar update in-place. Não é chave de loja.

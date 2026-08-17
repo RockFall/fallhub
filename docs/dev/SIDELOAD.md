@@ -33,4 +33,4 @@ Se dois PRs rodarem perto, o último a terminar é o que o link entrega. Para fo
 
 O Android pede permissão de “fontes desconhecidas” só na primeira vez por app de origem (Chrome, etc.).
 
-Este APK é **debug de desenvolvimento**, não uma build de loja.
+Este APK é **debug de desenvolvimento** (ABI `arm64-v8a`, celulares Android atuais), não uma build de loja.
