@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'flashcard.dart';
+import 'flashcard_tag.dart';
 import 'id_generator.dart';
 import 'knowledge_area.dart';
 import 'knowledge_area_catalog.dart';
@@ -524,6 +525,7 @@ abstract final class FlashcardJsonPromptBuilder {
     required List<KnowledgeArea> areas,
     List<KnowledgeAreaPlacement> placements = const [],
     List<FlashcardDeck> decks = const [],
+    List<FlashcardTag> tags = const [],
   }) {
     final buffer = StringBuffer()
       ..writeln(
@@ -558,7 +560,9 @@ abstract final class FlashcardJsonPromptBuilder {
         '      "alsoIn": [["Outra raiz", "Outra folha"]],',
       )
       ..writeln('      "extra": "nota opcional no verso",')
-      ..writeln('      "tags": ["opcional"],')
+      ..writeln(
+        '      "tags": ["Jazz", "Música / Harmonia"],',
+      )
       ..writeln('      "schedule": "scheduled|unscheduled",')
       ..writeln('      "bidirectional": false')
       ..writeln('    }')
@@ -581,6 +585,15 @@ abstract final class FlashcardJsonPromptBuilder {
       )
       ..writeln(
         '- alsoIn: caminhos extra (o mesmo tópico em outra prateleira, ex. Tropicalismo).',
+      )
+      ..writeln(
+        '- tags: etiquetas flexíveis, independentes do mapa. Um cartão pode ter várias.',
+      )
+      ..writeln(
+        '  Cada item pode ser um nome ("Jazz") ou um caminho de subtags ("Música / Harmonia").',
+      )
+      ..writeln(
+        '  Segmentos inexistentes são CRIADOS. Estudar a tag pai inclui as subtags.',
       )
       ..writeln(
         '- schedule: scheduled = entra na fila SM-2; unscheduled = só prática pontual.',
@@ -644,6 +657,26 @@ abstract final class FlashcardJsonPromptBuilder {
       buffer
         ..writeln('BARALHOS JÁ EXISTENTES:')
         ..writeln(visibleDecks.map((title) => '- $title').join('\n'));
+    }
+
+    buffer.writeln();
+    if (tags.isEmpty) {
+      buffer.writeln(
+        'TAGS ATUAIS: nenhuma. Invente nomes ou caminhos (ex. "Música / Harmonia").',
+      );
+    } else {
+      buffer.writeln('TAGS JÁ EXISTENTES (reutilize a mesma grafia):');
+      final forest = FlashcardTagPolicy.buildForest(tags);
+      void walkTag(FlashcardTagNode node, String indent) {
+        buffer.writeln('$indent- ${node.tag.title}');
+        for (final child in node.children) {
+          walkTag(child, '$indent  ');
+        }
+      }
+
+      for (final root in forest) {
+        walkTag(root, '');
+      }
     }
 
     buffer

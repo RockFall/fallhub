@@ -41,6 +41,7 @@ import 'trip_inventory.dart';
 import 'knowledge_area.dart';
 import 'knowledge_area_placement.dart';
 import 'flashcard.dart';
+import 'flashcard_tag.dart';
 import 'schedule_block.dart';
 import 'task.dart';
 import 'weekly_review.dart';
@@ -114,6 +115,8 @@ class ExportSnapshot extends Equatable {
     this.flashcardReviewLogs = const [],
     this.knowledgeAreaPlacements = const [],
     this.researchKnowledgeLinks = const [],
+    this.flashcardTags = const [],
+    this.flashcardTagLinks = const [],
   });
 
   final DateTime exportedAt;
@@ -170,6 +173,8 @@ class ExportSnapshot extends Equatable {
   final List<FlashcardReviewLog> flashcardReviewLogs;
   final List<KnowledgeAreaPlacement> knowledgeAreaPlacements;
   final List<ResearchKnowledgeLink> researchKnowledgeLinks;
+  final List<FlashcardTag> flashcardTags;
+  final List<FlashcardTagLink> flashcardTagLinks;
 
   Map<String, int> get entityCounts => {
         'tasks': tasks.length,
@@ -215,6 +220,8 @@ class ExportSnapshot extends Equatable {
         'flashcard_review_logs': flashcardReviewLogs.length,
         'knowledge_area_placements': knowledgeAreaPlacements.length,
         'research_knowledge_links': researchKnowledgeLinks.length,
+        'flashcard_tags': flashcardTags.length,
+        'flashcard_tag_links': flashcardTagLinks.length,
       };
 
   static ExportSnapshot fromJsonString(String source) {
@@ -233,7 +240,7 @@ class ExportSnapshot extends Equatable {
 
   static ExportSnapshot fromJson(Map<String, dynamic> json) {
     final version = _requireInt(json, 'version');
-    if (version < 1 || version > 31) {
+    if (version < 1 || version > 32) {
       throw ExportSnapshotException('Versão de export não suportada: $version');
     }
 
@@ -452,6 +459,12 @@ class ExportSnapshot extends Equatable {
               _parseResearchKnowledgeLink,
             )
           : <ResearchKnowledgeLink>[],
+      flashcardTags: version >= 32
+          ? _parseList(json['flashcard_tags'], _parseFlashcardTag(profileId))
+          : <FlashcardTag>[],
+      flashcardTagLinks: version >= 32
+          ? _parseList(json['flashcard_tag_links'], _parseFlashcardTagLink)
+          : <FlashcardTagLink>[],
     );
   }
 
@@ -1259,6 +1272,31 @@ class ExportSnapshot extends Equatable {
     );
   }
 
+  static FlashcardTag Function(Map<String, dynamic>) _parseFlashcardTag(
+    EntityId profileId,
+  ) {
+    return (json) {
+      return FlashcardTag(
+        id: EntityId(_requireString(json, 'id')),
+        profileId: profileId,
+        parentId: json['parent_id'] == null
+            ? null
+            : EntityId(_requireString(json, 'parent_id')),
+        title: _requireString(json, 'title'),
+        sortOrder: (json['sort_order'] as num?)?.toInt() ?? 0,
+        createdAt: _parseDateTime(_requireString(json, 'created_at')),
+      );
+    };
+  }
+
+  static FlashcardTagLink _parseFlashcardTagLink(Map<String, dynamic> json) {
+    return FlashcardTagLink(
+      cardId: EntityId(_requireString(json, 'card_id')),
+      tagId: EntityId(_requireString(json, 'tag_id')),
+      linkedAt: _parseDateTime(_requireString(json, 'linked_at')),
+    );
+  }
+
   static HealthAppointment Function(Map<String, dynamic>)
       _parseHealthAppointment(EntityId profileId) {
     return (json) {
@@ -1503,6 +1541,9 @@ class ExportSnapshot extends Equatable {
           knowledgeAreaPlacements.map(_knowledgeAreaPlacementJson).toList(),
       'research_knowledge_links':
           researchKnowledgeLinks.map(_researchKnowledgeLinkJson).toList(),
+      'flashcard_tags': flashcardTags.map(_flashcardTagJson).toList(),
+      'flashcard_tag_links':
+          flashcardTagLinks.map(_flashcardTagLinkJson).toList(),
     };
   }
 
@@ -2040,6 +2081,20 @@ class ExportSnapshot extends Equatable {
         'linked_at': link.linkedAt.toUtc().toIso8601String(),
       };
 
+  static Map<String, Object?> _flashcardTagJson(FlashcardTag tag) => {
+        'id': tag.id.value,
+        'parent_id': tag.parentId?.value,
+        'title': tag.title,
+        'sort_order': tag.sortOrder,
+        'created_at': tag.createdAt.toUtc().toIso8601String(),
+      };
+
+  static Map<String, Object?> _flashcardTagLinkJson(FlashcardTagLink link) => {
+        'card_id': link.cardId.value,
+        'tag_id': link.tagId.value,
+        'linked_at': link.linkedAt.toUtc().toIso8601String(),
+      };
+
   static Map<String, Object?> _healthAppointmentJson(HealthAppointment a) => {
         'id': a.id.value,
         'title': a.title,
@@ -2166,5 +2221,7 @@ class ExportSnapshot extends Equatable {
         flashcardReviewLogs,
         knowledgeAreaPlacements,
         researchKnowledgeLinks,
+        flashcardTags,
+        flashcardTagLinks,
       ];
 }

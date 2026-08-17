@@ -812,6 +812,58 @@ void main() {
       expect(placements, hasLength(1));
     });
 
+    test('v35 to v36 backfills flashcard tags from tags_json', () async {
+      final db = await openMigratedFrom(
+        35,
+        seed: (sqlite) {
+          seedProfile(sqlite);
+          sqlite.execute(
+            '''
+            INSERT INTO flashcard_decks (
+              id, profile_id, area_id, research_node_id, title, description,
+              new_limit_per_day, review_limit_per_day, archived_at,
+              created_at, updated_at, version
+            ) VALUES (
+              'deck-1', 'profile-1', NULL, NULL, 'Teoria', NULL,
+              20, 200, NULL, 1720000000000, 1720000000000, 1
+            )
+            ''',
+          );
+          sqlite.execute(
+            '''
+            INSERT INTO flashcards (
+              id, profile_id, deck_id, area_id, kind, front, back, extra,
+              tags_json, cloze_index, reverse_of_id, schedule_mode, suspended,
+              created_at, updated_at, version
+            ) VALUES (
+              'card-1', 'profile-1', 'deck-1', NULL, 'basic', 'ii-V-I',
+              'Progressão', NULL, '["Música","Jazz"]', NULL, NULL,
+              'scheduled', 0, 1720000000000, 1720000000000, 1
+            )
+            ''',
+          );
+        },
+      );
+      addTearDown(() async {
+        await db.close();
+      });
+
+      final repos = ColonyRepositories.create(
+        db,
+        idGenerator: FixedIdGenerator([
+          for (var i = 1; i <= 20; i++) 'id-$i',
+        ]),
+        clock: () => DateTime.utc(2026, 8, 17, 12),
+      );
+
+      final profile = (await repos.profiles.getActive())!;
+      final tags = await repos.flashcards.listTags(profile.id);
+      expect(tags.map((t) => t.title), containsAll(['Música', 'Jazz']));
+      expect(tags.every((t) => t.parentId == null), isTrue);
+      final links = await repos.flashcards.listTagLinks(profile.id);
+      expect(links, hasLength(2));
+    });
+
     test('v31 to v32 adds health_appointments table', () async {
       final db = await openMigratedFrom(
         31,

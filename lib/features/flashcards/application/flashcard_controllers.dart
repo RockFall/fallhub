@@ -104,6 +104,39 @@ class FlashcardController extends AsyncNotifier<void> {
     });
   }
 
+  Future<FlashcardTag?> createTag({
+    required String title,
+    EntityId? parentId,
+  }) {
+    return _run(() async {
+      final profile = await ref.read(profileProvider.future);
+      if (profile == null) throw StateError('Perfil não configurado');
+      return ref.read(repositoriesProvider).flashcards.createTag(
+            profileId: profile.id,
+            title: title,
+            parentId: parentId,
+          );
+    });
+  }
+
+  Future<void> updateTag(FlashcardTag tag) {
+    return _run(() {
+      return ref.read(repositoriesProvider).flashcards.updateTag(tag);
+    });
+  }
+
+  Future<void> applyCardTagLabels({
+    required Flashcard card,
+    required List<String> labels,
+  }) {
+    return _run(() {
+      return ref.read(repositoriesProvider).flashcards.applyCardTagLabels(
+            card: card,
+            labels: labels,
+          );
+    });
+  }
+
   Future<FlashcardDeck?> createDeck({
     required String title,
     EntityId? areaId,
@@ -162,9 +195,15 @@ class FlashcardController extends AsyncNotifier<void> {
     });
   }
 
-  Future<void> updateCard(Flashcard card) {
-    return _run(() {
-      return ref.read(repositoriesProvider).flashcards.updateCard(card);
+  Future<void> updateCard(Flashcard card, {List<String>? tagLabels}) {
+    return _run(() async {
+      await ref.read(repositoriesProvider).flashcards.updateCard(card);
+      if (tagLabels != null) {
+        await ref.read(repositoriesProvider).flashcards.applyCardTagLabels(
+              card: card,
+              labels: tagLabels,
+            );
+      }
     });
   }
 

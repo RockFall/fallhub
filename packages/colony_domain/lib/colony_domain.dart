@@ -77,6 +77,7 @@ export 'src/knowledge_area_placement.dart';
 export 'src/flashcard.dart';
 export 'src/flashcard_srs.dart';
 export 'src/flashcard_study.dart';
+export 'src/flashcard_tag.dart';
 export 'src/flashcard_json_import.dart';
 
 

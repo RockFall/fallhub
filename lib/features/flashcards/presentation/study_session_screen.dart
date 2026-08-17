@@ -17,6 +17,7 @@ class StudySessionScreen extends ConsumerStatefulWidget {
     super.key,
     this.deckId,
     this.areaId,
+    this.tagId,
     this.cardId,
     this.researchId,
     this.mode = FlashcardStudySessionMode.scheduled,
@@ -27,6 +28,7 @@ class StudySessionScreen extends ConsumerStatefulWidget {
 
   final String? deckId;
   final String? areaId;
+  final String? tagId;
   final String? cardId;
   final String? researchId;
   final FlashcardStudySessionMode mode;
@@ -66,6 +68,11 @@ class _StudySessionScreenState extends ConsumerState<StudySessionScreen> {
       return const Center(child: CircularProgressIndicator());
     }
     if (widget.areaId != null && (!areasReady || !placementsReady)) {
+      return const Center(child: CircularProgressIndicator());
+    }
+    final tagsReady = ref.watch(flashcardTagsProvider).hasValue;
+    final tagLinksReady = ref.watch(flashcardTagLinksProvider).hasValue;
+    if (widget.tagId != null && (!tagsReady || !tagLinksReady)) {
       return const Center(child: CircularProgressIndicator());
     }
     if (widget.researchId != null && !linksReady) {
@@ -157,6 +164,14 @@ class _StudySessionScreenState extends ConsumerState<StudySessionScreen> {
         areas: areas,
         placements: placements,
         decks: decks,
+      );
+    }
+    if (widget.tagId != null) {
+      filtered = FlashcardTagPolicy.cardsWithTag(
+        cards: filtered,
+        links: ref.read(flashcardTagLinksProvider).asData?.value ?? const [],
+        tags: ref.read(flashcardTagsProvider).asData?.value ?? const [],
+        rootId: EntityId(widget.tagId!),
       );
     }
     if (widget.researchId != null) {

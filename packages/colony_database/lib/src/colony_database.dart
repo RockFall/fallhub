@@ -66,12 +66,14 @@ part 'colony_database.g.dart';
   FlashcardReviewLogs,
   KnowledgeAreaPlacements,
   ResearchKnowledgeLinks,
+  FlashcardTags,
+  FlashcardTagLinks,
 ])
 class ColonyDatabase extends _$ColonyDatabase {
   ColonyDatabase(super.e);
 
   @override
-  int get schemaVersion => 35;
+  int get schemaVersion => 36;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -214,8 +216,58 @@ class ColonyDatabase extends _$ColonyDatabase {
             await m.createTable(knowledgeAreaPlacements);
             await m.createTable(researchKnowledgeLinks);
           }
+          if (from < 36) {
+            await m.createTable(flashcardTags);
+            await m.createTable(flashcardTagLinks);
+            await _backfillFlashcardTags(m);
+          }
         },
       );
+
+  static Future<void> _backfillFlashcardTags(Migrator m) async {
+    final rows = await m.database.customSelect('''
+      SELECT id, profile_id, tags_json FROM flashcards
+    ''').get();
+    final tagIdByKey = <String, String>{};
+    var created = 0;
+    for (final row in rows) {
+      final cardId = row.read<String>('id');
+      final profileId = row.read<String>('profile_id');
+      final raw = row.read<String>('tags_json');
+      List<dynamic> titles;
+      try {
+        titles = jsonDecode(raw) as List<dynamic>;
+      } catch (_) {
+        continue;
+      }
+      for (final item in titles) {
+        final title = item.toString().trim();
+        if (title.isEmpty) continue;
+        final key = '$profileId\u0001${title.toLowerCase()}';
+        var tagId = tagIdByKey[key];
+        if (tagId == null) {
+          created += 1;
+          tagId = 'tag-backfill-$profileId-$created';
+          tagIdByKey[key] = tagId;
+          await m.database.customStatement(
+            '''
+            INSERT INTO flashcard_tags (
+              id, profile_id, parent_id, title, sort_order, created_at
+            ) VALUES (?, ?, NULL, ?, 0, ?)
+            ''',
+            [tagId, profileId, title, 1_720_000_000_000],
+          );
+        }
+        await m.database.customStatement(
+          '''
+          INSERT OR IGNORE INTO flashcard_tag_links (card_id, tag_id, linked_at)
+          VALUES (?, ?, ?)
+          ''',
+          [cardId, tagId, 1_720_000_000_000],
+        );
+      }
+    }
+  }
 
   static Future<void> _backfillQuestAcceptance(Migrator m) async {
     await m.database.customStatement('''
@@ -2001,6 +2053,46 @@ class ColonyMappers {
       researchNodeId: link.researchNodeId.value,
       areaId: link.areaId.value,
       kind: link.kind.name,
+      linkedAt: link.linkedAt.millisecondsSinceEpoch,
+    );
+  }
+
+  static domain.FlashcardTag toFlashcardTag(FlashcardTagRow row) {
+    return domain.FlashcardTag(
+      id: domain.EntityId(row.id),
+      profileId: domain.EntityId(row.profileId),
+      parentId: row.parentId == null ? null : domain.EntityId(row.parentId!),
+      title: row.title,
+      sortOrder: row.sortOrder,
+      createdAt: DateTime.fromMillisecondsSinceEpoch(row.createdAt, isUtc: true),
+    );
+  }
+
+  static FlashcardTagsCompanion fromFlashcardTag(domain.FlashcardTag tag) {
+    return FlashcardTagsCompanion.insert(
+      id: tag.id.value,
+      profileId: tag.profileId.value,
+      parentId: Value(tag.parentId?.value),
+      title: tag.title,
+      sortOrder: Value(tag.sortOrder),
+      createdAt: tag.createdAt.millisecondsSinceEpoch,
+    );
+  }
+
+  static domain.FlashcardTagLink toFlashcardTagLink(FlashcardTagLinkRow row) {
+    return domain.FlashcardTagLink(
+      cardId: domain.EntityId(row.cardId),
+      tagId: domain.EntityId(row.tagId),
+      linkedAt: DateTime.fromMillisecondsSinceEpoch(row.linkedAt, isUtc: true),
+    );
+  }
+
+  static FlashcardTagLinksCompanion fromFlashcardTagLink(
+    domain.FlashcardTagLink link,
+  ) {
+    return FlashcardTagLinksCompanion.insert(
+      cardId: link.cardId.value,
+      tagId: link.tagId.value,
       linkedAt: link.linkedAt.millisecondsSinceEpoch,
     );
   }

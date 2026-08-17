@@ -121,6 +121,9 @@ Future<ColonyDatabase> openMigratedFrom(
   if (fromVersion >= 34) {
     _createPhase34Tables(sqliteDb);
   }
+  if (fromVersion >= 35) {
+    _createPhase35Tables(sqliteDb);
+  }
 
   sqliteDb.userVersion = fromVersion;
   seed?.call(sqliteDb);
@@ -1074,6 +1077,33 @@ void _createPhase34Tables(Database db) {
       ease_before REAL NOT NULL,
       ease_after REAL NOT NULL,
       duration_ms INTEGER
+    )
+  ''');
+}
+
+void _createPhase35Tables(Database db) {
+  db.execute(
+    "ALTER TABLE flashcards ADD COLUMN schedule_mode TEXT NOT NULL DEFAULT 'scheduled'",
+  );
+  db.execute(
+    "ALTER TABLE flashcard_review_logs ADD COLUMN review_kind TEXT NOT NULL DEFAULT 'srs'",
+  );
+  db.execute('''
+    CREATE TABLE knowledge_area_placements (
+      area_id TEXT NOT NULL REFERENCES knowledge_areas(id),
+      parent_area_id TEXT NOT NULL REFERENCES knowledge_areas(id),
+      linked_at INTEGER NOT NULL,
+      catalog_key TEXT,
+      PRIMARY KEY (area_id, parent_area_id)
+    )
+  ''');
+  db.execute('''
+    CREATE TABLE research_knowledge_links (
+      research_node_id TEXT NOT NULL REFERENCES research_nodes(id),
+      area_id TEXT NOT NULL REFERENCES knowledge_areas(id),
+      kind TEXT NOT NULL,
+      linked_at INTEGER NOT NULL,
+      PRIMARY KEY (research_node_id, area_id)
     )
   ''');
 }

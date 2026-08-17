@@ -92,7 +92,7 @@ void main() {
     expect(buried.dueAt.isAfter(now), isTrue);
 
     final snapshot = await repos.export.buildSnapshot();
-    expect(snapshot.version, 31);
+    expect(snapshot.version, 32);
     expect(snapshot.knowledgeAreas, isNotEmpty);
     expect(snapshot.flashcardDecks, hasLength(1));
     expect(snapshot.flashcards.length, greaterThanOrEqualTo(4));
@@ -267,5 +267,79 @@ void main() {
     final remaining = await repos.flashcards.listCards(created.id);
     expect(remaining.map((c) => c.id), containsAll([leftover.single.id, cloze.last.id]));
     expect(remaining, hasLength(2));
+  });
+
+  test('hierarchical tags link N cards and parent study includes subtags', () async {
+    final created = await profile();
+    final deck = await repos.flashcards.createDeck(
+      profileId: created.id,
+      title: 'Teoria',
+    );
+    final music = await repos.flashcards.createTag(
+      profileId: created.id,
+      title: 'Música',
+    );
+    final harmony = await repos.flashcards.createTag(
+      profileId: created.id,
+      title: 'Harmonia',
+      parentId: music.id,
+    );
+    final cards = await repos.flashcards.createCard(
+      profileId: created.id,
+      deckId: deck.id,
+      front: 'ii-V-I',
+      back: 'Progressão',
+      tags: const ['Música / Harmonia', 'Jazz'],
+    );
+    final other = await repos.flashcards.createCard(
+      profileId: created.id,
+      deckId: deck.id,
+      front: 'ODD',
+      back: 'domínio',
+    );
+    final tags = await repos.flashcards.listTags(created.id);
+    expect(tags.map((t) => t.title), containsAll(['Música', 'Harmonia', 'Jazz']));
+    final jazz = tags.firstWhere((t) => t.title == 'Jazz');
+    expect(jazz.parentId, isNull);
+    expect(harmony.parentId, music.id);
+
+    final listed = await repos.flashcards.listCards(created.id);
+    final tagged = listed.firstWhere((c) => c.id == cards.single.id);
+    expect(tagged.tags, containsAll(['Harmonia', 'Jazz']));
+
+    final links = await repos.flashcards.listTagLinks(created.id);
+    final hits = FlashcardTagPolicy.cardsWithTag(
+      cards: listed,
+      links: links,
+      tags: tags,
+      rootId: music.id,
+    );
+    expect(hits.map((c) => c.id), [cards.single.id]);
+    expect(hits.map((c) => c.id), isNot(contains(other.single.id)));
+
+    final snapshot = await repos.export.buildSnapshot();
+    expect(snapshot.flashcardTags, hasLength(3));
+    expect(snapshot.flashcardTagLinks, hasLength(2));
+    await repos.restore.restore(snapshot);
+    expect(await repos.flashcards.listTags(created.id), hasLength(3));
+    expect(await repos.flashcards.listTagLinks(created.id), hasLength(2));
+  });
+
+  test('deleteCard also removes tag links', () async {
+    final created = await profile();
+    final deck = await repos.flashcards.createDeck(
+      profileId: created.id,
+      title: 'Pares',
+    );
+    final cards = await repos.flashcards.createCard(
+      profileId: created.id,
+      deckId: deck.id,
+      front: 'keep',
+      back: 'ficar',
+      tags: const ['Jazz'],
+    );
+    await repos.flashcards.deleteCard(cards.single);
+    expect(await repos.flashcards.listTagLinks(created.id), isEmpty);
+    expect(await repos.flashcards.listTags(created.id), hasLength(1));
   });
 }

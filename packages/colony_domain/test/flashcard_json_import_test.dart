@@ -162,6 +162,8 @@ Aqui está o lote:
     expect(empty, contains('ainda não há categorias'));
     expect(empty, contains('areaPath'));
     expect(empty, contains('Linguagens > Português'));
+    expect(empty, contains('Música / Harmonia'));
+    expect(empty, contains('TAGS ATUAIS'));
 
     final filled = FlashcardJsonPromptBuilder.build(
       areas: [arts, trop],

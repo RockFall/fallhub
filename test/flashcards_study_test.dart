@@ -180,4 +180,82 @@ void main() {
       await tester.pump(const Duration(milliseconds: 1));
     }
   });
+
+  testWidgets('StudySessionScreen tagId includes cards on subtags only', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(800, 1400);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    final db = ColonyDatabase.inMemory();
+    addTearDown(db.close);
+    final repos = ColonyRepositories.create(
+      db,
+      idGenerator: FixedIdGenerator([
+        for (var i = 1; i <= 60; i++) 'id-$i',
+      ]),
+      clock: () => DateTime.utc(2026, 8, 17, 12),
+    );
+    final profile = await repos.profiles.create(
+      colonyName: 'Test',
+      displayName: 'Caio',
+      timezone: 'UTC',
+      locale: 'pt_BR',
+      baseCurrency: 'BRL',
+    );
+    await repos.preferences.save(
+      AppPreferences.defaults().copyWith(onboardingCompleted: true),
+    );
+    final deck = await repos.flashcards.createDeck(
+      profileId: profile.id,
+      title: 'Teoria',
+    );
+    final music = await repos.flashcards.createTag(
+      profileId: profile.id,
+      title: 'Música',
+    );
+    await repos.flashcards.createCard(
+      profileId: profile.id,
+      deckId: deck.id,
+      front: 'ii-V-I',
+      back: 'Progressão',
+      tags: const ['Música / Harmonia'],
+    );
+    await repos.flashcards.createCard(
+      profileId: profile.id,
+      deckId: deck.id,
+      front: 'ODD',
+      back: 'domínio',
+    );
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          databaseProvider.overrideWithValue(db),
+          clockProvider.overrideWithValue(() => DateTime.utc(2026, 8, 17, 12)),
+        ],
+        child: MaterialApp(
+          theme: ColonyTheme.dark(),
+          home: Scaffold(
+            body: StudySessionScreen(tagId: music.id.value),
+          ),
+        ),
+      ),
+    );
+    await tester.pump();
+    for (var i = 0; i < 20; i++) {
+      await tester.pump(const Duration(milliseconds: 50));
+      if (find.text('ii-V-I').evaluate().isNotEmpty) break;
+    }
+
+    expect(find.text('ii-V-I'), findsOneWidget);
+    expect(find.text('ODD'), findsNothing);
+
+    await tester.pumpWidget(const SizedBox.shrink());
+    for (var i = 0; i < 80; i++) {
+      await tester.pump(const Duration(milliseconds: 1));
+    }
+  });
 }

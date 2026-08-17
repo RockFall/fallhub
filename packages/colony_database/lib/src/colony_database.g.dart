@@ -30990,6 +30990,688 @@ class ResearchKnowledgeLinksCompanion
   }
 }
 
+class $FlashcardTagsTable extends FlashcardTags
+    with TableInfo<$FlashcardTagsTable, FlashcardTagRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $FlashcardTagsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _profileIdMeta = const VerificationMeta(
+    'profileId',
+  );
+  @override
+  late final GeneratedColumn<String> profileId = GeneratedColumn<String>(
+    'profile_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES profiles (id)',
+    ),
+  );
+  static const VerificationMeta _parentIdMeta = const VerificationMeta(
+    'parentId',
+  );
+  @override
+  late final GeneratedColumn<String> parentId = GeneratedColumn<String>(
+    'parent_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _titleMeta = const VerificationMeta('title');
+  @override
+  late final GeneratedColumn<String> title = GeneratedColumn<String>(
+    'title',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _sortOrderMeta = const VerificationMeta(
+    'sortOrder',
+  );
+  @override
+  late final GeneratedColumn<int> sortOrder = GeneratedColumn<int>(
+    'sort_order',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<int> createdAt = GeneratedColumn<int>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    profileId,
+    parentId,
+    title,
+    sortOrder,
+    createdAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'flashcard_tags';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<FlashcardTagRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('profile_id')) {
+      context.handle(
+        _profileIdMeta,
+        profileId.isAcceptableOrUnknown(data['profile_id']!, _profileIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_profileIdMeta);
+    }
+    if (data.containsKey('parent_id')) {
+      context.handle(
+        _parentIdMeta,
+        parentId.isAcceptableOrUnknown(data['parent_id']!, _parentIdMeta),
+      );
+    }
+    if (data.containsKey('title')) {
+      context.handle(
+        _titleMeta,
+        title.isAcceptableOrUnknown(data['title']!, _titleMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_titleMeta);
+    }
+    if (data.containsKey('sort_order')) {
+      context.handle(
+        _sortOrderMeta,
+        sortOrder.isAcceptableOrUnknown(data['sort_order']!, _sortOrderMeta),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  FlashcardTagRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return FlashcardTagRow(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      profileId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}profile_id'],
+      )!,
+      parentId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}parent_id'],
+      ),
+      title: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}title'],
+      )!,
+      sortOrder: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}sort_order'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}created_at'],
+      )!,
+    );
+  }
+
+  @override
+  $FlashcardTagsTable createAlias(String alias) {
+    return $FlashcardTagsTable(attachedDatabase, alias);
+  }
+}
+
+class FlashcardTagRow extends DataClass implements Insertable<FlashcardTagRow> {
+  final String id;
+  final String profileId;
+  final String? parentId;
+  final String title;
+  final int sortOrder;
+  final int createdAt;
+  const FlashcardTagRow({
+    required this.id,
+    required this.profileId,
+    this.parentId,
+    required this.title,
+    required this.sortOrder,
+    required this.createdAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['profile_id'] = Variable<String>(profileId);
+    if (!nullToAbsent || parentId != null) {
+      map['parent_id'] = Variable<String>(parentId);
+    }
+    map['title'] = Variable<String>(title);
+    map['sort_order'] = Variable<int>(sortOrder);
+    map['created_at'] = Variable<int>(createdAt);
+    return map;
+  }
+
+  FlashcardTagsCompanion toCompanion(bool nullToAbsent) {
+    return FlashcardTagsCompanion(
+      id: Value(id),
+      profileId: Value(profileId),
+      parentId: parentId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(parentId),
+      title: Value(title),
+      sortOrder: Value(sortOrder),
+      createdAt: Value(createdAt),
+    );
+  }
+
+  factory FlashcardTagRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return FlashcardTagRow(
+      id: serializer.fromJson<String>(json['id']),
+      profileId: serializer.fromJson<String>(json['profileId']),
+      parentId: serializer.fromJson<String?>(json['parentId']),
+      title: serializer.fromJson<String>(json['title']),
+      sortOrder: serializer.fromJson<int>(json['sortOrder']),
+      createdAt: serializer.fromJson<int>(json['createdAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'profileId': serializer.toJson<String>(profileId),
+      'parentId': serializer.toJson<String?>(parentId),
+      'title': serializer.toJson<String>(title),
+      'sortOrder': serializer.toJson<int>(sortOrder),
+      'createdAt': serializer.toJson<int>(createdAt),
+    };
+  }
+
+  FlashcardTagRow copyWith({
+    String? id,
+    String? profileId,
+    Value<String?> parentId = const Value.absent(),
+    String? title,
+    int? sortOrder,
+    int? createdAt,
+  }) => FlashcardTagRow(
+    id: id ?? this.id,
+    profileId: profileId ?? this.profileId,
+    parentId: parentId.present ? parentId.value : this.parentId,
+    title: title ?? this.title,
+    sortOrder: sortOrder ?? this.sortOrder,
+    createdAt: createdAt ?? this.createdAt,
+  );
+  FlashcardTagRow copyWithCompanion(FlashcardTagsCompanion data) {
+    return FlashcardTagRow(
+      id: data.id.present ? data.id.value : this.id,
+      profileId: data.profileId.present ? data.profileId.value : this.profileId,
+      parentId: data.parentId.present ? data.parentId.value : this.parentId,
+      title: data.title.present ? data.title.value : this.title,
+      sortOrder: data.sortOrder.present ? data.sortOrder.value : this.sortOrder,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('FlashcardTagRow(')
+          ..write('id: $id, ')
+          ..write('profileId: $profileId, ')
+          ..write('parentId: $parentId, ')
+          ..write('title: $title, ')
+          ..write('sortOrder: $sortOrder, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(id, profileId, parentId, title, sortOrder, createdAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is FlashcardTagRow &&
+          other.id == this.id &&
+          other.profileId == this.profileId &&
+          other.parentId == this.parentId &&
+          other.title == this.title &&
+          other.sortOrder == this.sortOrder &&
+          other.createdAt == this.createdAt);
+}
+
+class FlashcardTagsCompanion extends UpdateCompanion<FlashcardTagRow> {
+  final Value<String> id;
+  final Value<String> profileId;
+  final Value<String?> parentId;
+  final Value<String> title;
+  final Value<int> sortOrder;
+  final Value<int> createdAt;
+  final Value<int> rowid;
+  const FlashcardTagsCompanion({
+    this.id = const Value.absent(),
+    this.profileId = const Value.absent(),
+    this.parentId = const Value.absent(),
+    this.title = const Value.absent(),
+    this.sortOrder = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  FlashcardTagsCompanion.insert({
+    required String id,
+    required String profileId,
+    this.parentId = const Value.absent(),
+    required String title,
+    this.sortOrder = const Value.absent(),
+    required int createdAt,
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       profileId = Value(profileId),
+       title = Value(title),
+       createdAt = Value(createdAt);
+  static Insertable<FlashcardTagRow> custom({
+    Expression<String>? id,
+    Expression<String>? profileId,
+    Expression<String>? parentId,
+    Expression<String>? title,
+    Expression<int>? sortOrder,
+    Expression<int>? createdAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (profileId != null) 'profile_id': profileId,
+      if (parentId != null) 'parent_id': parentId,
+      if (title != null) 'title': title,
+      if (sortOrder != null) 'sort_order': sortOrder,
+      if (createdAt != null) 'created_at': createdAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  FlashcardTagsCompanion copyWith({
+    Value<String>? id,
+    Value<String>? profileId,
+    Value<String?>? parentId,
+    Value<String>? title,
+    Value<int>? sortOrder,
+    Value<int>? createdAt,
+    Value<int>? rowid,
+  }) {
+    return FlashcardTagsCompanion(
+      id: id ?? this.id,
+      profileId: profileId ?? this.profileId,
+      parentId: parentId ?? this.parentId,
+      title: title ?? this.title,
+      sortOrder: sortOrder ?? this.sortOrder,
+      createdAt: createdAt ?? this.createdAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (profileId.present) {
+      map['profile_id'] = Variable<String>(profileId.value);
+    }
+    if (parentId.present) {
+      map['parent_id'] = Variable<String>(parentId.value);
+    }
+    if (title.present) {
+      map['title'] = Variable<String>(title.value);
+    }
+    if (sortOrder.present) {
+      map['sort_order'] = Variable<int>(sortOrder.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<int>(createdAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('FlashcardTagsCompanion(')
+          ..write('id: $id, ')
+          ..write('profileId: $profileId, ')
+          ..write('parentId: $parentId, ')
+          ..write('title: $title, ')
+          ..write('sortOrder: $sortOrder, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $FlashcardTagLinksTable extends FlashcardTagLinks
+    with TableInfo<$FlashcardTagLinksTable, FlashcardTagLinkRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $FlashcardTagLinksTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _cardIdMeta = const VerificationMeta('cardId');
+  @override
+  late final GeneratedColumn<String> cardId = GeneratedColumn<String>(
+    'card_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES flashcards (id)',
+    ),
+  );
+  static const VerificationMeta _tagIdMeta = const VerificationMeta('tagId');
+  @override
+  late final GeneratedColumn<String> tagId = GeneratedColumn<String>(
+    'tag_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES flashcard_tags (id)',
+    ),
+  );
+  static const VerificationMeta _linkedAtMeta = const VerificationMeta(
+    'linkedAt',
+  );
+  @override
+  late final GeneratedColumn<int> linkedAt = GeneratedColumn<int>(
+    'linked_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [cardId, tagId, linkedAt];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'flashcard_tag_links';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<FlashcardTagLinkRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('card_id')) {
+      context.handle(
+        _cardIdMeta,
+        cardId.isAcceptableOrUnknown(data['card_id']!, _cardIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_cardIdMeta);
+    }
+    if (data.containsKey('tag_id')) {
+      context.handle(
+        _tagIdMeta,
+        tagId.isAcceptableOrUnknown(data['tag_id']!, _tagIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_tagIdMeta);
+    }
+    if (data.containsKey('linked_at')) {
+      context.handle(
+        _linkedAtMeta,
+        linkedAt.isAcceptableOrUnknown(data['linked_at']!, _linkedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_linkedAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {cardId, tagId};
+  @override
+  FlashcardTagLinkRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return FlashcardTagLinkRow(
+      cardId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}card_id'],
+      )!,
+      tagId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}tag_id'],
+      )!,
+      linkedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}linked_at'],
+      )!,
+    );
+  }
+
+  @override
+  $FlashcardTagLinksTable createAlias(String alias) {
+    return $FlashcardTagLinksTable(attachedDatabase, alias);
+  }
+}
+
+class FlashcardTagLinkRow extends DataClass
+    implements Insertable<FlashcardTagLinkRow> {
+  final String cardId;
+  final String tagId;
+  final int linkedAt;
+  const FlashcardTagLinkRow({
+    required this.cardId,
+    required this.tagId,
+    required this.linkedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['card_id'] = Variable<String>(cardId);
+    map['tag_id'] = Variable<String>(tagId);
+    map['linked_at'] = Variable<int>(linkedAt);
+    return map;
+  }
+
+  FlashcardTagLinksCompanion toCompanion(bool nullToAbsent) {
+    return FlashcardTagLinksCompanion(
+      cardId: Value(cardId),
+      tagId: Value(tagId),
+      linkedAt: Value(linkedAt),
+    );
+  }
+
+  factory FlashcardTagLinkRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return FlashcardTagLinkRow(
+      cardId: serializer.fromJson<String>(json['cardId']),
+      tagId: serializer.fromJson<String>(json['tagId']),
+      linkedAt: serializer.fromJson<int>(json['linkedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'cardId': serializer.toJson<String>(cardId),
+      'tagId': serializer.toJson<String>(tagId),
+      'linkedAt': serializer.toJson<int>(linkedAt),
+    };
+  }
+
+  FlashcardTagLinkRow copyWith({
+    String? cardId,
+    String? tagId,
+    int? linkedAt,
+  }) => FlashcardTagLinkRow(
+    cardId: cardId ?? this.cardId,
+    tagId: tagId ?? this.tagId,
+    linkedAt: linkedAt ?? this.linkedAt,
+  );
+  FlashcardTagLinkRow copyWithCompanion(FlashcardTagLinksCompanion data) {
+    return FlashcardTagLinkRow(
+      cardId: data.cardId.present ? data.cardId.value : this.cardId,
+      tagId: data.tagId.present ? data.tagId.value : this.tagId,
+      linkedAt: data.linkedAt.present ? data.linkedAt.value : this.linkedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('FlashcardTagLinkRow(')
+          ..write('cardId: $cardId, ')
+          ..write('tagId: $tagId, ')
+          ..write('linkedAt: $linkedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(cardId, tagId, linkedAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is FlashcardTagLinkRow &&
+          other.cardId == this.cardId &&
+          other.tagId == this.tagId &&
+          other.linkedAt == this.linkedAt);
+}
+
+class FlashcardTagLinksCompanion extends UpdateCompanion<FlashcardTagLinkRow> {
+  final Value<String> cardId;
+  final Value<String> tagId;
+  final Value<int> linkedAt;
+  final Value<int> rowid;
+  const FlashcardTagLinksCompanion({
+    this.cardId = const Value.absent(),
+    this.tagId = const Value.absent(),
+    this.linkedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  FlashcardTagLinksCompanion.insert({
+    required String cardId,
+    required String tagId,
+    required int linkedAt,
+    this.rowid = const Value.absent(),
+  }) : cardId = Value(cardId),
+       tagId = Value(tagId),
+       linkedAt = Value(linkedAt);
+  static Insertable<FlashcardTagLinkRow> custom({
+    Expression<String>? cardId,
+    Expression<String>? tagId,
+    Expression<int>? linkedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (cardId != null) 'card_id': cardId,
+      if (tagId != null) 'tag_id': tagId,
+      if (linkedAt != null) 'linked_at': linkedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  FlashcardTagLinksCompanion copyWith({
+    Value<String>? cardId,
+    Value<String>? tagId,
+    Value<int>? linkedAt,
+    Value<int>? rowid,
+  }) {
+    return FlashcardTagLinksCompanion(
+      cardId: cardId ?? this.cardId,
+      tagId: tagId ?? this.tagId,
+      linkedAt: linkedAt ?? this.linkedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (cardId.present) {
+      map['card_id'] = Variable<String>(cardId.value);
+    }
+    if (tagId.present) {
+      map['tag_id'] = Variable<String>(tagId.value);
+    }
+    if (linkedAt.present) {
+      map['linked_at'] = Variable<int>(linkedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('FlashcardTagLinksCompanion(')
+          ..write('cardId: $cardId, ')
+          ..write('tagId: $tagId, ')
+          ..write('linkedAt: $linkedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$ColonyDatabase extends GeneratedDatabase {
   _$ColonyDatabase(QueryExecutor e) : super(e);
   $ColonyDatabaseManager get managers => $ColonyDatabaseManager(this);
@@ -31074,6 +31756,9 @@ abstract class _$ColonyDatabase extends GeneratedDatabase {
       $KnowledgeAreaPlacementsTable(this);
   late final $ResearchKnowledgeLinksTable researchKnowledgeLinks =
       $ResearchKnowledgeLinksTable(this);
+  late final $FlashcardTagsTable flashcardTags = $FlashcardTagsTable(this);
+  late final $FlashcardTagLinksTable flashcardTagLinks =
+      $FlashcardTagLinksTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -31133,6 +31818,8 @@ abstract class _$ColonyDatabase extends GeneratedDatabase {
     flashcardReviewLogs,
     knowledgeAreaPlacements,
     researchKnowledgeLinks,
+    flashcardTags,
+    flashcardTagLinks,
   ];
 }
 
@@ -31915,6 +32602,24 @@ final class $$ProfilesTableReferences
     ).filter((f) => f.profileId.id.sqlEquals($_itemColumn<String>('id')!));
 
     final cache = $_typedResult.readTableOrNull(_flashcardsRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$FlashcardTagsTable, List<FlashcardTagRow>>
+  _flashcardTagsRefsTable(_$ColonyDatabase db) => MultiTypedResultKey.fromTable(
+    db.flashcardTags,
+    aliasName: $_aliasNameGenerator(db.profiles.id, db.flashcardTags.profileId),
+  );
+
+  $$FlashcardTagsTableProcessedTableManager get flashcardTagsRefs {
+    final manager = $$FlashcardTagsTableTableManager(
+      $_db,
+      $_db.flashcardTags,
+    ).filter((f) => f.profileId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_flashcardTagsRefsTable($_db));
     return ProcessedTableManager(
       manager.$state.copyWith(prefetchedData: cache),
     );
@@ -32823,6 +33528,31 @@ class $$ProfilesTableFilterComposer
           }) => $$FlashcardsTableFilterComposer(
             $db: $db,
             $table: $db.flashcards,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> flashcardTagsRefs(
+    Expression<bool> Function($$FlashcardTagsTableFilterComposer f) f,
+  ) {
+    final $$FlashcardTagsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.flashcardTags,
+      getReferencedColumn: (t) => t.profileId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$FlashcardTagsTableFilterComposer(
+            $db: $db,
+            $table: $db.flashcardTags,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -33796,6 +34526,31 @@ class $$ProfilesTableAnnotationComposer
     );
     return f(composer);
   }
+
+  Expression<T> flashcardTagsRefs<T extends Object>(
+    Expression<T> Function($$FlashcardTagsTableAnnotationComposer a) f,
+  ) {
+    final $$FlashcardTagsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.flashcardTags,
+      getReferencedColumn: (t) => t.profileId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$FlashcardTagsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.flashcardTags,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
 }
 
 class $$ProfilesTableTableManager
@@ -33846,6 +34601,7 @@ class $$ProfilesTableTableManager
             bool knowledgeAreasRefs,
             bool flashcardDecksRefs,
             bool flashcardsRefs,
+            bool flashcardTagsRefs,
           })
         > {
   $$ProfilesTableTableManager(_$ColonyDatabase db, $ProfilesTable table)
@@ -33955,6 +34711,7 @@ class $$ProfilesTableTableManager
                 knowledgeAreasRefs = false,
                 flashcardDecksRefs = false,
                 flashcardsRefs = false,
+                flashcardTagsRefs = false,
               }) {
                 return PrefetchHooks(
                   db: db,
@@ -33993,6 +34750,7 @@ class $$ProfilesTableTableManager
                     if (knowledgeAreasRefs) db.knowledgeAreas,
                     if (flashcardDecksRefs) db.flashcardDecks,
                     if (flashcardsRefs) db.flashcards,
+                    if (flashcardTagsRefs) db.flashcardTags,
                   ],
                   addJoins: null,
                   getPrefetchedDataCallback: (items) async {
@@ -34711,6 +35469,27 @@ class $$ProfilesTableTableManager
                               ),
                           typedResults: items,
                         ),
+                      if (flashcardTagsRefs)
+                        await $_getPrefetchedData<
+                          Profile,
+                          $ProfilesTable,
+                          FlashcardTagRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$ProfilesTableReferences
+                              ._flashcardTagsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$ProfilesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).flashcardTagsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.profileId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
                     ];
                   },
                 );
@@ -34766,6 +35545,7 @@ typedef $$ProfilesTableProcessedTableManager =
         bool knowledgeAreasRefs,
         bool flashcardDecksRefs,
         bool flashcardsRefs,
+        bool flashcardTagsRefs,
       })
     >;
 typedef $$DomainEventsTableCreateCompanionBuilder =
@@ -58886,6 +59666,30 @@ final class $$FlashcardsTableReferences
       manager.$state.copyWith(prefetchedData: cache),
     );
   }
+
+  static MultiTypedResultKey<$FlashcardTagLinksTable, List<FlashcardTagLinkRow>>
+  _flashcardTagLinksRefsTable(_$ColonyDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.flashcardTagLinks,
+        aliasName: $_aliasNameGenerator(
+          db.flashcards.id,
+          db.flashcardTagLinks.cardId,
+        ),
+      );
+
+  $$FlashcardTagLinksTableProcessedTableManager get flashcardTagLinksRefs {
+    final manager = $$FlashcardTagLinksTableTableManager(
+      $_db,
+      $_db.flashcardTagLinks,
+    ).filter((f) => f.cardId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _flashcardTagLinksRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
 }
 
 class $$FlashcardsTableFilterComposer
@@ -59054,6 +59858,31 @@ class $$FlashcardsTableFilterComposer
           }) => $$FlashcardReviewLogsTableFilterComposer(
             $db: $db,
             $table: $db.flashcardReviewLogs,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> flashcardTagLinksRefs(
+    Expression<bool> Function($$FlashcardTagLinksTableFilterComposer f) f,
+  ) {
+    final $$FlashcardTagLinksTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.flashcardTagLinks,
+      getReferencedColumn: (t) => t.cardId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$FlashcardTagLinksTableFilterComposer(
+            $db: $db,
+            $table: $db.flashcardTagLinks,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -59343,6 +60172,32 @@ class $$FlashcardsTableAnnotationComposer
         );
     return f(composer);
   }
+
+  Expression<T> flashcardTagLinksRefs<T extends Object>(
+    Expression<T> Function($$FlashcardTagLinksTableAnnotationComposer a) f,
+  ) {
+    final $$FlashcardTagLinksTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.flashcardTagLinks,
+          getReferencedColumn: (t) => t.cardId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$FlashcardTagLinksTableAnnotationComposer(
+                $db: $db,
+                $table: $db.flashcardTagLinks,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
 }
 
 class $$FlashcardsTableTableManager
@@ -59363,6 +60218,7 @@ class $$FlashcardsTableTableManager
             bool deckId,
             bool flashcardSrsRefs,
             bool flashcardReviewLogsRefs,
+            bool flashcardTagLinksRefs,
           })
         > {
   $$FlashcardsTableTableManager(_$ColonyDatabase db, $FlashcardsTable table)
@@ -59466,12 +60322,14 @@ class $$FlashcardsTableTableManager
                 deckId = false,
                 flashcardSrsRefs = false,
                 flashcardReviewLogsRefs = false,
+                flashcardTagLinksRefs = false,
               }) {
                 return PrefetchHooks(
                   db: db,
                   explicitlyWatchedTables: [
                     if (flashcardSrsRefs) db.flashcardSrs,
                     if (flashcardReviewLogsRefs) db.flashcardReviewLogs,
+                    if (flashcardTagLinksRefs) db.flashcardTagLinks,
                   ],
                   addJoins:
                       <
@@ -59564,6 +60422,27 @@ class $$FlashcardsTableTableManager
                               ),
                           typedResults: items,
                         ),
+                      if (flashcardTagLinksRefs)
+                        await $_getPrefetchedData<
+                          FlashcardRow,
+                          $FlashcardsTable,
+                          FlashcardTagLinkRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$FlashcardsTableReferences
+                              ._flashcardTagLinksRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$FlashcardsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).flashcardTagLinksRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.cardId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
                     ];
                   },
                 );
@@ -59589,6 +60468,7 @@ typedef $$FlashcardsTableProcessedTableManager =
         bool deckId,
         bool flashcardSrsRefs,
         bool flashcardReviewLogsRefs,
+        bool flashcardTagLinksRefs,
       })
     >;
 typedef $$FlashcardSrsTableCreateCompanionBuilder =
@@ -61299,6 +62179,840 @@ typedef $$ResearchKnowledgeLinksTableProcessedTableManager =
       ResearchKnowledgeLinkRow,
       PrefetchHooks Function({bool researchNodeId, bool areaId})
     >;
+typedef $$FlashcardTagsTableCreateCompanionBuilder =
+    FlashcardTagsCompanion Function({
+      required String id,
+      required String profileId,
+      Value<String?> parentId,
+      required String title,
+      Value<int> sortOrder,
+      required int createdAt,
+      Value<int> rowid,
+    });
+typedef $$FlashcardTagsTableUpdateCompanionBuilder =
+    FlashcardTagsCompanion Function({
+      Value<String> id,
+      Value<String> profileId,
+      Value<String?> parentId,
+      Value<String> title,
+      Value<int> sortOrder,
+      Value<int> createdAt,
+      Value<int> rowid,
+    });
+
+final class $$FlashcardTagsTableReferences
+    extends
+        BaseReferences<_$ColonyDatabase, $FlashcardTagsTable, FlashcardTagRow> {
+  $$FlashcardTagsTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $ProfilesTable _profileIdTable(_$ColonyDatabase db) =>
+      db.profiles.createAlias(
+        $_aliasNameGenerator(db.flashcardTags.profileId, db.profiles.id),
+      );
+
+  $$ProfilesTableProcessedTableManager get profileId {
+    final $_column = $_itemColumn<String>('profile_id')!;
+
+    final manager = $$ProfilesTableTableManager(
+      $_db,
+      $_db.profiles,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_profileIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static MultiTypedResultKey<$FlashcardTagLinksTable, List<FlashcardTagLinkRow>>
+  _flashcardTagLinksRefsTable(_$ColonyDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.flashcardTagLinks,
+        aliasName: $_aliasNameGenerator(
+          db.flashcardTags.id,
+          db.flashcardTagLinks.tagId,
+        ),
+      );
+
+  $$FlashcardTagLinksTableProcessedTableManager get flashcardTagLinksRefs {
+    final manager = $$FlashcardTagLinksTableTableManager(
+      $_db,
+      $_db.flashcardTagLinks,
+    ).filter((f) => f.tagId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _flashcardTagLinksRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+}
+
+class $$FlashcardTagsTableFilterComposer
+    extends Composer<_$ColonyDatabase, $FlashcardTagsTable> {
+  $$FlashcardTagsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get parentId => $composableBuilder(
+    column: $table.parentId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get title => $composableBuilder(
+    column: $table.title,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get sortOrder => $composableBuilder(
+    column: $table.sortOrder,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$ProfilesTableFilterComposer get profileId {
+    final $$ProfilesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.profileId,
+      referencedTable: $db.profiles,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProfilesTableFilterComposer(
+            $db: $db,
+            $table: $db.profiles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  Expression<bool> flashcardTagLinksRefs(
+    Expression<bool> Function($$FlashcardTagLinksTableFilterComposer f) f,
+  ) {
+    final $$FlashcardTagLinksTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.flashcardTagLinks,
+      getReferencedColumn: (t) => t.tagId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$FlashcardTagLinksTableFilterComposer(
+            $db: $db,
+            $table: $db.flashcardTagLinks,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $$FlashcardTagsTableOrderingComposer
+    extends Composer<_$ColonyDatabase, $FlashcardTagsTable> {
+  $$FlashcardTagsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get parentId => $composableBuilder(
+    column: $table.parentId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get title => $composableBuilder(
+    column: $table.title,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get sortOrder => $composableBuilder(
+    column: $table.sortOrder,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$ProfilesTableOrderingComposer get profileId {
+    final $$ProfilesTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.profileId,
+      referencedTable: $db.profiles,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProfilesTableOrderingComposer(
+            $db: $db,
+            $table: $db.profiles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$FlashcardTagsTableAnnotationComposer
+    extends Composer<_$ColonyDatabase, $FlashcardTagsTable> {
+  $$FlashcardTagsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get parentId =>
+      $composableBuilder(column: $table.parentId, builder: (column) => column);
+
+  GeneratedColumn<String> get title =>
+      $composableBuilder(column: $table.title, builder: (column) => column);
+
+  GeneratedColumn<int> get sortOrder =>
+      $composableBuilder(column: $table.sortOrder, builder: (column) => column);
+
+  GeneratedColumn<int> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  $$ProfilesTableAnnotationComposer get profileId {
+    final $$ProfilesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.profileId,
+      referencedTable: $db.profiles,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProfilesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.profiles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  Expression<T> flashcardTagLinksRefs<T extends Object>(
+    Expression<T> Function($$FlashcardTagLinksTableAnnotationComposer a) f,
+  ) {
+    final $$FlashcardTagLinksTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.flashcardTagLinks,
+          getReferencedColumn: (t) => t.tagId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$FlashcardTagLinksTableAnnotationComposer(
+                $db: $db,
+                $table: $db.flashcardTagLinks,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+}
+
+class $$FlashcardTagsTableTableManager
+    extends
+        RootTableManager<
+          _$ColonyDatabase,
+          $FlashcardTagsTable,
+          FlashcardTagRow,
+          $$FlashcardTagsTableFilterComposer,
+          $$FlashcardTagsTableOrderingComposer,
+          $$FlashcardTagsTableAnnotationComposer,
+          $$FlashcardTagsTableCreateCompanionBuilder,
+          $$FlashcardTagsTableUpdateCompanionBuilder,
+          (FlashcardTagRow, $$FlashcardTagsTableReferences),
+          FlashcardTagRow,
+          PrefetchHooks Function({bool profileId, bool flashcardTagLinksRefs})
+        > {
+  $$FlashcardTagsTableTableManager(
+    _$ColonyDatabase db,
+    $FlashcardTagsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$FlashcardTagsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$FlashcardTagsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$FlashcardTagsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> profileId = const Value.absent(),
+                Value<String?> parentId = const Value.absent(),
+                Value<String> title = const Value.absent(),
+                Value<int> sortOrder = const Value.absent(),
+                Value<int> createdAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => FlashcardTagsCompanion(
+                id: id,
+                profileId: profileId,
+                parentId: parentId,
+                title: title,
+                sortOrder: sortOrder,
+                createdAt: createdAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String profileId,
+                Value<String?> parentId = const Value.absent(),
+                required String title,
+                Value<int> sortOrder = const Value.absent(),
+                required int createdAt,
+                Value<int> rowid = const Value.absent(),
+              }) => FlashcardTagsCompanion.insert(
+                id: id,
+                profileId: profileId,
+                parentId: parentId,
+                title: title,
+                sortOrder: sortOrder,
+                createdAt: createdAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$FlashcardTagsTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback:
+              ({profileId = false, flashcardTagLinksRefs = false}) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [
+                    if (flashcardTagLinksRefs) db.flashcardTagLinks,
+                  ],
+                  addJoins:
+                      <
+                        T extends TableManagerState<
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic
+                        >
+                      >(state) {
+                        if (profileId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.profileId,
+                                    referencedTable:
+                                        $$FlashcardTagsTableReferences
+                                            ._profileIdTable(db),
+                                    referencedColumn:
+                                        $$FlashcardTagsTableReferences
+                                            ._profileIdTable(db)
+                                            .id,
+                                  )
+                                  as T;
+                        }
+
+                        return state;
+                      },
+                  getPrefetchedDataCallback: (items) async {
+                    return [
+                      if (flashcardTagLinksRefs)
+                        await $_getPrefetchedData<
+                          FlashcardTagRow,
+                          $FlashcardTagsTable,
+                          FlashcardTagLinkRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$FlashcardTagsTableReferences
+                              ._flashcardTagLinksRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$FlashcardTagsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).flashcardTagLinksRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.tagId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                    ];
+                  },
+                );
+              },
+        ),
+      );
+}
+
+typedef $$FlashcardTagsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$ColonyDatabase,
+      $FlashcardTagsTable,
+      FlashcardTagRow,
+      $$FlashcardTagsTableFilterComposer,
+      $$FlashcardTagsTableOrderingComposer,
+      $$FlashcardTagsTableAnnotationComposer,
+      $$FlashcardTagsTableCreateCompanionBuilder,
+      $$FlashcardTagsTableUpdateCompanionBuilder,
+      (FlashcardTagRow, $$FlashcardTagsTableReferences),
+      FlashcardTagRow,
+      PrefetchHooks Function({bool profileId, bool flashcardTagLinksRefs})
+    >;
+typedef $$FlashcardTagLinksTableCreateCompanionBuilder =
+    FlashcardTagLinksCompanion Function({
+      required String cardId,
+      required String tagId,
+      required int linkedAt,
+      Value<int> rowid,
+    });
+typedef $$FlashcardTagLinksTableUpdateCompanionBuilder =
+    FlashcardTagLinksCompanion Function({
+      Value<String> cardId,
+      Value<String> tagId,
+      Value<int> linkedAt,
+      Value<int> rowid,
+    });
+
+final class $$FlashcardTagLinksTableReferences
+    extends
+        BaseReferences<
+          _$ColonyDatabase,
+          $FlashcardTagLinksTable,
+          FlashcardTagLinkRow
+        > {
+  $$FlashcardTagLinksTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $FlashcardsTable _cardIdTable(_$ColonyDatabase db) =>
+      db.flashcards.createAlias(
+        $_aliasNameGenerator(db.flashcardTagLinks.cardId, db.flashcards.id),
+      );
+
+  $$FlashcardsTableProcessedTableManager get cardId {
+    final $_column = $_itemColumn<String>('card_id')!;
+
+    final manager = $$FlashcardsTableTableManager(
+      $_db,
+      $_db.flashcards,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_cardIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $FlashcardTagsTable _tagIdTable(_$ColonyDatabase db) =>
+      db.flashcardTags.createAlias(
+        $_aliasNameGenerator(db.flashcardTagLinks.tagId, db.flashcardTags.id),
+      );
+
+  $$FlashcardTagsTableProcessedTableManager get tagId {
+    final $_column = $_itemColumn<String>('tag_id')!;
+
+    final manager = $$FlashcardTagsTableTableManager(
+      $_db,
+      $_db.flashcardTags,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_tagIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$FlashcardTagLinksTableFilterComposer
+    extends Composer<_$ColonyDatabase, $FlashcardTagLinksTable> {
+  $$FlashcardTagLinksTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get linkedAt => $composableBuilder(
+    column: $table.linkedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$FlashcardsTableFilterComposer get cardId {
+    final $$FlashcardsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.cardId,
+      referencedTable: $db.flashcards,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$FlashcardsTableFilterComposer(
+            $db: $db,
+            $table: $db.flashcards,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$FlashcardTagsTableFilterComposer get tagId {
+    final $$FlashcardTagsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.tagId,
+      referencedTable: $db.flashcardTags,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$FlashcardTagsTableFilterComposer(
+            $db: $db,
+            $table: $db.flashcardTags,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$FlashcardTagLinksTableOrderingComposer
+    extends Composer<_$ColonyDatabase, $FlashcardTagLinksTable> {
+  $$FlashcardTagLinksTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get linkedAt => $composableBuilder(
+    column: $table.linkedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$FlashcardsTableOrderingComposer get cardId {
+    final $$FlashcardsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.cardId,
+      referencedTable: $db.flashcards,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$FlashcardsTableOrderingComposer(
+            $db: $db,
+            $table: $db.flashcards,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$FlashcardTagsTableOrderingComposer get tagId {
+    final $$FlashcardTagsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.tagId,
+      referencedTable: $db.flashcardTags,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$FlashcardTagsTableOrderingComposer(
+            $db: $db,
+            $table: $db.flashcardTags,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$FlashcardTagLinksTableAnnotationComposer
+    extends Composer<_$ColonyDatabase, $FlashcardTagLinksTable> {
+  $$FlashcardTagLinksTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get linkedAt =>
+      $composableBuilder(column: $table.linkedAt, builder: (column) => column);
+
+  $$FlashcardsTableAnnotationComposer get cardId {
+    final $$FlashcardsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.cardId,
+      referencedTable: $db.flashcards,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$FlashcardsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.flashcards,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$FlashcardTagsTableAnnotationComposer get tagId {
+    final $$FlashcardTagsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.tagId,
+      referencedTable: $db.flashcardTags,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$FlashcardTagsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.flashcardTags,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$FlashcardTagLinksTableTableManager
+    extends
+        RootTableManager<
+          _$ColonyDatabase,
+          $FlashcardTagLinksTable,
+          FlashcardTagLinkRow,
+          $$FlashcardTagLinksTableFilterComposer,
+          $$FlashcardTagLinksTableOrderingComposer,
+          $$FlashcardTagLinksTableAnnotationComposer,
+          $$FlashcardTagLinksTableCreateCompanionBuilder,
+          $$FlashcardTagLinksTableUpdateCompanionBuilder,
+          (FlashcardTagLinkRow, $$FlashcardTagLinksTableReferences),
+          FlashcardTagLinkRow,
+          PrefetchHooks Function({bool cardId, bool tagId})
+        > {
+  $$FlashcardTagLinksTableTableManager(
+    _$ColonyDatabase db,
+    $FlashcardTagLinksTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$FlashcardTagLinksTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$FlashcardTagLinksTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$FlashcardTagLinksTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> cardId = const Value.absent(),
+                Value<String> tagId = const Value.absent(),
+                Value<int> linkedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => FlashcardTagLinksCompanion(
+                cardId: cardId,
+                tagId: tagId,
+                linkedAt: linkedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String cardId,
+                required String tagId,
+                required int linkedAt,
+                Value<int> rowid = const Value.absent(),
+              }) => FlashcardTagLinksCompanion.insert(
+                cardId: cardId,
+                tagId: tagId,
+                linkedAt: linkedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$FlashcardTagLinksTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({cardId = false, tagId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (cardId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.cardId,
+                                referencedTable:
+                                    $$FlashcardTagLinksTableReferences
+                                        ._cardIdTable(db),
+                                referencedColumn:
+                                    $$FlashcardTagLinksTableReferences
+                                        ._cardIdTable(db)
+                                        .id,
+                              )
+                              as T;
+                    }
+                    if (tagId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.tagId,
+                                referencedTable:
+                                    $$FlashcardTagLinksTableReferences
+                                        ._tagIdTable(db),
+                                referencedColumn:
+                                    $$FlashcardTagLinksTableReferences
+                                        ._tagIdTable(db)
+                                        .id,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$FlashcardTagLinksTableProcessedTableManager =
+    ProcessedTableManager<
+      _$ColonyDatabase,
+      $FlashcardTagLinksTable,
+      FlashcardTagLinkRow,
+      $$FlashcardTagLinksTableFilterComposer,
+      $$FlashcardTagLinksTableOrderingComposer,
+      $$FlashcardTagLinksTableAnnotationComposer,
+      $$FlashcardTagLinksTableCreateCompanionBuilder,
+      $$FlashcardTagLinksTableUpdateCompanionBuilder,
+      (FlashcardTagLinkRow, $$FlashcardTagLinksTableReferences),
+      FlashcardTagLinkRow,
+      PrefetchHooks Function({bool cardId, bool tagId})
+    >;
 
 class $ColonyDatabaseManager {
   final _$ColonyDatabase _db;
@@ -61420,4 +63134,8 @@ class $ColonyDatabaseManager {
         _db,
         _db.researchKnowledgeLinks,
       );
+  $$FlashcardTagsTableTableManager get flashcardTags =>
+      $$FlashcardTagsTableTableManager(_db, _db.flashcardTags);
+  $$FlashcardTagLinksTableTableManager get flashcardTagLinks =>
+      $$FlashcardTagLinksTableTableManager(_db, _db.flashcardTagLinks);
 }

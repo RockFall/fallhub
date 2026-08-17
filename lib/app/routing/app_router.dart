@@ -31,6 +31,7 @@ import '../../features/research/presentation/research_list_screen.dart';
 import '../../features/research/presentation/research_node_detail_screen.dart';
 import '../../features/flashcards/presentation/flashcards_hub_screen.dart';
 import '../../features/flashcards/presentation/flashcard_deck_screen.dart';
+import '../../features/flashcards/presentation/flashcard_tag_screen.dart';
 import '../../features/flashcards/presentation/knowledge_area_screen.dart';
 import '../../features/flashcards/presentation/study_session_screen.dart';
 import '../../features/finance/presentation/finance_ledger_screen.dart';
@@ -190,6 +191,7 @@ final routerProvider = Provider<GoRouter>((ref) {
             builder: (context, state) => FlashcardsHubScreen(
               openCapture: state.uri.queryParameters['capture'] == '1',
               openImport: state.uri.queryParameters['import'] == '1',
+              openTags: state.uri.queryParameters['tab'] == 'tags',
             ),
             routes: [
               GoRoute(
@@ -197,6 +199,7 @@ final routerProvider = Provider<GoRouter>((ref) {
                 builder: (context, state) => StudySessionScreen(
                   deckId: state.uri.queryParameters['deckId'],
                   areaId: state.uri.queryParameters['areaId'],
+                  tagId: state.uri.queryParameters['tagId'],
                   cardId: state.uri.queryParameters['cardId'],
                   researchId: state.uri.queryParameters['researchId'],
                   mode: state.uri.queryParameters['mode'] == 'practice'
@@ -220,6 +223,12 @@ final routerProvider = Provider<GoRouter>((ref) {
                 path: 'decks/:id',
                 builder: (context, state) => FlashcardDeckScreen(
                   deckId: state.pathParameters['id']!,
+                ),
+              ),
+              GoRoute(
+                path: 'tags/:id',
+                builder: (context, state) => FlashcardTagScreen(
+                  tagId: state.pathParameters['id']!,
                 ),
               ),
             ],
