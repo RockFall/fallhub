@@ -225,4 +225,47 @@ void main() {
     );
     expect(odd.catalogKey, 'engineering.automotive.autonomous.odd');
   });
+
+  test('deleteCard removes the card, reverse pair, srs and logs', () async {
+    final created = await profile();
+    final deck = await repos.flashcards.createDeck(
+      profileId: created.id,
+      title: 'Pares',
+    );
+    final pair = await repos.flashcards.createCard(
+      profileId: created.id,
+      deckId: deck.id,
+      front: 'cat',
+      back: 'gato',
+      bidirectional: true,
+    );
+    expect(pair, hasLength(2));
+    await repos.flashcards.review(
+      card: pair.first,
+      rating: FlashcardRating.good,
+    );
+    await repos.flashcards.deleteCard(pair.first);
+    expect(await repos.flashcards.listCards(created.id), isEmpty);
+    expect(await repos.flashcards.listSrs(created.id), isEmpty);
+    expect(await repos.flashcards.listLogs(created.id), isEmpty);
+
+    final leftover = await repos.flashcards.createCard(
+      profileId: created.id,
+      deckId: deck.id,
+      front: 'keep',
+      back: 'ficar',
+    );
+    final cloze = await repos.flashcards.createCard(
+      profileId: created.id,
+      deckId: deck.id,
+      kind: FlashcardKind.cloze,
+      front: 'The capital of {{c1::France}} is {{c2::Paris}}',
+      back: '',
+    );
+    expect(cloze, hasLength(2));
+    await repos.flashcards.deleteCard(cloze.first);
+    final remaining = await repos.flashcards.listCards(created.id);
+    expect(remaining.map((c) => c.id), containsAll([leftover.single.id, cloze.last.id]));
+    expect(remaining, hasLength(2));
+  });
 }

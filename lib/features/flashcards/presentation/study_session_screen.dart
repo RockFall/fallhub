@@ -128,6 +128,7 @@ class _StudySessionScreenState extends ConsumerState<StudySessionScreen> {
                     onUndo: _undo,
                     onBury: _isPractice ? null : _bury,
                     onSuspend: _suspend,
+                    onDelete: _confirmDelete,
                     onSearchQuestion: () => _searchQuestion(queue[_index]),
                     onClose: () => context.go('/flashcards'),
                   ),
@@ -358,6 +359,61 @@ class _StudySessionScreenState extends ConsumerState<StudySessionScreen> {
       _revealed = false;
     });
   }
+
+  Future<void> _confirmDelete() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text(AppStrings.flashcardsDelete),
+        content: const Text(AppStrings.flashcardsDeleteConfirm),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text(AppStrings.cancel),
+          ),
+          FilledButton(
+            style: FilledButton.styleFrom(
+              backgroundColor: ColonyColors.statusCritical,
+              foregroundColor: Colors.white,
+            ),
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text(AppStrings.flashcardsDelete),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !mounted) return;
+    await _deleteCurrent();
+  }
+
+  Future<void> _deleteCurrent() async {
+    final queue = _queue;
+    if (queue == null || _index >= queue.length) return;
+    final current = queue[_index];
+    final deleted = await ref
+            .read(flashcardControllerProvider.notifier)
+            .deleteCard(current.card) ??
+        const <EntityId>[];
+    if (!mounted) return;
+    final removed = deleted.isEmpty
+        ? {current.card.id}
+        : deleted.toSet();
+    var removedBefore = 0;
+    for (var i = 0; i < _index; i++) {
+      if (removed.contains(queue[i].card.id)) removedBefore += 1;
+    }
+    setState(() {
+      _queue = [
+        for (final item in queue)
+          if (!removed.contains(item.card.id)) item,
+      ];
+      _index = (_index - removedBefore).clamp(0, _queue!.length);
+      _revealed = false;
+      _shownAt = null;
+      _lastOutcome = null;
+      _lastPractice = null;
+    });
+  }
 }
 
 class _StudyBody extends StatelessWidget {
@@ -373,6 +429,7 @@ class _StudyBody extends StatelessWidget {
     required this.onUndo,
     required this.onBury,
     required this.onSuspend,
+    required this.onDelete,
     required this.onSearchQuestion,
     required this.onClose,
     this.areaLabel,
@@ -390,6 +447,7 @@ class _StudyBody extends StatelessWidget {
   final VoidCallback onUndo;
   final VoidCallback? onBury;
   final VoidCallback onSuspend;
+  final VoidCallback onDelete;
   final VoidCallback onSearchQuestion;
   final VoidCallback onClose;
 
@@ -416,6 +474,7 @@ class _StudyBody extends StatelessWidget {
             const SizedBox(width: ColonySpacing.sm),
             Text(AppStrings.flashcardsProgress(current, total)),
             PopupMenuButton<String>(
+              key: const Key('flashcards.more_actions'),
               tooltip: AppStrings.flashcardsMoreActions,
               onSelected: (value) {
                 switch (value) {
@@ -425,6 +484,8 @@ class _StudyBody extends StatelessWidget {
                     onBury?.call();
                   case 'suspend':
                     onSuspend();
+                  case 'delete':
+                    onDelete();
                 }
               },
               itemBuilder: (context) => [
@@ -441,6 +502,13 @@ class _StudyBody extends StatelessWidget {
                 const PopupMenuItem(
                   value: 'suspend',
                   child: Text(AppStrings.flashcardsSuspend),
+                ),
+                PopupMenuItem(
+                  value: 'delete',
+                  child: Text(
+                    AppStrings.flashcardsDelete,
+                    style: TextStyle(color: ColonyColors.statusCritical),
+                  ),
                 ),
               ],
             ),

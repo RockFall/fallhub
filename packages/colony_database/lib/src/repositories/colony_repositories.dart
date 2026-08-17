@@ -5608,6 +5608,38 @@ class FlashcardRepository {
     });
   }
 
+  Future<List<EntityId>> deleteCard(Flashcard card) async {
+    return _db.transaction(() async {
+      final related = await (_db.select(_db.flashcards)
+            ..where(
+              (t) =>
+                  t.id.equals(card.id.value) |
+                  t.reverseOfId.equals(card.id.value),
+            ))
+          .get();
+      final ids = [for (final row in related) row.id];
+      if (ids.isEmpty) return const <EntityId>[];
+      await (_db.delete(_db.flashcardReviewLogs)
+            ..where((t) => t.cardId.isIn(ids)))
+          .go();
+      await (_db.delete(_db.flashcardSrs)
+            ..where((t) => t.cardId.isIn(ids)))
+          .go();
+      await (_db.delete(_db.flashcards)..where((t) => t.id.isIn(ids))).go();
+      await _events.record(
+        aggregateType: AggregateType.flashcard,
+        aggregateId: card.id,
+        eventType: EventType.flashcardDeleted,
+        payload: {
+          'front': card.front,
+          'deleted_ids': ids,
+        },
+        sourceType: SourceType.manual,
+      );
+      return [for (final id in ids) EntityId(id)];
+    });
+  }
+
   Future<FlashcardJsonImportResult> importJson({
     required EntityId profileId,
     required String source,

@@ -198,6 +198,7 @@ enum EventType {
   flashcardDeckUpdated,
   flashcardCreated,
   flashcardUpdated,
+  flashcardDeleted,
   flashcardReviewed,
   flashcardPracticed,
   flashcardScheduled,

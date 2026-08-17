@@ -214,6 +214,7 @@ class ChronicleScreen extends ConsumerWidget {
       EventType.flashcardDeckUpdated => 'Baralho atualizado',
       EventType.flashcardCreated => 'Flashcard criado',
       EventType.flashcardUpdated => 'Flashcard atualizado',
+      EventType.flashcardDeleted => 'Flashcard excluído',
       EventType.flashcardReviewed => 'Flashcard revisado',
       EventType.flashcardPracticed => 'Flashcard praticado',
       EventType.flashcardScheduled => 'Flashcard programado',
