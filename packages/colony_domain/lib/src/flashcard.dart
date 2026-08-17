@@ -26,6 +26,27 @@ enum FlashcardRating {
   easy,
 }
 
+enum FlashcardScheduleMode {
+  scheduled,
+  unscheduled,
+}
+
+enum FlashcardReviewKind {
+  srs,
+  practice,
+}
+
+enum FlashcardStudySessionMode {
+  scheduled,
+  practice,
+}
+
+enum FlashcardCaptureIntent {
+  schedule,
+  saveOnly,
+  practiceNow,
+}
+
 class FlashcardDeck extends Equatable {
   const FlashcardDeck({
     required this.id,
@@ -148,6 +169,7 @@ class Flashcard extends Equatable {
     this.tags = const [],
     this.clozeIndex,
     this.reverseOfId,
+    this.scheduleMode = FlashcardScheduleMode.scheduled,
     this.version = 1,
   });
 
@@ -162,6 +184,7 @@ class Flashcard extends Equatable {
   final List<String> tags;
   final int? clozeIndex;
   final EntityId? reverseOfId;
+  final FlashcardScheduleMode scheduleMode;
   final bool suspended;
   final DateTime createdAt;
   final DateTime updatedAt;
@@ -180,6 +203,7 @@ class Flashcard extends Equatable {
     List<String> tags = const [],
     int? clozeIndex,
     EntityId? reverseOfId,
+    FlashcardScheduleMode scheduleMode = FlashcardScheduleMode.scheduled,
     bool suspended = false,
   }) {
     return Flashcard(
@@ -194,6 +218,7 @@ class Flashcard extends Equatable {
       tags: normalizeFlashcardTags(tags),
       clozeIndex: clozeIndex,
       reverseOfId: reverseOfId,
+      scheduleMode: scheduleMode,
       suspended: suspended,
       createdAt: createdAt,
       updatedAt: createdAt,
@@ -210,6 +235,7 @@ class Flashcard extends Equatable {
     List<String>? tags,
     int? clozeIndex,
     bool? suspended,
+    FlashcardScheduleMode? scheduleMode,
     DateTime? updatedAt,
     int? version,
     bool clearArea = false,
@@ -227,6 +253,7 @@ class Flashcard extends Equatable {
       tags: tags == null ? this.tags : normalizeFlashcardTags(tags),
       clozeIndex: clozeIndex ?? this.clozeIndex,
       reverseOfId: reverseOfId,
+      scheduleMode: scheduleMode ?? this.scheduleMode,
       suspended: suspended ?? this.suspended,
       createdAt: createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
@@ -247,6 +274,7 @@ class Flashcard extends Equatable {
         tags,
         clozeIndex,
         reverseOfId,
+        scheduleMode,
         suspended,
         createdAt,
         updatedAt,
@@ -347,6 +375,7 @@ class FlashcardReviewLog extends Equatable {
     required this.easeBefore,
     required this.easeAfter,
     this.durationMs,
+    this.reviewKind = FlashcardReviewKind.srs,
   });
 
   final EntityId id;
@@ -358,6 +387,7 @@ class FlashcardReviewLog extends Equatable {
   final double easeBefore;
   final double easeAfter;
   final int? durationMs;
+  final FlashcardReviewKind reviewKind;
 
   @override
   List<Object?> get props => [
@@ -370,6 +400,7 @@ class FlashcardReviewLog extends Equatable {
         easeBefore,
         easeAfter,
         durationMs,
+        reviewKind,
       ];
 }
 

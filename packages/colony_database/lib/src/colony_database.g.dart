@@ -28287,6 +28287,18 @@ class $FlashcardsTable extends Flashcards
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _scheduleModeMeta = const VerificationMeta(
+    'scheduleMode',
+  );
+  @override
+  late final GeneratedColumn<String> scheduleMode = GeneratedColumn<String>(
+    'schedule_mode',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('scheduled'),
+  );
   static const VerificationMeta _suspendedMeta = const VerificationMeta(
     'suspended',
   );
@@ -28349,6 +28361,7 @@ class $FlashcardsTable extends Flashcards
     tagsJson,
     clozeIndex,
     reverseOfId,
+    scheduleMode,
     suspended,
     createdAt,
     updatedAt,
@@ -28442,6 +28455,15 @@ class $FlashcardsTable extends Flashcards
         ),
       );
     }
+    if (data.containsKey('schedule_mode')) {
+      context.handle(
+        _scheduleModeMeta,
+        scheduleMode.isAcceptableOrUnknown(
+          data['schedule_mode']!,
+          _scheduleModeMeta,
+        ),
+      );
+    }
     if (data.containsKey('suspended')) {
       context.handle(
         _suspendedMeta,
@@ -28523,6 +28545,10 @@ class $FlashcardsTable extends Flashcards
         DriftSqlType.string,
         data['${effectivePrefix}reverse_of_id'],
       ),
+      scheduleMode: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}schedule_mode'],
+      )!,
       suspended: attachedDatabase.typeMapping.read(
         DriftSqlType.bool,
         data['${effectivePrefix}suspended'],
@@ -28560,6 +28586,7 @@ class FlashcardRow extends DataClass implements Insertable<FlashcardRow> {
   final String tagsJson;
   final int? clozeIndex;
   final String? reverseOfId;
+  final String scheduleMode;
   final bool suspended;
   final int createdAt;
   final int updatedAt;
@@ -28576,6 +28603,7 @@ class FlashcardRow extends DataClass implements Insertable<FlashcardRow> {
     required this.tagsJson,
     this.clozeIndex,
     this.reverseOfId,
+    required this.scheduleMode,
     required this.suspended,
     required this.createdAt,
     required this.updatedAt,
@@ -28603,6 +28631,7 @@ class FlashcardRow extends DataClass implements Insertable<FlashcardRow> {
     if (!nullToAbsent || reverseOfId != null) {
       map['reverse_of_id'] = Variable<String>(reverseOfId);
     }
+    map['schedule_mode'] = Variable<String>(scheduleMode);
     map['suspended'] = Variable<bool>(suspended);
     map['created_at'] = Variable<int>(createdAt);
     map['updated_at'] = Variable<int>(updatedAt);
@@ -28631,6 +28660,7 @@ class FlashcardRow extends DataClass implements Insertable<FlashcardRow> {
       reverseOfId: reverseOfId == null && nullToAbsent
           ? const Value.absent()
           : Value(reverseOfId),
+      scheduleMode: Value(scheduleMode),
       suspended: Value(suspended),
       createdAt: Value(createdAt),
       updatedAt: Value(updatedAt),
@@ -28655,6 +28685,7 @@ class FlashcardRow extends DataClass implements Insertable<FlashcardRow> {
       tagsJson: serializer.fromJson<String>(json['tagsJson']),
       clozeIndex: serializer.fromJson<int?>(json['clozeIndex']),
       reverseOfId: serializer.fromJson<String?>(json['reverseOfId']),
+      scheduleMode: serializer.fromJson<String>(json['scheduleMode']),
       suspended: serializer.fromJson<bool>(json['suspended']),
       createdAt: serializer.fromJson<int>(json['createdAt']),
       updatedAt: serializer.fromJson<int>(json['updatedAt']),
@@ -28676,6 +28707,7 @@ class FlashcardRow extends DataClass implements Insertable<FlashcardRow> {
       'tagsJson': serializer.toJson<String>(tagsJson),
       'clozeIndex': serializer.toJson<int?>(clozeIndex),
       'reverseOfId': serializer.toJson<String?>(reverseOfId),
+      'scheduleMode': serializer.toJson<String>(scheduleMode),
       'suspended': serializer.toJson<bool>(suspended),
       'createdAt': serializer.toJson<int>(createdAt),
       'updatedAt': serializer.toJson<int>(updatedAt),
@@ -28695,6 +28727,7 @@ class FlashcardRow extends DataClass implements Insertable<FlashcardRow> {
     String? tagsJson,
     Value<int?> clozeIndex = const Value.absent(),
     Value<String?> reverseOfId = const Value.absent(),
+    String? scheduleMode,
     bool? suspended,
     int? createdAt,
     int? updatedAt,
@@ -28711,6 +28744,7 @@ class FlashcardRow extends DataClass implements Insertable<FlashcardRow> {
     tagsJson: tagsJson ?? this.tagsJson,
     clozeIndex: clozeIndex.present ? clozeIndex.value : this.clozeIndex,
     reverseOfId: reverseOfId.present ? reverseOfId.value : this.reverseOfId,
+    scheduleMode: scheduleMode ?? this.scheduleMode,
     suspended: suspended ?? this.suspended,
     createdAt: createdAt ?? this.createdAt,
     updatedAt: updatedAt ?? this.updatedAt,
@@ -28733,6 +28767,9 @@ class FlashcardRow extends DataClass implements Insertable<FlashcardRow> {
       reverseOfId: data.reverseOfId.present
           ? data.reverseOfId.value
           : this.reverseOfId,
+      scheduleMode: data.scheduleMode.present
+          ? data.scheduleMode.value
+          : this.scheduleMode,
       suspended: data.suspended.present ? data.suspended.value : this.suspended,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
@@ -28754,6 +28791,7 @@ class FlashcardRow extends DataClass implements Insertable<FlashcardRow> {
           ..write('tagsJson: $tagsJson, ')
           ..write('clozeIndex: $clozeIndex, ')
           ..write('reverseOfId: $reverseOfId, ')
+          ..write('scheduleMode: $scheduleMode, ')
           ..write('suspended: $suspended, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
@@ -28775,6 +28813,7 @@ class FlashcardRow extends DataClass implements Insertable<FlashcardRow> {
     tagsJson,
     clozeIndex,
     reverseOfId,
+    scheduleMode,
     suspended,
     createdAt,
     updatedAt,
@@ -28795,6 +28834,7 @@ class FlashcardRow extends DataClass implements Insertable<FlashcardRow> {
           other.tagsJson == this.tagsJson &&
           other.clozeIndex == this.clozeIndex &&
           other.reverseOfId == this.reverseOfId &&
+          other.scheduleMode == this.scheduleMode &&
           other.suspended == this.suspended &&
           other.createdAt == this.createdAt &&
           other.updatedAt == this.updatedAt &&
@@ -28813,6 +28853,7 @@ class FlashcardsCompanion extends UpdateCompanion<FlashcardRow> {
   final Value<String> tagsJson;
   final Value<int?> clozeIndex;
   final Value<String?> reverseOfId;
+  final Value<String> scheduleMode;
   final Value<bool> suspended;
   final Value<int> createdAt;
   final Value<int> updatedAt;
@@ -28830,6 +28871,7 @@ class FlashcardsCompanion extends UpdateCompanion<FlashcardRow> {
     this.tagsJson = const Value.absent(),
     this.clozeIndex = const Value.absent(),
     this.reverseOfId = const Value.absent(),
+    this.scheduleMode = const Value.absent(),
     this.suspended = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
@@ -28848,6 +28890,7 @@ class FlashcardsCompanion extends UpdateCompanion<FlashcardRow> {
     this.tagsJson = const Value.absent(),
     this.clozeIndex = const Value.absent(),
     this.reverseOfId = const Value.absent(),
+    this.scheduleMode = const Value.absent(),
     this.suspended = const Value.absent(),
     required int createdAt,
     required int updatedAt,
@@ -28872,6 +28915,7 @@ class FlashcardsCompanion extends UpdateCompanion<FlashcardRow> {
     Expression<String>? tagsJson,
     Expression<int>? clozeIndex,
     Expression<String>? reverseOfId,
+    Expression<String>? scheduleMode,
     Expression<bool>? suspended,
     Expression<int>? createdAt,
     Expression<int>? updatedAt,
@@ -28890,6 +28934,7 @@ class FlashcardsCompanion extends UpdateCompanion<FlashcardRow> {
       if (tagsJson != null) 'tags_json': tagsJson,
       if (clozeIndex != null) 'cloze_index': clozeIndex,
       if (reverseOfId != null) 'reverse_of_id': reverseOfId,
+      if (scheduleMode != null) 'schedule_mode': scheduleMode,
       if (suspended != null) 'suspended': suspended,
       if (createdAt != null) 'created_at': createdAt,
       if (updatedAt != null) 'updated_at': updatedAt,
@@ -28910,6 +28955,7 @@ class FlashcardsCompanion extends UpdateCompanion<FlashcardRow> {
     Value<String>? tagsJson,
     Value<int?>? clozeIndex,
     Value<String?>? reverseOfId,
+    Value<String>? scheduleMode,
     Value<bool>? suspended,
     Value<int>? createdAt,
     Value<int>? updatedAt,
@@ -28928,6 +28974,7 @@ class FlashcardsCompanion extends UpdateCompanion<FlashcardRow> {
       tagsJson: tagsJson ?? this.tagsJson,
       clozeIndex: clozeIndex ?? this.clozeIndex,
       reverseOfId: reverseOfId ?? this.reverseOfId,
+      scheduleMode: scheduleMode ?? this.scheduleMode,
       suspended: suspended ?? this.suspended,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
@@ -28972,6 +29019,9 @@ class FlashcardsCompanion extends UpdateCompanion<FlashcardRow> {
     if (reverseOfId.present) {
       map['reverse_of_id'] = Variable<String>(reverseOfId.value);
     }
+    if (scheduleMode.present) {
+      map['schedule_mode'] = Variable<String>(scheduleMode.value);
+    }
     if (suspended.present) {
       map['suspended'] = Variable<bool>(suspended.value);
     }
@@ -29004,6 +29054,7 @@ class FlashcardsCompanion extends UpdateCompanion<FlashcardRow> {
           ..write('tagsJson: $tagsJson, ')
           ..write('clozeIndex: $clozeIndex, ')
           ..write('reverseOfId: $reverseOfId, ')
+          ..write('scheduleMode: $scheduleMode, ')
           ..write('suspended: $suspended, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
@@ -29739,6 +29790,18 @@ class $FlashcardReviewLogsTable extends FlashcardReviewLogs
     type: DriftSqlType.int,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _reviewKindMeta = const VerificationMeta(
+    'reviewKind',
+  );
+  @override
+  late final GeneratedColumn<String> reviewKind = GeneratedColumn<String>(
+    'review_kind',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('srs'),
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -29750,6 +29813,7 @@ class $FlashcardReviewLogsTable extends FlashcardReviewLogs
     easeBefore,
     easeAfter,
     durationMs,
+    reviewKind,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -29836,6 +29900,12 @@ class $FlashcardReviewLogsTable extends FlashcardReviewLogs
         durationMs.isAcceptableOrUnknown(data['duration_ms']!, _durationMsMeta),
       );
     }
+    if (data.containsKey('review_kind')) {
+      context.handle(
+        _reviewKindMeta,
+        reviewKind.isAcceptableOrUnknown(data['review_kind']!, _reviewKindMeta),
+      );
+    }
     return context;
   }
 
@@ -29881,6 +29951,10 @@ class $FlashcardReviewLogsTable extends FlashcardReviewLogs
         DriftSqlType.int,
         data['${effectivePrefix}duration_ms'],
       ),
+      reviewKind: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}review_kind'],
+      )!,
     );
   }
 
@@ -29901,6 +29975,7 @@ class FlashcardReviewLogRow extends DataClass
   final double easeBefore;
   final double easeAfter;
   final int? durationMs;
+  final String reviewKind;
   const FlashcardReviewLogRow({
     required this.id,
     required this.cardId,
@@ -29911,6 +29986,7 @@ class FlashcardReviewLogRow extends DataClass
     required this.easeBefore,
     required this.easeAfter,
     this.durationMs,
+    required this.reviewKind,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -29926,6 +30002,7 @@ class FlashcardReviewLogRow extends DataClass
     if (!nullToAbsent || durationMs != null) {
       map['duration_ms'] = Variable<int>(durationMs);
     }
+    map['review_kind'] = Variable<String>(reviewKind);
     return map;
   }
 
@@ -29942,6 +30019,7 @@ class FlashcardReviewLogRow extends DataClass
       durationMs: durationMs == null && nullToAbsent
           ? const Value.absent()
           : Value(durationMs),
+      reviewKind: Value(reviewKind),
     );
   }
 
@@ -29962,6 +30040,7 @@ class FlashcardReviewLogRow extends DataClass
       easeBefore: serializer.fromJson<double>(json['easeBefore']),
       easeAfter: serializer.fromJson<double>(json['easeAfter']),
       durationMs: serializer.fromJson<int?>(json['durationMs']),
+      reviewKind: serializer.fromJson<String>(json['reviewKind']),
     );
   }
   @override
@@ -29977,6 +30056,7 @@ class FlashcardReviewLogRow extends DataClass
       'easeBefore': serializer.toJson<double>(easeBefore),
       'easeAfter': serializer.toJson<double>(easeAfter),
       'durationMs': serializer.toJson<int?>(durationMs),
+      'reviewKind': serializer.toJson<String>(reviewKind),
     };
   }
 
@@ -29990,6 +30070,7 @@ class FlashcardReviewLogRow extends DataClass
     double? easeBefore,
     double? easeAfter,
     Value<int?> durationMs = const Value.absent(),
+    String? reviewKind,
   }) => FlashcardReviewLogRow(
     id: id ?? this.id,
     cardId: cardId ?? this.cardId,
@@ -30000,6 +30081,7 @@ class FlashcardReviewLogRow extends DataClass
     easeBefore: easeBefore ?? this.easeBefore,
     easeAfter: easeAfter ?? this.easeAfter,
     durationMs: durationMs.present ? durationMs.value : this.durationMs,
+    reviewKind: reviewKind ?? this.reviewKind,
   );
   FlashcardReviewLogRow copyWithCompanion(FlashcardReviewLogsCompanion data) {
     return FlashcardReviewLogRow(
@@ -30022,6 +30104,9 @@ class FlashcardReviewLogRow extends DataClass
       durationMs: data.durationMs.present
           ? data.durationMs.value
           : this.durationMs,
+      reviewKind: data.reviewKind.present
+          ? data.reviewKind.value
+          : this.reviewKind,
     );
   }
 
@@ -30036,7 +30121,8 @@ class FlashcardReviewLogRow extends DataClass
           ..write('intervalDaysAfter: $intervalDaysAfter, ')
           ..write('easeBefore: $easeBefore, ')
           ..write('easeAfter: $easeAfter, ')
-          ..write('durationMs: $durationMs')
+          ..write('durationMs: $durationMs, ')
+          ..write('reviewKind: $reviewKind')
           ..write(')'))
         .toString();
   }
@@ -30052,6 +30138,7 @@ class FlashcardReviewLogRow extends DataClass
     easeBefore,
     easeAfter,
     durationMs,
+    reviewKind,
   );
   @override
   bool operator ==(Object other) =>
@@ -30065,7 +30152,8 @@ class FlashcardReviewLogRow extends DataClass
           other.intervalDaysAfter == this.intervalDaysAfter &&
           other.easeBefore == this.easeBefore &&
           other.easeAfter == this.easeAfter &&
-          other.durationMs == this.durationMs);
+          other.durationMs == this.durationMs &&
+          other.reviewKind == this.reviewKind);
 }
 
 class FlashcardReviewLogsCompanion
@@ -30079,6 +30167,7 @@ class FlashcardReviewLogsCompanion
   final Value<double> easeBefore;
   final Value<double> easeAfter;
   final Value<int?> durationMs;
+  final Value<String> reviewKind;
   final Value<int> rowid;
   const FlashcardReviewLogsCompanion({
     this.id = const Value.absent(),
@@ -30090,6 +30179,7 @@ class FlashcardReviewLogsCompanion
     this.easeBefore = const Value.absent(),
     this.easeAfter = const Value.absent(),
     this.durationMs = const Value.absent(),
+    this.reviewKind = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   FlashcardReviewLogsCompanion.insert({
@@ -30102,6 +30192,7 @@ class FlashcardReviewLogsCompanion
     required double easeBefore,
     required double easeAfter,
     this.durationMs = const Value.absent(),
+    this.reviewKind = const Value.absent(),
     this.rowid = const Value.absent(),
   }) : id = Value(id),
        cardId = Value(cardId),
@@ -30121,6 +30212,7 @@ class FlashcardReviewLogsCompanion
     Expression<double>? easeBefore,
     Expression<double>? easeAfter,
     Expression<int>? durationMs,
+    Expression<String>? reviewKind,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
@@ -30134,6 +30226,7 @@ class FlashcardReviewLogsCompanion
       if (easeBefore != null) 'ease_before': easeBefore,
       if (easeAfter != null) 'ease_after': easeAfter,
       if (durationMs != null) 'duration_ms': durationMs,
+      if (reviewKind != null) 'review_kind': reviewKind,
       if (rowid != null) 'rowid': rowid,
     });
   }
@@ -30148,6 +30241,7 @@ class FlashcardReviewLogsCompanion
     Value<double>? easeBefore,
     Value<double>? easeAfter,
     Value<int?>? durationMs,
+    Value<String>? reviewKind,
     Value<int>? rowid,
   }) {
     return FlashcardReviewLogsCompanion(
@@ -30160,6 +30254,7 @@ class FlashcardReviewLogsCompanion
       easeBefore: easeBefore ?? this.easeBefore,
       easeAfter: easeAfter ?? this.easeAfter,
       durationMs: durationMs ?? this.durationMs,
+      reviewKind: reviewKind ?? this.reviewKind,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -30194,6 +30289,9 @@ class FlashcardReviewLogsCompanion
     if (durationMs.present) {
       map['duration_ms'] = Variable<int>(durationMs.value);
     }
+    if (reviewKind.present) {
+      map['review_kind'] = Variable<String>(reviewKind.value);
+    }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
     }
@@ -30212,6 +30310,680 @@ class FlashcardReviewLogsCompanion
           ..write('easeBefore: $easeBefore, ')
           ..write('easeAfter: $easeAfter, ')
           ..write('durationMs: $durationMs, ')
+          ..write('reviewKind: $reviewKind, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $KnowledgeAreaPlacementsTable extends KnowledgeAreaPlacements
+    with TableInfo<$KnowledgeAreaPlacementsTable, KnowledgeAreaPlacementRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $KnowledgeAreaPlacementsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _areaIdMeta = const VerificationMeta('areaId');
+  @override
+  late final GeneratedColumn<String> areaId = GeneratedColumn<String>(
+    'area_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES knowledge_areas (id)',
+    ),
+  );
+  static const VerificationMeta _parentAreaIdMeta = const VerificationMeta(
+    'parentAreaId',
+  );
+  @override
+  late final GeneratedColumn<String> parentAreaId = GeneratedColumn<String>(
+    'parent_area_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES knowledge_areas (id)',
+    ),
+  );
+  static const VerificationMeta _linkedAtMeta = const VerificationMeta(
+    'linkedAt',
+  );
+  @override
+  late final GeneratedColumn<int> linkedAt = GeneratedColumn<int>(
+    'linked_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _catalogKeyMeta = const VerificationMeta(
+    'catalogKey',
+  );
+  @override
+  late final GeneratedColumn<String> catalogKey = GeneratedColumn<String>(
+    'catalog_key',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    areaId,
+    parentAreaId,
+    linkedAt,
+    catalogKey,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'knowledge_area_placements';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<KnowledgeAreaPlacementRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('area_id')) {
+      context.handle(
+        _areaIdMeta,
+        areaId.isAcceptableOrUnknown(data['area_id']!, _areaIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_areaIdMeta);
+    }
+    if (data.containsKey('parent_area_id')) {
+      context.handle(
+        _parentAreaIdMeta,
+        parentAreaId.isAcceptableOrUnknown(
+          data['parent_area_id']!,
+          _parentAreaIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_parentAreaIdMeta);
+    }
+    if (data.containsKey('linked_at')) {
+      context.handle(
+        _linkedAtMeta,
+        linkedAt.isAcceptableOrUnknown(data['linked_at']!, _linkedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_linkedAtMeta);
+    }
+    if (data.containsKey('catalog_key')) {
+      context.handle(
+        _catalogKeyMeta,
+        catalogKey.isAcceptableOrUnknown(data['catalog_key']!, _catalogKeyMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {areaId, parentAreaId};
+  @override
+  KnowledgeAreaPlacementRow map(
+    Map<String, dynamic> data, {
+    String? tablePrefix,
+  }) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return KnowledgeAreaPlacementRow(
+      areaId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}area_id'],
+      )!,
+      parentAreaId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}parent_area_id'],
+      )!,
+      linkedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}linked_at'],
+      )!,
+      catalogKey: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}catalog_key'],
+      ),
+    );
+  }
+
+  @override
+  $KnowledgeAreaPlacementsTable createAlias(String alias) {
+    return $KnowledgeAreaPlacementsTable(attachedDatabase, alias);
+  }
+}
+
+class KnowledgeAreaPlacementRow extends DataClass
+    implements Insertable<KnowledgeAreaPlacementRow> {
+  final String areaId;
+  final String parentAreaId;
+  final int linkedAt;
+  final String? catalogKey;
+  const KnowledgeAreaPlacementRow({
+    required this.areaId,
+    required this.parentAreaId,
+    required this.linkedAt,
+    this.catalogKey,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['area_id'] = Variable<String>(areaId);
+    map['parent_area_id'] = Variable<String>(parentAreaId);
+    map['linked_at'] = Variable<int>(linkedAt);
+    if (!nullToAbsent || catalogKey != null) {
+      map['catalog_key'] = Variable<String>(catalogKey);
+    }
+    return map;
+  }
+
+  KnowledgeAreaPlacementsCompanion toCompanion(bool nullToAbsent) {
+    return KnowledgeAreaPlacementsCompanion(
+      areaId: Value(areaId),
+      parentAreaId: Value(parentAreaId),
+      linkedAt: Value(linkedAt),
+      catalogKey: catalogKey == null && nullToAbsent
+          ? const Value.absent()
+          : Value(catalogKey),
+    );
+  }
+
+  factory KnowledgeAreaPlacementRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return KnowledgeAreaPlacementRow(
+      areaId: serializer.fromJson<String>(json['areaId']),
+      parentAreaId: serializer.fromJson<String>(json['parentAreaId']),
+      linkedAt: serializer.fromJson<int>(json['linkedAt']),
+      catalogKey: serializer.fromJson<String?>(json['catalogKey']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'areaId': serializer.toJson<String>(areaId),
+      'parentAreaId': serializer.toJson<String>(parentAreaId),
+      'linkedAt': serializer.toJson<int>(linkedAt),
+      'catalogKey': serializer.toJson<String?>(catalogKey),
+    };
+  }
+
+  KnowledgeAreaPlacementRow copyWith({
+    String? areaId,
+    String? parentAreaId,
+    int? linkedAt,
+    Value<String?> catalogKey = const Value.absent(),
+  }) => KnowledgeAreaPlacementRow(
+    areaId: areaId ?? this.areaId,
+    parentAreaId: parentAreaId ?? this.parentAreaId,
+    linkedAt: linkedAt ?? this.linkedAt,
+    catalogKey: catalogKey.present ? catalogKey.value : this.catalogKey,
+  );
+  KnowledgeAreaPlacementRow copyWithCompanion(
+    KnowledgeAreaPlacementsCompanion data,
+  ) {
+    return KnowledgeAreaPlacementRow(
+      areaId: data.areaId.present ? data.areaId.value : this.areaId,
+      parentAreaId: data.parentAreaId.present
+          ? data.parentAreaId.value
+          : this.parentAreaId,
+      linkedAt: data.linkedAt.present ? data.linkedAt.value : this.linkedAt,
+      catalogKey: data.catalogKey.present
+          ? data.catalogKey.value
+          : this.catalogKey,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('KnowledgeAreaPlacementRow(')
+          ..write('areaId: $areaId, ')
+          ..write('parentAreaId: $parentAreaId, ')
+          ..write('linkedAt: $linkedAt, ')
+          ..write('catalogKey: $catalogKey')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(areaId, parentAreaId, linkedAt, catalogKey);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is KnowledgeAreaPlacementRow &&
+          other.areaId == this.areaId &&
+          other.parentAreaId == this.parentAreaId &&
+          other.linkedAt == this.linkedAt &&
+          other.catalogKey == this.catalogKey);
+}
+
+class KnowledgeAreaPlacementsCompanion
+    extends UpdateCompanion<KnowledgeAreaPlacementRow> {
+  final Value<String> areaId;
+  final Value<String> parentAreaId;
+  final Value<int> linkedAt;
+  final Value<String?> catalogKey;
+  final Value<int> rowid;
+  const KnowledgeAreaPlacementsCompanion({
+    this.areaId = const Value.absent(),
+    this.parentAreaId = const Value.absent(),
+    this.linkedAt = const Value.absent(),
+    this.catalogKey = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  KnowledgeAreaPlacementsCompanion.insert({
+    required String areaId,
+    required String parentAreaId,
+    required int linkedAt,
+    this.catalogKey = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : areaId = Value(areaId),
+       parentAreaId = Value(parentAreaId),
+       linkedAt = Value(linkedAt);
+  static Insertable<KnowledgeAreaPlacementRow> custom({
+    Expression<String>? areaId,
+    Expression<String>? parentAreaId,
+    Expression<int>? linkedAt,
+    Expression<String>? catalogKey,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (areaId != null) 'area_id': areaId,
+      if (parentAreaId != null) 'parent_area_id': parentAreaId,
+      if (linkedAt != null) 'linked_at': linkedAt,
+      if (catalogKey != null) 'catalog_key': catalogKey,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  KnowledgeAreaPlacementsCompanion copyWith({
+    Value<String>? areaId,
+    Value<String>? parentAreaId,
+    Value<int>? linkedAt,
+    Value<String?>? catalogKey,
+    Value<int>? rowid,
+  }) {
+    return KnowledgeAreaPlacementsCompanion(
+      areaId: areaId ?? this.areaId,
+      parentAreaId: parentAreaId ?? this.parentAreaId,
+      linkedAt: linkedAt ?? this.linkedAt,
+      catalogKey: catalogKey ?? this.catalogKey,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (areaId.present) {
+      map['area_id'] = Variable<String>(areaId.value);
+    }
+    if (parentAreaId.present) {
+      map['parent_area_id'] = Variable<String>(parentAreaId.value);
+    }
+    if (linkedAt.present) {
+      map['linked_at'] = Variable<int>(linkedAt.value);
+    }
+    if (catalogKey.present) {
+      map['catalog_key'] = Variable<String>(catalogKey.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('KnowledgeAreaPlacementsCompanion(')
+          ..write('areaId: $areaId, ')
+          ..write('parentAreaId: $parentAreaId, ')
+          ..write('linkedAt: $linkedAt, ')
+          ..write('catalogKey: $catalogKey, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $ResearchKnowledgeLinksTable extends ResearchKnowledgeLinks
+    with TableInfo<$ResearchKnowledgeLinksTable, ResearchKnowledgeLinkRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $ResearchKnowledgeLinksTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _researchNodeIdMeta = const VerificationMeta(
+    'researchNodeId',
+  );
+  @override
+  late final GeneratedColumn<String> researchNodeId = GeneratedColumn<String>(
+    'research_node_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES research_nodes (id)',
+    ),
+  );
+  static const VerificationMeta _areaIdMeta = const VerificationMeta('areaId');
+  @override
+  late final GeneratedColumn<String> areaId = GeneratedColumn<String>(
+    'area_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES knowledge_areas (id)',
+    ),
+  );
+  static const VerificationMeta _kindMeta = const VerificationMeta('kind');
+  @override
+  late final GeneratedColumn<String> kind = GeneratedColumn<String>(
+    'kind',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _linkedAtMeta = const VerificationMeta(
+    'linkedAt',
+  );
+  @override
+  late final GeneratedColumn<int> linkedAt = GeneratedColumn<int>(
+    'linked_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    researchNodeId,
+    areaId,
+    kind,
+    linkedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'research_knowledge_links';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<ResearchKnowledgeLinkRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('research_node_id')) {
+      context.handle(
+        _researchNodeIdMeta,
+        researchNodeId.isAcceptableOrUnknown(
+          data['research_node_id']!,
+          _researchNodeIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_researchNodeIdMeta);
+    }
+    if (data.containsKey('area_id')) {
+      context.handle(
+        _areaIdMeta,
+        areaId.isAcceptableOrUnknown(data['area_id']!, _areaIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_areaIdMeta);
+    }
+    if (data.containsKey('kind')) {
+      context.handle(
+        _kindMeta,
+        kind.isAcceptableOrUnknown(data['kind']!, _kindMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_kindMeta);
+    }
+    if (data.containsKey('linked_at')) {
+      context.handle(
+        _linkedAtMeta,
+        linkedAt.isAcceptableOrUnknown(data['linked_at']!, _linkedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_linkedAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {researchNodeId, areaId};
+  @override
+  ResearchKnowledgeLinkRow map(
+    Map<String, dynamic> data, {
+    String? tablePrefix,
+  }) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return ResearchKnowledgeLinkRow(
+      researchNodeId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}research_node_id'],
+      )!,
+      areaId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}area_id'],
+      )!,
+      kind: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}kind'],
+      )!,
+      linkedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}linked_at'],
+      )!,
+    );
+  }
+
+  @override
+  $ResearchKnowledgeLinksTable createAlias(String alias) {
+    return $ResearchKnowledgeLinksTable(attachedDatabase, alias);
+  }
+}
+
+class ResearchKnowledgeLinkRow extends DataClass
+    implements Insertable<ResearchKnowledgeLinkRow> {
+  final String researchNodeId;
+  final String areaId;
+  final String kind;
+  final int linkedAt;
+  const ResearchKnowledgeLinkRow({
+    required this.researchNodeId,
+    required this.areaId,
+    required this.kind,
+    required this.linkedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['research_node_id'] = Variable<String>(researchNodeId);
+    map['area_id'] = Variable<String>(areaId);
+    map['kind'] = Variable<String>(kind);
+    map['linked_at'] = Variable<int>(linkedAt);
+    return map;
+  }
+
+  ResearchKnowledgeLinksCompanion toCompanion(bool nullToAbsent) {
+    return ResearchKnowledgeLinksCompanion(
+      researchNodeId: Value(researchNodeId),
+      areaId: Value(areaId),
+      kind: Value(kind),
+      linkedAt: Value(linkedAt),
+    );
+  }
+
+  factory ResearchKnowledgeLinkRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return ResearchKnowledgeLinkRow(
+      researchNodeId: serializer.fromJson<String>(json['researchNodeId']),
+      areaId: serializer.fromJson<String>(json['areaId']),
+      kind: serializer.fromJson<String>(json['kind']),
+      linkedAt: serializer.fromJson<int>(json['linkedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'researchNodeId': serializer.toJson<String>(researchNodeId),
+      'areaId': serializer.toJson<String>(areaId),
+      'kind': serializer.toJson<String>(kind),
+      'linkedAt': serializer.toJson<int>(linkedAt),
+    };
+  }
+
+  ResearchKnowledgeLinkRow copyWith({
+    String? researchNodeId,
+    String? areaId,
+    String? kind,
+    int? linkedAt,
+  }) => ResearchKnowledgeLinkRow(
+    researchNodeId: researchNodeId ?? this.researchNodeId,
+    areaId: areaId ?? this.areaId,
+    kind: kind ?? this.kind,
+    linkedAt: linkedAt ?? this.linkedAt,
+  );
+  ResearchKnowledgeLinkRow copyWithCompanion(
+    ResearchKnowledgeLinksCompanion data,
+  ) {
+    return ResearchKnowledgeLinkRow(
+      researchNodeId: data.researchNodeId.present
+          ? data.researchNodeId.value
+          : this.researchNodeId,
+      areaId: data.areaId.present ? data.areaId.value : this.areaId,
+      kind: data.kind.present ? data.kind.value : this.kind,
+      linkedAt: data.linkedAt.present ? data.linkedAt.value : this.linkedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ResearchKnowledgeLinkRow(')
+          ..write('researchNodeId: $researchNodeId, ')
+          ..write('areaId: $areaId, ')
+          ..write('kind: $kind, ')
+          ..write('linkedAt: $linkedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(researchNodeId, areaId, kind, linkedAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is ResearchKnowledgeLinkRow &&
+          other.researchNodeId == this.researchNodeId &&
+          other.areaId == this.areaId &&
+          other.kind == this.kind &&
+          other.linkedAt == this.linkedAt);
+}
+
+class ResearchKnowledgeLinksCompanion
+    extends UpdateCompanion<ResearchKnowledgeLinkRow> {
+  final Value<String> researchNodeId;
+  final Value<String> areaId;
+  final Value<String> kind;
+  final Value<int> linkedAt;
+  final Value<int> rowid;
+  const ResearchKnowledgeLinksCompanion({
+    this.researchNodeId = const Value.absent(),
+    this.areaId = const Value.absent(),
+    this.kind = const Value.absent(),
+    this.linkedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  ResearchKnowledgeLinksCompanion.insert({
+    required String researchNodeId,
+    required String areaId,
+    required String kind,
+    required int linkedAt,
+    this.rowid = const Value.absent(),
+  }) : researchNodeId = Value(researchNodeId),
+       areaId = Value(areaId),
+       kind = Value(kind),
+       linkedAt = Value(linkedAt);
+  static Insertable<ResearchKnowledgeLinkRow> custom({
+    Expression<String>? researchNodeId,
+    Expression<String>? areaId,
+    Expression<String>? kind,
+    Expression<int>? linkedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (researchNodeId != null) 'research_node_id': researchNodeId,
+      if (areaId != null) 'area_id': areaId,
+      if (kind != null) 'kind': kind,
+      if (linkedAt != null) 'linked_at': linkedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  ResearchKnowledgeLinksCompanion copyWith({
+    Value<String>? researchNodeId,
+    Value<String>? areaId,
+    Value<String>? kind,
+    Value<int>? linkedAt,
+    Value<int>? rowid,
+  }) {
+    return ResearchKnowledgeLinksCompanion(
+      researchNodeId: researchNodeId ?? this.researchNodeId,
+      areaId: areaId ?? this.areaId,
+      kind: kind ?? this.kind,
+      linkedAt: linkedAt ?? this.linkedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (researchNodeId.present) {
+      map['research_node_id'] = Variable<String>(researchNodeId.value);
+    }
+    if (areaId.present) {
+      map['area_id'] = Variable<String>(areaId.value);
+    }
+    if (kind.present) {
+      map['kind'] = Variable<String>(kind.value);
+    }
+    if (linkedAt.present) {
+      map['linked_at'] = Variable<int>(linkedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ResearchKnowledgeLinksCompanion(')
+          ..write('researchNodeId: $researchNodeId, ')
+          ..write('areaId: $areaId, ')
+          ..write('kind: $kind, ')
+          ..write('linkedAt: $linkedAt, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -30298,6 +31070,10 @@ abstract class _$ColonyDatabase extends GeneratedDatabase {
   late final $FlashcardSrsTable flashcardSrs = $FlashcardSrsTable(this);
   late final $FlashcardReviewLogsTable flashcardReviewLogs =
       $FlashcardReviewLogsTable(this);
+  late final $KnowledgeAreaPlacementsTable knowledgeAreaPlacements =
+      $KnowledgeAreaPlacementsTable(this);
+  late final $ResearchKnowledgeLinksTable researchKnowledgeLinks =
+      $ResearchKnowledgeLinksTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -30355,6 +31131,8 @@ abstract class _$ColonyDatabase extends GeneratedDatabase {
     flashcards,
     flashcardSrs,
     flashcardReviewLogs,
+    knowledgeAreaPlacements,
+    researchKnowledgeLinks,
   ];
 }
 
@@ -42412,6 +43190,34 @@ final class $$ResearchNodesTableReferences
       manager.$state.copyWith(prefetchedData: cache),
     );
   }
+
+  static MultiTypedResultKey<
+    $ResearchKnowledgeLinksTable,
+    List<ResearchKnowledgeLinkRow>
+  >
+  _researchKnowledgeLinksRefsTable(_$ColonyDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.researchKnowledgeLinks,
+        aliasName: $_aliasNameGenerator(
+          db.researchNodes.id,
+          db.researchKnowledgeLinks.researchNodeId,
+        ),
+      );
+
+  $$ResearchKnowledgeLinksTableProcessedTableManager
+  get researchKnowledgeLinksRefs {
+    final manager = $$ResearchKnowledgeLinksTableTableManager(
+      $_db,
+      $_db.researchKnowledgeLinks,
+    ).filter((f) => f.researchNodeId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _researchKnowledgeLinksRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
 }
 
 class $$ResearchNodesTableFilterComposer
@@ -42558,6 +43364,32 @@ class $$ResearchNodesTableFilterComposer
               }) => $$ResearchEvidenceItemsTableFilterComposer(
                 $db: $db,
                 $table: $db.researchEvidenceItems,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+
+  Expression<bool> researchKnowledgeLinksRefs(
+    Expression<bool> Function($$ResearchKnowledgeLinksTableFilterComposer f) f,
+  ) {
+    final $$ResearchKnowledgeLinksTableFilterComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.researchKnowledgeLinks,
+          getReferencedColumn: (t) => t.researchNodeId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$ResearchKnowledgeLinksTableFilterComposer(
+                $db: $db,
+                $table: $db.researchKnowledgeLinks,
                 $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
                 joinBuilder: joinBuilder,
                 $removeJoinBuilderFromRootComposer:
@@ -42784,6 +43616,32 @@ class $$ResearchNodesTableAnnotationComposer
         );
     return f(composer);
   }
+
+  Expression<T> researchKnowledgeLinksRefs<T extends Object>(
+    Expression<T> Function($$ResearchKnowledgeLinksTableAnnotationComposer a) f,
+  ) {
+    final $$ResearchKnowledgeLinksTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.researchKnowledgeLinks,
+          getReferencedColumn: (t) => t.researchNodeId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$ResearchKnowledgeLinksTableAnnotationComposer(
+                $db: $db,
+                $table: $db.researchKnowledgeLinks,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
 }
 
 class $$ResearchNodesTableTableManager
@@ -42804,6 +43662,7 @@ class $$ResearchNodesTableTableManager
             bool questResearchRefs,
             bool learningSessionsRefs,
             bool researchEvidenceItemsRefs,
+            bool researchKnowledgeLinksRefs,
           })
         > {
   $$ResearchNodesTableTableManager(
@@ -42885,6 +43744,7 @@ class $$ResearchNodesTableTableManager
                 questResearchRefs = false,
                 learningSessionsRefs = false,
                 researchEvidenceItemsRefs = false,
+                researchKnowledgeLinksRefs = false,
               }) {
                 return PrefetchHooks(
                   db: db,
@@ -42892,6 +43752,7 @@ class $$ResearchNodesTableTableManager
                     if (questResearchRefs) db.questResearch,
                     if (learningSessionsRefs) db.learningSessions,
                     if (researchEvidenceItemsRefs) db.researchEvidenceItems,
+                    if (researchKnowledgeLinksRefs) db.researchKnowledgeLinks,
                   ],
                   addJoins:
                       <
@@ -42992,6 +43853,27 @@ class $$ResearchNodesTableTableManager
                               ),
                           typedResults: items,
                         ),
+                      if (researchKnowledgeLinksRefs)
+                        await $_getPrefetchedData<
+                          ResearchNode,
+                          $ResearchNodesTable,
+                          ResearchKnowledgeLinkRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$ResearchNodesTableReferences
+                              ._researchKnowledgeLinksRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$ResearchNodesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).researchKnowledgeLinksRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.researchNodeId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
                     ];
                   },
                 );
@@ -43017,6 +43899,7 @@ typedef $$ResearchNodesTableProcessedTableManager =
         bool questResearchRefs,
         bool learningSessionsRefs,
         bool researchEvidenceItemsRefs,
+        bool researchKnowledgeLinksRefs,
       })
     >;
 typedef $$ResearchPrerequisitesTableCreateCompanionBuilder =
@@ -56818,6 +57701,34 @@ final class $$KnowledgeAreasTableReferences
       manager.$state.copyWith(prefetchedData: [item]),
     );
   }
+
+  static MultiTypedResultKey<
+    $ResearchKnowledgeLinksTable,
+    List<ResearchKnowledgeLinkRow>
+  >
+  _researchKnowledgeLinksRefsTable(_$ColonyDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.researchKnowledgeLinks,
+        aliasName: $_aliasNameGenerator(
+          db.knowledgeAreas.id,
+          db.researchKnowledgeLinks.areaId,
+        ),
+      );
+
+  $$ResearchKnowledgeLinksTableProcessedTableManager
+  get researchKnowledgeLinksRefs {
+    final manager = $$ResearchKnowledgeLinksTableTableManager(
+      $_db,
+      $_db.researchKnowledgeLinks,
+    ).filter((f) => f.areaId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _researchKnowledgeLinksRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
 }
 
 class $$KnowledgeAreasTableFilterComposer
@@ -56900,6 +57811,32 @@ class $$KnowledgeAreasTableFilterComposer
           ),
     );
     return composer;
+  }
+
+  Expression<bool> researchKnowledgeLinksRefs(
+    Expression<bool> Function($$ResearchKnowledgeLinksTableFilterComposer f) f,
+  ) {
+    final $$ResearchKnowledgeLinksTableFilterComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.researchKnowledgeLinks,
+          getReferencedColumn: (t) => t.areaId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$ResearchKnowledgeLinksTableFilterComposer(
+                $db: $db,
+                $table: $db.researchKnowledgeLinks,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
   }
 }
 
@@ -57051,6 +57988,32 @@ class $$KnowledgeAreasTableAnnotationComposer
     );
     return composer;
   }
+
+  Expression<T> researchKnowledgeLinksRefs<T extends Object>(
+    Expression<T> Function($$ResearchKnowledgeLinksTableAnnotationComposer a) f,
+  ) {
+    final $$ResearchKnowledgeLinksTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.researchKnowledgeLinks,
+          getReferencedColumn: (t) => t.areaId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$ResearchKnowledgeLinksTableAnnotationComposer(
+                $db: $db,
+                $table: $db.researchKnowledgeLinks,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
 }
 
 class $$KnowledgeAreasTableTableManager
@@ -57066,7 +58029,10 @@ class $$KnowledgeAreasTableTableManager
           $$KnowledgeAreasTableUpdateCompanionBuilder,
           (KnowledgeAreaRow, $$KnowledgeAreasTableReferences),
           KnowledgeAreaRow,
-          PrefetchHooks Function({bool profileId})
+          PrefetchHooks Function({
+            bool profileId,
+            bool researchKnowledgeLinksRefs,
+          })
         > {
   $$KnowledgeAreasTableTableManager(
     _$ColonyDatabase db,
@@ -57145,48 +58111,74 @@ class $$KnowledgeAreasTableTableManager
                 ),
               )
               .toList(),
-          prefetchHooksCallback: ({profileId = false}) {
-            return PrefetchHooks(
-              db: db,
-              explicitlyWatchedTables: [],
-              addJoins:
-                  <
-                    T extends TableManagerState<
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic
-                    >
-                  >(state) {
-                    if (profileId) {
-                      state =
-                          state.withJoin(
-                                currentTable: table,
-                                currentColumn: table.profileId,
-                                referencedTable: $$KnowledgeAreasTableReferences
-                                    ._profileIdTable(db),
-                                referencedColumn:
-                                    $$KnowledgeAreasTableReferences
-                                        ._profileIdTable(db)
-                                        .id,
-                              )
-                              as T;
-                    }
+          prefetchHooksCallback:
+              ({profileId = false, researchKnowledgeLinksRefs = false}) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [
+                    if (researchKnowledgeLinksRefs) db.researchKnowledgeLinks,
+                  ],
+                  addJoins:
+                      <
+                        T extends TableManagerState<
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic
+                        >
+                      >(state) {
+                        if (profileId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.profileId,
+                                    referencedTable:
+                                        $$KnowledgeAreasTableReferences
+                                            ._profileIdTable(db),
+                                    referencedColumn:
+                                        $$KnowledgeAreasTableReferences
+                                            ._profileIdTable(db)
+                                            .id,
+                                  )
+                                  as T;
+                        }
 
-                    return state;
+                        return state;
+                      },
+                  getPrefetchedDataCallback: (items) async {
+                    return [
+                      if (researchKnowledgeLinksRefs)
+                        await $_getPrefetchedData<
+                          KnowledgeAreaRow,
+                          $KnowledgeAreasTable,
+                          ResearchKnowledgeLinkRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$KnowledgeAreasTableReferences
+                              ._researchKnowledgeLinksRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$KnowledgeAreasTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).researchKnowledgeLinksRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.areaId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                    ];
                   },
-              getPrefetchedDataCallback: (items) async {
-                return [];
+                );
               },
-            );
-          },
         ),
       );
 }
@@ -57203,7 +58195,7 @@ typedef $$KnowledgeAreasTableProcessedTableManager =
       $$KnowledgeAreasTableUpdateCompanionBuilder,
       (KnowledgeAreaRow, $$KnowledgeAreasTableReferences),
       KnowledgeAreaRow,
-      PrefetchHooks Function({bool profileId})
+      PrefetchHooks Function({bool profileId, bool researchKnowledgeLinksRefs})
     >;
 typedef $$FlashcardDecksTableCreateCompanionBuilder =
     FlashcardDecksCompanion Function({
@@ -57780,6 +58772,7 @@ typedef $$FlashcardsTableCreateCompanionBuilder =
       Value<String> tagsJson,
       Value<int?> clozeIndex,
       Value<String?> reverseOfId,
+      Value<String> scheduleMode,
       Value<bool> suspended,
       required int createdAt,
       required int updatedAt,
@@ -57799,6 +58792,7 @@ typedef $$FlashcardsTableUpdateCompanionBuilder =
       Value<String> tagsJson,
       Value<int?> clozeIndex,
       Value<String?> reverseOfId,
+      Value<String> scheduleMode,
       Value<bool> suspended,
       Value<int> createdAt,
       Value<int> updatedAt,
@@ -57945,6 +58939,11 @@ class $$FlashcardsTableFilterComposer
 
   ColumnFilters<String> get reverseOfId => $composableBuilder(
     column: $table.reverseOfId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get scheduleMode => $composableBuilder(
+    column: $table.scheduleMode,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -58119,6 +59118,11 @@ class $$FlashcardsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get scheduleMode => $composableBuilder(
+    column: $table.scheduleMode,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<bool> get suspended => $composableBuilder(
     column: $table.suspended,
     builder: (column) => ColumnOrderings(column),
@@ -58223,6 +59227,11 @@ class $$FlashcardsTableAnnotationComposer
 
   GeneratedColumn<String> get reverseOfId => $composableBuilder(
     column: $table.reverseOfId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get scheduleMode => $composableBuilder(
+    column: $table.scheduleMode,
     builder: (column) => column,
   );
 
@@ -58380,6 +59389,7 @@ class $$FlashcardsTableTableManager
                 Value<String> tagsJson = const Value.absent(),
                 Value<int?> clozeIndex = const Value.absent(),
                 Value<String?> reverseOfId = const Value.absent(),
+                Value<String> scheduleMode = const Value.absent(),
                 Value<bool> suspended = const Value.absent(),
                 Value<int> createdAt = const Value.absent(),
                 Value<int> updatedAt = const Value.absent(),
@@ -58397,6 +59407,7 @@ class $$FlashcardsTableTableManager
                 tagsJson: tagsJson,
                 clozeIndex: clozeIndex,
                 reverseOfId: reverseOfId,
+                scheduleMode: scheduleMode,
                 suspended: suspended,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
@@ -58416,6 +59427,7 @@ class $$FlashcardsTableTableManager
                 Value<String> tagsJson = const Value.absent(),
                 Value<int?> clozeIndex = const Value.absent(),
                 Value<String?> reverseOfId = const Value.absent(),
+                Value<String> scheduleMode = const Value.absent(),
                 Value<bool> suspended = const Value.absent(),
                 required int createdAt,
                 required int updatedAt,
@@ -58433,6 +59445,7 @@ class $$FlashcardsTableTableManager
                 tagsJson: tagsJson,
                 clozeIndex: clozeIndex,
                 reverseOfId: reverseOfId,
+                scheduleMode: scheduleMode,
                 suspended: suspended,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
@@ -59014,6 +60027,7 @@ typedef $$FlashcardReviewLogsTableCreateCompanionBuilder =
       required double easeBefore,
       required double easeAfter,
       Value<int?> durationMs,
+      Value<String> reviewKind,
       Value<int> rowid,
     });
 typedef $$FlashcardReviewLogsTableUpdateCompanionBuilder =
@@ -59027,6 +60041,7 @@ typedef $$FlashcardReviewLogsTableUpdateCompanionBuilder =
       Value<double> easeBefore,
       Value<double> easeAfter,
       Value<int?> durationMs,
+      Value<String> reviewKind,
       Value<int> rowid,
     });
 
@@ -59112,6 +60127,11 @@ class $$FlashcardReviewLogsTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
+  ColumnFilters<String> get reviewKind => $composableBuilder(
+    column: $table.reviewKind,
+    builder: (column) => ColumnFilters(column),
+  );
+
   $$FlashcardsTableFilterComposer get cardId {
     final $$FlashcardsTableFilterComposer composer = $composerBuilder(
       composer: this,
@@ -59185,6 +60205,11 @@ class $$FlashcardReviewLogsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get reviewKind => $composableBuilder(
+    column: $table.reviewKind,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   $$FlashcardsTableOrderingComposer get cardId {
     final $$FlashcardsTableOrderingComposer composer = $composerBuilder(
       composer: this,
@@ -59249,6 +60274,11 @@ class $$FlashcardReviewLogsTableAnnotationComposer
 
   GeneratedColumn<int> get durationMs => $composableBuilder(
     column: $table.durationMs,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get reviewKind => $composableBuilder(
+    column: $table.reviewKind,
     builder: (column) => column,
   );
 
@@ -59321,6 +60351,7 @@ class $$FlashcardReviewLogsTableTableManager
                 Value<double> easeBefore = const Value.absent(),
                 Value<double> easeAfter = const Value.absent(),
                 Value<int?> durationMs = const Value.absent(),
+                Value<String> reviewKind = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => FlashcardReviewLogsCompanion(
                 id: id,
@@ -59332,6 +60363,7 @@ class $$FlashcardReviewLogsTableTableManager
                 easeBefore: easeBefore,
                 easeAfter: easeAfter,
                 durationMs: durationMs,
+                reviewKind: reviewKind,
                 rowid: rowid,
               ),
           createCompanionCallback:
@@ -59345,6 +60377,7 @@ class $$FlashcardReviewLogsTableTableManager
                 required double easeBefore,
                 required double easeAfter,
                 Value<int?> durationMs = const Value.absent(),
+                Value<String> reviewKind = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => FlashcardReviewLogsCompanion.insert(
                 id: id,
@@ -59356,6 +60389,7 @@ class $$FlashcardReviewLogsTableTableManager
                 easeBefore: easeBefore,
                 easeAfter: easeAfter,
                 durationMs: durationMs,
+                reviewKind: reviewKind,
                 rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0
@@ -59426,6 +60460,844 @@ typedef $$FlashcardReviewLogsTableProcessedTableManager =
       (FlashcardReviewLogRow, $$FlashcardReviewLogsTableReferences),
       FlashcardReviewLogRow,
       PrefetchHooks Function({bool cardId})
+    >;
+typedef $$KnowledgeAreaPlacementsTableCreateCompanionBuilder =
+    KnowledgeAreaPlacementsCompanion Function({
+      required String areaId,
+      required String parentAreaId,
+      required int linkedAt,
+      Value<String?> catalogKey,
+      Value<int> rowid,
+    });
+typedef $$KnowledgeAreaPlacementsTableUpdateCompanionBuilder =
+    KnowledgeAreaPlacementsCompanion Function({
+      Value<String> areaId,
+      Value<String> parentAreaId,
+      Value<int> linkedAt,
+      Value<String?> catalogKey,
+      Value<int> rowid,
+    });
+
+final class $$KnowledgeAreaPlacementsTableReferences
+    extends
+        BaseReferences<
+          _$ColonyDatabase,
+          $KnowledgeAreaPlacementsTable,
+          KnowledgeAreaPlacementRow
+        > {
+  $$KnowledgeAreaPlacementsTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $KnowledgeAreasTable _areaIdTable(_$ColonyDatabase db) =>
+      db.knowledgeAreas.createAlias(
+        $_aliasNameGenerator(
+          db.knowledgeAreaPlacements.areaId,
+          db.knowledgeAreas.id,
+        ),
+      );
+
+  $$KnowledgeAreasTableProcessedTableManager get areaId {
+    final $_column = $_itemColumn<String>('area_id')!;
+
+    final manager = $$KnowledgeAreasTableTableManager(
+      $_db,
+      $_db.knowledgeAreas,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_areaIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $KnowledgeAreasTable _parentAreaIdTable(_$ColonyDatabase db) =>
+      db.knowledgeAreas.createAlias(
+        $_aliasNameGenerator(
+          db.knowledgeAreaPlacements.parentAreaId,
+          db.knowledgeAreas.id,
+        ),
+      );
+
+  $$KnowledgeAreasTableProcessedTableManager get parentAreaId {
+    final $_column = $_itemColumn<String>('parent_area_id')!;
+
+    final manager = $$KnowledgeAreasTableTableManager(
+      $_db,
+      $_db.knowledgeAreas,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_parentAreaIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$KnowledgeAreaPlacementsTableFilterComposer
+    extends Composer<_$ColonyDatabase, $KnowledgeAreaPlacementsTable> {
+  $$KnowledgeAreaPlacementsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get linkedAt => $composableBuilder(
+    column: $table.linkedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get catalogKey => $composableBuilder(
+    column: $table.catalogKey,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$KnowledgeAreasTableFilterComposer get areaId {
+    final $$KnowledgeAreasTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.areaId,
+      referencedTable: $db.knowledgeAreas,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$KnowledgeAreasTableFilterComposer(
+            $db: $db,
+            $table: $db.knowledgeAreas,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$KnowledgeAreasTableFilterComposer get parentAreaId {
+    final $$KnowledgeAreasTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.parentAreaId,
+      referencedTable: $db.knowledgeAreas,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$KnowledgeAreasTableFilterComposer(
+            $db: $db,
+            $table: $db.knowledgeAreas,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$KnowledgeAreaPlacementsTableOrderingComposer
+    extends Composer<_$ColonyDatabase, $KnowledgeAreaPlacementsTable> {
+  $$KnowledgeAreaPlacementsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get linkedAt => $composableBuilder(
+    column: $table.linkedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get catalogKey => $composableBuilder(
+    column: $table.catalogKey,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$KnowledgeAreasTableOrderingComposer get areaId {
+    final $$KnowledgeAreasTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.areaId,
+      referencedTable: $db.knowledgeAreas,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$KnowledgeAreasTableOrderingComposer(
+            $db: $db,
+            $table: $db.knowledgeAreas,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$KnowledgeAreasTableOrderingComposer get parentAreaId {
+    final $$KnowledgeAreasTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.parentAreaId,
+      referencedTable: $db.knowledgeAreas,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$KnowledgeAreasTableOrderingComposer(
+            $db: $db,
+            $table: $db.knowledgeAreas,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$KnowledgeAreaPlacementsTableAnnotationComposer
+    extends Composer<_$ColonyDatabase, $KnowledgeAreaPlacementsTable> {
+  $$KnowledgeAreaPlacementsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get linkedAt =>
+      $composableBuilder(column: $table.linkedAt, builder: (column) => column);
+
+  GeneratedColumn<String> get catalogKey => $composableBuilder(
+    column: $table.catalogKey,
+    builder: (column) => column,
+  );
+
+  $$KnowledgeAreasTableAnnotationComposer get areaId {
+    final $$KnowledgeAreasTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.areaId,
+      referencedTable: $db.knowledgeAreas,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$KnowledgeAreasTableAnnotationComposer(
+            $db: $db,
+            $table: $db.knowledgeAreas,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$KnowledgeAreasTableAnnotationComposer get parentAreaId {
+    final $$KnowledgeAreasTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.parentAreaId,
+      referencedTable: $db.knowledgeAreas,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$KnowledgeAreasTableAnnotationComposer(
+            $db: $db,
+            $table: $db.knowledgeAreas,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$KnowledgeAreaPlacementsTableTableManager
+    extends
+        RootTableManager<
+          _$ColonyDatabase,
+          $KnowledgeAreaPlacementsTable,
+          KnowledgeAreaPlacementRow,
+          $$KnowledgeAreaPlacementsTableFilterComposer,
+          $$KnowledgeAreaPlacementsTableOrderingComposer,
+          $$KnowledgeAreaPlacementsTableAnnotationComposer,
+          $$KnowledgeAreaPlacementsTableCreateCompanionBuilder,
+          $$KnowledgeAreaPlacementsTableUpdateCompanionBuilder,
+          (KnowledgeAreaPlacementRow, $$KnowledgeAreaPlacementsTableReferences),
+          KnowledgeAreaPlacementRow,
+          PrefetchHooks Function({bool areaId, bool parentAreaId})
+        > {
+  $$KnowledgeAreaPlacementsTableTableManager(
+    _$ColonyDatabase db,
+    $KnowledgeAreaPlacementsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$KnowledgeAreaPlacementsTableFilterComposer(
+                $db: db,
+                $table: table,
+              ),
+          createOrderingComposer: () =>
+              $$KnowledgeAreaPlacementsTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$KnowledgeAreaPlacementsTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> areaId = const Value.absent(),
+                Value<String> parentAreaId = const Value.absent(),
+                Value<int> linkedAt = const Value.absent(),
+                Value<String?> catalogKey = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => KnowledgeAreaPlacementsCompanion(
+                areaId: areaId,
+                parentAreaId: parentAreaId,
+                linkedAt: linkedAt,
+                catalogKey: catalogKey,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String areaId,
+                required String parentAreaId,
+                required int linkedAt,
+                Value<String?> catalogKey = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => KnowledgeAreaPlacementsCompanion.insert(
+                areaId: areaId,
+                parentAreaId: parentAreaId,
+                linkedAt: linkedAt,
+                catalogKey: catalogKey,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$KnowledgeAreaPlacementsTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({areaId = false, parentAreaId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (areaId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.areaId,
+                                referencedTable:
+                                    $$KnowledgeAreaPlacementsTableReferences
+                                        ._areaIdTable(db),
+                                referencedColumn:
+                                    $$KnowledgeAreaPlacementsTableReferences
+                                        ._areaIdTable(db)
+                                        .id,
+                              )
+                              as T;
+                    }
+                    if (parentAreaId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.parentAreaId,
+                                referencedTable:
+                                    $$KnowledgeAreaPlacementsTableReferences
+                                        ._parentAreaIdTable(db),
+                                referencedColumn:
+                                    $$KnowledgeAreaPlacementsTableReferences
+                                        ._parentAreaIdTable(db)
+                                        .id,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$KnowledgeAreaPlacementsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$ColonyDatabase,
+      $KnowledgeAreaPlacementsTable,
+      KnowledgeAreaPlacementRow,
+      $$KnowledgeAreaPlacementsTableFilterComposer,
+      $$KnowledgeAreaPlacementsTableOrderingComposer,
+      $$KnowledgeAreaPlacementsTableAnnotationComposer,
+      $$KnowledgeAreaPlacementsTableCreateCompanionBuilder,
+      $$KnowledgeAreaPlacementsTableUpdateCompanionBuilder,
+      (KnowledgeAreaPlacementRow, $$KnowledgeAreaPlacementsTableReferences),
+      KnowledgeAreaPlacementRow,
+      PrefetchHooks Function({bool areaId, bool parentAreaId})
+    >;
+typedef $$ResearchKnowledgeLinksTableCreateCompanionBuilder =
+    ResearchKnowledgeLinksCompanion Function({
+      required String researchNodeId,
+      required String areaId,
+      required String kind,
+      required int linkedAt,
+      Value<int> rowid,
+    });
+typedef $$ResearchKnowledgeLinksTableUpdateCompanionBuilder =
+    ResearchKnowledgeLinksCompanion Function({
+      Value<String> researchNodeId,
+      Value<String> areaId,
+      Value<String> kind,
+      Value<int> linkedAt,
+      Value<int> rowid,
+    });
+
+final class $$ResearchKnowledgeLinksTableReferences
+    extends
+        BaseReferences<
+          _$ColonyDatabase,
+          $ResearchKnowledgeLinksTable,
+          ResearchKnowledgeLinkRow
+        > {
+  $$ResearchKnowledgeLinksTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $ResearchNodesTable _researchNodeIdTable(_$ColonyDatabase db) =>
+      db.researchNodes.createAlias(
+        $_aliasNameGenerator(
+          db.researchKnowledgeLinks.researchNodeId,
+          db.researchNodes.id,
+        ),
+      );
+
+  $$ResearchNodesTableProcessedTableManager get researchNodeId {
+    final $_column = $_itemColumn<String>('research_node_id')!;
+
+    final manager = $$ResearchNodesTableTableManager(
+      $_db,
+      $_db.researchNodes,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_researchNodeIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $KnowledgeAreasTable _areaIdTable(_$ColonyDatabase db) =>
+      db.knowledgeAreas.createAlias(
+        $_aliasNameGenerator(
+          db.researchKnowledgeLinks.areaId,
+          db.knowledgeAreas.id,
+        ),
+      );
+
+  $$KnowledgeAreasTableProcessedTableManager get areaId {
+    final $_column = $_itemColumn<String>('area_id')!;
+
+    final manager = $$KnowledgeAreasTableTableManager(
+      $_db,
+      $_db.knowledgeAreas,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_areaIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$ResearchKnowledgeLinksTableFilterComposer
+    extends Composer<_$ColonyDatabase, $ResearchKnowledgeLinksTable> {
+  $$ResearchKnowledgeLinksTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get kind => $composableBuilder(
+    column: $table.kind,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get linkedAt => $composableBuilder(
+    column: $table.linkedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$ResearchNodesTableFilterComposer get researchNodeId {
+    final $$ResearchNodesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.researchNodeId,
+      referencedTable: $db.researchNodes,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ResearchNodesTableFilterComposer(
+            $db: $db,
+            $table: $db.researchNodes,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$KnowledgeAreasTableFilterComposer get areaId {
+    final $$KnowledgeAreasTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.areaId,
+      referencedTable: $db.knowledgeAreas,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$KnowledgeAreasTableFilterComposer(
+            $db: $db,
+            $table: $db.knowledgeAreas,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$ResearchKnowledgeLinksTableOrderingComposer
+    extends Composer<_$ColonyDatabase, $ResearchKnowledgeLinksTable> {
+  $$ResearchKnowledgeLinksTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get kind => $composableBuilder(
+    column: $table.kind,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get linkedAt => $composableBuilder(
+    column: $table.linkedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$ResearchNodesTableOrderingComposer get researchNodeId {
+    final $$ResearchNodesTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.researchNodeId,
+      referencedTable: $db.researchNodes,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ResearchNodesTableOrderingComposer(
+            $db: $db,
+            $table: $db.researchNodes,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$KnowledgeAreasTableOrderingComposer get areaId {
+    final $$KnowledgeAreasTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.areaId,
+      referencedTable: $db.knowledgeAreas,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$KnowledgeAreasTableOrderingComposer(
+            $db: $db,
+            $table: $db.knowledgeAreas,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$ResearchKnowledgeLinksTableAnnotationComposer
+    extends Composer<_$ColonyDatabase, $ResearchKnowledgeLinksTable> {
+  $$ResearchKnowledgeLinksTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get kind =>
+      $composableBuilder(column: $table.kind, builder: (column) => column);
+
+  GeneratedColumn<int> get linkedAt =>
+      $composableBuilder(column: $table.linkedAt, builder: (column) => column);
+
+  $$ResearchNodesTableAnnotationComposer get researchNodeId {
+    final $$ResearchNodesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.researchNodeId,
+      referencedTable: $db.researchNodes,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ResearchNodesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.researchNodes,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$KnowledgeAreasTableAnnotationComposer get areaId {
+    final $$KnowledgeAreasTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.areaId,
+      referencedTable: $db.knowledgeAreas,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$KnowledgeAreasTableAnnotationComposer(
+            $db: $db,
+            $table: $db.knowledgeAreas,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$ResearchKnowledgeLinksTableTableManager
+    extends
+        RootTableManager<
+          _$ColonyDatabase,
+          $ResearchKnowledgeLinksTable,
+          ResearchKnowledgeLinkRow,
+          $$ResearchKnowledgeLinksTableFilterComposer,
+          $$ResearchKnowledgeLinksTableOrderingComposer,
+          $$ResearchKnowledgeLinksTableAnnotationComposer,
+          $$ResearchKnowledgeLinksTableCreateCompanionBuilder,
+          $$ResearchKnowledgeLinksTableUpdateCompanionBuilder,
+          (ResearchKnowledgeLinkRow, $$ResearchKnowledgeLinksTableReferences),
+          ResearchKnowledgeLinkRow,
+          PrefetchHooks Function({bool researchNodeId, bool areaId})
+        > {
+  $$ResearchKnowledgeLinksTableTableManager(
+    _$ColonyDatabase db,
+    $ResearchKnowledgeLinksTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$ResearchKnowledgeLinksTableFilterComposer(
+                $db: db,
+                $table: table,
+              ),
+          createOrderingComposer: () =>
+              $$ResearchKnowledgeLinksTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$ResearchKnowledgeLinksTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> researchNodeId = const Value.absent(),
+                Value<String> areaId = const Value.absent(),
+                Value<String> kind = const Value.absent(),
+                Value<int> linkedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => ResearchKnowledgeLinksCompanion(
+                researchNodeId: researchNodeId,
+                areaId: areaId,
+                kind: kind,
+                linkedAt: linkedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String researchNodeId,
+                required String areaId,
+                required String kind,
+                required int linkedAt,
+                Value<int> rowid = const Value.absent(),
+              }) => ResearchKnowledgeLinksCompanion.insert(
+                researchNodeId: researchNodeId,
+                areaId: areaId,
+                kind: kind,
+                linkedAt: linkedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$ResearchKnowledgeLinksTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({researchNodeId = false, areaId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (researchNodeId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.researchNodeId,
+                                referencedTable:
+                                    $$ResearchKnowledgeLinksTableReferences
+                                        ._researchNodeIdTable(db),
+                                referencedColumn:
+                                    $$ResearchKnowledgeLinksTableReferences
+                                        ._researchNodeIdTable(db)
+                                        .id,
+                              )
+                              as T;
+                    }
+                    if (areaId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.areaId,
+                                referencedTable:
+                                    $$ResearchKnowledgeLinksTableReferences
+                                        ._areaIdTable(db),
+                                referencedColumn:
+                                    $$ResearchKnowledgeLinksTableReferences
+                                        ._areaIdTable(db)
+                                        .id,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$ResearchKnowledgeLinksTableProcessedTableManager =
+    ProcessedTableManager<
+      _$ColonyDatabase,
+      $ResearchKnowledgeLinksTable,
+      ResearchKnowledgeLinkRow,
+      $$ResearchKnowledgeLinksTableFilterComposer,
+      $$ResearchKnowledgeLinksTableOrderingComposer,
+      $$ResearchKnowledgeLinksTableAnnotationComposer,
+      $$ResearchKnowledgeLinksTableCreateCompanionBuilder,
+      $$ResearchKnowledgeLinksTableUpdateCompanionBuilder,
+      (ResearchKnowledgeLinkRow, $$ResearchKnowledgeLinksTableReferences),
+      ResearchKnowledgeLinkRow,
+      PrefetchHooks Function({bool researchNodeId, bool areaId})
     >;
 
 class $ColonyDatabaseManager {
@@ -59538,4 +61410,14 @@ class $ColonyDatabaseManager {
       $$FlashcardSrsTableTableManager(_db, _db.flashcardSrs);
   $$FlashcardReviewLogsTableTableManager get flashcardReviewLogs =>
       $$FlashcardReviewLogsTableTableManager(_db, _db.flashcardReviewLogs);
+  $$KnowledgeAreaPlacementsTableTableManager get knowledgeAreaPlacements =>
+      $$KnowledgeAreaPlacementsTableTableManager(
+        _db,
+        _db.knowledgeAreaPlacements,
+      );
+  $$ResearchKnowledgeLinksTableTableManager get researchKnowledgeLinks =>
+      $$ResearchKnowledgeLinksTableTableManager(
+        _db,
+        _db.researchKnowledgeLinks,
+      );
 }

@@ -39,6 +39,7 @@ import 'home_maintenance.dart';
 import 'quest_inventory.dart';
 import 'trip_inventory.dart';
 import 'knowledge_area.dart';
+import 'knowledge_area_placement.dart';
 import 'flashcard.dart';
 import 'schedule_block.dart';
 import 'task.dart';
@@ -111,6 +112,8 @@ class ExportSnapshot extends Equatable {
     this.flashcards = const [],
     this.flashcardSrs = const [],
     this.flashcardReviewLogs = const [],
+    this.knowledgeAreaPlacements = const [],
+    this.researchKnowledgeLinks = const [],
   });
 
   final DateTime exportedAt;
@@ -165,6 +168,8 @@ class ExportSnapshot extends Equatable {
   final List<Flashcard> flashcards;
   final List<FlashcardSrsState> flashcardSrs;
   final List<FlashcardReviewLog> flashcardReviewLogs;
+  final List<KnowledgeAreaPlacement> knowledgeAreaPlacements;
+  final List<ResearchKnowledgeLink> researchKnowledgeLinks;
 
   Map<String, int> get entityCounts => {
         'tasks': tasks.length,
@@ -208,6 +213,8 @@ class ExportSnapshot extends Equatable {
         'flashcards': flashcards.length,
         'flashcard_srs': flashcardSrs.length,
         'flashcard_review_logs': flashcardReviewLogs.length,
+        'knowledge_area_placements': knowledgeAreaPlacements.length,
+        'research_knowledge_links': researchKnowledgeLinks.length,
       };
 
   static ExportSnapshot fromJsonString(String source) {
@@ -226,7 +233,7 @@ class ExportSnapshot extends Equatable {
 
   static ExportSnapshot fromJson(Map<String, dynamic> json) {
     final version = _requireInt(json, 'version');
-    if (version < 1 || version > 30) {
+    if (version < 1 || version > 31) {
       throw ExportSnapshotException('Versão de export não suportada: $version');
     }
 
@@ -433,6 +440,18 @@ class ExportSnapshot extends Equatable {
               _parseFlashcardReviewLog,
             )
           : <FlashcardReviewLog>[],
+      knowledgeAreaPlacements: version >= 31
+          ? _parseList(
+              json['knowledge_area_placements'],
+              _parseKnowledgeAreaPlacement,
+            )
+          : <KnowledgeAreaPlacement>[],
+      researchKnowledgeLinks: version >= 31
+          ? _parseList(
+              json['research_knowledge_links'],
+              _parseResearchKnowledgeLink,
+            )
+          : <ResearchKnowledgeLink>[],
     );
   }
 
@@ -1173,6 +1192,9 @@ class ExportSnapshot extends Equatable {
         reverseOfId: json['reverse_of_id'] == null
             ? null
             : EntityId(_requireString(json, 'reverse_of_id')),
+        scheduleMode: FlashcardScheduleMode.values.byName(
+          json['schedule_mode'] as String? ?? 'scheduled',
+        ),
         suspended: json['suspended'] as bool? ?? false,
         createdAt: _parseDateTime(_requireString(json, 'created_at')),
         updatedAt: _parseDateTime(_requireString(json, 'updated_at')),
@@ -1209,6 +1231,31 @@ class ExportSnapshot extends Equatable {
       easeBefore: (json['ease_before'] as num).toDouble(),
       easeAfter: (json['ease_after'] as num).toDouble(),
       durationMs: json['duration_ms'] as int?,
+      reviewKind: FlashcardReviewKind.values.byName(
+        json['review_kind'] as String? ?? 'srs',
+      ),
+    );
+  }
+
+  static KnowledgeAreaPlacement _parseKnowledgeAreaPlacement(
+    Map<String, dynamic> json,
+  ) {
+    return KnowledgeAreaPlacement(
+      areaId: EntityId(_requireString(json, 'area_id')),
+      parentAreaId: EntityId(_requireString(json, 'parent_area_id')),
+      linkedAt: _parseDateTime(_requireString(json, 'linked_at')),
+      catalogKey: json['catalog_key'] as String?,
+    );
+  }
+
+  static ResearchKnowledgeLink _parseResearchKnowledgeLink(
+    Map<String, dynamic> json,
+  ) {
+    return ResearchKnowledgeLink(
+      researchNodeId: EntityId(_requireString(json, 'research_node_id')),
+      areaId: EntityId(_requireString(json, 'area_id')),
+      kind: ResearchKnowledgeLinkKind.values.byName(_requireString(json, 'kind')),
+      linkedAt: _parseDateTime(_requireString(json, 'linked_at')),
     );
   }
 
@@ -1452,6 +1499,10 @@ class ExportSnapshot extends Equatable {
       'flashcard_srs': flashcardSrs.map(_flashcardSrsJson).toList(),
       'flashcard_review_logs':
           flashcardReviewLogs.map(_flashcardReviewLogJson).toList(),
+      'knowledge_area_placements':
+          knowledgeAreaPlacements.map(_knowledgeAreaPlacementJson).toList(),
+      'research_knowledge_links':
+          researchKnowledgeLinks.map(_researchKnowledgeLinkJson).toList(),
     };
   }
 
@@ -1934,6 +1985,7 @@ class ExportSnapshot extends Equatable {
         'tags': card.tags,
         if (card.clozeIndex != null) 'cloze_index': card.clozeIndex,
         if (card.reverseOfId != null) 'reverse_of_id': card.reverseOfId!.value,
+        'schedule_mode': card.scheduleMode.name,
         'suspended': card.suspended,
         'created_at': card.createdAt.toUtc().toIso8601String(),
         'updated_at': card.updatedAt.toUtc().toIso8601String(),
@@ -1965,6 +2017,27 @@ class ExportSnapshot extends Equatable {
         'ease_before': log.easeBefore,
         'ease_after': log.easeAfter,
         if (log.durationMs != null) 'duration_ms': log.durationMs,
+        'review_kind': log.reviewKind.name,
+      };
+
+  static Map<String, Object?> _knowledgeAreaPlacementJson(
+    KnowledgeAreaPlacement placement,
+  ) =>
+      {
+        'area_id': placement.areaId.value,
+        'parent_area_id': placement.parentAreaId.value,
+        'linked_at': placement.linkedAt.toUtc().toIso8601String(),
+        if (placement.catalogKey != null) 'catalog_key': placement.catalogKey,
+      };
+
+  static Map<String, Object?> _researchKnowledgeLinkJson(
+    ResearchKnowledgeLink link,
+  ) =>
+      {
+        'research_node_id': link.researchNodeId.value,
+        'area_id': link.areaId.value,
+        'kind': link.kind.name,
+        'linked_at': link.linkedAt.toUtc().toIso8601String(),
       };
 
   static Map<String, Object?> _healthAppointmentJson(HealthAppointment a) => {
@@ -2091,5 +2164,7 @@ class ExportSnapshot extends Equatable {
         flashcards,
         flashcardSrs,
         flashcardReviewLogs,
+        knowledgeAreaPlacements,
+        researchKnowledgeLinks,
       ];
 }

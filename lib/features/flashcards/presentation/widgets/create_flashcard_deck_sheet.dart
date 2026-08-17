@@ -104,87 +104,96 @@ class _CreateFlashcardDeckSheetState
                 labelText: AppStrings.flashcardsDeckTitle,
               ),
             ),
-            const SizedBox(height: ColonySpacing.sm),
-            DropdownButtonFormField<String>(
-              // ignore: deprecated_member_use
-              value: _areaId?.value,
-              decoration: const InputDecoration(
-                labelText: AppStrings.flashcardsMapTitle,
-              ),
-              items: [
-                const DropdownMenuItem(
-                  value: null,
-                  child: Text(AppStrings.flashcardsNoParent),
-                ),
-                for (final area in areas)
-                  DropdownMenuItem(
-                    value: area.id.value,
-                    child: Text(area.title),
-                  ),
-              ],
-              onChanged: (value) => setState(() {
-                _areaId = value == null ? null : EntityId(value);
-              }),
-            ),
-            const SizedBox(height: ColonySpacing.sm),
-            DropdownButtonFormField<String>(
-              // ignore: deprecated_member_use
-              value: _researchId?.value,
-              decoration: const InputDecoration(
-                labelText: AppStrings.flashcardsLinkedResearch,
-              ),
-              items: [
-                const DropdownMenuItem(
-                  value: null,
-                  child: Text(AppStrings.flashcardsNoResearch),
-                ),
-                for (final node in nodes)
-                  DropdownMenuItem(
-                    value: node.id.value,
-                    child: Text(node.title),
-                  ),
-              ],
-              onChanged: (value) => setState(() {
-                _researchId = value == null ? null : EntityId(value);
-              }),
-            ),
-            const SizedBox(height: ColonySpacing.sm),
-            TextField(
-              controller: _description,
-              decoration: const InputDecoration(
-                labelText: AppStrings.researchDescriptionOptional,
-              ),
-            ),
-            const SizedBox(height: ColonySpacing.sm),
-            Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: _newLimit,
-                    keyboardType: TextInputType.number,
+            const SizedBox(height: ColonySpacing.md),
+            Theme(
+              data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+              child: ExpansionTile(
+                tilePadding: EdgeInsets.zero,
+                title: const Text(AppStrings.flashcardsAdvanced),
+                children: [
+                  DropdownButtonFormField<String>(
+                    // ignore: deprecated_member_use
+                    value: _areaId?.value,
                     decoration: const InputDecoration(
-                      labelText: AppStrings.flashcardsNewLimit,
+                      labelText: AppStrings.flashcardsMapTitle,
+                    ),
+                    items: [
+                      const DropdownMenuItem(
+                        value: null,
+                        child: Text(AppStrings.flashcardsNoParent),
+                      ),
+                      for (final area in areas)
+                        DropdownMenuItem(
+                          value: area.id.value,
+                          child: Text(area.title),
+                        ),
+                    ],
+                    onChanged: (value) => setState(() {
+                      _areaId = value == null ? null : EntityId(value);
+                    }),
+                  ),
+                  const SizedBox(height: ColonySpacing.sm),
+                  DropdownButtonFormField<String>(
+                    // ignore: deprecated_member_use
+                    value: _researchId?.value,
+                    decoration: const InputDecoration(
+                      labelText: AppStrings.flashcardsLinkedResearch,
+                    ),
+                    items: [
+                      const DropdownMenuItem(
+                        value: null,
+                        child: Text(AppStrings.flashcardsNoResearch),
+                      ),
+                      for (final node in nodes)
+                        DropdownMenuItem(
+                          value: node.id.value,
+                          child: Text(node.title),
+                        ),
+                    ],
+                    onChanged: (value) => setState(() {
+                      _researchId = value == null ? null : EntityId(value);
+                    }),
+                  ),
+                  const SizedBox(height: ColonySpacing.sm),
+                  TextField(
+                    controller: _description,
+                    decoration: const InputDecoration(
+                      labelText: AppStrings.researchDescriptionOptional,
                     ),
                   ),
-                ),
-                const SizedBox(width: ColonySpacing.sm),
-                Expanded(
-                  child: TextField(
-                    controller: _reviewLimit,
-                    keyboardType: TextInputType.number,
-                    decoration: const InputDecoration(
-                      labelText: AppStrings.flashcardsReviewLimit,
-                    ),
+                  const SizedBox(height: ColonySpacing.sm),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextField(
+                          controller: _newLimit,
+                          keyboardType: TextInputType.number,
+                          decoration: const InputDecoration(
+                            labelText: AppStrings.flashcardsNewLimit,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: ColonySpacing.sm),
+                      Expanded(
+                        child: TextField(
+                          controller: _reviewLimit,
+                          keyboardType: TextInputType.number,
+                          decoration: const InputDecoration(
+                            labelText: AppStrings.flashcardsReviewLimit,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                ),
-              ],
-            ),
-            const SizedBox(height: ColonySpacing.xs),
-            Text(
-              AppStrings.flashcardsLimitsHint,
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: ColonyColors.textMuted,
+                  const SizedBox(height: ColonySpacing.xs),
+                  Text(
+                    AppStrings.flashcardsLimitsHint,
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: ColonyColors.textMuted,
+                        ),
                   ),
+                ],
+              ),
             ),
             const SizedBox(height: ColonySpacing.lg),
             FilledButton(

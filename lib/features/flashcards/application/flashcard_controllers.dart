@@ -9,11 +9,14 @@ class FlashcardController extends AsyncNotifier<void> {
 
   Future<T?> _run<T>(Future<T> Function() body) async {
     state = const AsyncLoading();
-    T? result;
-    state = await AsyncValue.guard(() async {
-      result = await body();
-    });
-    return result;
+    try {
+      final result = await body();
+      state = const AsyncData(null);
+      return result;
+    } catch (error, stackTrace) {
+      state = AsyncError(error, stackTrace);
+      rethrow;
+    }
   }
 
   Future<KnowledgeArea?> createArea({
@@ -46,6 +49,56 @@ class FlashcardController extends AsyncNotifier<void> {
       return ref.read(repositoriesProvider).flashcards.seedCatalog(
             profileId: profile.id,
             keys: keys,
+          );
+    });
+  }
+
+  Future<void> addPlacement({
+    required EntityId areaId,
+    required EntityId parentAreaId,
+  }) {
+    return _run(() {
+      return ref.read(repositoriesProvider).flashcards.addPlacement(
+            areaId: areaId,
+            parentAreaId: parentAreaId,
+          );
+    });
+  }
+
+  Future<void> removePlacement({
+    required EntityId areaId,
+    required EntityId parentAreaId,
+  }) {
+    return _run(() {
+      return ref.read(repositoriesProvider).flashcards.removePlacement(
+            areaId: areaId,
+            parentAreaId: parentAreaId,
+          );
+    });
+  }
+
+  Future<void> linkResearch({
+    required EntityId researchNodeId,
+    required EntityId areaId,
+    ResearchKnowledgeLinkKind kind = ResearchKnowledgeLinkKind.related,
+  }) {
+    return _run(() {
+      return ref.read(repositoriesProvider).flashcards.linkResearch(
+            researchNodeId: researchNodeId,
+            areaId: areaId,
+            kind: kind,
+          );
+    });
+  }
+
+  Future<void> unlinkResearch({
+    required EntityId researchNodeId,
+    required EntityId areaId,
+  }) {
+    return _run(() {
+      return ref.read(repositoriesProvider).flashcards.unlinkResearch(
+            researchNodeId: researchNodeId,
+            areaId: areaId,
           );
     });
   }
@@ -88,6 +141,7 @@ class FlashcardController extends AsyncNotifier<void> {
     String? extra,
     List<String> tags = const [],
     bool bidirectional = false,
+    FlashcardScheduleMode scheduleMode = FlashcardScheduleMode.scheduled,
   }) {
     return _run(() async {
       final profile = await ref.read(profileProvider.future);
@@ -102,6 +156,7 @@ class FlashcardController extends AsyncNotifier<void> {
             extra: extra,
             tags: tags,
             bidirectional: bidirectional,
+            scheduleMode: scheduleMode,
           );
     });
   }
@@ -127,6 +182,18 @@ class FlashcardController extends AsyncNotifier<void> {
     });
   }
 
+  Future<void> scheduleCard(Flashcard card) {
+    return _run(() {
+      return ref.read(repositoriesProvider).flashcards.scheduleCard(card);
+    });
+  }
+
+  Future<void> unscheduleCard(Flashcard card) {
+    return _run(() {
+      return ref.read(repositoriesProvider).flashcards.unscheduleCard(card);
+    });
+  }
+
   Future<FlashcardReviewOutcome?> review({
     required Flashcard card,
     required FlashcardRating rating,
@@ -141,11 +208,31 @@ class FlashcardController extends AsyncNotifier<void> {
     });
   }
 
+  Future<FlashcardReviewLog?> practice({
+    required Flashcard card,
+    required FlashcardRating rating,
+    int? durationMs,
+  }) {
+    return _run(() {
+      return ref.read(repositoriesProvider).flashcards.practice(
+            card: card,
+            rating: rating,
+            durationMs: durationMs,
+          );
+    });
+  }
+
   Future<void> undoReview(FlashcardReviewOutcome outcome) {
     return _run(() {
       return ref.read(repositoriesProvider).flashcards.undoReview(
             outcome: outcome,
           );
+    });
+  }
+
+  Future<void> undoPractice(FlashcardReviewLog log) {
+    return _run(() {
+      return ref.read(repositoriesProvider).flashcards.undoPractice(log);
     });
   }
 }

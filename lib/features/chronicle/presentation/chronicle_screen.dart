@@ -215,7 +215,14 @@ class ChronicleScreen extends ConsumerWidget {
       EventType.flashcardCreated => 'Flashcard criado',
       EventType.flashcardUpdated => 'Flashcard atualizado',
       EventType.flashcardReviewed => 'Flashcard revisado',
+      EventType.flashcardPracticed => 'Flashcard praticado',
+      EventType.flashcardScheduled => 'Flashcard programado',
+      EventType.flashcardUnscheduled => 'Flashcard guardado',
       EventType.flashcardCatalogSeeded => 'Mapa de conhecimento semeado',
+      EventType.knowledgeAreaPlacementAdded => 'Área colocada em outra prateleira',
+      EventType.knowledgeAreaPlacementRemoved => 'Colocação de área removida',
+      EventType.researchKnowledgeLinked => 'Pesquisa ligada à área',
+      EventType.researchKnowledgeUnlinked => 'Pesquisa desligada da área',
       _ => event.eventType.name,
     };
   }

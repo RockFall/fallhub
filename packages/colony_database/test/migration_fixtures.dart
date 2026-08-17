@@ -118,6 +118,9 @@ Future<ColonyDatabase> openMigratedFrom(
   if (fromVersion >= 33) {
     _createPhase33Tables(sqliteDb);
   }
+  if (fromVersion >= 34) {
+    _createPhase34Tables(sqliteDb);
+  }
 
   sqliteDb.userVersion = fromVersion;
   seed?.call(sqliteDb);
@@ -991,6 +994,86 @@ void _createPhase33Tables(Database db) {
       inventory_item_id TEXT NOT NULL REFERENCES inventory_items(id),
       linked_at INTEGER NOT NULL,
       PRIMARY KEY (trip_id, inventory_item_id)
+    )
+  ''');
+}
+
+void _createPhase34Tables(Database db) {
+  db.execute('''
+    CREATE TABLE knowledge_areas (
+      id TEXT NOT NULL PRIMARY KEY,
+      profile_id TEXT NOT NULL REFERENCES profiles(id),
+      parent_id TEXT,
+      title TEXT NOT NULL,
+      slug TEXT NOT NULL,
+      description TEXT,
+      icon_key TEXT,
+      catalog_key TEXT,
+      sort_order INTEGER NOT NULL DEFAULT 0,
+      created_at INTEGER NOT NULL,
+      updated_at INTEGER NOT NULL
+    )
+  ''');
+  db.execute('''
+    CREATE TABLE flashcard_decks (
+      id TEXT NOT NULL PRIMARY KEY,
+      profile_id TEXT NOT NULL REFERENCES profiles(id),
+      area_id TEXT,
+      research_node_id TEXT,
+      title TEXT NOT NULL,
+      description TEXT,
+      new_limit_per_day INTEGER NOT NULL DEFAULT 20,
+      review_limit_per_day INTEGER NOT NULL DEFAULT 200,
+      archived_at INTEGER,
+      created_at INTEGER NOT NULL,
+      updated_at INTEGER NOT NULL,
+      version INTEGER NOT NULL DEFAULT 1
+    )
+  ''');
+  db.execute('''
+    CREATE TABLE flashcards (
+      id TEXT NOT NULL PRIMARY KEY,
+      profile_id TEXT NOT NULL REFERENCES profiles(id),
+      deck_id TEXT NOT NULL REFERENCES flashcard_decks(id),
+      area_id TEXT,
+      kind TEXT NOT NULL,
+      front TEXT NOT NULL,
+      back TEXT NOT NULL DEFAULT '',
+      extra TEXT,
+      tags_json TEXT NOT NULL DEFAULT '[]',
+      cloze_index INTEGER,
+      reverse_of_id TEXT,
+      suspended INTEGER NOT NULL DEFAULT 0,
+      created_at INTEGER NOT NULL,
+      updated_at INTEGER NOT NULL,
+      version INTEGER NOT NULL DEFAULT 1
+    )
+  ''');
+  db.execute('''
+    CREATE TABLE flashcard_srs (
+      card_id TEXT NOT NULL PRIMARY KEY REFERENCES flashcards(id),
+      status TEXT NOT NULL,
+      ease_factor REAL NOT NULL DEFAULT 2.5,
+      interval_days REAL NOT NULL DEFAULT 0,
+      repetitions INTEGER NOT NULL DEFAULT 0,
+      lapses INTEGER NOT NULL DEFAULT 0,
+      learning_step_index INTEGER NOT NULL DEFAULT 0,
+      leech INTEGER NOT NULL DEFAULT 0,
+      due_at INTEGER NOT NULL,
+      last_reviewed_at INTEGER
+    )
+  ''');
+  db.execute('''
+    CREATE TABLE flashcard_review_logs (
+      id TEXT NOT NULL PRIMARY KEY,
+      card_id TEXT NOT NULL REFERENCES flashcards(id),
+      reviewed_at INTEGER NOT NULL,
+      rating TEXT NOT NULL,
+      interval_days_before REAL NOT NULL,
+      interval_days_after REAL NOT NULL,
+      ease_before REAL NOT NULL,
+      ease_after REAL NOT NULL,
+      duration_ms INTEGER
     )
   ''');
 }

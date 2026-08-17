@@ -860,6 +860,8 @@ class Flashcards extends Table {
   TextColumn get tagsJson => text().withDefault(const Constant('[]'))();
   IntColumn get clozeIndex => integer().nullable()();
   TextColumn get reverseOfId => text().nullable()();
+  TextColumn get scheduleMode =>
+      text().withDefault(const Constant('scheduled'))();
   BoolColumn get suspended => boolean().withDefault(const Constant(false))();
   IntColumn get createdAt => integer()();
   IntColumn get updatedAt => integer()();
@@ -903,7 +905,36 @@ class FlashcardReviewLogs extends Table {
   RealColumn get easeBefore => real()();
   RealColumn get easeAfter => real()();
   IntColumn get durationMs => integer().nullable()();
+  TextColumn get reviewKind => text().withDefault(const Constant('srs'))();
 
   @override
   Set<Column<Object>> get primaryKey => {id};
+}
+
+@DataClassName('KnowledgeAreaPlacementRow')
+class KnowledgeAreaPlacements extends Table {
+  @override
+  String get tableName => 'knowledge_area_placements';
+
+  TextColumn get areaId => text().references(KnowledgeAreas, #id)();
+  TextColumn get parentAreaId => text().references(KnowledgeAreas, #id)();
+  IntColumn get linkedAt => integer()();
+  TextColumn get catalogKey => text().nullable()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {areaId, parentAreaId};
+}
+
+@DataClassName('ResearchKnowledgeLinkRow')
+class ResearchKnowledgeLinks extends Table {
+  @override
+  String get tableName => 'research_knowledge_links';
+
+  TextColumn get researchNodeId => text().references(ResearchNodes, #id)();
+  TextColumn get areaId => text().references(KnowledgeAreas, #id)();
+  TextColumn get kind => text()();
+  IntColumn get linkedAt => integer()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {researchNodeId, areaId};
 }

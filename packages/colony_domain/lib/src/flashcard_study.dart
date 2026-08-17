@@ -2,6 +2,8 @@ import 'package:equatable/equatable.dart';
 
 import 'flashcard.dart';
 import 'id_generator.dart';
+import 'knowledge_area.dart';
+import 'knowledge_area_placement.dart';
 
 class StudyCard extends Equatable {
   const StudyCard({
@@ -10,6 +12,7 @@ class StudyCard extends Equatable {
     required this.prompt,
     required this.answer,
     this.extra,
+    this.sessionMode = FlashcardStudySessionMode.scheduled,
   });
 
   final Flashcard card;
@@ -17,9 +20,10 @@ class StudyCard extends Equatable {
   final String prompt;
   final String answer;
   final String? extra;
+  final FlashcardStudySessionMode sessionMode;
 
   @override
-  List<Object?> get props => [card, srs, prompt, answer, extra];
+  List<Object?> get props => [card, srs, prompt, answer, extra, sessionMode];
 }
 
 class FlashcardQueueCounts extends Equatable {
@@ -58,8 +62,179 @@ class KnowledgeAreaHeat extends Equatable {
   List<Object?> get props => [areaId, cardCount, dueCount, retention];
 }
 
+abstract final class FlashcardSchedulePolicy {
+  static bool isInDueQueue(Flashcard card) =>
+      !card.suspended && card.scheduleMode == FlashcardScheduleMode.scheduled;
+}
+
+class FlashcardTodayDigest extends Equatable {
+  const FlashcardTodayDigest({
+    required this.dueNowTotal,
+    required this.dueNowByBucket,
+    required this.dueLaterToday,
+    required this.unscheduledCount,
+    required this.completedToday,
+    required this.cappedForSession,
+    required this.limitDeferred,
+    required this.estimatedMinutes,
+  });
+
+  final int dueNowTotal;
+  final FlashcardQueueCounts dueNowByBucket;
+  final int dueLaterToday;
+  final int unscheduledCount;
+  final int completedToday;
+  final int cappedForSession;
+  final int limitDeferred;
+  final int estimatedMinutes;
+
+  @override
+  List<Object?> get props => [
+        dueNowTotal,
+        dueNowByBucket,
+        dueLaterToday,
+        unscheduledCount,
+        completedToday,
+        cappedForSession,
+        limitDeferred,
+        estimatedMinutes,
+      ];
+}
+
+abstract final class FlashcardDailyUsagePolicy {
+  static Map<EntityId, int> newIntroducedByDeck({
+    required List<Flashcard> cards,
+    required Map<EntityId, FlashcardSrsState> srsByCard,
+    required List<FlashcardReviewLog> logs,
+    required DateTime now,
+  }) {
+    final byId = {for (final card in cards) card.id: card};
+    final firstSrs = <EntityId, FlashcardReviewLog>{};
+    for (final log in logs) {
+      if (log.reviewKind != FlashcardReviewKind.srs) continue;
+      if (!StudyQueuePolicy.isSameLocalDay(log.reviewedAt, now)) continue;
+      final existing = firstSrs[log.cardId];
+      if (existing == null || log.reviewedAt.isBefore(existing.reviewedAt)) {
+        firstSrs[log.cardId] = log;
+      }
+    }
+    final out = <EntityId, int>{};
+    for (final entry in firstSrs.entries) {
+      final card = byId[entry.key];
+      if (card == null) continue;
+      final srs = srsByCard[card.id];
+      if (srs == null) continue;
+      if (srs.repetitions <= 1 &&
+          (srs.status == FlashcardSrsStatus.learning ||
+              srs.status == FlashcardSrsStatus.review)) {
+        out[card.deckId] = (out[card.deckId] ?? 0) + 1;
+      }
+    }
+    return out;
+  }
+
+  static Map<EntityId, int> reviewRepsByDeck({
+    required List<Flashcard> cards,
+    required List<FlashcardReviewLog> logs,
+    required DateTime now,
+  }) {
+    final byId = {for (final card in cards) card.id: card};
+    final out = <EntityId, int>{};
+    for (final log in logs) {
+      if (log.reviewKind != FlashcardReviewKind.srs) continue;
+      if (!StudyQueuePolicy.isSameLocalDay(log.reviewedAt, now)) continue;
+      if (log.intervalDaysBefore < 1) continue;
+      final card = byId[log.cardId];
+      if (card == null) continue;
+      out[card.deckId] = (out[card.deckId] ?? 0) + 1;
+    }
+    return out;
+  }
+}
+
+abstract final class FlashcardTodayDigestPolicy {
+  static FlashcardTodayDigest build({
+    required List<Flashcard> cards,
+    required Map<EntityId, FlashcardSrsState> srsByCard,
+    required List<FlashcardDeck> decks,
+    required List<FlashcardReviewLog> logs,
+    required DateTime now,
+  }) {
+    final scheduled = cards.where(FlashcardSchedulePolicy.isInDueQueue).toList();
+    final buckets = StudyQueuePolicy.counts(
+      cards: scheduled,
+      srsByCard: srsByCard,
+      now: now,
+    );
+    final later = StudyQueuePolicy.countDueLaterToday(
+      cards: scheduled,
+      srsByCard: srsByCard,
+      now: now,
+    );
+    final unscheduled = cards
+        .where(
+          (c) =>
+              !c.suspended &&
+              c.scheduleMode == FlashcardScheduleMode.unscheduled,
+        )
+        .length;
+    final completed = {
+      for (final log in logs)
+        if (log.reviewKind == FlashcardReviewKind.srs &&
+            StudyQueuePolicy.isSameLocalDay(log.reviewedAt, now))
+          log.cardId,
+    }.length;
+
+    final deckById = {for (final deck in decks) deck.id: deck};
+    final newUsed = FlashcardDailyUsagePolicy.newIntroducedByDeck(
+      cards: cards,
+      srsByCard: srsByCard,
+      logs: logs,
+      now: now,
+    );
+    final reviewUsed = FlashcardDailyUsagePolicy.reviewRepsByDeck(
+      cards: cards,
+      logs: logs,
+      now: now,
+    );
+
+    var capped = 0;
+    final byDeck = <EntityId, List<Flashcard>>{};
+    for (final card in scheduled) {
+      byDeck.putIfAbsent(card.deckId, () => []).add(card);
+    }
+    for (final entry in byDeck.entries) {
+      final deck = deckById[entry.key];
+      capped += StudyQueuePolicy.buildQueue(
+        cards: entry.value,
+        srsByCard: srsByCard,
+        now: now,
+        newRemaining: (deck?.newLimitPerDay ?? 20) - (newUsed[entry.key] ?? 0),
+        reviewRemaining:
+            (deck?.reviewLimitPerDay ?? 200) - (reviewUsed[entry.key] ?? 0),
+        interleaveByArea: false,
+      ).length;
+    }
+
+    return FlashcardTodayDigest(
+      dueNowTotal: buckets.dueTotal,
+      dueNowByBucket: buckets,
+      dueLaterToday: later,
+      unscheduledCount: unscheduled,
+      completedToday: completed,
+      cappedForSession: capped,
+      limitDeferred: (buckets.dueTotal - capped).clamp(0, buckets.dueTotal),
+      estimatedMinutes: capped < 1 ? 0 : (capped * 0.5).ceil().clamp(1, 180),
+    );
+  }
+}
+
 abstract final class StudyQueuePolicy {
-  static StudyCard present(Flashcard card, FlashcardSrsState srs) {
+  static StudyCard present(
+    Flashcard card,
+    FlashcardSrsState srs, {
+    FlashcardStudySessionMode sessionMode = FlashcardStudySessionMode.scheduled,
+  }) {
     if (card.kind == FlashcardKind.cloze) {
       final index = card.clozeIndex ??
           (ClozeRenderer.indicesIn(card.front).isEmpty
@@ -71,6 +246,7 @@ abstract final class StudyQueuePolicy {
         prompt: ClozeRenderer.prompt(card.front, index),
         answer: ClozeRenderer.answer(card.front),
         extra: card.extra ?? (card.back.isEmpty ? null : card.back),
+        sessionMode: sessionMode,
       );
     }
     return StudyCard(
@@ -79,6 +255,7 @@ abstract final class StudyQueuePolicy {
       prompt: card.front,
       answer: card.back,
       extra: card.extra,
+      sessionMode: sessionMode,
     );
   }
 
@@ -91,7 +268,7 @@ abstract final class StudyQueuePolicy {
     var learningCount = 0;
     var reviewCount = 0;
     for (final card in cards) {
-      if (card.suspended) continue;
+      if (!FlashcardSchedulePolicy.isInDueQueue(card)) continue;
       final srs = srsByCard[card.id] ??
           FlashcardSrsState.fresh(cardId: card.id, createdAt: card.createdAt);
       if (srs.dueAt.isAfter(now)) continue;
@@ -125,7 +302,7 @@ abstract final class StudyQueuePolicy {
     final news = <StudyCard>[];
 
     for (final card in cards) {
-      if (card.suspended) continue;
+      if (!FlashcardSchedulePolicy.isInDueQueue(card)) continue;
       final srs = srsByCard[card.id] ??
           FlashcardSrsState.fresh(cardId: card.id, createdAt: card.createdAt);
       if (srs.dueAt.isAfter(now)) continue;
@@ -173,6 +350,40 @@ abstract final class StudyQueuePolicy {
     return out;
   }
 
+  static int countDueLaterToday({
+    required List<Flashcard> cards,
+    required Map<EntityId, FlashcardSrsState> srsByCard,
+    required DateTime now,
+  }) {
+    final end = startOfNextLocalDay(now);
+    var count = 0;
+    for (final card in cards) {
+      if (!FlashcardSchedulePolicy.isInDueQueue(card)) continue;
+      final srs = srsByCard[card.id] ??
+          FlashcardSrsState.fresh(cardId: card.id, createdAt: card.createdAt);
+      if (srs.dueAt.isAfter(now) && !srs.dueAt.isAfter(end)) count++;
+    }
+    return count;
+  }
+
+  static List<StudyCard> buildPracticeQueue({
+    required List<Flashcard> cards,
+    required Map<EntityId, FlashcardSrsState> srsByCard,
+    int limit = 20,
+  }) {
+    final out = <StudyCard>[];
+    for (final card in cards) {
+      if (card.suspended) continue;
+      final srs = srsByCard[card.id] ??
+          FlashcardSrsState.fresh(cardId: card.id, createdAt: card.createdAt);
+      out.add(
+        present(card, srs, sessionMode: FlashcardStudySessionMode.practice),
+      );
+      if (out.length >= limit) break;
+    }
+    return out;
+  }
+
   static DateTime startOfNextLocalDay(DateTime now) {
     final local = now.toLocal();
     return DateTime(local.year, local.month, local.day + 1).toUtc();
@@ -204,32 +415,60 @@ abstract final class StudyQueuePolicy {
     required Map<EntityId, FlashcardSrsState> srsByCard,
     required List<FlashcardReviewLog> logs,
     required DateTime now,
+    List<KnowledgeArea> areas = const [],
+    List<KnowledgeAreaPlacement> placements = const [],
   }) {
-    final cardsByArea = <EntityId, List<Flashcard>>{};
-    for (final card in cards) {
-      final areaId = card.areaId;
-      if (areaId == null) continue;
-      cardsByArea.putIfAbsent(areaId, () => []).add(card);
-    }
     final logsByCard = <EntityId, List<FlashcardReviewLog>>{};
     for (final log in logs) {
+      if (log.reviewKind != FlashcardReviewKind.srs) continue;
       logsByCard.putIfAbsent(log.cardId, () => []).add(log);
     }
 
+    KnowledgeAreaHeat heatFor(
+      EntityId areaId,
+      Iterable<Flashcard> subset,
+    ) {
+      final list = subset.toList();
+      return KnowledgeAreaHeat(
+        areaId: areaId,
+        cardCount: list.length,
+        dueCount: counts(
+          cards: list,
+          srsByCard: srsByCard,
+          now: now,
+        ).dueTotal,
+        retention: retention([
+          for (final card in list) ...?logsByCard[card.id],
+        ]),
+      );
+    }
+
+    if (areas.isEmpty) {
+      final cardsByArea = <EntityId, List<Flashcard>>{};
+      for (final card in cards) {
+        final areaId = card.areaId;
+        if (areaId == null) continue;
+        cardsByArea.putIfAbsent(areaId, () => []).add(card);
+      }
+      return {
+        for (final entry in cardsByArea.entries)
+          entry.key: heatFor(entry.key, entry.value),
+      };
+    }
+
     return {
-      for (final entry in cardsByArea.entries)
-        entry.key: KnowledgeAreaHeat(
-          areaId: entry.key,
-          cardCount: entry.value.length,
-          dueCount: counts(
-            cards: entry.value,
-            srsByCard: srsByCard,
-            now: now,
-          ).dueTotal,
-          retention: retention([
-            for (final card in entry.value)
-              ...?logsByCard[card.id],
-          ]),
+      for (final area in areas)
+        area.id: heatFor(
+          area.id,
+          cards.where((card) {
+            final areaId = card.areaId;
+            if (areaId == null) return false;
+            return KnowledgeAreaPolicy.descendantIds(
+              rootId: area.id,
+              areas: areas,
+              placements: placements,
+            ).contains(areaId);
+          }),
         ),
     };
   }
@@ -242,7 +481,10 @@ abstract final class StudyQueuePolicy {
     final out = List<int>.filled(days, 0);
     final start = DateTime(now.toLocal().year, now.toLocal().month, now.toLocal().day);
     for (final state in states) {
-      if (state.status == FlashcardSrsStatus.newCard) continue;
+      if (state.status == FlashcardSrsStatus.newCard &&
+          state.lastReviewedAt == null) {
+        continue;
+      }
       final due = state.dueAt.toLocal();
       final delta = DateTime(due.year, due.month, due.day).difference(start).inDays;
       if (delta >= 0 && delta < days) out[delta]++;

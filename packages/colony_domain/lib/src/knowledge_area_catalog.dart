@@ -8,6 +8,7 @@ class KnowledgeCatalogEntry extends Equatable {
     this.description,
     this.iconKey,
     this.children = const [],
+    this.catalogPlacements = const [],
   });
 
   final String key;
@@ -16,8 +17,12 @@ class KnowledgeCatalogEntry extends Equatable {
   final String? iconKey;
   final List<KnowledgeCatalogEntry> children;
 
+  /// Catalog keys of extra parents (alias shelves).
+  final List<String> catalogPlacements;
+
   @override
-  List<Object?> get props => [key, title, description, iconKey, children];
+  List<Object?> get props =>
+      [key, title, description, iconKey, children, catalogPlacements];
 }
 
 abstract final class KnowledgeAreaCatalog {
@@ -81,7 +86,20 @@ abstract final class KnowledgeAreaCatalog {
       title: 'Humanidades',
       iconKey: 'menu_book',
       children: [
-        KnowledgeCatalogEntry(key: 'humanities.history', title: 'História'),
+        KnowledgeCatalogEntry(
+          key: 'humanities.history',
+          title: 'História',
+          children: [
+            KnowledgeCatalogEntry(
+              key: 'humanities.history.brazil',
+              title: 'História do Brasil',
+            ),
+            KnowledgeCatalogEntry(
+              key: 'humanities.history.art',
+              title: 'História da arte',
+            ),
+          ],
+        ),
         KnowledgeCatalogEntry(key: 'humanities.philosophy', title: 'Filosofia'),
         KnowledgeCatalogEntry(key: 'humanities.art', title: 'História da arte'),
         KnowledgeCatalogEntry(key: 'humanities.literature', title: 'Literatura'),
@@ -93,7 +111,21 @@ abstract final class KnowledgeAreaCatalog {
       title: 'Artes',
       iconKey: 'piano',
       children: [
-        KnowledgeCatalogEntry(key: 'arts.music', title: 'Música'),
+        KnowledgeCatalogEntry(
+          key: 'arts.music',
+          title: 'Música',
+          children: [
+            KnowledgeCatalogEntry(
+              key: 'arts.music.theory',
+              title: 'Teoria musical',
+            ),
+            KnowledgeCatalogEntry(
+              key: 'arts.music.tropicalismo',
+              title: 'Tropicalismo',
+              catalogPlacements: ['humanities.history.brazil'],
+            ),
+          ],
+        ),
         KnowledgeCatalogEntry(key: 'arts.harmony', title: 'Harmonia'),
         KnowledgeCatalogEntry(key: 'arts.piano', title: 'Piano'),
         KnowledgeCatalogEntry(key: 'arts.drawing', title: 'Desenho'),
@@ -130,6 +162,24 @@ abstract final class KnowledgeAreaCatalog {
         KnowledgeCatalogEntry(key: 'engineering.ee', title: 'Elétrica'),
         KnowledgeCatalogEntry(key: 'engineering.me', title: 'Mecânica'),
         KnowledgeCatalogEntry(key: 'engineering.ce', title: 'Civil'),
+        KnowledgeCatalogEntry(
+          key: 'engineering.automotive',
+          title: 'Automotiva',
+          children: [
+            KnowledgeCatalogEntry(
+              key: 'engineering.automotive.autonomous',
+              title: 'Carros autônomos',
+              children: [
+                KnowledgeCatalogEntry(
+                  key: 'engineering.automotive.autonomous.odd',
+                  title: 'ODD (Operational Design Domain)',
+                  description:
+                      'Condições em que o sistema autônomo foi projetado para operar.',
+                ),
+              ],
+            ),
+          ],
+        ),
       ],
     ),
   ];
@@ -145,6 +195,41 @@ abstract final class KnowledgeAreaCatalog {
     }
 
     return walk(entries);
+  }
+
+  /// Selected keys plus placement parents (and, via [needed], their ancestors).
+  static Set<String> expandKeys(Iterable<String> keys) {
+    final selected = keys.toSet();
+    if (selected.isEmpty) return selected;
+    var changed = true;
+    while (changed) {
+      changed = false;
+      void walk(KnowledgeCatalogEntry entry) {
+        final inSubtree = selected.contains(entry.key) ||
+            entry.children.any((child) => _subtreeSelected(child, selected));
+        if (inSubtree) {
+          for (final parent in entry.catalogPlacements) {
+            if (selected.add(parent)) changed = true;
+          }
+        }
+        for (final child in entry.children) {
+          walk(child);
+        }
+      }
+
+      for (final root in entries) {
+        walk(root);
+      }
+    }
+    return selected;
+  }
+
+  static bool _subtreeSelected(
+    KnowledgeCatalogEntry entry,
+    Set<String> selected,
+  ) {
+    if (selected.contains(entry.key)) return true;
+    return entry.children.any((child) => _subtreeSelected(child, selected));
   }
 
   static List<String> flattenKeys([List<KnowledgeCatalogEntry>? nodes]) {

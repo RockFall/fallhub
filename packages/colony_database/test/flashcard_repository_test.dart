@@ -92,7 +92,7 @@ void main() {
     expect(buried.dueAt.isAfter(now), isTrue);
 
     final snapshot = await repos.export.buildSnapshot();
-    expect(snapshot.version, 30);
+    expect(snapshot.version, 31);
     expect(snapshot.knowledgeAreas, isNotEmpty);
     expect(snapshot.flashcardDecks, hasLength(1));
     expect(snapshot.flashcards.length, greaterThanOrEqualTo(4));
@@ -121,6 +121,63 @@ void main() {
     expect(
       () => repos.flashcards.updateArea(root.copyWith(parentId: child.id)),
       throwsA(isA<KnowledgeAreaCycleException>()),
+    );
+  });
+
+  test('unscheduled card has no SRS; practice does not mutate intervals', () async {
+    final created = await profile();
+    final deck = await repos.flashcards.createDeck(
+      profileId: created.id,
+      title: 'Pontual',
+    );
+    final cards = await repos.flashcards.createCard(
+      profileId: created.id,
+      deckId: deck.id,
+      front: 'ODD',
+      back: 'Operational Design Domain',
+      scheduleMode: FlashcardScheduleMode.unscheduled,
+    );
+    expect(await repos.flashcards.listSrs(created.id), isEmpty);
+    final log = await repos.flashcards.practice(
+      card: cards.single,
+      rating: FlashcardRating.good,
+    );
+    expect(log.reviewKind, FlashcardReviewKind.practice);
+    expect(await repos.flashcards.listSrs(created.id), isEmpty);
+    await repos.flashcards.scheduleCard(cards.single);
+    final scheduled = (await repos.flashcards.listCards(created.id)).single;
+    expect(scheduled.scheduleMode, FlashcardScheduleMode.scheduled);
+    expect(await repos.flashcards.listSrs(created.id), hasLength(1));
+  });
+
+  test('catalog seeds Tropicalismo under Music and History of Brazil', () async {
+    final created = await profile();
+    await repos.flashcards.seedCatalog(
+      profileId: created.id,
+      keys: const ['arts.music.tropicalismo'],
+    );
+    final areas = await repos.flashcards.listAreas(created.id);
+    final trop = areas.firstWhere(
+      (a) => a.catalogKey == 'arts.music.tropicalismo',
+    );
+    final brazil = areas.firstWhere(
+      (a) => a.catalogKey == 'humanities.history.brazil',
+    );
+    expect(trop.parentId, isNotNull);
+    final placements = await repos.flashcards.listPlacements(created.id);
+    expect(
+      placements.any(
+        (p) => p.areaId == trop.id && p.parentAreaId == brazil.id,
+      ),
+      isTrue,
+    );
+    expect(
+      KnowledgeAreaPolicy.descendantIds(
+        rootId: brazil.id,
+        areas: areas,
+        placements: placements,
+      ),
+      contains(trop.id),
     );
   });
 }

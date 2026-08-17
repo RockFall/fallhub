@@ -152,7 +152,137 @@ void main() {
     final keys = KnowledgeAreaCatalog.flattenKeys();
     expect(keys.toSet().length, keys.length);
     expect(keys, contains('computing.flutter'));
+    expect(keys, contains('arts.music.tropicalismo'));
+    expect(keys, contains('engineering.automotive.autonomous.odd'));
+    expect(keys, contains('humanities.history.brazil'));
     expect(KnowledgeAreaCatalog.byKey('arts.piano')?.title, 'Piano');
+    expect(
+      KnowledgeAreaCatalog.byKey('arts.music.tropicalismo')?.catalogPlacements,
+      ['humanities.history.brazil'],
+    );
+    expect(
+      KnowledgeAreaCatalog.expandKeys(['arts.music.tropicalismo']),
+      containsAll(['arts.music.tropicalismo', 'humanities.history.brazil']),
+    );
+  });
+
+  test('unscheduled cards stay out of the due queue', () {
+    final scheduled = card('s');
+    final saved = card('u').copyWith(
+      scheduleMode: FlashcardScheduleMode.unscheduled,
+    );
+    final srs = {
+      scheduled.id: FlashcardSrsState.fresh(
+        cardId: scheduled.id,
+        createdAt: now,
+      ),
+      saved.id: FlashcardSrsState.fresh(cardId: saved.id, createdAt: now),
+    };
+    final queue = StudyQueuePolicy.buildQueue(
+      cards: [scheduled, saved],
+      srsByCard: srs,
+      now: now,
+      newRemaining: 10,
+      reviewRemaining: 10,
+      interleaveByArea: false,
+    );
+    expect(queue.map((c) => c.card.id.value), ['s']);
+    expect(
+      StudyQueuePolicy.counts(
+        cards: [scheduled, saved],
+        srsByCard: srs,
+        now: now,
+      ).dueTotal,
+      1,
+    );
+  });
+
+  test('practice queue does not require due SRS and marks session mode', () {
+    final saved = card('p').copyWith(
+      scheduleMode: FlashcardScheduleMode.unscheduled,
+    );
+    final queue = StudyQueuePolicy.buildPracticeQueue(
+      cards: [saved],
+      srsByCard: const {},
+      limit: 5,
+    );
+    expect(queue, hasLength(1));
+    expect(queue.single.sessionMode, FlashcardStudySessionMode.practice);
+  });
+
+  test('today digest caps the session and separates later / unscheduled', () {
+    final deckA = FlashcardDeck.create(
+      id: deck,
+      profileId: profile,
+      title: 'A',
+      createdAt: now,
+      newLimitPerDay: 1,
+      reviewLimitPerDay: 1,
+    );
+    final n1 = card('n1');
+    final n2 = card('n2');
+    final later = card('later');
+    final saved = card('saved').copyWith(
+      scheduleMode: FlashcardScheduleMode.unscheduled,
+    );
+    final srs = {
+      n1.id: FlashcardSrsState.fresh(cardId: n1.id, createdAt: now),
+      n2.id: FlashcardSrsState.fresh(cardId: n2.id, createdAt: now),
+      later.id: FlashcardSrsState.fresh(cardId: later.id, createdAt: now)
+          .copyWith(
+        status: FlashcardSrsStatus.learning,
+        dueAt: now.add(const Duration(hours: 3)),
+      ),
+      saved.id: FlashcardSrsState.fresh(cardId: saved.id, createdAt: now),
+    };
+    final digest = FlashcardTodayDigestPolicy.build(
+      cards: [n1, n2, later, saved],
+      srsByCard: srs,
+      decks: [deckA],
+      logs: const [],
+      now: now,
+    );
+    expect(digest.dueNowTotal, 2);
+    expect(digest.cappedForSession, 1);
+    expect(digest.limitDeferred, 1);
+    expect(digest.dueLaterToday, 1);
+    expect(digest.unscheduledCount, 1);
+    expect(digest.estimatedMinutes, 1);
+  });
+
+  test('daily usage ignores practice logs and learning-step reps', () {
+    final reviewCard = card('r');
+    final logs = [
+      FlashcardReviewLog(
+        id: EntityId('p'),
+        cardId: reviewCard.id,
+        reviewedAt: now,
+        rating: FlashcardRating.good,
+        intervalDaysBefore: 2,
+        intervalDaysAfter: 2,
+        easeBefore: 2.5,
+        easeAfter: 2.5,
+        reviewKind: FlashcardReviewKind.practice,
+      ),
+      FlashcardReviewLog(
+        id: EntityId('l'),
+        cardId: reviewCard.id,
+        reviewedAt: now,
+        rating: FlashcardRating.good,
+        intervalDaysBefore: 0,
+        intervalDaysAfter: 0,
+        easeBefore: 2.5,
+        easeAfter: 2.5,
+      ),
+    ];
+    expect(
+      FlashcardDailyUsagePolicy.reviewRepsByDeck(
+        cards: [reviewCard],
+        logs: logs,
+        now: now,
+      ),
+      isEmpty,
+    );
   });
 
   test('flashcard policy rejects empty front and cloze without tokens', () {

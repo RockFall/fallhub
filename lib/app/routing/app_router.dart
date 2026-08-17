@@ -1,4 +1,5 @@
 import 'package:colony_design_system/colony_design_system.dart';
+import 'package:colony_domain/colony_domain.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -193,12 +194,17 @@ final routerProvider = Provider<GoRouter>((ref) {
                 builder: (context, state) => StudySessionScreen(
                   deckId: state.uri.queryParameters['deckId'],
                   areaId: state.uri.queryParameters['areaId'],
+                  cardId: state.uri.queryParameters['cardId'],
+                  mode: state.uri.queryParameters['mode'] == 'practice'
+                      ? FlashcardStudySessionMode.practice
+                      : FlashcardStudySessionMode.scheduled,
                 ),
               ),
               GoRoute(
                 path: 'areas/:id',
                 builder: (context, state) => KnowledgeAreaScreen(
                   areaId: state.pathParameters['id']!,
+                  viaAreaId: state.uri.queryParameters['via'],
                 ),
               ),
               GoRoute(

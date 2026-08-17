@@ -11,7 +11,7 @@ O uso-alvo é estudar no celular (sideload, ADR-035): captura rápida, sessão d
 ## Decisão
 
 ### 1. Mapa de conhecimento (independente da research tree)
-`KnowledgeArea` é uma árvore (`parent_id` opcional): área → subárea → tópico.
+`KnowledgeArea` tem um pai **primário** (`parent_id` opcional). Colocações secundárias e pontes com pesquisa: **ADR-037**.
 - Não substitui `ResearchNode`. Pesquisa = intenção/evidência; área = taxonomia.
 - Catálogo sugerido (linguagens, matemática, ciências, computação, humanidades, artes, sociedade, vida prática, engenharia) — o usuário **escolhe** o que semear. Não despejamos 50 áreas vazias.
 - Áreas customizadas são cidadãs de primeira classe.
@@ -21,6 +21,7 @@ O uso-alvo é estudar no celular (sideload, ADR-035): captura rápida, sessão d
 `Flashcard`:
 - `kind`: `basic` | `reverse` | `cloze` | `freeRecall` | `exercise` | `repertoire`
 - `front`, `back`, `extra?`, `tags[]`, `clozeIndex?`, `reverseOfId?`, `suspended`
+- `scheduleMode`: `scheduled` (SRS) | `unscheduled` (guardado / prática pontual)
 - Cloze: `{{cN::texto}}` — um cartão por índice; o verso mostra o texto completo.
 - Reverse: o controller cria o par invertido (`reverseOfId`) com SRS **separado**.
 
@@ -43,10 +44,14 @@ Fila do dia (`StudyQueuePolicy`):
 
 Bury = empurrar `dueAt` para o próximo dia local. Undo = reverte o último log + estado SRS.
 
+Sessão **prática** (`FlashcardStudySessionMode.practice`): avalia sem mutar SRS; log com `reviewKind = practice`. Não conta no limite diário nem no digest “agora”.
+
+Digest do dia (`FlashcardTodayDigestPolicy`): fila **limitada** (o que a sessão vai servir), “mais tarde hoje”, guardados, adiados por limite. O herói do hub mostra esse número — não o pool cru.
+
 ### 4. Persistência e export
-- DB **v34**: `knowledge_areas`, `flashcard_decks`, `flashcards`, `flashcard_srs`, `flashcard_review_logs`
-- Export **v30**: as cinco coleções; v≤29 restauram `[]`
-- Eventos: deck/card/area created/updated, `flashcardReviewed`, `flashcardCatalogSeeded`
+- DB **v35**: áreas, baralhos, cartões (`schedule_mode`), SRS, logs (`review_kind`), colocações, research↔área
+- Export **v31**: coleções v30 + `schedule_mode` / `review_kind` + colocações + links; v≤30 default `scheduled` / `srs`
+- Eventos: deck/card/area created/updated, `flashcardReviewed`, `flashcardPracticed`, `flashcardScheduled`, `flashcardCatalogSeeded`
 
 ### 5. UI
 Hub `/flashcards` (hero do dia + mapa com calor de retenção + baralhos).

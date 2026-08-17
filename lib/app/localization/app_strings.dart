@@ -716,6 +716,63 @@ abstract final class AppStrings {
   static const flashcardsLimitsHint =
       'Limites valem só para este baralho, no dia local.';
   static const flashcardsEmptyCta = 'Começar pelo mapa ou por um baralho';
+  static const flashcardsHeroToday = 'Hoje';
+  static const flashcardsDueTodayZero = 'Nada na fila agora';
+  static const flashcardsLaterToday = 'Mais tarde hoje';
+  static const flashcardsLimitDeferred = 'Adiados pelo limite';
+  static const flashcardsCompletedToday = 'Feitos hoje';
+  static const flashcardsUnscheduled = 'Guardados';
+  static const flashcardsPractice = 'Praticar';
+  static const flashcardsPracticeNow = 'Praticar agora';
+  static const flashcardsPracticeDeck = 'Praticar baralho';
+  static const flashcardsPracticeArea = 'Praticar área';
+  static const flashcardsPracticeSaved = 'Praticar guardados';
+  static const flashcardsPracticeDone = 'Prática encerrada.';
+  static const flashcardsPracticeDoneHint =
+      'Isto não alterou a fila espaçada. Programe o cartão quando quiser revisá-lo no tempo.';
+  static const flashcardsPracticeSession = 'Prática pontual';
+  static const flashcardsSchedule = 'Programar';
+  static const flashcardsSaveOnly = 'Só guardar';
+  static const flashcardsScheduled = 'Na fila';
+  static const flashcardsCaptureHint =
+      'Programar entra na fila de hoje. Guardar fica à mão para uma prática pontual.';
+  static const flashcardsAdvanced = 'Opções avançadas';
+  static const flashcardsAlsoIn = 'Também em';
+  static const flashcardsAddPlacement = 'Colocar também em…';
+  static const flashcardsPlacementHint =
+      'O mesmo tópico pode viver em mais de uma prateleira — Tropicalismo em Música e em História do Brasil.';
+  static const flashcardsAliasShortcut = 'atalho';
+  static const flashcardsSubareasEmpty = 'Nenhuma subárea ainda.';
+  static const flashcardsBackToHub = 'Voltar aos flashcards';
+  static const flashcardsRetentionFirm = 'Firme';
+  static const flashcardsRetentionWarm = 'Em construção';
+  static const flashcardsRetentionFragile = 'Frágil';
+  static const flashcardsRetentionUnknown = 'Sem histórico';
+  static const flashcardsMoreActions = 'Mais ações';
+  static const flashcardsSearchDecksHint = 'Filtrar cartões deste baralho';
+  static const flashcardsLinkedShelves = 'Prateleiras de conhecimento';
+  static const flashcardsNoLinkedShelves = 'Nenhuma área ligada a este nó.';
+  static const flashcardsLinkShelf = 'Ligar área';
+  static const flashcardsLinkedResearchEmpty = 'Nenhum nó de pesquisa nesta área.';
+  static const flashcardsLinkResearch = 'Ligar pesquisa';
+  static const flashcardsPlacementParent = 'Outra prateleira';
+  static const flashcardsTodayDigestHelp =
+      'O número é o que a sessão vai servir hoje, já com os limites do baralho.';
+
+  static String flashcardsHeroStudyCount(int count) => count == 1
+      ? '1 cartão agora'
+      : '$count cartões agora';
+
+  static String flashcardsMinutes(int minutes) => '~$minutes min';
+
+  static String flashcardsProgress(int current, int total) => '$current/$total';
+
+  static String researchKnowledgeLinkLabel(ResearchKnowledgeLinkKind kind) =>
+      switch (kind) {
+        ResearchKnowledgeLinkKind.primary => 'Foco',
+        ResearchKnowledgeLinkKind.related => 'Relacionada',
+        ResearchKnowledgeLinkKind.practice => 'Prática',
+      };
 
   static String flashcardKindLabel(FlashcardKind kind) => switch (kind) {
         FlashcardKind.basic => 'Básico',
@@ -1473,6 +1530,8 @@ abstract final class AppStrings {
       'flashcards' => 'Flashcards',
       'flashcard_srs' => 'Estados SRS',
       'flashcard_review_logs' => 'Revisões de flashcards',
+      'knowledge_area_placements' => 'Colocações de áreas',
+      'research_knowledge_links' => 'Pontes pesquisa↔conhecimento',
       _ => key,
     };
     return '$label: $count';

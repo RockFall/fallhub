@@ -47,7 +47,10 @@ void main() {
 
     await tester.pumpWidget(
       ProviderScope(
-        overrides: [databaseProvider.overrideWithValue(db)],
+        overrides: [
+          databaseProvider.overrideWithValue(db),
+          clockProvider.overrideWithValue(() => DateTime.utc(2026, 8, 17, 12)),
+        ],
         child: MaterialApp(
           theme: ColonyTheme.dark(),
           home: const Scaffold(body: FlashcardsHubScreen()),
@@ -59,8 +62,78 @@ void main() {
 
     expect(find.text(AppStrings.flashcardsEmpty), findsOneWidget);
     expect(find.text(AppStrings.flashcardsEmptyHint), findsOneWidget);
-    expect(find.text(AppStrings.flashcardsMapEmpty), findsOneWidget);
     expect(find.text(AppStrings.flashcardsStudyNow), findsOneWidget);
+    expect(find.text(AppStrings.flashcardsDueTodayZero), findsOneWidget);
+    expect(find.text(AppStrings.flashcardsSeedMap), findsWidgets);
+    expect(find.text(AppStrings.flashcardsNewDeck), findsOneWidget);
+    expect(find.text(AppStrings.flashcardsDisclaimer), findsOneWidget);
+
+    await _flushDisposeTimers(tester);
+  });
+
+  testWidgets('FlashcardsHubScreen hero shows capped session count', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(800, 1600);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    final now = DateTime.utc(2026, 8, 17, 12);
+    final db = ColonyDatabase.inMemory();
+    addTearDown(db.close);
+    final repos = ColonyRepositories.create(
+      db,
+      idGenerator: FixedIdGenerator([
+        for (var i = 1; i <= 40; i++) 'id-$i',
+      ]),
+      clock: () => now,
+    );
+    final profile = await repos.profiles.create(
+      colonyName: 'Test',
+      displayName: 'Caio',
+      timezone: 'UTC',
+      locale: 'pt_BR',
+      baseCurrency: 'BRL',
+    );
+    await repos.preferences.save(
+      AppPreferences.defaults().copyWith(onboardingCompleted: true),
+    );
+    final deck = await repos.flashcards.createDeck(
+      profileId: profile.id,
+      title: 'Limite',
+      newLimitPerDay: 1,
+    );
+    await repos.flashcards.createCard(
+      profileId: profile.id,
+      deckId: deck.id,
+      front: 'Um',
+      back: '1',
+    );
+    await repos.flashcards.createCard(
+      profileId: profile.id,
+      deckId: deck.id,
+      front: 'Dois',
+      back: '2',
+    );
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          databaseProvider.overrideWithValue(db),
+          clockProvider.overrideWithValue(() => now),
+        ],
+        child: MaterialApp(
+          theme: ColonyTheme.dark(),
+          home: const Scaffold(body: FlashcardsHubScreen()),
+        ),
+      ),
+    );
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 500));
+
+    expect(find.text(AppStrings.flashcardsHeroStudyCount(1)), findsOneWidget);
+    expect(find.text(AppStrings.flashcardsMinutes(1)), findsOneWidget);
 
     await _flushDisposeTimers(tester);
   });

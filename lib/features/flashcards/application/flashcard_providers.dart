@@ -9,6 +9,23 @@ final knowledgeAreasProvider = StreamProvider<List<KnowledgeArea>>((ref) {
   return ref.watch(repositoriesProvider).flashcards.watchAreas(profile.id);
 });
 
+final knowledgePlacementsProvider =
+    StreamProvider<List<KnowledgeAreaPlacement>>((ref) {
+  final profile = ref.watch(profileProvider).asData?.value;
+  if (profile == null) return const Stream.empty();
+  return ref.watch(repositoriesProvider).flashcards.watchPlacements(profile.id);
+});
+
+final researchKnowledgeLinksProvider =
+    StreamProvider<List<ResearchKnowledgeLink>>((ref) {
+  final profile = ref.watch(profileProvider).asData?.value;
+  if (profile == null) return const Stream.empty();
+  return ref
+      .watch(repositoriesProvider)
+      .flashcards
+      .watchResearchLinks(profile.id);
+});
+
 final flashcardDecksProvider = StreamProvider<List<FlashcardDeck>>((ref) {
   final profile = ref.watch(profileProvider).asData?.value;
   if (profile == null) return const Stream.empty();
@@ -53,23 +70,40 @@ class FlashcardSearchQuery extends Notifier<String> {
   void set(String query) => state = query;
 }
 
-final flashcardQueueCountsProvider = Provider<FlashcardQueueCounts>((ref) {
+final flashcardTodayDigestProvider = Provider<FlashcardTodayDigest>((ref) {
   final cards = ref.watch(flashcardsProvider).asData?.value ?? const [];
   final srs = ref.watch(flashcardSrsProvider).asData?.value ?? const {};
+  final decks = ref.watch(flashcardDecksProvider).asData?.value ?? const [];
+  final logs = ref.watch(flashcardLogsProvider).asData?.value ?? const [];
   final now = ref.watch(clockProvider)();
-  return StudyQueuePolicy.counts(cards: cards, srsByCard: srs, now: now);
+  return FlashcardTodayDigestPolicy.build(
+    cards: cards,
+    srsByCard: srs,
+    decks: decks,
+    logs: logs,
+    now: now,
+  );
+});
+
+final flashcardQueueCountsProvider = Provider<FlashcardQueueCounts>((ref) {
+  return ref.watch(flashcardTodayDigestProvider).dueNowByBucket;
 });
 
 final flashcardHeatProvider = Provider<Map<EntityId, KnowledgeAreaHeat>>((ref) {
   final cards = ref.watch(flashcardsProvider).asData?.value ?? const [];
   final srs = ref.watch(flashcardSrsProvider).asData?.value ?? const {};
   final logs = ref.watch(flashcardLogsProvider).asData?.value ?? const [];
+  final areas = ref.watch(knowledgeAreasProvider).asData?.value ?? const [];
+  final placements =
+      ref.watch(knowledgePlacementsProvider).asData?.value ?? const [];
   final now = ref.watch(clockProvider)();
   return StudyQueuePolicy.heatByArea(
     cards: cards,
     srsByCard: srs,
     logs: logs,
     now: now,
+    areas: areas,
+    placements: placements,
   );
 });
 
@@ -99,4 +133,12 @@ final researchFlashcardDecksProvider =
       .watch(repositoriesProvider)
       .flashcards
       .watchDecksForResearch(EntityId(nodeId));
+});
+
+final researchKnowledgeShelvesProvider =
+    StreamProvider.family<List<ResearchKnowledgeLink>, String>((ref, nodeId) {
+  return ref
+      .watch(repositoriesProvider)
+      .flashcards
+      .watchResearchLinksForNode(EntityId(nodeId));
 });

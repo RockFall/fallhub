@@ -751,6 +751,67 @@ void main() {
       expect(srs.single.status, FlashcardSrsStatus.newCard);
     });
 
+    test('v34 to v35 adds schedule mode, placements and research links', () async {
+      final db = await openMigratedFrom(
+        34,
+        seed: (sqlite) {
+          seedProfile(sqlite);
+        },
+      );
+      addTearDown(() async {
+        await db.close();
+      });
+
+      final repos = ColonyRepositories.create(
+        db,
+        idGenerator: FixedIdGenerator([
+          'area-1',
+          'event-1',
+          'area-2',
+          'event-2',
+          'deck-1',
+          'event-3',
+          'card-1',
+          'event-4',
+          'event-5',
+          'log-1',
+          'event-6',
+        ]),
+        clock: () => DateTime.utc(2026, 8, 17, 12),
+      );
+
+      final profile = (await repos.profiles.getActive())!;
+      final music = await repos.flashcards.createArea(
+        profileId: profile.id,
+        title: 'Música',
+      );
+      final brazil = await repos.flashcards.createArea(
+        profileId: profile.id,
+        title: 'Brasil',
+      );
+      await repos.flashcards.addPlacement(
+        areaId: music.id,
+        parentAreaId: brazil.id,
+      );
+      final deck = await repos.flashcards.createDeck(
+        profileId: profile.id,
+        title: 'Teoria',
+        areaId: music.id,
+      );
+      final cards = await repos.flashcards.createCard(
+        profileId: profile.id,
+        deckId: deck.id,
+        areaId: music.id,
+        front: 'Dominante',
+        back: 'V',
+        scheduleMode: FlashcardScheduleMode.unscheduled,
+      );
+      expect(cards.single.scheduleMode, FlashcardScheduleMode.unscheduled);
+      expect(await repos.flashcards.listSrs(profile.id), isEmpty);
+      final placements = await repos.flashcards.listPlacements(profile.id);
+      expect(placements, hasLength(1));
+    });
+
     test('v31 to v32 adds health_appointments table', () async {
       final db = await openMigratedFrom(
         31,

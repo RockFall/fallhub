@@ -1,6 +1,7 @@
 import 'package:equatable/equatable.dart';
 
 import 'id_generator.dart';
+import 'knowledge_area_placement.dart';
 
 class KnowledgeArea extends Equatable {
   const KnowledgeArea({
@@ -198,6 +199,7 @@ abstract final class KnowledgeAreaPolicy {
   static Set<EntityId> descendantIds({
     required EntityId rootId,
     required List<KnowledgeArea> areas,
+    List<KnowledgeAreaPlacement> placements = const [],
   }) {
     final children = <EntityId, List<EntityId>>{};
     for (final area in areas) {
@@ -205,6 +207,9 @@ abstract final class KnowledgeAreaPolicy {
       if (parent != null) {
         children.putIfAbsent(parent, () => []).add(area.id);
       }
+    }
+    for (final placement in placements) {
+      children.putIfAbsent(placement.parentAreaId, () => []).add(placement.areaId);
     }
     final out = <EntityId>{rootId};
     final stack = <EntityId>[rootId];
@@ -215,6 +220,90 @@ abstract final class KnowledgeAreaPolicy {
       }
     }
     return out;
+  }
+
+  static List<KnowledgeArea> childrenOf({
+    required EntityId parentId,
+    required List<KnowledgeArea> areas,
+    List<KnowledgeAreaPlacement> placements = const [],
+  }) {
+    final byId = {for (final area in areas) area.id: area};
+    final ids = <EntityId>{
+      for (final area in areas)
+        if (area.parentId == parentId) area.id,
+      for (final placement in placements)
+        if (placement.parentAreaId == parentId) placement.areaId,
+    };
+    return [
+      for (final id in ids)
+        if (byId[id] != null) byId[id]!,
+    ];
+  }
+
+  static bool isAliasUnder({
+    required EntityId areaId,
+    required EntityId parentId,
+    required List<KnowledgeArea> areas,
+    required List<KnowledgeAreaPlacement> placements,
+  }) {
+    final area = {for (final item in areas) item.id: item}[areaId];
+    if (area?.parentId == parentId) return false;
+    return placements.any(
+      (p) => p.areaId == areaId && p.parentAreaId == parentId,
+    );
+  }
+
+  static List<String> pathsTo({
+    required EntityId areaId,
+    required List<KnowledgeArea> areas,
+    List<KnowledgeAreaPlacement> placements = const [],
+  }) {
+    final byId = {for (final area in areas) area.id: area};
+    if (byId[areaId] == null) return const [];
+    final parents = <EntityId?>{
+      byId[areaId]!.parentId,
+      for (final placement in placements)
+        if (placement.areaId == areaId) placement.parentAreaId,
+    };
+    final labels = <String>[];
+    for (final parentId in parents) {
+      final chain = <String>[byId[areaId]!.title];
+      var cursor = parentId == null ? null : byId[parentId];
+      final seen = <EntityId>{areaId};
+      while (cursor != null && seen.add(cursor.id)) {
+        chain.add(cursor.title);
+        final next = cursor.parentId;
+        cursor = next == null ? null : byId[next];
+      }
+      labels.add(chain.reversed.join(' · '));
+    }
+    return labels.toSet().toList()..sort();
+  }
+
+  static void assertPlacementAcyclic({
+    required EntityId areaId,
+    required EntityId parentAreaId,
+    required List<KnowledgeArea> areas,
+    required List<KnowledgeAreaPlacement> placements,
+  }) {
+    if (areaId == parentAreaId) {
+      throw KnowledgeAreaCycleException('Área não pode ser pai de si mesma.');
+    }
+    final next = [
+      ...placements,
+      KnowledgeAreaPlacement(
+        areaId: areaId,
+        parentAreaId: parentAreaId,
+        linkedAt: DateTime.fromMillisecondsSinceEpoch(0, isUtc: true),
+      ),
+    ];
+    if (descendantIds(
+      rootId: areaId,
+      areas: areas,
+      placements: next,
+    ).contains(parentAreaId)) {
+      throw KnowledgeAreaCycleException('Ciclo no mapa de conhecimento.');
+    }
   }
 }
 

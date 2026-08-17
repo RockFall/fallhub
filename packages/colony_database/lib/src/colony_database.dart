@@ -64,12 +64,14 @@ part 'colony_database.g.dart';
   Flashcards,
   FlashcardSrs,
   FlashcardReviewLogs,
+  KnowledgeAreaPlacements,
+  ResearchKnowledgeLinks,
 ])
 class ColonyDatabase extends _$ColonyDatabase {
   ColonyDatabase(super.e);
 
   @override
-  int get schemaVersion => 34;
+  int get schemaVersion => 35;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -203,6 +205,14 @@ class ColonyDatabase extends _$ColonyDatabase {
             await m.createTable(flashcards);
             await m.createTable(flashcardSrs);
             await m.createTable(flashcardReviewLogs);
+          }
+          if (from >= 34 && from < 35) {
+            await m.addColumn(flashcards, flashcards.scheduleMode);
+            await m.addColumn(flashcardReviewLogs, flashcardReviewLogs.reviewKind);
+          }
+          if (from < 35) {
+            await m.createTable(knowledgeAreaPlacements);
+            await m.createTable(researchKnowledgeLinks);
           }
         },
       );
@@ -1852,6 +1862,7 @@ class ColonyMappers {
       clozeIndex: row.clozeIndex,
       reverseOfId:
           row.reverseOfId == null ? null : domain.EntityId(row.reverseOfId!),
+      scheduleMode: domain.FlashcardScheduleMode.values.byName(row.scheduleMode),
       suspended: row.suspended,
       createdAt: DateTime.fromMillisecondsSinceEpoch(row.createdAt, isUtc: true),
       updatedAt: DateTime.fromMillisecondsSinceEpoch(row.updatedAt, isUtc: true),
@@ -1872,6 +1883,7 @@ class ColonyMappers {
       tagsJson: Value(jsonEncode(card.tags)),
       clozeIndex: Value(card.clozeIndex),
       reverseOfId: Value(card.reverseOfId?.value),
+      scheduleMode: Value(card.scheduleMode.name),
       suspended: Value(card.suspended),
       createdAt: card.createdAt.millisecondsSinceEpoch,
       updatedAt: card.updatedAt.millisecondsSinceEpoch,
@@ -1928,6 +1940,7 @@ class ColonyMappers {
       easeBefore: row.easeBefore,
       easeAfter: row.easeAfter,
       durationMs: row.durationMs,
+      reviewKind: domain.FlashcardReviewKind.values.byName(row.reviewKind),
     );
   }
 
@@ -1944,6 +1957,51 @@ class ColonyMappers {
       easeBefore: log.easeBefore,
       easeAfter: log.easeAfter,
       durationMs: Value(log.durationMs),
+      reviewKind: Value(log.reviewKind.name),
+    );
+  }
+
+  static domain.KnowledgeAreaPlacement toKnowledgeAreaPlacement(
+    KnowledgeAreaPlacementRow row,
+  ) {
+    return domain.KnowledgeAreaPlacement(
+      areaId: domain.EntityId(row.areaId),
+      parentAreaId: domain.EntityId(row.parentAreaId),
+      linkedAt: DateTime.fromMillisecondsSinceEpoch(row.linkedAt, isUtc: true),
+      catalogKey: row.catalogKey,
+    );
+  }
+
+  static KnowledgeAreaPlacementsCompanion fromKnowledgeAreaPlacement(
+    domain.KnowledgeAreaPlacement placement,
+  ) {
+    return KnowledgeAreaPlacementsCompanion.insert(
+      areaId: placement.areaId.value,
+      parentAreaId: placement.parentAreaId.value,
+      linkedAt: placement.linkedAt.millisecondsSinceEpoch,
+      catalogKey: Value(placement.catalogKey),
+    );
+  }
+
+  static domain.ResearchKnowledgeLink toResearchKnowledgeLink(
+    ResearchKnowledgeLinkRow row,
+  ) {
+    return domain.ResearchKnowledgeLink(
+      researchNodeId: domain.EntityId(row.researchNodeId),
+      areaId: domain.EntityId(row.areaId),
+      kind: domain.ResearchKnowledgeLinkKind.values.byName(row.kind),
+      linkedAt: DateTime.fromMillisecondsSinceEpoch(row.linkedAt, isUtc: true),
+    );
+  }
+
+  static ResearchKnowledgeLinksCompanion fromResearchKnowledgeLink(
+    domain.ResearchKnowledgeLink link,
+  ) {
+    return ResearchKnowledgeLinksCompanion.insert(
+      researchNodeId: link.researchNodeId.value,
+      areaId: link.areaId.value,
+      kind: link.kind.name,
+      linkedAt: link.linkedAt.millisecondsSinceEpoch,
     );
   }
 }

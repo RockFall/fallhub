@@ -73,6 +73,7 @@ export 'src/ics_schedule_policy.dart';
 export 'src/narrative_digest.dart';
 export 'src/knowledge_area.dart';
 export 'src/knowledge_area_catalog.dart';
+export 'src/knowledge_area_placement.dart';
 export 'src/flashcard.dart';
 export 'src/flashcard_srs.dart';
 export 'src/flashcard_study.dart';

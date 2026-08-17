@@ -449,10 +449,14 @@ class ExportRepository {
     final flashcards = await _flashcards.listCards(profile.id);
     final flashcardSrs = await _flashcards.listSrs(profile.id);
     final flashcardReviewLogs = await _flashcards.listLogs(profile.id);
+    final knowledgeAreaPlacements =
+        await _flashcards.listPlacements(profile.id);
+    final researchKnowledgeLinks =
+        await _flashcards.listResearchLinks(profile.id);
 
     return ExportSnapshot(
       exportedAt: _clock(),
-      version: 30,
+      version: 31,
       profile: profile,
       preferences: prefs,
       tasks: tasks,
@@ -503,6 +507,8 @@ class ExportRepository {
       flashcards: flashcards,
       flashcardSrs: flashcardSrs,
       flashcardReviewLogs: flashcardReviewLogs,
+      knowledgeAreaPlacements: knowledgeAreaPlacements,
+      researchKnowledgeLinks: researchKnowledgeLinks,
     );
   }
 
@@ -547,6 +553,8 @@ class RestoreRepository {
   }
 
   Future<void> _wipeAll() async {
+    await _db.delete(_db.researchKnowledgeLinks).go();
+    await _db.delete(_db.knowledgeAreaPlacements).go();
     await _db.delete(_db.flashcardReviewLogs).go();
     await _db.delete(_db.flashcardSrs).go();
     await _db.delete(_db.flashcards).go();
@@ -624,6 +632,16 @@ class RestoreRepository {
       await _db
           .into(_db.knowledgeAreas)
           .insert(ColonyMappers.fromKnowledgeArea(area));
+    }
+    for (final placement in snapshot.knowledgeAreaPlacements) {
+      await _db
+          .into(_db.knowledgeAreaPlacements)
+          .insert(ColonyMappers.fromKnowledgeAreaPlacement(placement));
+    }
+    for (final link in snapshot.researchKnowledgeLinks) {
+      await _db
+          .into(_db.researchKnowledgeLinks)
+          .insert(ColonyMappers.fromResearchKnowledgeLink(link));
     }
     for (final deck in snapshot.flashcardDecks) {
       await _db
@@ -4866,7 +4884,7 @@ class FlashcardRepository {
     required EntityId profileId,
     required Iterable<String> keys,
   }) async {
-    final selected = keys.toSet();
+    final selected = KnowledgeAreaCatalog.expandKeys(keys);
     if (selected.isEmpty) return const [];
     final existing = await listAreas(profileId);
     final byCatalog = {
@@ -4909,6 +4927,7 @@ class FlashcardRepository {
     for (final root in KnowledgeAreaCatalog.entries) {
       await ensure(root, null);
     }
+    await _seedCatalogPlacements(byCatalog);
     if (created.isNotEmpty) {
       await _events.record(
         aggregateType: AggregateType.knowledgeArea,
@@ -4919,6 +4938,211 @@ class FlashcardRepository {
       );
     }
     return created;
+  }
+
+  Future<void> _seedCatalogPlacements(
+    Map<String, KnowledgeArea> byCatalog,
+  ) async {
+    Future<void> walk(KnowledgeCatalogEntry entry) async {
+      final area = byCatalog[entry.key];
+      if (area != null) {
+        for (final parentKey in entry.catalogPlacements) {
+          final parent = byCatalog[parentKey];
+          if (parent == null) continue;
+          await addPlacement(
+            areaId: area.id,
+            parentAreaId: parent.id,
+            catalogKey: parentKey,
+          );
+        }
+      }
+      for (final child in entry.children) {
+        await walk(child);
+      }
+    }
+
+    for (final root in KnowledgeAreaCatalog.entries) {
+      await walk(root);
+    }
+  }
+
+  Stream<List<KnowledgeAreaPlacement>> watchPlacements(EntityId profileId) {
+    return _db
+        .select(_db.knowledgeAreaPlacements)
+        .watch()
+        .asyncMap((_) => listPlacements(profileId));
+  }
+
+  Future<List<KnowledgeAreaPlacement>> listPlacements(
+    EntityId profileId,
+  ) async {
+    final areas = await listAreas(profileId);
+    if (areas.isEmpty) return const [];
+    final ids = {for (final area in areas) area.id.value};
+    final rows = await _db.select(_db.knowledgeAreaPlacements).get();
+    return [
+      for (final row in rows)
+        if (ids.contains(row.areaId))
+          ColonyMappers.toKnowledgeAreaPlacement(row),
+    ];
+  }
+
+  Future<KnowledgeAreaPlacement> addPlacement({
+    required EntityId areaId,
+    required EntityId parentAreaId,
+    String? catalogKey,
+  }) async {
+    final areaRow = await (_db.select(_db.knowledgeAreas)
+          ..where((t) => t.id.equals(areaId.value)))
+        .getSingle();
+    final areas = await listAreas(EntityId(areaRow.profileId));
+    final existing = await listPlacements(EntityId(areaRow.profileId));
+    final duplicate = existing.any(
+      (p) => p.areaId == areaId && p.parentAreaId == parentAreaId,
+    );
+    if (duplicate) {
+      return existing.firstWhere(
+        (p) => p.areaId == areaId && p.parentAreaId == parentAreaId,
+      );
+    }
+    KnowledgeAreaPolicy.assertPlacementAcyclic(
+      areaId: areaId,
+      parentAreaId: parentAreaId,
+      areas: areas,
+      placements: existing,
+    );
+    final placement = KnowledgeAreaPlacement(
+      areaId: areaId,
+      parentAreaId: parentAreaId,
+      linkedAt: _clock(),
+      catalogKey: catalogKey,
+    );
+    await _db.transaction(() async {
+      await _db
+          .into(_db.knowledgeAreaPlacements)
+          .insert(ColonyMappers.fromKnowledgeAreaPlacement(placement));
+      await _events.record(
+        aggregateType: AggregateType.knowledgeArea,
+        aggregateId: areaId,
+        eventType: EventType.knowledgeAreaPlacementAdded,
+        payload: {'parent_area_id': parentAreaId.value},
+        sourceType: SourceType.manual,
+      );
+    });
+    return placement;
+  }
+
+  Future<void> removePlacement({
+    required EntityId areaId,
+    required EntityId parentAreaId,
+  }) async {
+    await _db.transaction(() async {
+      await (_db.delete(_db.knowledgeAreaPlacements)
+            ..where(
+              (t) =>
+                  t.areaId.equals(areaId.value) &
+                  t.parentAreaId.equals(parentAreaId.value),
+            ))
+          .go();
+      await _events.record(
+        aggregateType: AggregateType.knowledgeArea,
+        aggregateId: areaId,
+        eventType: EventType.knowledgeAreaPlacementRemoved,
+        payload: {'parent_area_id': parentAreaId.value},
+        sourceType: SourceType.manual,
+      );
+    });
+  }
+
+  Stream<List<ResearchKnowledgeLink>> watchResearchLinks(EntityId profileId) {
+    return _db
+        .select(_db.researchKnowledgeLinks)
+        .watch()
+        .asyncMap((_) => listResearchLinks(profileId));
+  }
+
+  Future<List<ResearchKnowledgeLink>> listResearchLinks(
+    EntityId profileId,
+  ) async {
+    final areas = await listAreas(profileId);
+    if (areas.isEmpty) return const [];
+    final ids = {for (final area in areas) area.id.value};
+    final rows = await _db.select(_db.researchKnowledgeLinks).get();
+    return [
+      for (final row in rows)
+        if (ids.contains(row.areaId))
+          ColonyMappers.toResearchKnowledgeLink(row),
+    ];
+  }
+
+  Stream<List<ResearchKnowledgeLink>> watchResearchLinksForNode(
+    EntityId nodeId,
+  ) {
+    return (_db.select(_db.researchKnowledgeLinks)
+          ..where((t) => t.researchNodeId.equals(nodeId.value)))
+        .watch()
+        .map((rows) => rows.map(ColonyMappers.toResearchKnowledgeLink).toList());
+  }
+
+  Future<ResearchKnowledgeLink> linkResearch({
+    required EntityId researchNodeId,
+    required EntityId areaId,
+    ResearchKnowledgeLinkKind kind = ResearchKnowledgeLinkKind.related,
+  }) async {
+    final existing = await (_db.select(_db.researchKnowledgeLinks)
+          ..where(
+            (t) =>
+                t.researchNodeId.equals(researchNodeId.value) &
+                t.areaId.equals(areaId.value),
+          ))
+        .getSingleOrNull();
+    if (existing != null) {
+      return ColonyMappers.toResearchKnowledgeLink(existing);
+    }
+    final link = ResearchKnowledgeLink(
+      researchNodeId: researchNodeId,
+      areaId: areaId,
+      kind: kind,
+      linkedAt: _clock(),
+    );
+    await _db.transaction(() async {
+      await _db
+          .into(_db.researchKnowledgeLinks)
+          .insert(ColonyMappers.fromResearchKnowledgeLink(link));
+      await _events.record(
+        aggregateType: AggregateType.knowledgeArea,
+        aggregateId: areaId,
+        eventType: EventType.researchKnowledgeLinked,
+        payload: {
+          'research_node_id': researchNodeId.value,
+          'kind': kind.name,
+        },
+        sourceType: SourceType.manual,
+      );
+    });
+    return link;
+  }
+
+  Future<void> unlinkResearch({
+    required EntityId researchNodeId,
+    required EntityId areaId,
+  }) async {
+    await _db.transaction(() async {
+      await (_db.delete(_db.researchKnowledgeLinks)
+            ..where(
+              (t) =>
+                  t.researchNodeId.equals(researchNodeId.value) &
+                  t.areaId.equals(areaId.value),
+            ))
+          .go();
+      await _events.record(
+        aggregateType: AggregateType.knowledgeArea,
+        aggregateId: areaId,
+        eventType: EventType.researchKnowledgeUnlinked,
+        payload: {'research_node_id': researchNodeId.value},
+        sourceType: SourceType.manual,
+      );
+    });
   }
 
   Stream<List<FlashcardDeck>> watchDecks(EntityId profileId) {
@@ -5080,14 +5304,21 @@ class FlashcardRepository {
 
   Future<Flashcard> _insertCard(Flashcard card) async {
     FlashcardPolicy.validateCard(card);
-    final srs = FlashcardSrsState.fresh(cardId: card.id, createdAt: card.createdAt);
     await _db.into(_db.flashcards).insert(ColonyMappers.fromFlashcard(card));
-    await _db.into(_db.flashcardSrs).insert(ColonyMappers.fromFlashcardSrs(srs));
+    if (card.scheduleMode == FlashcardScheduleMode.scheduled) {
+      final srs =
+          FlashcardSrsState.fresh(cardId: card.id, createdAt: card.createdAt);
+      await _db.into(_db.flashcardSrs).insert(ColonyMappers.fromFlashcardSrs(srs));
+    }
     await _events.record(
       aggregateType: AggregateType.flashcard,
       aggregateId: card.id,
       eventType: EventType.flashcardCreated,
-      payload: {'kind': card.kind.name, 'deck_id': card.deckId.value},
+      payload: {
+        'kind': card.kind.name,
+        'deck_id': card.deckId.value,
+        'schedule_mode': card.scheduleMode.name,
+      },
       sourceType: SourceType.manual,
     );
     return card;
@@ -5103,6 +5334,7 @@ class FlashcardRepository {
     String? extra,
     List<String> tags = const [],
     bool bidirectional = false,
+    FlashcardScheduleMode scheduleMode = FlashcardScheduleMode.scheduled,
   }) async {
     final now = _clock();
     final created = <Flashcard>[];
@@ -5128,6 +5360,7 @@ class FlashcardRepository {
                 extra: extra,
                 tags: tags,
                 clozeIndex: index,
+                scheduleMode: scheduleMode,
                 createdAt: now,
               ),
             ),
@@ -5145,6 +5378,7 @@ class FlashcardRepository {
             back: back,
             extra: extra,
             tags: tags,
+            scheduleMode: scheduleMode,
             createdAt: now,
           ),
         );
@@ -5163,6 +5397,7 @@ class FlashcardRepository {
                 extra: extra,
                 tags: tags,
                 reverseOfId: card.id,
+                scheduleMode: scheduleMode,
                 createdAt: now,
               ),
             ),
@@ -5232,6 +5467,7 @@ class FlashcardRepository {
       easeBefore: previous.easeFactor,
       easeAfter: next.easeFactor,
       durationMs: durationMs,
+      reviewKind: FlashcardReviewKind.srs,
     );
     await _db.transaction(() async {
       await (_db.update(_db.flashcardSrs)
@@ -5266,9 +5502,109 @@ class FlashcardRepository {
       await (_db.delete(_db.flashcardReviewLogs)
             ..where((t) => t.id.equals(outcome.log.id.value)))
           .go();
-      await (_db.update(_db.flashcardSrs)
-            ..where((t) => t.cardId.equals(outcome.previous.cardId.value)))
-          .write(ColonyMappers.fromFlashcardSrs(outcome.previous));
+      if (outcome.log.reviewKind == FlashcardReviewKind.srs) {
+        await (_db.update(_db.flashcardSrs)
+              ..where((t) => t.cardId.equals(outcome.previous.cardId.value)))
+            .write(ColonyMappers.fromFlashcardSrs(outcome.previous));
+      }
+    });
+  }
+
+  Future<FlashcardReviewLog> practice({
+    required Flashcard card,
+    required FlashcardRating rating,
+    int? durationMs,
+  }) async {
+    final now = _clock();
+    final previous = await _srsFor(card.id, card.createdAt);
+    final log = FlashcardReviewLog(
+      id: EntityId(_ids.newId()),
+      cardId: card.id,
+      reviewedAt: now,
+      rating: rating,
+      intervalDaysBefore: previous.intervalDays,
+      intervalDaysAfter: previous.intervalDays,
+      easeBefore: previous.easeFactor,
+      easeAfter: previous.easeFactor,
+      durationMs: durationMs,
+      reviewKind: FlashcardReviewKind.practice,
+    );
+    await _db.transaction(() async {
+      await _db
+          .into(_db.flashcardReviewLogs)
+          .insert(ColonyMappers.fromFlashcardReviewLog(log));
+      await _events.record(
+        aggregateType: AggregateType.flashcard,
+        aggregateId: card.id,
+        eventType: EventType.flashcardPracticed,
+        payload: {'rating': rating.name},
+        sourceType: SourceType.manual,
+      );
+    });
+    return log;
+  }
+
+  Future<void> undoPractice(FlashcardReviewLog log) async {
+    await (_db.delete(_db.flashcardReviewLogs)
+          ..where((t) => t.id.equals(log.id.value)))
+        .go();
+  }
+
+  Future<void> scheduleCard(Flashcard card) async {
+    if (card.scheduleMode == FlashcardScheduleMode.scheduled) return;
+    final updated = card.copyWith(
+      scheduleMode: FlashcardScheduleMode.scheduled,
+      updatedAt: _clock(),
+      version: card.version + 1,
+    );
+    await _db.transaction(() async {
+      await (_db.update(_db.flashcards)
+            ..where((t) => t.id.equals(card.id.value)))
+          .write(ColonyMappers.fromFlashcard(updated));
+      final existing = await (_db.select(_db.flashcardSrs)
+            ..where((t) => t.cardId.equals(card.id.value)))
+          .getSingleOrNull();
+      if (existing == null) {
+        await _db.into(_db.flashcardSrs).insert(
+              ColonyMappers.fromFlashcardSrs(
+                FlashcardSrsState.fresh(
+                  cardId: card.id,
+                  createdAt: updated.updatedAt,
+                ),
+              ),
+            );
+      }
+      await _events.record(
+        aggregateType: AggregateType.flashcard,
+        aggregateId: card.id,
+        eventType: EventType.flashcardScheduled,
+        payload: const {},
+        sourceType: SourceType.manual,
+      );
+    });
+  }
+
+  Future<void> unscheduleCard(Flashcard card) async {
+    if (card.scheduleMode == FlashcardScheduleMode.unscheduled) return;
+    final updated = card.copyWith(
+      scheduleMode: FlashcardScheduleMode.unscheduled,
+      updatedAt: _clock(),
+      version: card.version + 1,
+    );
+    await _db.transaction(() async {
+      await (_db.update(_db.flashcards)
+            ..where((t) => t.id.equals(card.id.value)))
+          .write(ColonyMappers.fromFlashcard(updated));
+      await (_db.delete(_db.flashcardSrs)
+            ..where((t) => t.cardId.equals(card.id.value)))
+          .go();
+      await _events.record(
+        aggregateType: AggregateType.flashcard,
+        aggregateId: card.id,
+        eventType: EventType.flashcardUnscheduled,
+        payload: const {},
+        sourceType: SourceType.manual,
+      );
     });
   }
 }

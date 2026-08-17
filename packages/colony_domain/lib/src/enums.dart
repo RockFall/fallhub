@@ -199,7 +199,14 @@ enum EventType {
   flashcardCreated,
   flashcardUpdated,
   flashcardReviewed,
+  flashcardPracticed,
+  flashcardScheduled,
+  flashcardUnscheduled,
   flashcardCatalogSeeded,
+  knowledgeAreaPlacementAdded,
+  knowledgeAreaPlacementRemoved,
+  researchKnowledgeLinked,
+  researchKnowledgeUnlinked,
 }
 
 enum UndoActionType {

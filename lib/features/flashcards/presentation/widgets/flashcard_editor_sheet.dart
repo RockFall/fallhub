@@ -2,6 +2,7 @@ import 'package:colony_design_system/colony_design_system.dart';
 import 'package:colony_domain/colony_domain.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../../app/localization/app_strings.dart';
 import '../../application/flashcard_controllers.dart';
@@ -169,36 +170,97 @@ class _FlashcardEditorSheetState extends ConsumerState<FlashcardEditorSheet> {
                 onChanged: (value) => setState(() => _bidirectional = value),
               ),
             ],
-            const SizedBox(height: ColonySpacing.lg),
-            FilledButton(
-              onPressed: _save,
-              child: const Text(AppStrings.save),
+            const SizedBox(height: ColonySpacing.md),
+            Text(
+              AppStrings.flashcardsCaptureHint,
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: ColonyColors.textMuted,
+                  ),
             ),
+            const SizedBox(height: ColonySpacing.md),
+            if (widget.existing == null) ...[
+              FilledButton(
+                onPressed: () => _save(FlashcardCaptureIntent.schedule),
+                child: const Text(AppStrings.flashcardsSchedule),
+              ),
+              const SizedBox(height: ColonySpacing.sm),
+              OutlinedButton(
+                onPressed: () => _save(FlashcardCaptureIntent.saveOnly),
+                child: const Text(AppStrings.flashcardsSaveOnly),
+              ),
+              const SizedBox(height: ColonySpacing.sm),
+              TextButton(
+                onPressed: () => _save(FlashcardCaptureIntent.practiceNow),
+                child: const Text(AppStrings.flashcardsPracticeNow),
+              ),
+            ] else ...[
+              FilledButton(
+                onPressed: () => _save(FlashcardCaptureIntent.schedule),
+                child: const Text(AppStrings.save),
+              ),
+              const SizedBox(height: ColonySpacing.sm),
+              OutlinedButton(
+                onPressed: () async {
+                  final existing = widget.existing!;
+                  if (existing.scheduleMode ==
+                      FlashcardScheduleMode.scheduled) {
+                    await ref
+                        .read(flashcardControllerProvider.notifier)
+                        .unscheduleCard(existing);
+                  } else {
+                    await ref
+                        .read(flashcardControllerProvider.notifier)
+                        .scheduleCard(existing);
+                  }
+                  if (context.mounted) Navigator.of(context).pop();
+                },
+                child: Text(
+                  widget.existing!.scheduleMode ==
+                          FlashcardScheduleMode.scheduled
+                      ? AppStrings.flashcardsSaveOnly
+                      : AppStrings.flashcardsSchedule,
+                ),
+              ),
+            ],
           ],
         ),
       ),
     );
   }
 
-  Future<void> _save() async {
+  Future<void> _save(FlashcardCaptureIntent intent) async {
     final tags = _tags.text
         .split(',')
         .map((t) => t.trim())
         .where((t) => t.isNotEmpty)
         .toList();
     final existing = widget.existing;
+    final scheduleMode = intent == FlashcardCaptureIntent.schedule
+        ? FlashcardScheduleMode.scheduled
+        : FlashcardScheduleMode.unscheduled;
     try {
       if (existing == null) {
-        await ref.read(flashcardControllerProvider.notifier).createCard(
-              deckId: widget.deckId,
-              areaId: widget.areaId,
-              front: _front.text,
-              back: _back.text,
-              kind: _kind,
-              extra: _extra.text,
-              tags: tags,
-              bidirectional: _bidirectional || _kind == FlashcardKind.reverse,
-            );
+        final created =
+            await ref.read(flashcardControllerProvider.notifier).createCard(
+                  deckId: widget.deckId,
+                  areaId: widget.areaId,
+                  front: _front.text,
+                  back: _back.text,
+                  kind: _kind,
+                  extra: _extra.text,
+                  tags: tags,
+                  bidirectional: _bidirectional || _kind == FlashcardKind.reverse,
+                  scheduleMode: scheduleMode,
+                );
+        if (!mounted) return;
+        Navigator.of(context).pop();
+        if (intent == FlashcardCaptureIntent.practiceNow &&
+            created != null &&
+            created.isNotEmpty) {
+          context.go(
+            '/flashcards/study?mode=practice&cardId=${created.first.id.value}',
+          );
+        }
       } else {
         await ref.read(flashcardControllerProvider.notifier).updateCard(
               existing.copyWith(
@@ -209,8 +271,8 @@ class _FlashcardEditorSheetState extends ConsumerState<FlashcardEditorSheet> {
                 clearExtra: _extra.text.trim().isEmpty,
               ),
             );
+        if (mounted) Navigator.of(context).pop();
       }
-      if (mounted) Navigator.of(context).pop();
     } on FlashcardValidationException catch (error) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
