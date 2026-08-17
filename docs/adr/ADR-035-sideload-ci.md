@@ -7,7 +7,7 @@ Aceito
 O desenvolvimento passa a ser guiado pela interface remota (Cursor) sem um desktop como intermediário para `flutter build apk`. É preciso instalar atualizações no celular Android e confirmar qual commit está rodando, sem perder dados locais (app local-first).
 
 ## Decisão
-1. **GitHub Actions** (`sideload_apk.yml`) gera um APK debug a cada push em `master`, PR e `workflow_dispatch`.
+1. **GitHub Actions** (`sideload_apk.yml`) gera um APK debug a cada push em `main`, PR e `workflow_dispatch`.
 2. Publica um **release rolling** `sideload-latest` com o asset estável `fallhub-sideload.apk` (ABI `arm64-v8a`, para o download caber no celular).
 3. URL de download permanente:
    `https://github.com/RockFall/fallhub/releases/download/sideload-latest/fallhub-sideload.apk`

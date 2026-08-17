@@ -5,7 +5,7 @@ name: sideload_apk
 on:
   workflow_dispatch:
   push:
-    branches: [master]
+    branches: [main]
   pull_request:
 
 concurrency:

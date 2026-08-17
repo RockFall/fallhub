@@ -95,11 +95,11 @@ fallhub/
 
 ## Testar no celular (sem desktop)
 
-O GitHub Actions gera um APK debug e publica sempre no mesmo link:
+O GitHub Actions gera um APK debug a cada push em `main` (e em PRs) e publica sempre no mesmo link:
 
 **[fallhub-sideload.apk](https://github.com/RockFall/fallhub/releases/download/sideload-latest/fallhub-sideload.apk)**
 
-No Android: abra o link → permitir instalação → instalar. Confira o commit em **Configurações → Build de teste**.
+No Android: abra o link → permitir instalação → instalar. Confira o commit em **Configurações → Build de teste** (tem de bater com o SHA do release [sideload-latest](https://github.com/RockFall/fallhub/releases/tag/sideload-latest)).
 
 Guia completo: [`docs/dev/SIDELOAD.md`](docs/dev/SIDELOAD.md) · ADR-035
 

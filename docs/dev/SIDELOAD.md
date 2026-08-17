@@ -24,7 +24,7 @@ Builds assinados com a mesma keystore de sideload **atualizam por cima** e mant�
 Qualquer um destes republica o mesmo link:
 
 - Abrir ou atualizar um PR (o agente faz isso)
-- Merge em `master`
+- Push / merge em `main`
 - No celular: **GitHub → Actions → sideload_apk → Run workflow**
 
 Se dois PRs rodarem perto, o último a terminar é o que o link entrega. Para forçar o branch atual: *Run workflow* nesse branch.
