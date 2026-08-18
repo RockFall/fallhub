@@ -1,6 +1,7 @@
 import 'package:equatable/equatable.dart';
 
 import 'flashcard.dart';
+import 'flashcard_pace.dart';
 import 'flashcard_srs.dart';
 import 'id_generator.dart';
 import 'knowledge_area.dart';
@@ -320,7 +321,10 @@ abstract final class FlashcardTodayDigestPolicy {
       completedToday: completed,
       cappedForSession: capped,
       limitDeferred: (buckets.dueTotal - capped).clamp(0, buckets.dueTotal),
-      estimatedMinutes: capped < 1 ? 0 : (capped * 0.5).ceil().clamp(1, 180),
+      estimatedMinutes: FlashcardPacePolicy.estimatedSessionMinutes(
+        cardCount: capped,
+        logs: logs,
+      ),
     );
   }
 }

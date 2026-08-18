@@ -125,6 +125,15 @@ final flashcardForecastProvider = Provider<List<int>>((ref) {
   );
 });
 
+final flashcardPaceMetricsProvider = Provider<FlashcardPaceMetrics>((ref) {
+  return FlashcardPacePolicy.metrics(
+    cards: ref.watch(flashcardsProvider).asData?.value ?? const [],
+    srsByCard: ref.watch(flashcardSrsProvider).asData?.value ?? const {},
+    logs: ref.watch(flashcardLogsProvider).asData?.value ?? const [],
+    now: ref.watch(clockProvider)(),
+  );
+});
+
 final flashcardDeckProvider =
     Provider.family<FlashcardDeck?, String>((ref, deckId) {
   final decks = ref.watch(flashcardDecksProvider).asData?.value ?? const [];

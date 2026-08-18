@@ -704,6 +704,27 @@ abstract final class AppStrings {
   static const flashcardsLeech =
       'Sanguessuga: este cartão foi suspenso após muitos lapsos.';
   static const flashcardsForecast = 'Previsão (7 dias)';
+  static const flashcardsPaceTitle = 'Ritmo e término';
+  static const flashcardsPaceHelp =
+      'Tempo e cartões/dia vêm das revisões SRS dos últimos 14 dias. '
+      'Término = primeira formação de todos os agendados (novos + aprendendo). '
+      'O ciclo espaçado continua depois.';
+  static const flashcardsPaceNoSample =
+      'Estude alguns cartões para medir o tempo médio e o ritmo diário.';
+  static const flashcardsPaceMeanTime = 'Tempo médio';
+  static const flashcardsPaceCardsDay = 'Cartões/dia';
+  static const flashcardsPaceReviewsDay = 'Repetições/dia';
+  static const flashcardsPaceRepetitions = 'Repetições';
+  static const flashcardsPaceLapses = 'Lapsos';
+  static const flashcardsPaceReviewsPerCard = 'Reviews/cartão';
+  static const flashcardsPaceAgainRate = 'De novo';
+  static const flashcardsPaceRemaining =
+      'Ainda por formar';
+  static const flashcardsPaceLoad = 'Avaliações restantes';
+  static const flashcardsPaceTargetPerDay = 'Cartões por dia';
+  static const flashcardsPaceTargetDays = 'Terminar em (dias)';
+  static const flashcardsPaceNeedSample = 'Sem ritmo ainda — use um alvo manual.';
+  static const flashcardsPaceAllDone = 'Todos os cartões agendados já passaram da formação.';
   static const flashcardsRetention = 'Retenção recente';
   static const flashcardsCards = 'Cartões';
   static const flashcardsSubareas = 'Subáreas';
@@ -848,6 +869,30 @@ abstract final class AppStrings {
       : '$count cartões agora';
 
   static String flashcardsMinutes(int minutes) => '~$minutes min';
+
+  static String flashcardsPaceFinishIn(int days, String date) {
+    if (days <= 0) return 'Já formados.';
+    if (days == 1) return 'Termina amanhã ($date) se mantiver o ritmo.';
+    return 'Termina em $days dias ($date) se mantiver o ritmo.';
+  }
+
+  static String flashcardsPaceRecommend(int cardsPerDay, int days) {
+    if (days < 1) {
+      return 'Informe em quantos dias quer formar o restante.';
+    }
+    if (cardsPerDay <= 0) return 'Nada pendente para formar.';
+    return 'Faça $cardsPerDay cartões/dia para formar todos em $days dias.';
+  }
+
+  static String flashcardsPaceRemainingCount({
+    required int remaining,
+    required int reviews,
+  }) {
+    return '$remaining cartões · $reviews avaliações';
+  }
+
+  static String flashcardsPacePercent(double rate) =>
+      '${(rate * 100).round()}%';
 
   static String flashcardsProgress(int current, int total) => '$current/$total';
 

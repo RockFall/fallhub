@@ -12,6 +12,7 @@ import 'widgets/create_flashcard_deck_sheet.dart';
 import 'widgets/create_knowledge_area_sheet.dart';
 import 'widgets/flashcard_due_hero.dart';
 import 'widgets/flashcard_editor_sheet.dart';
+import 'widgets/flashcard_pace_panel.dart';
 import 'widgets/flashcards_disclaimer_banner.dart';
 import 'widgets/import_flashcards_json_sheet.dart';
 import 'widgets/knowledge_map_view.dart';
@@ -215,6 +216,8 @@ class _FlashcardsHubScreenState extends ConsumerState<FlashcardsHubScreen> {
                   icon: Icons.calendar_view_week_outlined,
                   child: _ForecastBar(values: forecast, labels: labels),
                 ),
+                const SizedBox(height: ColonySpacing.md),
+                const FlashcardPacePanel(),
                 const SizedBox(height: ColonySpacing.md),
                 ColonyPanel(
                   title: AppStrings.flashcardsDecksTitle,

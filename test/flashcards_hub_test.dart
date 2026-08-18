@@ -8,6 +8,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:fallhub/app/localization/app_strings.dart';
 import 'package:fallhub/core/providers/app_providers.dart';
 import 'package:fallhub/features/flashcards/presentation/flashcards_hub_screen.dart';
+import 'package:fallhub/features/flashcards/presentation/widgets/flashcard_pace_panel.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 Future<void> _flushDisposeTimers(WidgetTester tester) async {
@@ -227,6 +228,93 @@ void main() {
       (await repos.flashcards.listDecks(profile.id)).map((d) => d.title),
       contains('AV'),
     );
+
+    await _flushDisposeTimers(tester);
+  });
+
+  testWidgets('FlashcardsHubScreen shows pace metrics and finish forecast', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(800, 1800);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    final now = DateTime.utc(2026, 8, 17, 12);
+    final db = ColonyDatabase.inMemory();
+    addTearDown(db.close);
+    final repos = ColonyRepositories.create(
+      db,
+      idGenerator: FixedIdGenerator([
+        for (var i = 1; i <= 40; i++) 'id-$i',
+      ]),
+      clock: () => now,
+    );
+    final profile = await repos.profiles.create(
+      colonyName: 'Test',
+      displayName: 'Caio',
+      timezone: 'UTC',
+      locale: 'pt_BR',
+      baseCurrency: 'BRL',
+    );
+    await repos.preferences.save(
+      AppPreferences.defaults().copyWith(onboardingCompleted: true),
+    );
+    final deck = await repos.flashcards.createDeck(
+      profileId: profile.id,
+      title: 'Ritmo',
+    );
+    final created = await repos.flashcards.createCard(
+      profileId: profile.id,
+      deckId: deck.id,
+      front: 'ii-V-I',
+      back: 'Progressão',
+    );
+    await repos.flashcards.createCard(
+      profileId: profile.id,
+      deckId: deck.id,
+      front: 'ODD',
+      back: 'domínio',
+    );
+    await repos.flashcards.review(
+      card: created.single,
+      rating: FlashcardRating.good,
+      durationMs: 12000,
+    );
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          databaseProvider.overrideWithValue(db),
+          clockProvider.overrideWithValue(() => now),
+        ],
+        child: MaterialApp(
+          theme: ColonyTheme.dark(),
+          home: const Scaffold(body: FlashcardsHubScreen()),
+        ),
+      ),
+    );
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 500));
+
+    final list = find.byType(ListView);
+    for (var i = 0; i < 10; i++) {
+      if (find.byType(FlashcardPacePanel).evaluate().isNotEmpty) {
+        break;
+      }
+      await tester.drag(list, const Offset(0, -500));
+      await tester.pump();
+    }
+
+    expect(find.byType(FlashcardPacePanel), findsOneWidget);
+    expect(find.text('12s'), findsOneWidget);
+    expect(find.textContaining('2 cartões'), findsWidgets);
+    expect(find.text(AppStrings.flashcardsPaceTargetPerDay), findsOneWidget);
+    expect(find.text(AppStrings.flashcardsPaceTargetDays), findsOneWidget);
+
+    await tester.enterText(find.byKey(const Key('flashcards.pace.per_day')), '2');
+    await tester.pump();
+    expect(find.textContaining('Termina em'), findsOneWidget);
 
     await _flushDisposeTimers(tester);
   });
