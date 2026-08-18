@@ -6,7 +6,12 @@ void main() {
   final profile = EntityId('p1');
   final deck = EntityId('d1');
 
-  Flashcard card(String id, {EntityId? area, bool suspended = false}) {
+  Flashcard card(
+    String id, {
+    EntityId? area,
+    bool suspended = false,
+    int? priority,
+  }) {
     return Flashcard.create(
       id: EntityId(id),
       profileId: profile,
@@ -16,6 +21,7 @@ void main() {
       back: 'A $id',
       createdAt: now,
       suspended: suspended,
+      priority: priority,
     );
   }
 
@@ -71,6 +77,35 @@ void main() {
     );
 
     expect(queue.map((c) => c.card.id.value), ['l', 'r', 'n']);
+  });
+
+  test('queue prefers higher priority within the same SRS bucket', () {
+    final high = card('high', priority: 1);
+    final low = card('low', priority: 5);
+    final srs = {
+      high.id: FlashcardSrsState.fresh(cardId: high.id, createdAt: now),
+      low.id: FlashcardSrsState.fresh(cardId: low.id, createdAt: now),
+    };
+    final queue = StudyQueuePolicy.buildQueue(
+      cards: [low, high],
+      srsByCard: srs,
+      now: now,
+      newRemaining: 10,
+      reviewRemaining: 10,
+      interleaveByArea: false,
+    );
+    expect(queue.map((c) => c.card.id.value), ['high', 'low']);
+    expect(Flashcard.create(
+      id: EntityId('defaults'),
+      profileId: profile,
+      deckId: deck,
+      front: 'Q',
+      back: 'A',
+      createdAt: now,
+    ).priority, 5);
+    expect(FlashcardPolicy.normalizePriority(null), 5);
+    expect(FlashcardPolicy.normalizePriority(0), 1);
+    expect(FlashcardPolicy.normalizePriority(9), 5);
   });
 
   test('interleave alternates areas', () {

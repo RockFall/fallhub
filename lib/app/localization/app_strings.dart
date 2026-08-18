@@ -698,6 +698,10 @@ abstract final class AppStrings {
   static const flashcardsDelete = 'Deletar flashcard';
   static const flashcardsDeleteConfirm =
       'Este cartão sai do baralho e da fila de estudo. Não dá para desfazer.';
+  static const flashcardsSetPriority = 'Definir prioridade';
+  static const flashcardsPriorityHigh = 'Alta';
+  static const flashcardsPriorityLow = 'Baixa';
+  static String flashcardsPriorityValue(int value) => 'Prioridade $value';
   static const flashcardsDone = 'Tudo revisado por hoje.';
   static const flashcardsDoneHint =
       'Volte amanhã — o intervalo cresce quando a lembrança é estável.';

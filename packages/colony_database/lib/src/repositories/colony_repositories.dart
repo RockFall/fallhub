@@ -456,7 +456,7 @@ class ExportRepository {
 
     return ExportSnapshot(
       exportedAt: _clock(),
-      version: 31,
+      version: 32,
       profile: profile,
       preferences: prefs,
       tasks: tasks,
@@ -5335,6 +5335,7 @@ class FlashcardRepository {
     List<String> tags = const [],
     bool bidirectional = false,
     FlashcardScheduleMode scheduleMode = FlashcardScheduleMode.scheduled,
+    int? priority,
   }) async {
     final now = _clock();
     final created = <Flashcard>[];
@@ -5361,6 +5362,7 @@ class FlashcardRepository {
                 tags: tags,
                 clozeIndex: index,
                 scheduleMode: scheduleMode,
+                priority: priority,
                 createdAt: now,
               ),
             ),
@@ -5379,6 +5381,7 @@ class FlashcardRepository {
             extra: extra,
             tags: tags,
             scheduleMode: scheduleMode,
+            priority: priority,
             createdAt: now,
           ),
         );
@@ -5398,6 +5401,7 @@ class FlashcardRepository {
                 tags: tags,
                 reverseOfId: card.id,
                 scheduleMode: scheduleMode,
+                priority: priority,
                 createdAt: now,
               ),
             ),
@@ -5742,6 +5746,7 @@ class FlashcardRepository {
                 extra: step.card.extra,
                 tags: step.card.tags,
                 areaId: areaId ?? current.areaId,
+                priority: step.card.priority,
                 clearExtra: (step.card.extra ?? '').trim().isEmpty,
               ),
             );
@@ -5760,6 +5765,7 @@ class FlashcardRepository {
             tags: step.card.tags,
             bidirectional: step.card.bidirectional,
             scheduleMode: step.card.scheduleMode,
+            priority: step.card.priority,
           );
           createdCards += created.length;
           break;

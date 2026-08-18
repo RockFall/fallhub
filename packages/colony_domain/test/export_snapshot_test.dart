@@ -1111,14 +1111,14 @@ void main() {
     expect(snapshot.tripInventoryLinks.first.inventoryItemId.value, 'inv-1');
   });
 
-  test('rejects unsupported version 32', () {
-    final json = Map<String, dynamic>.from(baseJson)..['version'] = 32;
+  test('rejects unsupported version 33', () {
+    final json = Map<String, dynamic>.from(baseJson)..['version'] = 33;
 
     expect(
       () => ExportSnapshot.fromJson(json),
       throwsA(
         predicate<ExportSnapshotException>(
-          (e) => e.message.contains('32'),
+          (e) => e.message.contains('33'),
         ),
       ),
     );

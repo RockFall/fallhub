@@ -42,6 +42,22 @@ Aqui está o lote:
     expect(doc.cards.single.kind, FlashcardKind.basic);
     expect(doc.cards.single.areaPath, ['Artes', 'Música', 'Harmonia']);
     expect(doc.cards.single.scheduleMode, FlashcardScheduleMode.unscheduled);
+    expect(doc.cards.single.priority, 5);
+  });
+
+  test('parse clamps missing and out-of-range priority to 1..5', () {
+    final missing = FlashcardJsonCodec.parse('''
+{"cards":[{"front":"A","back":"B","deck":"D"}]}
+''');
+    expect(missing.cards.single.priority, 5);
+    final high = FlashcardJsonCodec.parse('''
+{"cards":[{"front":"A","back":"B","deck":"D","priority":1}]}
+''');
+    expect(high.cards.single.priority, 1);
+    final clamped = FlashcardJsonCodec.parse('''
+{"cards":[{"front":"A","back":"B","deck":"D","prioridade":9}]}
+''');
+    expect(clamped.cards.single.priority, 5);
   });
 
   test('plan creates missing shelves and skips identical cards', () {

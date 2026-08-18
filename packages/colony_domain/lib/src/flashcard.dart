@@ -170,6 +170,7 @@ class Flashcard extends Equatable {
     this.clozeIndex,
     this.reverseOfId,
     this.scheduleMode = FlashcardScheduleMode.scheduled,
+    this.priority = FlashcardPolicy.lowestPriority,
     this.version = 1,
   });
 
@@ -185,6 +186,7 @@ class Flashcard extends Equatable {
   final int? clozeIndex;
   final EntityId? reverseOfId;
   final FlashcardScheduleMode scheduleMode;
+  final int priority;
   final bool suspended;
   final DateTime createdAt;
   final DateTime updatedAt;
@@ -204,6 +206,7 @@ class Flashcard extends Equatable {
     int? clozeIndex,
     EntityId? reverseOfId,
     FlashcardScheduleMode scheduleMode = FlashcardScheduleMode.scheduled,
+    int? priority,
     bool suspended = false,
   }) {
     return Flashcard(
@@ -219,6 +222,7 @@ class Flashcard extends Equatable {
       clozeIndex: clozeIndex,
       reverseOfId: reverseOfId,
       scheduleMode: scheduleMode,
+      priority: FlashcardPolicy.normalizePriority(priority),
       suspended: suspended,
       createdAt: createdAt,
       updatedAt: createdAt,
@@ -236,6 +240,7 @@ class Flashcard extends Equatable {
     int? clozeIndex,
     bool? suspended,
     FlashcardScheduleMode? scheduleMode,
+    int? priority,
     DateTime? updatedAt,
     int? version,
     bool clearArea = false,
@@ -254,6 +259,7 @@ class Flashcard extends Equatable {
       clozeIndex: clozeIndex ?? this.clozeIndex,
       reverseOfId: reverseOfId,
       scheduleMode: scheduleMode ?? this.scheduleMode,
+      priority: FlashcardPolicy.normalizePriority(priority ?? this.priority),
       suspended: suspended ?? this.suspended,
       createdAt: createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
@@ -275,6 +281,7 @@ class Flashcard extends Equatable {
         clozeIndex,
         reverseOfId,
         scheduleMode,
+        priority,
         suspended,
         createdAt,
         updatedAt,
@@ -430,6 +437,16 @@ class FlashcardValidationException implements Exception {
 }
 
 abstract final class FlashcardPolicy {
+  static const highestPriority = 1;
+  static const lowestPriority = 5;
+
+  static int normalizePriority(int? raw) {
+    if (raw == null) return lowestPriority;
+    if (raw < highestPriority) return highestPriority;
+    if (raw > lowestPriority) return lowestPriority;
+    return raw;
+  }
+
   static void validateCard(Flashcard card) {
     if (card.front.isEmpty) {
       throw FlashcardValidationException('A frente do cartão é obrigatória.');

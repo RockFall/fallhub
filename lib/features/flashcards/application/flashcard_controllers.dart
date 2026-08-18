@@ -143,6 +143,7 @@ class FlashcardController extends AsyncNotifier<void> {
     List<String> tags = const [],
     bool bidirectional = false,
     FlashcardScheduleMode scheduleMode = FlashcardScheduleMode.scheduled,
+    int? priority,
   }) {
     return _run(() async {
       final profile = await ref.read(profileProvider.future);
@@ -158,6 +159,7 @@ class FlashcardController extends AsyncNotifier<void> {
             tags: tags,
             bidirectional: bidirectional,
             scheduleMode: scheduleMode,
+            priority: priority,
           );
     });
   }
@@ -166,6 +168,10 @@ class FlashcardController extends AsyncNotifier<void> {
     return _run(() {
       return ref.read(repositoriesProvider).flashcards.updateCard(card);
     });
+  }
+
+  Future<void> setPriority(Flashcard card, int priority) {
+    return updateCard(card.copyWith(priority: priority));
   }
 
   Future<void> setSuspended(Flashcard card, bool suspended) {

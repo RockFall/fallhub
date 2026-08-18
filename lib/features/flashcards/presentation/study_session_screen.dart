@@ -129,6 +129,7 @@ class _StudySessionScreenState extends ConsumerState<StudySessionScreen> {
                     onBury: _isPractice ? null : _bury,
                     onSuspend: _suspend,
                     onDelete: _confirmDelete,
+                    onSetPriority: _setPriority,
                     onSearchQuestion: () => _searchQuestion(queue[_index]),
                     onClose: () => context.go('/flashcards'),
                   ),
@@ -386,6 +387,36 @@ class _StudySessionScreenState extends ConsumerState<StudySessionScreen> {
     await _deleteCurrent();
   }
 
+  Future<void> _setPriority() async {
+    final queue = _queue;
+    if (queue == null || _index >= queue.length) return;
+    final current = queue[_index];
+    final selected = await showDialog<int>(
+      context: context,
+      builder: (ctx) => _PriorityPickerDialog(initial: current.card.priority),
+    );
+    if (selected == null || !mounted) return;
+    if (selected == current.card.priority) return;
+    final updated = current.card.copyWith(priority: selected);
+    await ref.read(flashcardControllerProvider.notifier).setPriority(
+          current.card,
+          selected,
+        );
+    if (!mounted) return;
+    setState(() {
+      _queue = [
+        for (var i = 0; i < queue.length; i++)
+          i == _index
+              ? StudyQueuePolicy.present(
+                  updated,
+                  queue[i].srs,
+                  sessionMode: queue[i].sessionMode,
+                )
+              : queue[i],
+      ];
+    });
+  }
+
   Future<void> _deleteCurrent() async {
     final queue = _queue;
     if (queue == null || _index >= queue.length) return;
@@ -430,6 +461,7 @@ class _StudyBody extends StatelessWidget {
     required this.onBury,
     required this.onSuspend,
     required this.onDelete,
+    required this.onSetPriority,
     required this.onSearchQuestion,
     required this.onClose,
     this.areaLabel,
@@ -448,6 +480,7 @@ class _StudyBody extends StatelessWidget {
   final VoidCallback? onBury;
   final VoidCallback onSuspend;
   final VoidCallback onDelete;
+  final VoidCallback onSetPriority;
   final VoidCallback onSearchQuestion;
   final VoidCallback onClose;
 
@@ -486,6 +519,8 @@ class _StudyBody extends StatelessWidget {
                     onSuspend();
                   case 'delete':
                     onDelete();
+                  case 'priority':
+                    onSetPriority();
                 }
               },
               itemBuilder: (context) => [
@@ -502,6 +537,10 @@ class _StudyBody extends StatelessWidget {
                 const PopupMenuItem(
                   value: 'suspend',
                   child: Text(AppStrings.flashcardsSuspend),
+                ),
+                const PopupMenuItem(
+                  value: 'priority',
+                  child: Text(AppStrings.flashcardsSetPriority),
                 ),
                 PopupMenuItem(
                   value: 'delete',
@@ -717,6 +756,70 @@ class _Done extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class _PriorityPickerDialog extends StatefulWidget {
+  const _PriorityPickerDialog({required this.initial});
+
+  final int initial;
+
+  @override
+  State<_PriorityPickerDialog> createState() => _PriorityPickerDialogState();
+}
+
+class _PriorityPickerDialogState extends State<_PriorityPickerDialog> {
+  late int _value = widget.initial;
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Text(AppStrings.flashcardsSetPriority),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(AppStrings.flashcardsPriorityValue(_value)),
+          Slider(
+            key: const Key('flashcards.priority_slider'),
+            min: FlashcardPolicy.highestPriority.toDouble(),
+            max: FlashcardPolicy.lowestPriority.toDouble(),
+            divisions: FlashcardPolicy.lowestPriority -
+                FlashcardPolicy.highestPriority,
+            value: _value.toDouble(),
+            label: '$_value',
+            onChanged: (next) {
+              setState(() => _value = next.round());
+            },
+            onChangeEnd: (next) {
+              Navigator.pop(context, next.round());
+            },
+          ),
+          Row(
+            children: [
+              Text(
+                '1 · ${AppStrings.flashcardsPriorityHigh}',
+                style: Theme.of(context).textTheme.labelSmall,
+              ),
+              const Spacer(),
+              Text(
+                '5 · ${AppStrings.flashcardsPriorityLow}',
+                style: Theme.of(context).textTheme.labelSmall,
+              ),
+            ],
+          ),
+        ],
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text(AppStrings.cancel),
+        ),
+        FilledButton(
+          onPressed: () => Navigator.pop(context, _value),
+          child: const Text(AppStrings.save),
+        ),
+      ],
     );
   }
 }

@@ -28299,6 +28299,18 @@ class $FlashcardsTable extends Flashcards
     requiredDuringInsert: false,
     defaultValue: const Constant('scheduled'),
   );
+  static const VerificationMeta _priorityMeta = const VerificationMeta(
+    'priority',
+  );
+  @override
+  late final GeneratedColumn<int> priority = GeneratedColumn<int>(
+    'priority',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(5),
+  );
   static const VerificationMeta _suspendedMeta = const VerificationMeta(
     'suspended',
   );
@@ -28362,6 +28374,7 @@ class $FlashcardsTable extends Flashcards
     clozeIndex,
     reverseOfId,
     scheduleMode,
+    priority,
     suspended,
     createdAt,
     updatedAt,
@@ -28464,6 +28477,12 @@ class $FlashcardsTable extends Flashcards
         ),
       );
     }
+    if (data.containsKey('priority')) {
+      context.handle(
+        _priorityMeta,
+        priority.isAcceptableOrUnknown(data['priority']!, _priorityMeta),
+      );
+    }
     if (data.containsKey('suspended')) {
       context.handle(
         _suspendedMeta,
@@ -28549,6 +28568,10 @@ class $FlashcardsTable extends Flashcards
         DriftSqlType.string,
         data['${effectivePrefix}schedule_mode'],
       )!,
+      priority: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}priority'],
+      )!,
       suspended: attachedDatabase.typeMapping.read(
         DriftSqlType.bool,
         data['${effectivePrefix}suspended'],
@@ -28587,6 +28610,7 @@ class FlashcardRow extends DataClass implements Insertable<FlashcardRow> {
   final int? clozeIndex;
   final String? reverseOfId;
   final String scheduleMode;
+  final int priority;
   final bool suspended;
   final int createdAt;
   final int updatedAt;
@@ -28604,6 +28628,7 @@ class FlashcardRow extends DataClass implements Insertable<FlashcardRow> {
     this.clozeIndex,
     this.reverseOfId,
     required this.scheduleMode,
+    required this.priority,
     required this.suspended,
     required this.createdAt,
     required this.updatedAt,
@@ -28632,6 +28657,7 @@ class FlashcardRow extends DataClass implements Insertable<FlashcardRow> {
       map['reverse_of_id'] = Variable<String>(reverseOfId);
     }
     map['schedule_mode'] = Variable<String>(scheduleMode);
+    map['priority'] = Variable<int>(priority);
     map['suspended'] = Variable<bool>(suspended);
     map['created_at'] = Variable<int>(createdAt);
     map['updated_at'] = Variable<int>(updatedAt);
@@ -28661,6 +28687,7 @@ class FlashcardRow extends DataClass implements Insertable<FlashcardRow> {
           ? const Value.absent()
           : Value(reverseOfId),
       scheduleMode: Value(scheduleMode),
+      priority: Value(priority),
       suspended: Value(suspended),
       createdAt: Value(createdAt),
       updatedAt: Value(updatedAt),
@@ -28686,6 +28713,7 @@ class FlashcardRow extends DataClass implements Insertable<FlashcardRow> {
       clozeIndex: serializer.fromJson<int?>(json['clozeIndex']),
       reverseOfId: serializer.fromJson<String?>(json['reverseOfId']),
       scheduleMode: serializer.fromJson<String>(json['scheduleMode']),
+      priority: serializer.fromJson<int>(json['priority']),
       suspended: serializer.fromJson<bool>(json['suspended']),
       createdAt: serializer.fromJson<int>(json['createdAt']),
       updatedAt: serializer.fromJson<int>(json['updatedAt']),
@@ -28708,6 +28736,7 @@ class FlashcardRow extends DataClass implements Insertable<FlashcardRow> {
       'clozeIndex': serializer.toJson<int?>(clozeIndex),
       'reverseOfId': serializer.toJson<String?>(reverseOfId),
       'scheduleMode': serializer.toJson<String>(scheduleMode),
+      'priority': serializer.toJson<int>(priority),
       'suspended': serializer.toJson<bool>(suspended),
       'createdAt': serializer.toJson<int>(createdAt),
       'updatedAt': serializer.toJson<int>(updatedAt),
@@ -28728,6 +28757,7 @@ class FlashcardRow extends DataClass implements Insertable<FlashcardRow> {
     Value<int?> clozeIndex = const Value.absent(),
     Value<String?> reverseOfId = const Value.absent(),
     String? scheduleMode,
+    int? priority,
     bool? suspended,
     int? createdAt,
     int? updatedAt,
@@ -28745,6 +28775,7 @@ class FlashcardRow extends DataClass implements Insertable<FlashcardRow> {
     clozeIndex: clozeIndex.present ? clozeIndex.value : this.clozeIndex,
     reverseOfId: reverseOfId.present ? reverseOfId.value : this.reverseOfId,
     scheduleMode: scheduleMode ?? this.scheduleMode,
+    priority: priority ?? this.priority,
     suspended: suspended ?? this.suspended,
     createdAt: createdAt ?? this.createdAt,
     updatedAt: updatedAt ?? this.updatedAt,
@@ -28770,6 +28801,7 @@ class FlashcardRow extends DataClass implements Insertable<FlashcardRow> {
       scheduleMode: data.scheduleMode.present
           ? data.scheduleMode.value
           : this.scheduleMode,
+      priority: data.priority.present ? data.priority.value : this.priority,
       suspended: data.suspended.present ? data.suspended.value : this.suspended,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
@@ -28792,6 +28824,7 @@ class FlashcardRow extends DataClass implements Insertable<FlashcardRow> {
           ..write('clozeIndex: $clozeIndex, ')
           ..write('reverseOfId: $reverseOfId, ')
           ..write('scheduleMode: $scheduleMode, ')
+          ..write('priority: $priority, ')
           ..write('suspended: $suspended, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
@@ -28814,6 +28847,7 @@ class FlashcardRow extends DataClass implements Insertable<FlashcardRow> {
     clozeIndex,
     reverseOfId,
     scheduleMode,
+    priority,
     suspended,
     createdAt,
     updatedAt,
@@ -28835,6 +28869,7 @@ class FlashcardRow extends DataClass implements Insertable<FlashcardRow> {
           other.clozeIndex == this.clozeIndex &&
           other.reverseOfId == this.reverseOfId &&
           other.scheduleMode == this.scheduleMode &&
+          other.priority == this.priority &&
           other.suspended == this.suspended &&
           other.createdAt == this.createdAt &&
           other.updatedAt == this.updatedAt &&
@@ -28854,6 +28889,7 @@ class FlashcardsCompanion extends UpdateCompanion<FlashcardRow> {
   final Value<int?> clozeIndex;
   final Value<String?> reverseOfId;
   final Value<String> scheduleMode;
+  final Value<int> priority;
   final Value<bool> suspended;
   final Value<int> createdAt;
   final Value<int> updatedAt;
@@ -28872,6 +28908,7 @@ class FlashcardsCompanion extends UpdateCompanion<FlashcardRow> {
     this.clozeIndex = const Value.absent(),
     this.reverseOfId = const Value.absent(),
     this.scheduleMode = const Value.absent(),
+    this.priority = const Value.absent(),
     this.suspended = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
@@ -28891,6 +28928,7 @@ class FlashcardsCompanion extends UpdateCompanion<FlashcardRow> {
     this.clozeIndex = const Value.absent(),
     this.reverseOfId = const Value.absent(),
     this.scheduleMode = const Value.absent(),
+    this.priority = const Value.absent(),
     this.suspended = const Value.absent(),
     required int createdAt,
     required int updatedAt,
@@ -28916,6 +28954,7 @@ class FlashcardsCompanion extends UpdateCompanion<FlashcardRow> {
     Expression<int>? clozeIndex,
     Expression<String>? reverseOfId,
     Expression<String>? scheduleMode,
+    Expression<int>? priority,
     Expression<bool>? suspended,
     Expression<int>? createdAt,
     Expression<int>? updatedAt,
@@ -28935,6 +28974,7 @@ class FlashcardsCompanion extends UpdateCompanion<FlashcardRow> {
       if (clozeIndex != null) 'cloze_index': clozeIndex,
       if (reverseOfId != null) 'reverse_of_id': reverseOfId,
       if (scheduleMode != null) 'schedule_mode': scheduleMode,
+      if (priority != null) 'priority': priority,
       if (suspended != null) 'suspended': suspended,
       if (createdAt != null) 'created_at': createdAt,
       if (updatedAt != null) 'updated_at': updatedAt,
@@ -28956,6 +28996,7 @@ class FlashcardsCompanion extends UpdateCompanion<FlashcardRow> {
     Value<int?>? clozeIndex,
     Value<String?>? reverseOfId,
     Value<String>? scheduleMode,
+    Value<int>? priority,
     Value<bool>? suspended,
     Value<int>? createdAt,
     Value<int>? updatedAt,
@@ -28975,6 +29016,7 @@ class FlashcardsCompanion extends UpdateCompanion<FlashcardRow> {
       clozeIndex: clozeIndex ?? this.clozeIndex,
       reverseOfId: reverseOfId ?? this.reverseOfId,
       scheduleMode: scheduleMode ?? this.scheduleMode,
+      priority: priority ?? this.priority,
       suspended: suspended ?? this.suspended,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
@@ -29022,6 +29064,9 @@ class FlashcardsCompanion extends UpdateCompanion<FlashcardRow> {
     if (scheduleMode.present) {
       map['schedule_mode'] = Variable<String>(scheduleMode.value);
     }
+    if (priority.present) {
+      map['priority'] = Variable<int>(priority.value);
+    }
     if (suspended.present) {
       map['suspended'] = Variable<bool>(suspended.value);
     }
@@ -29055,6 +29100,7 @@ class FlashcardsCompanion extends UpdateCompanion<FlashcardRow> {
           ..write('clozeIndex: $clozeIndex, ')
           ..write('reverseOfId: $reverseOfId, ')
           ..write('scheduleMode: $scheduleMode, ')
+          ..write('priority: $priority, ')
           ..write('suspended: $suspended, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
@@ -58773,6 +58819,7 @@ typedef $$FlashcardsTableCreateCompanionBuilder =
       Value<int?> clozeIndex,
       Value<String?> reverseOfId,
       Value<String> scheduleMode,
+      Value<int> priority,
       Value<bool> suspended,
       required int createdAt,
       required int updatedAt,
@@ -58793,6 +58840,7 @@ typedef $$FlashcardsTableUpdateCompanionBuilder =
       Value<int?> clozeIndex,
       Value<String?> reverseOfId,
       Value<String> scheduleMode,
+      Value<int> priority,
       Value<bool> suspended,
       Value<int> createdAt,
       Value<int> updatedAt,
@@ -58944,6 +58992,11 @@ class $$FlashcardsTableFilterComposer
 
   ColumnFilters<String> get scheduleMode => $composableBuilder(
     column: $table.scheduleMode,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get priority => $composableBuilder(
+    column: $table.priority,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -59123,6 +59176,11 @@ class $$FlashcardsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<int> get priority => $composableBuilder(
+    column: $table.priority,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<bool> get suspended => $composableBuilder(
     column: $table.suspended,
     builder: (column) => ColumnOrderings(column),
@@ -59234,6 +59292,9 @@ class $$FlashcardsTableAnnotationComposer
     column: $table.scheduleMode,
     builder: (column) => column,
   );
+
+  GeneratedColumn<int> get priority =>
+      $composableBuilder(column: $table.priority, builder: (column) => column);
 
   GeneratedColumn<bool> get suspended =>
       $composableBuilder(column: $table.suspended, builder: (column) => column);
@@ -59390,6 +59451,7 @@ class $$FlashcardsTableTableManager
                 Value<int?> clozeIndex = const Value.absent(),
                 Value<String?> reverseOfId = const Value.absent(),
                 Value<String> scheduleMode = const Value.absent(),
+                Value<int> priority = const Value.absent(),
                 Value<bool> suspended = const Value.absent(),
                 Value<int> createdAt = const Value.absent(),
                 Value<int> updatedAt = const Value.absent(),
@@ -59408,6 +59470,7 @@ class $$FlashcardsTableTableManager
                 clozeIndex: clozeIndex,
                 reverseOfId: reverseOfId,
                 scheduleMode: scheduleMode,
+                priority: priority,
                 suspended: suspended,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
@@ -59428,6 +59491,7 @@ class $$FlashcardsTableTableManager
                 Value<int?> clozeIndex = const Value.absent(),
                 Value<String?> reverseOfId = const Value.absent(),
                 Value<String> scheduleMode = const Value.absent(),
+                Value<int> priority = const Value.absent(),
                 Value<bool> suspended = const Value.absent(),
                 required int createdAt,
                 required int updatedAt,
@@ -59446,6 +59510,7 @@ class $$FlashcardsTableTableManager
                 clozeIndex: clozeIndex,
                 reverseOfId: reverseOfId,
                 scheduleMode: scheduleMode,
+                priority: priority,
                 suspended: suspended,
                 createdAt: createdAt,
                 updatedAt: updatedAt,

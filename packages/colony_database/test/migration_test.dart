@@ -812,6 +812,30 @@ void main() {
       expect(placements, hasLength(1));
     });
 
+    test('v35 to v36 adds flashcard priority defaulting to 5', () async {
+      final db = await openMigratedFrom(
+        35,
+        seed: (sqlite) {
+          seedProfile(sqlite);
+          seedFlashcardV35(sqlite);
+        },
+      );
+      addTearDown(() async {
+        await db.close();
+      });
+
+      final repos = ColonyRepositories.create(
+        db,
+        idGenerator: FixedIdGenerator(['event-1']),
+        clock: () => DateTime.utc(2026, 8, 18, 12),
+      );
+      final profile = (await repos.profiles.getActive())!;
+      final cards = await repos.flashcards.listCards(profile.id);
+      expect(cards, hasLength(1));
+      expect(cards.single.priority, 5);
+      expect(cards.single.front, 'Dominante');
+    });
+
     test('v31 to v32 adds health_appointments table', () async {
       final db = await openMigratedFrom(
         31,

@@ -421,9 +421,11 @@ abstract final class StudyQueuePolicy {
       }
     }
 
-    learning.sort((a, b) => a.srs.dueAt.compareTo(b.srs.dueAt));
-    reviews.sort((a, b) => a.srs.dueAt.compareTo(b.srs.dueAt));
-    news.sort((a, b) => a.card.createdAt.compareTo(b.card.createdAt));
+    learning.sort(_byPriorityThen((a, b) => a.srs.dueAt.compareTo(b.srs.dueAt)));
+    reviews.sort(_byPriorityThen((a, b) => a.srs.dueAt.compareTo(b.srs.dueAt)));
+    news.sort(
+      _byPriorityThen((a, b) => a.card.createdAt.compareTo(b.card.createdAt)),
+    );
 
     final limitedReviews =
         reviews.take(reviewRemaining.clamp(0, reviews.length));
@@ -431,6 +433,18 @@ abstract final class StudyQueuePolicy {
     final combined = [...learning, ...limitedReviews, ...limitedNews];
     if (!interleaveByArea) return combined;
     return _interleave(combined, decksById: decksById);
+  }
+
+  static int Function(StudyCard, StudyCard) _byPriorityThen(
+    int Function(StudyCard a, StudyCard b) next,
+  ) {
+    return (a, b) {
+      final byPriority = a.card.priority.compareTo(b.card.priority);
+      if (byPriority != 0) return byPriority;
+      final byNext = next(a, b);
+      if (byNext != 0) return byNext;
+      return a.card.id.value.compareTo(b.card.id.value);
+    };
   }
 
   static List<StudyCard> _interleave(
@@ -490,9 +504,11 @@ abstract final class StudyQueuePolicy {
       out.add(
         present(card, srs, sessionMode: FlashcardStudySessionMode.practice),
       );
-      if (out.length >= limit) break;
     }
-    return out;
+    out.sort(
+      _byPriorityThen((a, b) => a.card.createdAt.compareTo(b.card.createdAt)),
+    );
+    return out.take(limit.clamp(0, out.length)).toList();
   }
 
   static DateTime startOfNextLocalDay(DateTime now) {

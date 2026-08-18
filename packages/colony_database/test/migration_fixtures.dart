@@ -121,6 +121,12 @@ Future<ColonyDatabase> openMigratedFrom(
   if (fromVersion >= 34) {
     _createPhase34Tables(sqliteDb);
   }
+  if (fromVersion >= 35) {
+    _createPhase35Tables(sqliteDb);
+  }
+  if (fromVersion >= 36) {
+    _createPhase36Tables(sqliteDb);
+  }
 
   sqliteDb.userVersion = fromVersion;
   seed?.call(sqliteDb);
@@ -1076,6 +1082,76 @@ void _createPhase34Tables(Database db) {
       duration_ms INTEGER
     )
   ''');
+}
+
+void _createPhase35Tables(Database db) {
+  db.execute(
+    "ALTER TABLE flashcards ADD COLUMN schedule_mode TEXT NOT NULL DEFAULT 'scheduled'",
+  );
+  db.execute(
+    "ALTER TABLE flashcard_review_logs ADD COLUMN review_kind TEXT NOT NULL DEFAULT 'srs'",
+  );
+  db.execute('''
+    CREATE TABLE knowledge_area_placements (
+      area_id TEXT NOT NULL REFERENCES knowledge_areas(id),
+      parent_area_id TEXT NOT NULL REFERENCES knowledge_areas(id),
+      linked_at INTEGER NOT NULL,
+      catalog_key TEXT,
+      PRIMARY KEY (area_id, parent_area_id)
+    )
+  ''');
+  db.execute('''
+    CREATE TABLE research_knowledge_links (
+      research_node_id TEXT NOT NULL REFERENCES research_nodes(id),
+      area_id TEXT NOT NULL REFERENCES knowledge_areas(id),
+      kind TEXT NOT NULL,
+      linked_at INTEGER NOT NULL,
+      PRIMARY KEY (research_node_id, area_id)
+    )
+  ''');
+}
+
+void _createPhase36Tables(Database db) {
+  db.execute(
+    'ALTER TABLE flashcards ADD COLUMN priority INTEGER NOT NULL DEFAULT 5',
+  );
+}
+
+void seedFlashcardV35(
+  Database db, {
+  String profileId = 'profile-1',
+  String deckId = 'deck-1',
+  String cardId = 'card-1',
+}) {
+  db.execute(
+    '''
+    INSERT INTO flashcard_decks (
+      id, profile_id, area_id, research_node_id, title, description,
+      new_limit_per_day, review_limit_per_day, archived_at,
+      created_at, updated_at, version
+    ) VALUES (?, ?, NULL, NULL, ?, NULL, 20, 200, NULL, ?, ?, 1)
+    ''',
+    [deckId, profileId, 'Teoria', 1_720_000_000_000, 1_720_000_000_000],
+  );
+  db.execute(
+    '''
+    INSERT INTO flashcards (
+      id, profile_id, deck_id, area_id, kind, front, back, extra,
+      tags_json, cloze_index, reverse_of_id, schedule_mode, suspended,
+      created_at, updated_at, version
+    ) VALUES (?, ?, ?, NULL, 'basic', ?, ?, NULL, '[]', NULL, NULL,
+      'scheduled', 0, ?, ?, 1)
+    ''',
+    [
+      cardId,
+      profileId,
+      deckId,
+      'Dominante',
+      'V',
+      1_720_000_000_000,
+      1_720_000_000_000,
+    ],
+  );
 }
 
 void seedResearchNodeV10(

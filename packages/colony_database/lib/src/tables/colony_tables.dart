@@ -862,6 +862,7 @@ class Flashcards extends Table {
   TextColumn get reverseOfId => text().nullable()();
   TextColumn get scheduleMode =>
       text().withDefault(const Constant('scheduled'))();
+  IntColumn get priority => integer().withDefault(const Constant(5))();
   BoolColumn get suspended => boolean().withDefault(const Constant(false))();
   IntColumn get createdAt => integer()();
   IntColumn get updatedAt => integer()();

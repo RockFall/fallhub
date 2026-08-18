@@ -92,7 +92,7 @@ void main() {
     expect(buried.dueAt.isAfter(now), isTrue);
 
     final snapshot = await repos.export.buildSnapshot();
-    expect(snapshot.version, 31);
+    expect(snapshot.version, 32);
     expect(snapshot.knowledgeAreas, isNotEmpty);
     expect(snapshot.flashcardDecks, hasLength(1));
     expect(snapshot.flashcards.length, greaterThanOrEqualTo(4));
@@ -267,5 +267,32 @@ void main() {
     final remaining = await repos.flashcards.listCards(created.id);
     expect(remaining.map((c) => c.id), containsAll([leftover.single.id, cloze.last.id]));
     expect(remaining, hasLength(2));
+  });
+
+  test('new cards default to priority 5 and update persists 1', () async {
+    final created = await profile();
+    final deck = await repos.flashcards.createDeck(
+      profileId: created.id,
+      title: 'Prioridade',
+    );
+    final cards = await repos.flashcards.createCard(
+      profileId: created.id,
+      deckId: deck.id,
+      front: 'Baixa',
+      back: '5',
+    );
+    expect(cards.single.priority, 5);
+
+    await repos.flashcards.updateCard(cards.single.copyWith(priority: 1));
+    final stored = (await repos.flashcards.listCards(created.id)).single;
+    expect(stored.priority, 1);
+
+    final snapshot = await repos.export.buildSnapshot();
+    expect(snapshot.version, 32);
+    expect(snapshot.flashcards.single.priority, 1);
+
+    await repos.restore.restore(snapshot);
+    final restored = (await repos.flashcards.listCards(created.id)).single;
+    expect(restored.priority, 1);
   });
 }

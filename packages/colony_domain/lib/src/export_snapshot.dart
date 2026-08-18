@@ -233,7 +233,7 @@ class ExportSnapshot extends Equatable {
 
   static ExportSnapshot fromJson(Map<String, dynamic> json) {
     final version = _requireInt(json, 'version');
-    if (version < 1 || version > 31) {
+    if (version < 1 || version > 32) {
       throw ExportSnapshotException('Versão de export não suportada: $version');
     }
 
@@ -494,6 +494,14 @@ class ExportSnapshot extends Equatable {
     if (value is int) return value;
     if (value is num) return value.toInt();
     throw ExportSnapshotException('Campo numérico inválido: $key');
+  }
+
+  static int? _optionalInt(Map<String, dynamic> json, String key) {
+    final value = json[key];
+    if (value == null) return null;
+    if (value is int) return value;
+    if (value is num) return value.toInt();
+    return int.tryParse(value.toString());
   }
 
   static bool _requireBool(Map<String, dynamic> json, String key) {
@@ -1194,6 +1202,9 @@ class ExportSnapshot extends Equatable {
             : EntityId(_requireString(json, 'reverse_of_id')),
         scheduleMode: FlashcardScheduleMode.values.byName(
           json['schedule_mode'] as String? ?? 'scheduled',
+        ),
+        priority: FlashcardPolicy.normalizePriority(
+          _optionalInt(json, 'priority'),
         ),
         suspended: json['suspended'] as bool? ?? false,
         createdAt: _parseDateTime(_requireString(json, 'created_at')),
@@ -1986,6 +1997,7 @@ class ExportSnapshot extends Equatable {
         if (card.clozeIndex != null) 'cloze_index': card.clozeIndex,
         if (card.reverseOfId != null) 'reverse_of_id': card.reverseOfId!.value,
         'schedule_mode': card.scheduleMode.name,
+        'priority': card.priority,
         'suspended': card.suspended,
         'created_at': card.createdAt.toUtc().toIso8601String(),
         'updated_at': card.updatedAt.toUtc().toIso8601String(),

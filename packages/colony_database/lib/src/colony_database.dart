@@ -71,7 +71,7 @@ class ColonyDatabase extends _$ColonyDatabase {
   ColonyDatabase(super.e);
 
   @override
-  int get schemaVersion => 35;
+  int get schemaVersion => 36;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -213,6 +213,9 @@ class ColonyDatabase extends _$ColonyDatabase {
           if (from < 35) {
             await m.createTable(knowledgeAreaPlacements);
             await m.createTable(researchKnowledgeLinks);
+          }
+          if (from >= 34 && from < 36) {
+            await m.addColumn(flashcards, flashcards.priority);
           }
         },
       );
@@ -1863,6 +1866,7 @@ class ColonyMappers {
       reverseOfId:
           row.reverseOfId == null ? null : domain.EntityId(row.reverseOfId!),
       scheduleMode: domain.FlashcardScheduleMode.values.byName(row.scheduleMode),
+      priority: domain.FlashcardPolicy.normalizePriority(row.priority),
       suspended: row.suspended,
       createdAt: DateTime.fromMillisecondsSinceEpoch(row.createdAt, isUtc: true),
       updatedAt: DateTime.fromMillisecondsSinceEpoch(row.updatedAt, isUtc: true),
@@ -1884,6 +1888,7 @@ class ColonyMappers {
       clozeIndex: Value(card.clozeIndex),
       reverseOfId: Value(card.reverseOfId?.value),
       scheduleMode: Value(card.scheduleMode.name),
+      priority: Value(card.priority),
       suspended: Value(card.suspended),
       createdAt: card.createdAt.millisecondsSinceEpoch,
       updatedAt: card.updatedAt.millisecondsSinceEpoch,

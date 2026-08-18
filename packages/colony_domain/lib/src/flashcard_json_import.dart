@@ -25,6 +25,7 @@ class FlashcardJsonCard {
     this.extra,
     this.tags = const [],
     this.scheduleMode = FlashcardScheduleMode.scheduled,
+    this.priority = FlashcardPolicy.lowestPriority,
     this.bidirectional = false,
   });
 
@@ -37,6 +38,7 @@ class FlashcardJsonCard {
   final String? extra;
   final List<String> tags;
   final FlashcardScheduleMode scheduleMode;
+  final int priority;
   final bool bidirectional;
 }
 
@@ -291,6 +293,7 @@ abstract final class FlashcardJsonCodec {
       extra: _readString(map['extra']),
       tags: tags,
       scheduleMode: parseSchedule(map['schedule'] ?? map['scheduleMode']),
+      priority: parsePriority(map['priority'] ?? map['prioridade']),
       bidirectional: map['bidirectional'] == true ||
           map['inverso'] == true ||
           kind == FlashcardKind.reverse,
@@ -324,6 +327,14 @@ abstract final class FlashcardJsonCodec {
         FlashcardScheduleMode.unscheduled,
       _ => throw FlashcardJsonException('Agenda desconhecida: $raw'),
     };
+  }
+
+  static int parsePriority(Object? raw) {
+    if (raw == null) return FlashcardPolicy.lowestPriority;
+    if (raw is int) return FlashcardPolicy.normalizePriority(raw);
+    if (raw is num) return FlashcardPolicy.normalizePriority(raw.round());
+    final parsed = int.tryParse(raw.toString().trim());
+    return FlashcardPolicy.normalizePriority(parsed);
   }
 
   static String _extractJson(String source) {
@@ -560,6 +571,7 @@ abstract final class FlashcardJsonPromptBuilder {
       ..writeln('      "extra": "nota opcional no verso",')
       ..writeln('      "tags": ["opcional"],')
       ..writeln('      "schedule": "scheduled|unscheduled",')
+      ..writeln('      "priority": 5,')
       ..writeln('      "bidirectional": false')
       ..writeln('    }')
       ..writeln('  ]')
@@ -584,6 +596,9 @@ abstract final class FlashcardJsonPromptBuilder {
       )
       ..writeln(
         '- schedule: scheduled = entra na fila SM-2; unscheduled = só prática pontual.',
+      )
+      ..writeln(
+        '- priority: 1 (mais alta) a 5 (mais baixa). Omitir = 5.',
       )
       ..writeln(
         '- bidirectional: true cria o cartão invertido (frente↔verso) com SRS separado.',

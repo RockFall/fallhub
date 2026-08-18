@@ -162,8 +162,13 @@ void main() {
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 200));
 
+    expect(find.text(AppStrings.flashcardsSetPriority), findsOneWidget);
     expect(find.text(AppStrings.flashcardsDelete), findsOneWidget);
-    await tester.tap(find.text(AppStrings.flashcardsDelete));
+    tester
+        .widget<PopupMenuButton<String>>(
+          find.byKey(const Key('flashcards.more_actions')),
+        )
+        .onSelected!('delete');
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 200));
 
@@ -174,6 +179,87 @@ void main() {
 
     expect(find.text(AppStrings.flashcardsDone), findsOneWidget);
     expect(await repos.flashcards.listCards(profile.id), isEmpty);
+
+    await tester.pumpWidget(const SizedBox.shrink());
+    for (var i = 0; i < 80; i++) {
+      await tester.pump(const Duration(milliseconds: 1));
+    }
+  });
+
+  testWidgets('study menu sets priority with a slider', (tester) async {
+    tester.view.physicalSize = const Size(800, 1400);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    final db = ColonyDatabase.inMemory();
+    addTearDown(db.close);
+    final repos = ColonyRepositories.create(
+      db,
+      idGenerator: FixedIdGenerator([
+        for (var i = 1; i <= 40; i++) 'id-$i',
+      ]),
+      clock: () => DateTime.utc(2026, 8, 17, 12),
+    );
+    final profile = await repos.profiles.create(
+      colonyName: 'Test',
+      displayName: 'Caio',
+      timezone: 'UTC',
+      locale: 'pt_BR',
+      baseCurrency: 'BRL',
+    );
+    await repos.preferences.save(
+      AppPreferences.defaults().copyWith(onboardingCompleted: true),
+    );
+    final deck = await repos.flashcards.createDeck(
+      profileId: profile.id,
+      title: 'Básico',
+    );
+    await repos.flashcards.createCard(
+      profileId: profile.id,
+      deckId: deck.id,
+      front: 'Prioridade',
+      back: 'cinco',
+    );
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          databaseProvider.overrideWithValue(db),
+          clockProvider.overrideWithValue(() => DateTime.utc(2026, 8, 17, 12)),
+        ],
+        child: MaterialApp(
+          theme: ColonyTheme.dark(),
+          home: const Scaffold(body: StudySessionScreen()),
+        ),
+      ),
+    );
+    await tester.pump();
+    for (var i = 0; i < 20; i++) {
+      await tester.pump(const Duration(milliseconds: 50));
+      if (find.text('Prioridade').evaluate().isNotEmpty) break;
+    }
+
+    expect(find.text('Prioridade'), findsOneWidget);
+    await tester.tap(find.byKey(const Key('flashcards.more_actions')));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 200));
+
+    await tester.tap(find.text(AppStrings.flashcardsSetPriority));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 200));
+
+    final slider = tester.widget<Slider>(
+      find.byKey(const Key('flashcards.priority_slider')),
+    );
+    expect(slider.value, 5);
+    slider.onChanged?.call(1);
+    slider.onChangeEnd?.call(1);
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 500));
+
+    final stored = (await repos.flashcards.listCards(profile.id)).single;
+    expect(stored.priority, 1);
 
     await tester.pumpWidget(const SizedBox.shrink());
     for (var i = 0; i < 80; i++) {
