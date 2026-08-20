@@ -164,7 +164,7 @@ void main() {
     router.go('/resources/travel');
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 500));
-    expect(find.text(AppStrings.travelTitle), findsOneWidget);
+    expect(find.text(AppStrings.timelineHubTitle), findsOneWidget);
     expect(find.text(AppStrings.travelDisclaimer), findsOneWidget);
     expect(find.text(AppStrings.travelEmpty), findsOneWidget);
 

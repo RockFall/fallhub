@@ -939,3 +939,33 @@ class ResearchKnowledgeLinks extends Table {
   @override
   Set<Column<Object>> get primaryKey => {researchNodeId, areaId};
 }
+
+@DataClassName('GoogleTimelineImportRow')
+class GoogleTimelineImports extends Table {
+  @override
+  String get tableName => 'google_timeline_imports';
+
+  TextColumn get id => text()();
+  TextColumn get profileId => text().references(Profiles, #id)();
+  TextColumn get fileName => text()();
+  IntColumn get importedAt => integer()();
+  TextColumn get payloadJson => text()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+}
+
+@DataClassName('GoogleTimelinePlaceLabelRow')
+class GoogleTimelinePlaceLabels extends Table {
+  @override
+  String get tableName => 'google_timeline_place_labels';
+
+  TextColumn get profileId => text().references(Profiles, #id)();
+  TextColumn get placeId => text()();
+  TextColumn get category => text()();
+  TextColumn get customName => text().nullable()();
+  IntColumn get updatedAt => integer()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {profileId, placeId};
+}

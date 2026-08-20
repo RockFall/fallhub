@@ -31036,6 +31036,771 @@ class ResearchKnowledgeLinksCompanion
   }
 }
 
+class $GoogleTimelineImportsTable extends GoogleTimelineImports
+    with TableInfo<$GoogleTimelineImportsTable, GoogleTimelineImportRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $GoogleTimelineImportsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _profileIdMeta = const VerificationMeta(
+    'profileId',
+  );
+  @override
+  late final GeneratedColumn<String> profileId = GeneratedColumn<String>(
+    'profile_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES profiles (id)',
+    ),
+  );
+  static const VerificationMeta _fileNameMeta = const VerificationMeta(
+    'fileName',
+  );
+  @override
+  late final GeneratedColumn<String> fileName = GeneratedColumn<String>(
+    'file_name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _importedAtMeta = const VerificationMeta(
+    'importedAt',
+  );
+  @override
+  late final GeneratedColumn<int> importedAt = GeneratedColumn<int>(
+    'imported_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _payloadJsonMeta = const VerificationMeta(
+    'payloadJson',
+  );
+  @override
+  late final GeneratedColumn<String> payloadJson = GeneratedColumn<String>(
+    'payload_json',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    profileId,
+    fileName,
+    importedAt,
+    payloadJson,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'google_timeline_imports';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<GoogleTimelineImportRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('profile_id')) {
+      context.handle(
+        _profileIdMeta,
+        profileId.isAcceptableOrUnknown(data['profile_id']!, _profileIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_profileIdMeta);
+    }
+    if (data.containsKey('file_name')) {
+      context.handle(
+        _fileNameMeta,
+        fileName.isAcceptableOrUnknown(data['file_name']!, _fileNameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_fileNameMeta);
+    }
+    if (data.containsKey('imported_at')) {
+      context.handle(
+        _importedAtMeta,
+        importedAt.isAcceptableOrUnknown(data['imported_at']!, _importedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_importedAtMeta);
+    }
+    if (data.containsKey('payload_json')) {
+      context.handle(
+        _payloadJsonMeta,
+        payloadJson.isAcceptableOrUnknown(
+          data['payload_json']!,
+          _payloadJsonMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_payloadJsonMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  GoogleTimelineImportRow map(
+    Map<String, dynamic> data, {
+    String? tablePrefix,
+  }) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return GoogleTimelineImportRow(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      profileId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}profile_id'],
+      )!,
+      fileName: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}file_name'],
+      )!,
+      importedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}imported_at'],
+      )!,
+      payloadJson: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}payload_json'],
+      )!,
+    );
+  }
+
+  @override
+  $GoogleTimelineImportsTable createAlias(String alias) {
+    return $GoogleTimelineImportsTable(attachedDatabase, alias);
+  }
+}
+
+class GoogleTimelineImportRow extends DataClass
+    implements Insertable<GoogleTimelineImportRow> {
+  final String id;
+  final String profileId;
+  final String fileName;
+  final int importedAt;
+  final String payloadJson;
+  const GoogleTimelineImportRow({
+    required this.id,
+    required this.profileId,
+    required this.fileName,
+    required this.importedAt,
+    required this.payloadJson,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['profile_id'] = Variable<String>(profileId);
+    map['file_name'] = Variable<String>(fileName);
+    map['imported_at'] = Variable<int>(importedAt);
+    map['payload_json'] = Variable<String>(payloadJson);
+    return map;
+  }
+
+  GoogleTimelineImportsCompanion toCompanion(bool nullToAbsent) {
+    return GoogleTimelineImportsCompanion(
+      id: Value(id),
+      profileId: Value(profileId),
+      fileName: Value(fileName),
+      importedAt: Value(importedAt),
+      payloadJson: Value(payloadJson),
+    );
+  }
+
+  factory GoogleTimelineImportRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return GoogleTimelineImportRow(
+      id: serializer.fromJson<String>(json['id']),
+      profileId: serializer.fromJson<String>(json['profileId']),
+      fileName: serializer.fromJson<String>(json['fileName']),
+      importedAt: serializer.fromJson<int>(json['importedAt']),
+      payloadJson: serializer.fromJson<String>(json['payloadJson']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'profileId': serializer.toJson<String>(profileId),
+      'fileName': serializer.toJson<String>(fileName),
+      'importedAt': serializer.toJson<int>(importedAt),
+      'payloadJson': serializer.toJson<String>(payloadJson),
+    };
+  }
+
+  GoogleTimelineImportRow copyWith({
+    String? id,
+    String? profileId,
+    String? fileName,
+    int? importedAt,
+    String? payloadJson,
+  }) => GoogleTimelineImportRow(
+    id: id ?? this.id,
+    profileId: profileId ?? this.profileId,
+    fileName: fileName ?? this.fileName,
+    importedAt: importedAt ?? this.importedAt,
+    payloadJson: payloadJson ?? this.payloadJson,
+  );
+  GoogleTimelineImportRow copyWithCompanion(
+    GoogleTimelineImportsCompanion data,
+  ) {
+    return GoogleTimelineImportRow(
+      id: data.id.present ? data.id.value : this.id,
+      profileId: data.profileId.present ? data.profileId.value : this.profileId,
+      fileName: data.fileName.present ? data.fileName.value : this.fileName,
+      importedAt: data.importedAt.present
+          ? data.importedAt.value
+          : this.importedAt,
+      payloadJson: data.payloadJson.present
+          ? data.payloadJson.value
+          : this.payloadJson,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('GoogleTimelineImportRow(')
+          ..write('id: $id, ')
+          ..write('profileId: $profileId, ')
+          ..write('fileName: $fileName, ')
+          ..write('importedAt: $importedAt, ')
+          ..write('payloadJson: $payloadJson')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(id, profileId, fileName, importedAt, payloadJson);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is GoogleTimelineImportRow &&
+          other.id == this.id &&
+          other.profileId == this.profileId &&
+          other.fileName == this.fileName &&
+          other.importedAt == this.importedAt &&
+          other.payloadJson == this.payloadJson);
+}
+
+class GoogleTimelineImportsCompanion
+    extends UpdateCompanion<GoogleTimelineImportRow> {
+  final Value<String> id;
+  final Value<String> profileId;
+  final Value<String> fileName;
+  final Value<int> importedAt;
+  final Value<String> payloadJson;
+  final Value<int> rowid;
+  const GoogleTimelineImportsCompanion({
+    this.id = const Value.absent(),
+    this.profileId = const Value.absent(),
+    this.fileName = const Value.absent(),
+    this.importedAt = const Value.absent(),
+    this.payloadJson = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  GoogleTimelineImportsCompanion.insert({
+    required String id,
+    required String profileId,
+    required String fileName,
+    required int importedAt,
+    required String payloadJson,
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       profileId = Value(profileId),
+       fileName = Value(fileName),
+       importedAt = Value(importedAt),
+       payloadJson = Value(payloadJson);
+  static Insertable<GoogleTimelineImportRow> custom({
+    Expression<String>? id,
+    Expression<String>? profileId,
+    Expression<String>? fileName,
+    Expression<int>? importedAt,
+    Expression<String>? payloadJson,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (profileId != null) 'profile_id': profileId,
+      if (fileName != null) 'file_name': fileName,
+      if (importedAt != null) 'imported_at': importedAt,
+      if (payloadJson != null) 'payload_json': payloadJson,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  GoogleTimelineImportsCompanion copyWith({
+    Value<String>? id,
+    Value<String>? profileId,
+    Value<String>? fileName,
+    Value<int>? importedAt,
+    Value<String>? payloadJson,
+    Value<int>? rowid,
+  }) {
+    return GoogleTimelineImportsCompanion(
+      id: id ?? this.id,
+      profileId: profileId ?? this.profileId,
+      fileName: fileName ?? this.fileName,
+      importedAt: importedAt ?? this.importedAt,
+      payloadJson: payloadJson ?? this.payloadJson,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (profileId.present) {
+      map['profile_id'] = Variable<String>(profileId.value);
+    }
+    if (fileName.present) {
+      map['file_name'] = Variable<String>(fileName.value);
+    }
+    if (importedAt.present) {
+      map['imported_at'] = Variable<int>(importedAt.value);
+    }
+    if (payloadJson.present) {
+      map['payload_json'] = Variable<String>(payloadJson.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('GoogleTimelineImportsCompanion(')
+          ..write('id: $id, ')
+          ..write('profileId: $profileId, ')
+          ..write('fileName: $fileName, ')
+          ..write('importedAt: $importedAt, ')
+          ..write('payloadJson: $payloadJson, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $GoogleTimelinePlaceLabelsTable extends GoogleTimelinePlaceLabels
+    with
+        TableInfo<
+          $GoogleTimelinePlaceLabelsTable,
+          GoogleTimelinePlaceLabelRow
+        > {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $GoogleTimelinePlaceLabelsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _profileIdMeta = const VerificationMeta(
+    'profileId',
+  );
+  @override
+  late final GeneratedColumn<String> profileId = GeneratedColumn<String>(
+    'profile_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES profiles (id)',
+    ),
+  );
+  static const VerificationMeta _placeIdMeta = const VerificationMeta(
+    'placeId',
+  );
+  @override
+  late final GeneratedColumn<String> placeId = GeneratedColumn<String>(
+    'place_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _categoryMeta = const VerificationMeta(
+    'category',
+  );
+  @override
+  late final GeneratedColumn<String> category = GeneratedColumn<String>(
+    'category',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _customNameMeta = const VerificationMeta(
+    'customName',
+  );
+  @override
+  late final GeneratedColumn<String> customName = GeneratedColumn<String>(
+    'custom_name',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<int> updatedAt = GeneratedColumn<int>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    profileId,
+    placeId,
+    category,
+    customName,
+    updatedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'google_timeline_place_labels';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<GoogleTimelinePlaceLabelRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('profile_id')) {
+      context.handle(
+        _profileIdMeta,
+        profileId.isAcceptableOrUnknown(data['profile_id']!, _profileIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_profileIdMeta);
+    }
+    if (data.containsKey('place_id')) {
+      context.handle(
+        _placeIdMeta,
+        placeId.isAcceptableOrUnknown(data['place_id']!, _placeIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_placeIdMeta);
+    }
+    if (data.containsKey('category')) {
+      context.handle(
+        _categoryMeta,
+        category.isAcceptableOrUnknown(data['category']!, _categoryMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_categoryMeta);
+    }
+    if (data.containsKey('custom_name')) {
+      context.handle(
+        _customNameMeta,
+        customName.isAcceptableOrUnknown(data['custom_name']!, _customNameMeta),
+      );
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {profileId, placeId};
+  @override
+  GoogleTimelinePlaceLabelRow map(
+    Map<String, dynamic> data, {
+    String? tablePrefix,
+  }) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return GoogleTimelinePlaceLabelRow(
+      profileId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}profile_id'],
+      )!,
+      placeId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}place_id'],
+      )!,
+      category: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}category'],
+      )!,
+      customName: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}custom_name'],
+      ),
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}updated_at'],
+      )!,
+    );
+  }
+
+  @override
+  $GoogleTimelinePlaceLabelsTable createAlias(String alias) {
+    return $GoogleTimelinePlaceLabelsTable(attachedDatabase, alias);
+  }
+}
+
+class GoogleTimelinePlaceLabelRow extends DataClass
+    implements Insertable<GoogleTimelinePlaceLabelRow> {
+  final String profileId;
+  final String placeId;
+  final String category;
+  final String? customName;
+  final int updatedAt;
+  const GoogleTimelinePlaceLabelRow({
+    required this.profileId,
+    required this.placeId,
+    required this.category,
+    this.customName,
+    required this.updatedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['profile_id'] = Variable<String>(profileId);
+    map['place_id'] = Variable<String>(placeId);
+    map['category'] = Variable<String>(category);
+    if (!nullToAbsent || customName != null) {
+      map['custom_name'] = Variable<String>(customName);
+    }
+    map['updated_at'] = Variable<int>(updatedAt);
+    return map;
+  }
+
+  GoogleTimelinePlaceLabelsCompanion toCompanion(bool nullToAbsent) {
+    return GoogleTimelinePlaceLabelsCompanion(
+      profileId: Value(profileId),
+      placeId: Value(placeId),
+      category: Value(category),
+      customName: customName == null && nullToAbsent
+          ? const Value.absent()
+          : Value(customName),
+      updatedAt: Value(updatedAt),
+    );
+  }
+
+  factory GoogleTimelinePlaceLabelRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return GoogleTimelinePlaceLabelRow(
+      profileId: serializer.fromJson<String>(json['profileId']),
+      placeId: serializer.fromJson<String>(json['placeId']),
+      category: serializer.fromJson<String>(json['category']),
+      customName: serializer.fromJson<String?>(json['customName']),
+      updatedAt: serializer.fromJson<int>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'profileId': serializer.toJson<String>(profileId),
+      'placeId': serializer.toJson<String>(placeId),
+      'category': serializer.toJson<String>(category),
+      'customName': serializer.toJson<String?>(customName),
+      'updatedAt': serializer.toJson<int>(updatedAt),
+    };
+  }
+
+  GoogleTimelinePlaceLabelRow copyWith({
+    String? profileId,
+    String? placeId,
+    String? category,
+    Value<String?> customName = const Value.absent(),
+    int? updatedAt,
+  }) => GoogleTimelinePlaceLabelRow(
+    profileId: profileId ?? this.profileId,
+    placeId: placeId ?? this.placeId,
+    category: category ?? this.category,
+    customName: customName.present ? customName.value : this.customName,
+    updatedAt: updatedAt ?? this.updatedAt,
+  );
+  GoogleTimelinePlaceLabelRow copyWithCompanion(
+    GoogleTimelinePlaceLabelsCompanion data,
+  ) {
+    return GoogleTimelinePlaceLabelRow(
+      profileId: data.profileId.present ? data.profileId.value : this.profileId,
+      placeId: data.placeId.present ? data.placeId.value : this.placeId,
+      category: data.category.present ? data.category.value : this.category,
+      customName: data.customName.present
+          ? data.customName.value
+          : this.customName,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('GoogleTimelinePlaceLabelRow(')
+          ..write('profileId: $profileId, ')
+          ..write('placeId: $placeId, ')
+          ..write('category: $category, ')
+          ..write('customName: $customName, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(profileId, placeId, category, customName, updatedAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is GoogleTimelinePlaceLabelRow &&
+          other.profileId == this.profileId &&
+          other.placeId == this.placeId &&
+          other.category == this.category &&
+          other.customName == this.customName &&
+          other.updatedAt == this.updatedAt);
+}
+
+class GoogleTimelinePlaceLabelsCompanion
+    extends UpdateCompanion<GoogleTimelinePlaceLabelRow> {
+  final Value<String> profileId;
+  final Value<String> placeId;
+  final Value<String> category;
+  final Value<String?> customName;
+  final Value<int> updatedAt;
+  final Value<int> rowid;
+  const GoogleTimelinePlaceLabelsCompanion({
+    this.profileId = const Value.absent(),
+    this.placeId = const Value.absent(),
+    this.category = const Value.absent(),
+    this.customName = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  GoogleTimelinePlaceLabelsCompanion.insert({
+    required String profileId,
+    required String placeId,
+    required String category,
+    this.customName = const Value.absent(),
+    required int updatedAt,
+    this.rowid = const Value.absent(),
+  }) : profileId = Value(profileId),
+       placeId = Value(placeId),
+       category = Value(category),
+       updatedAt = Value(updatedAt);
+  static Insertable<GoogleTimelinePlaceLabelRow> custom({
+    Expression<String>? profileId,
+    Expression<String>? placeId,
+    Expression<String>? category,
+    Expression<String>? customName,
+    Expression<int>? updatedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (profileId != null) 'profile_id': profileId,
+      if (placeId != null) 'place_id': placeId,
+      if (category != null) 'category': category,
+      if (customName != null) 'custom_name': customName,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  GoogleTimelinePlaceLabelsCompanion copyWith({
+    Value<String>? profileId,
+    Value<String>? placeId,
+    Value<String>? category,
+    Value<String?>? customName,
+    Value<int>? updatedAt,
+    Value<int>? rowid,
+  }) {
+    return GoogleTimelinePlaceLabelsCompanion(
+      profileId: profileId ?? this.profileId,
+      placeId: placeId ?? this.placeId,
+      category: category ?? this.category,
+      customName: customName ?? this.customName,
+      updatedAt: updatedAt ?? this.updatedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (profileId.present) {
+      map['profile_id'] = Variable<String>(profileId.value);
+    }
+    if (placeId.present) {
+      map['place_id'] = Variable<String>(placeId.value);
+    }
+    if (category.present) {
+      map['category'] = Variable<String>(category.value);
+    }
+    if (customName.present) {
+      map['custom_name'] = Variable<String>(customName.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<int>(updatedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('GoogleTimelinePlaceLabelsCompanion(')
+          ..write('profileId: $profileId, ')
+          ..write('placeId: $placeId, ')
+          ..write('category: $category, ')
+          ..write('customName: $customName, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$ColonyDatabase extends GeneratedDatabase {
   _$ColonyDatabase(QueryExecutor e) : super(e);
   $ColonyDatabaseManager get managers => $ColonyDatabaseManager(this);
@@ -31120,6 +31885,10 @@ abstract class _$ColonyDatabase extends GeneratedDatabase {
       $KnowledgeAreaPlacementsTable(this);
   late final $ResearchKnowledgeLinksTable researchKnowledgeLinks =
       $ResearchKnowledgeLinksTable(this);
+  late final $GoogleTimelineImportsTable googleTimelineImports =
+      $GoogleTimelineImportsTable(this);
+  late final $GoogleTimelinePlaceLabelsTable googleTimelinePlaceLabels =
+      $GoogleTimelinePlaceLabelsTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -31179,6 +31948,8 @@ abstract class _$ColonyDatabase extends GeneratedDatabase {
     flashcardReviewLogs,
     knowledgeAreaPlacements,
     researchKnowledgeLinks,
+    googleTimelineImports,
+    googleTimelinePlaceLabels,
   ];
 }
 
@@ -31961,6 +32732,62 @@ final class $$ProfilesTableReferences
     ).filter((f) => f.profileId.id.sqlEquals($_itemColumn<String>('id')!));
 
     final cache = $_typedResult.readTableOrNull(_flashcardsRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<
+    $GoogleTimelineImportsTable,
+    List<GoogleTimelineImportRow>
+  >
+  _googleTimelineImportsRefsTable(_$ColonyDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.googleTimelineImports,
+        aliasName: $_aliasNameGenerator(
+          db.profiles.id,
+          db.googleTimelineImports.profileId,
+        ),
+      );
+
+  $$GoogleTimelineImportsTableProcessedTableManager
+  get googleTimelineImportsRefs {
+    final manager = $$GoogleTimelineImportsTableTableManager(
+      $_db,
+      $_db.googleTimelineImports,
+    ).filter((f) => f.profileId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _googleTimelineImportsRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<
+    $GoogleTimelinePlaceLabelsTable,
+    List<GoogleTimelinePlaceLabelRow>
+  >
+  _googleTimelinePlaceLabelsRefsTable(_$ColonyDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.googleTimelinePlaceLabels,
+        aliasName: $_aliasNameGenerator(
+          db.profiles.id,
+          db.googleTimelinePlaceLabels.profileId,
+        ),
+      );
+
+  $$GoogleTimelinePlaceLabelsTableProcessedTableManager
+  get googleTimelinePlaceLabelsRefs {
+    final manager = $$GoogleTimelinePlaceLabelsTableTableManager(
+      $_db,
+      $_db.googleTimelinePlaceLabels,
+    ).filter((f) => f.profileId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _googleTimelinePlaceLabelsRefsTable($_db),
+    );
     return ProcessedTableManager(
       manager.$state.copyWith(prefetchedData: cache),
     );
@@ -32875,6 +33702,59 @@ class $$ProfilesTableFilterComposer
                 $removeJoinBuilderFromRootComposer,
           ),
     );
+    return f(composer);
+  }
+
+  Expression<bool> googleTimelineImportsRefs(
+    Expression<bool> Function($$GoogleTimelineImportsTableFilterComposer f) f,
+  ) {
+    final $$GoogleTimelineImportsTableFilterComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.googleTimelineImports,
+          getReferencedColumn: (t) => t.profileId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$GoogleTimelineImportsTableFilterComposer(
+                $db: $db,
+                $table: $db.googleTimelineImports,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+
+  Expression<bool> googleTimelinePlaceLabelsRefs(
+    Expression<bool> Function($$GoogleTimelinePlaceLabelsTableFilterComposer f)
+    f,
+  ) {
+    final $$GoogleTimelinePlaceLabelsTableFilterComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.googleTimelinePlaceLabels,
+          getReferencedColumn: (t) => t.profileId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$GoogleTimelinePlaceLabelsTableFilterComposer(
+                $db: $db,
+                $table: $db.googleTimelinePlaceLabels,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
     return f(composer);
   }
 }
@@ -33842,6 +34722,59 @@ class $$ProfilesTableAnnotationComposer
     );
     return f(composer);
   }
+
+  Expression<T> googleTimelineImportsRefs<T extends Object>(
+    Expression<T> Function($$GoogleTimelineImportsTableAnnotationComposer a) f,
+  ) {
+    final $$GoogleTimelineImportsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.googleTimelineImports,
+          getReferencedColumn: (t) => t.profileId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$GoogleTimelineImportsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.googleTimelineImports,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+
+  Expression<T> googleTimelinePlaceLabelsRefs<T extends Object>(
+    Expression<T> Function($$GoogleTimelinePlaceLabelsTableAnnotationComposer a)
+    f,
+  ) {
+    final $$GoogleTimelinePlaceLabelsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.googleTimelinePlaceLabels,
+          getReferencedColumn: (t) => t.profileId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$GoogleTimelinePlaceLabelsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.googleTimelinePlaceLabels,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
 }
 
 class $$ProfilesTableTableManager
@@ -33892,6 +34825,8 @@ class $$ProfilesTableTableManager
             bool knowledgeAreasRefs,
             bool flashcardDecksRefs,
             bool flashcardsRefs,
+            bool googleTimelineImportsRefs,
+            bool googleTimelinePlaceLabelsRefs,
           })
         > {
   $$ProfilesTableTableManager(_$ColonyDatabase db, $ProfilesTable table)
@@ -34001,6 +34936,8 @@ class $$ProfilesTableTableManager
                 knowledgeAreasRefs = false,
                 flashcardDecksRefs = false,
                 flashcardsRefs = false,
+                googleTimelineImportsRefs = false,
+                googleTimelinePlaceLabelsRefs = false,
               }) {
                 return PrefetchHooks(
                   db: db,
@@ -34039,6 +34976,9 @@ class $$ProfilesTableTableManager
                     if (knowledgeAreasRefs) db.knowledgeAreas,
                     if (flashcardDecksRefs) db.flashcardDecks,
                     if (flashcardsRefs) db.flashcards,
+                    if (googleTimelineImportsRefs) db.googleTimelineImports,
+                    if (googleTimelinePlaceLabelsRefs)
+                      db.googleTimelinePlaceLabels,
                   ],
                   addJoins: null,
                   getPrefetchedDataCallback: (items) async {
@@ -34757,6 +35697,48 @@ class $$ProfilesTableTableManager
                               ),
                           typedResults: items,
                         ),
+                      if (googleTimelineImportsRefs)
+                        await $_getPrefetchedData<
+                          Profile,
+                          $ProfilesTable,
+                          GoogleTimelineImportRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$ProfilesTableReferences
+                              ._googleTimelineImportsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$ProfilesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).googleTimelineImportsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.profileId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (googleTimelinePlaceLabelsRefs)
+                        await $_getPrefetchedData<
+                          Profile,
+                          $ProfilesTable,
+                          GoogleTimelinePlaceLabelRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$ProfilesTableReferences
+                              ._googleTimelinePlaceLabelsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$ProfilesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).googleTimelinePlaceLabelsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.profileId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
                     ];
                   },
                 );
@@ -34812,6 +35794,8 @@ typedef $$ProfilesTableProcessedTableManager =
         bool knowledgeAreasRefs,
         bool flashcardDecksRefs,
         bool flashcardsRefs,
+        bool googleTimelineImportsRefs,
+        bool googleTimelinePlaceLabelsRefs,
       })
     >;
 typedef $$DomainEventsTableCreateCompanionBuilder =
@@ -61364,6 +62348,703 @@ typedef $$ResearchKnowledgeLinksTableProcessedTableManager =
       ResearchKnowledgeLinkRow,
       PrefetchHooks Function({bool researchNodeId, bool areaId})
     >;
+typedef $$GoogleTimelineImportsTableCreateCompanionBuilder =
+    GoogleTimelineImportsCompanion Function({
+      required String id,
+      required String profileId,
+      required String fileName,
+      required int importedAt,
+      required String payloadJson,
+      Value<int> rowid,
+    });
+typedef $$GoogleTimelineImportsTableUpdateCompanionBuilder =
+    GoogleTimelineImportsCompanion Function({
+      Value<String> id,
+      Value<String> profileId,
+      Value<String> fileName,
+      Value<int> importedAt,
+      Value<String> payloadJson,
+      Value<int> rowid,
+    });
+
+final class $$GoogleTimelineImportsTableReferences
+    extends
+        BaseReferences<
+          _$ColonyDatabase,
+          $GoogleTimelineImportsTable,
+          GoogleTimelineImportRow
+        > {
+  $$GoogleTimelineImportsTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $ProfilesTable _profileIdTable(_$ColonyDatabase db) =>
+      db.profiles.createAlias(
+        $_aliasNameGenerator(
+          db.googleTimelineImports.profileId,
+          db.profiles.id,
+        ),
+      );
+
+  $$ProfilesTableProcessedTableManager get profileId {
+    final $_column = $_itemColumn<String>('profile_id')!;
+
+    final manager = $$ProfilesTableTableManager(
+      $_db,
+      $_db.profiles,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_profileIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$GoogleTimelineImportsTableFilterComposer
+    extends Composer<_$ColonyDatabase, $GoogleTimelineImportsTable> {
+  $$GoogleTimelineImportsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get fileName => $composableBuilder(
+    column: $table.fileName,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get importedAt => $composableBuilder(
+    column: $table.importedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get payloadJson => $composableBuilder(
+    column: $table.payloadJson,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$ProfilesTableFilterComposer get profileId {
+    final $$ProfilesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.profileId,
+      referencedTable: $db.profiles,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProfilesTableFilterComposer(
+            $db: $db,
+            $table: $db.profiles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$GoogleTimelineImportsTableOrderingComposer
+    extends Composer<_$ColonyDatabase, $GoogleTimelineImportsTable> {
+  $$GoogleTimelineImportsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get fileName => $composableBuilder(
+    column: $table.fileName,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get importedAt => $composableBuilder(
+    column: $table.importedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get payloadJson => $composableBuilder(
+    column: $table.payloadJson,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$ProfilesTableOrderingComposer get profileId {
+    final $$ProfilesTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.profileId,
+      referencedTable: $db.profiles,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProfilesTableOrderingComposer(
+            $db: $db,
+            $table: $db.profiles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$GoogleTimelineImportsTableAnnotationComposer
+    extends Composer<_$ColonyDatabase, $GoogleTimelineImportsTable> {
+  $$GoogleTimelineImportsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get fileName =>
+      $composableBuilder(column: $table.fileName, builder: (column) => column);
+
+  GeneratedColumn<int> get importedAt => $composableBuilder(
+    column: $table.importedAt,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get payloadJson => $composableBuilder(
+    column: $table.payloadJson,
+    builder: (column) => column,
+  );
+
+  $$ProfilesTableAnnotationComposer get profileId {
+    final $$ProfilesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.profileId,
+      referencedTable: $db.profiles,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProfilesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.profiles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$GoogleTimelineImportsTableTableManager
+    extends
+        RootTableManager<
+          _$ColonyDatabase,
+          $GoogleTimelineImportsTable,
+          GoogleTimelineImportRow,
+          $$GoogleTimelineImportsTableFilterComposer,
+          $$GoogleTimelineImportsTableOrderingComposer,
+          $$GoogleTimelineImportsTableAnnotationComposer,
+          $$GoogleTimelineImportsTableCreateCompanionBuilder,
+          $$GoogleTimelineImportsTableUpdateCompanionBuilder,
+          (GoogleTimelineImportRow, $$GoogleTimelineImportsTableReferences),
+          GoogleTimelineImportRow,
+          PrefetchHooks Function({bool profileId})
+        > {
+  $$GoogleTimelineImportsTableTableManager(
+    _$ColonyDatabase db,
+    $GoogleTimelineImportsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$GoogleTimelineImportsTableFilterComposer(
+                $db: db,
+                $table: table,
+              ),
+          createOrderingComposer: () =>
+              $$GoogleTimelineImportsTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$GoogleTimelineImportsTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> profileId = const Value.absent(),
+                Value<String> fileName = const Value.absent(),
+                Value<int> importedAt = const Value.absent(),
+                Value<String> payloadJson = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => GoogleTimelineImportsCompanion(
+                id: id,
+                profileId: profileId,
+                fileName: fileName,
+                importedAt: importedAt,
+                payloadJson: payloadJson,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String profileId,
+                required String fileName,
+                required int importedAt,
+                required String payloadJson,
+                Value<int> rowid = const Value.absent(),
+              }) => GoogleTimelineImportsCompanion.insert(
+                id: id,
+                profileId: profileId,
+                fileName: fileName,
+                importedAt: importedAt,
+                payloadJson: payloadJson,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$GoogleTimelineImportsTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({profileId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (profileId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.profileId,
+                                referencedTable:
+                                    $$GoogleTimelineImportsTableReferences
+                                        ._profileIdTable(db),
+                                referencedColumn:
+                                    $$GoogleTimelineImportsTableReferences
+                                        ._profileIdTable(db)
+                                        .id,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$GoogleTimelineImportsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$ColonyDatabase,
+      $GoogleTimelineImportsTable,
+      GoogleTimelineImportRow,
+      $$GoogleTimelineImportsTableFilterComposer,
+      $$GoogleTimelineImportsTableOrderingComposer,
+      $$GoogleTimelineImportsTableAnnotationComposer,
+      $$GoogleTimelineImportsTableCreateCompanionBuilder,
+      $$GoogleTimelineImportsTableUpdateCompanionBuilder,
+      (GoogleTimelineImportRow, $$GoogleTimelineImportsTableReferences),
+      GoogleTimelineImportRow,
+      PrefetchHooks Function({bool profileId})
+    >;
+typedef $$GoogleTimelinePlaceLabelsTableCreateCompanionBuilder =
+    GoogleTimelinePlaceLabelsCompanion Function({
+      required String profileId,
+      required String placeId,
+      required String category,
+      Value<String?> customName,
+      required int updatedAt,
+      Value<int> rowid,
+    });
+typedef $$GoogleTimelinePlaceLabelsTableUpdateCompanionBuilder =
+    GoogleTimelinePlaceLabelsCompanion Function({
+      Value<String> profileId,
+      Value<String> placeId,
+      Value<String> category,
+      Value<String?> customName,
+      Value<int> updatedAt,
+      Value<int> rowid,
+    });
+
+final class $$GoogleTimelinePlaceLabelsTableReferences
+    extends
+        BaseReferences<
+          _$ColonyDatabase,
+          $GoogleTimelinePlaceLabelsTable,
+          GoogleTimelinePlaceLabelRow
+        > {
+  $$GoogleTimelinePlaceLabelsTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $ProfilesTable _profileIdTable(_$ColonyDatabase db) =>
+      db.profiles.createAlias(
+        $_aliasNameGenerator(
+          db.googleTimelinePlaceLabels.profileId,
+          db.profiles.id,
+        ),
+      );
+
+  $$ProfilesTableProcessedTableManager get profileId {
+    final $_column = $_itemColumn<String>('profile_id')!;
+
+    final manager = $$ProfilesTableTableManager(
+      $_db,
+      $_db.profiles,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_profileIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$GoogleTimelinePlaceLabelsTableFilterComposer
+    extends Composer<_$ColonyDatabase, $GoogleTimelinePlaceLabelsTable> {
+  $$GoogleTimelinePlaceLabelsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get placeId => $composableBuilder(
+    column: $table.placeId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get category => $composableBuilder(
+    column: $table.category,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get customName => $composableBuilder(
+    column: $table.customName,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$ProfilesTableFilterComposer get profileId {
+    final $$ProfilesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.profileId,
+      referencedTable: $db.profiles,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProfilesTableFilterComposer(
+            $db: $db,
+            $table: $db.profiles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$GoogleTimelinePlaceLabelsTableOrderingComposer
+    extends Composer<_$ColonyDatabase, $GoogleTimelinePlaceLabelsTable> {
+  $$GoogleTimelinePlaceLabelsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get placeId => $composableBuilder(
+    column: $table.placeId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get category => $composableBuilder(
+    column: $table.category,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get customName => $composableBuilder(
+    column: $table.customName,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$ProfilesTableOrderingComposer get profileId {
+    final $$ProfilesTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.profileId,
+      referencedTable: $db.profiles,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProfilesTableOrderingComposer(
+            $db: $db,
+            $table: $db.profiles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$GoogleTimelinePlaceLabelsTableAnnotationComposer
+    extends Composer<_$ColonyDatabase, $GoogleTimelinePlaceLabelsTable> {
+  $$GoogleTimelinePlaceLabelsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get placeId =>
+      $composableBuilder(column: $table.placeId, builder: (column) => column);
+
+  GeneratedColumn<String> get category =>
+      $composableBuilder(column: $table.category, builder: (column) => column);
+
+  GeneratedColumn<String> get customName => $composableBuilder(
+    column: $table.customName,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  $$ProfilesTableAnnotationComposer get profileId {
+    final $$ProfilesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.profileId,
+      referencedTable: $db.profiles,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProfilesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.profiles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$GoogleTimelinePlaceLabelsTableTableManager
+    extends
+        RootTableManager<
+          _$ColonyDatabase,
+          $GoogleTimelinePlaceLabelsTable,
+          GoogleTimelinePlaceLabelRow,
+          $$GoogleTimelinePlaceLabelsTableFilterComposer,
+          $$GoogleTimelinePlaceLabelsTableOrderingComposer,
+          $$GoogleTimelinePlaceLabelsTableAnnotationComposer,
+          $$GoogleTimelinePlaceLabelsTableCreateCompanionBuilder,
+          $$GoogleTimelinePlaceLabelsTableUpdateCompanionBuilder,
+          (
+            GoogleTimelinePlaceLabelRow,
+            $$GoogleTimelinePlaceLabelsTableReferences,
+          ),
+          GoogleTimelinePlaceLabelRow,
+          PrefetchHooks Function({bool profileId})
+        > {
+  $$GoogleTimelinePlaceLabelsTableTableManager(
+    _$ColonyDatabase db,
+    $GoogleTimelinePlaceLabelsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$GoogleTimelinePlaceLabelsTableFilterComposer(
+                $db: db,
+                $table: table,
+              ),
+          createOrderingComposer: () =>
+              $$GoogleTimelinePlaceLabelsTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$GoogleTimelinePlaceLabelsTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> profileId = const Value.absent(),
+                Value<String> placeId = const Value.absent(),
+                Value<String> category = const Value.absent(),
+                Value<String?> customName = const Value.absent(),
+                Value<int> updatedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => GoogleTimelinePlaceLabelsCompanion(
+                profileId: profileId,
+                placeId: placeId,
+                category: category,
+                customName: customName,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String profileId,
+                required String placeId,
+                required String category,
+                Value<String?> customName = const Value.absent(),
+                required int updatedAt,
+                Value<int> rowid = const Value.absent(),
+              }) => GoogleTimelinePlaceLabelsCompanion.insert(
+                profileId: profileId,
+                placeId: placeId,
+                category: category,
+                customName: customName,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$GoogleTimelinePlaceLabelsTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({profileId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (profileId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.profileId,
+                                referencedTable:
+                                    $$GoogleTimelinePlaceLabelsTableReferences
+                                        ._profileIdTable(db),
+                                referencedColumn:
+                                    $$GoogleTimelinePlaceLabelsTableReferences
+                                        ._profileIdTable(db)
+                                        .id,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$GoogleTimelinePlaceLabelsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$ColonyDatabase,
+      $GoogleTimelinePlaceLabelsTable,
+      GoogleTimelinePlaceLabelRow,
+      $$GoogleTimelinePlaceLabelsTableFilterComposer,
+      $$GoogleTimelinePlaceLabelsTableOrderingComposer,
+      $$GoogleTimelinePlaceLabelsTableAnnotationComposer,
+      $$GoogleTimelinePlaceLabelsTableCreateCompanionBuilder,
+      $$GoogleTimelinePlaceLabelsTableUpdateCompanionBuilder,
+      (GoogleTimelinePlaceLabelRow, $$GoogleTimelinePlaceLabelsTableReferences),
+      GoogleTimelinePlaceLabelRow,
+      PrefetchHooks Function({bool profileId})
+    >;
 
 class $ColonyDatabaseManager {
   final _$ColonyDatabase _db;
@@ -61484,5 +63165,12 @@ class $ColonyDatabaseManager {
       $$ResearchKnowledgeLinksTableTableManager(
         _db,
         _db.researchKnowledgeLinks,
+      );
+  $$GoogleTimelineImportsTableTableManager get googleTimelineImports =>
+      $$GoogleTimelineImportsTableTableManager(_db, _db.googleTimelineImports);
+  $$GoogleTimelinePlaceLabelsTableTableManager get googleTimelinePlaceLabels =>
+      $$GoogleTimelinePlaceLabelsTableTableManager(
+        _db,
+        _db.googleTimelinePlaceLabels,
       );
 }

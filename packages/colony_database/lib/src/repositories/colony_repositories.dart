@@ -360,6 +360,7 @@ class ExportRepository {
     this._dailyReviews,
     this._weeklyReviews,
     this._flashcards,
+    this._googleTimeline,
     this._clock,
   );
 
@@ -389,6 +390,7 @@ class ExportRepository {
   final DailyReviewRepository _dailyReviews;
   final WeeklyReviewRepository _weeklyReviews;
   final FlashcardRepository _flashcards;
+  final GoogleTimelineRepository _googleTimeline;
   final DateTime Function() _clock;
 
   Future<ExportSnapshot> buildSnapshot() async {
@@ -453,10 +455,14 @@ class ExportRepository {
         await _flashcards.listPlacements(profile.id);
     final researchKnowledgeLinks =
         await _flashcards.listResearchLinks(profile.id);
+    final googleTimelineImport =
+        await _googleTimeline.getForProfile(profile.id);
+    final googleTimelinePlaceLabels =
+        await _googleTimeline.listLabels(profile.id);
 
     return ExportSnapshot(
       exportedAt: _clock(),
-      version: 32,
+      version: 33,
       profile: profile,
       preferences: prefs,
       tasks: tasks,
@@ -509,6 +515,8 @@ class ExportRepository {
       flashcardReviewLogs: flashcardReviewLogs,
       knowledgeAreaPlacements: knowledgeAreaPlacements,
       researchKnowledgeLinks: researchKnowledgeLinks,
+      googleTimelineImport: googleTimelineImport,
+      googleTimelinePlaceLabels: googleTimelinePlaceLabels,
     );
   }
 
@@ -553,6 +561,8 @@ class RestoreRepository {
   }
 
   Future<void> _wipeAll() async {
+    await _db.delete(_db.googleTimelinePlaceLabels).go();
+    await _db.delete(_db.googleTimelineImports).go();
     await _db.delete(_db.researchKnowledgeLinks).go();
     await _db.delete(_db.knowledgeAreaPlacements).go();
     await _db.delete(_db.flashcardReviewLogs).go();
@@ -642,6 +652,21 @@ class RestoreRepository {
       await _db
           .into(_db.researchKnowledgeLinks)
           .insert(ColonyMappers.fromResearchKnowledgeLink(link));
+    }
+    final timelineImport = snapshot.googleTimelineImport;
+    if (timelineImport != null) {
+      await _db
+          .into(_db.googleTimelineImports)
+          .insert(ColonyMappers.fromGoogleTimelineImport(timelineImport));
+    }
+    for (final label in snapshot.googleTimelinePlaceLabels) {
+      await _db.into(_db.googleTimelinePlaceLabels).insert(
+            ColonyMappers.fromTimelinePlaceLabel(
+              profileId: snapshot.profile.id,
+              label: label,
+              updatedAt: snapshot.exportedAt,
+            ),
+          );
     }
     for (final deck in snapshot.flashcardDecks) {
       await _db
@@ -5796,6 +5821,119 @@ class FlashcardRepository {
   }
 }
 
+class GoogleTimelineRepository {
+  GoogleTimelineRepository(
+    this._db,
+    this._ids,
+    this._clock,
+    this._events,
+  );
+
+  final ColonyDatabase _db;
+  final IdGenerator _ids;
+  final DateTime Function() _clock;
+  final DomainEventRepository _events;
+
+  Stream<GoogleTimelineImport?> watchImport(EntityId profileId) {
+    return (_db.select(_db.googleTimelineImports)
+          ..where((t) => t.profileId.equals(profileId.value)))
+        .watch()
+        .map(
+          (rows) => rows.isEmpty
+              ? null
+              : ColonyMappers.toGoogleTimelineImport(rows.first),
+        );
+  }
+
+  Future<GoogleTimelineImport?> getForProfile(EntityId profileId) async {
+    final row = await (_db.select(_db.googleTimelineImports)
+          ..where((t) => t.profileId.equals(profileId.value))
+          ..limit(1))
+        .getSingleOrNull();
+    return row == null ? null : ColonyMappers.toGoogleTimelineImport(row);
+  }
+
+  Stream<List<TimelinePlaceLabel>> watchLabels(EntityId profileId) {
+    return (_db.select(_db.googleTimelinePlaceLabels)
+          ..where((t) => t.profileId.equals(profileId.value)))
+        .watch()
+        .map((rows) => rows.map(ColonyMappers.toTimelinePlaceLabel).toList());
+  }
+
+  Future<List<TimelinePlaceLabel>> listLabels(EntityId profileId) async {
+    final rows = await (_db.select(_db.googleTimelinePlaceLabels)
+          ..where((t) => t.profileId.equals(profileId.value)))
+        .get();
+    return rows.map(ColonyMappers.toTimelinePlaceLabel).toList();
+  }
+
+  /// Replaces any previous Timeline payload for the profile. Place labels stay.
+  Future<GoogleTimelineImport> replaceImport({
+    required EntityId profileId,
+    required String fileName,
+    required GoogleTimelineDocument document,
+  }) async {
+    final now = _clock();
+    final existing = await getForProfile(profileId);
+    final import = GoogleTimelineImport(
+      id: existing?.id ?? EntityId(_ids.newId()),
+      profileId: profileId,
+      fileName: fileName,
+      importedAt: now,
+      document: document,
+    );
+    await _db.transaction(() async {
+      await (_db.delete(_db.googleTimelineImports)
+            ..where((t) => t.profileId.equals(profileId.value)))
+          .go();
+      await _db
+          .into(_db.googleTimelineImports)
+          .insert(ColonyMappers.fromGoogleTimelineImport(import));
+      await _events.record(
+        aggregateType: AggregateType.googleTimeline,
+        aggregateId: import.id,
+        eventType: EventType.googleTimelineImported,
+        payload: {
+          'file_name': fileName,
+          'visits': document.visits.length,
+          'activities': document.activities.length,
+          'trips': document.trips.length,
+          'overwrote': existing != null,
+        },
+        sourceType: SourceType.import,
+      );
+    });
+    return import;
+  }
+
+  Future<TimelinePlaceLabel> upsertLabel({
+    required EntityId profileId,
+    required TimelinePlaceLabel label,
+  }) async {
+    final now = _clock();
+    await _db.into(_db.googleTimelinePlaceLabels).insertOnConflictUpdate(
+          ColonyMappers.fromTimelinePlaceLabel(
+            profileId: profileId,
+            label: label,
+            updatedAt: now,
+          ),
+        );
+    return label;
+  }
+
+  Future<void> deleteLabel({
+    required EntityId profileId,
+    required String placeId,
+  }) async {
+    await (_db.delete(_db.googleTimelinePlaceLabels)
+          ..where(
+            (t) =>
+                t.profileId.equals(profileId.value) & t.placeId.equals(placeId),
+          ))
+        .go();
+  }
+}
+
 class ColonyRepositories {
   ColonyRepositories({
     required this.database,
@@ -5825,6 +5963,7 @@ class ColonyRepositories {
     required this.contextZones,
     required this.integrations,
     required this.flashcards,
+    required this.googleTimeline,
     required this.sync,
     required this.export,
     required this.restore,
@@ -5857,6 +5996,7 @@ class ColonyRepositories {
   final ContextZoneRepository contextZones;
   final IntegrationRepository integrations;
   final FlashcardRepository flashcards;
+  final GoogleTimelineRepository googleTimeline;
   final SyncRepository sync;
   final ExportRepository export;
   final RestoreRepository restore;
@@ -5896,6 +6036,8 @@ class ColonyRepositories {
     final integrationsRepo =
         IntegrationRepository(database, ids, now, events);
     final flashcardsRepo = FlashcardRepository(database, ids, now, events);
+    final googleTimelineRepo =
+        GoogleTimelineRepository(database, ids, now, events);
     final dailyReviews = DailyReviewRepository(database, ids, now, events);
     final weeklyReviews = WeeklyReviewRepository(database, ids, now, events);
     final restore = RestoreRepository(database, events, now);
@@ -5927,6 +6069,7 @@ class ColonyRepositories {
       contextZones: zonesRepo,
       integrations: integrationsRepo,
       flashcards: flashcardsRepo,
+      googleTimeline: googleTimelineRepo,
       sync: syncRepo,
       export: ExportRepository(
         profiles,
@@ -5955,6 +6098,7 @@ class ColonyRepositories {
         dailyReviews,
         weeklyReviews,
         flashcardsRepo,
+        googleTimelineRepo,
         now,
       ),
       restore: restore,

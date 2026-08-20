@@ -41,6 +41,7 @@ import 'trip_inventory.dart';
 import 'knowledge_area.dart';
 import 'knowledge_area_placement.dart';
 import 'flashcard.dart';
+import 'google_timeline.dart';
 import 'schedule_block.dart';
 import 'task.dart';
 import 'weekly_review.dart';
@@ -114,6 +115,8 @@ class ExportSnapshot extends Equatable {
     this.flashcardReviewLogs = const [],
     this.knowledgeAreaPlacements = const [],
     this.researchKnowledgeLinks = const [],
+    this.googleTimelineImport,
+    this.googleTimelinePlaceLabels = const [],
   });
 
   final DateTime exportedAt;
@@ -170,6 +173,8 @@ class ExportSnapshot extends Equatable {
   final List<FlashcardReviewLog> flashcardReviewLogs;
   final List<KnowledgeAreaPlacement> knowledgeAreaPlacements;
   final List<ResearchKnowledgeLink> researchKnowledgeLinks;
+  final GoogleTimelineImport? googleTimelineImport;
+  final List<TimelinePlaceLabel> googleTimelinePlaceLabels;
 
   Map<String, int> get entityCounts => {
         'tasks': tasks.length,
@@ -215,6 +220,8 @@ class ExportSnapshot extends Equatable {
         'flashcard_review_logs': flashcardReviewLogs.length,
         'knowledge_area_placements': knowledgeAreaPlacements.length,
         'research_knowledge_links': researchKnowledgeLinks.length,
+        'google_timeline_import': googleTimelineImport == null ? 0 : 1,
+        'google_timeline_place_labels': googleTimelinePlaceLabels.length,
       };
 
   static ExportSnapshot fromJsonString(String source) {
@@ -233,7 +240,7 @@ class ExportSnapshot extends Equatable {
 
   static ExportSnapshot fromJson(Map<String, dynamic> json) {
     final version = _requireInt(json, 'version');
-    if (version < 1 || version > 32) {
+    if (version < 1 || version > 33) {
       throw ExportSnapshotException('Versão de export não suportada: $version');
     }
 
@@ -452,6 +459,15 @@ class ExportSnapshot extends Equatable {
               _parseResearchKnowledgeLink,
             )
           : <ResearchKnowledgeLink>[],
+      googleTimelineImport: version >= 33
+          ? _parseGoogleTimelineImport(json['google_timeline_import'])
+          : null,
+      googleTimelinePlaceLabels: version >= 33
+          ? _parseList(
+              json['google_timeline_place_labels'],
+              _parseTimelinePlaceLabel,
+            )
+          : <TimelinePlaceLabel>[],
     );
   }
 
@@ -1270,6 +1286,38 @@ class ExportSnapshot extends Equatable {
     );
   }
 
+  static GoogleTimelineImport? _parseGoogleTimelineImport(Object? raw) {
+    if (raw == null) return null;
+    if (raw is! Map<String, dynamic>) {
+      throw ExportSnapshotException(
+        'google_timeline_import deve ser um objeto',
+      );
+    }
+    final documentRaw = raw['document'];
+    if (documentRaw is! Map<String, dynamic>) {
+      throw ExportSnapshotException(
+        'google_timeline_import.document deve ser um objeto',
+      );
+    }
+    return GoogleTimelineImport(
+      id: EntityId(_requireString(raw, 'id')),
+      profileId: EntityId(_requireString(raw, 'profile_id')),
+      fileName: _requireString(raw, 'file_name'),
+      importedAt: _parseDateTime(_requireString(raw, 'imported_at')),
+      document: GoogleTimelineDocument.fromJson(documentRaw),
+    );
+  }
+
+  static TimelinePlaceLabel _parseTimelinePlaceLabel(Map<String, dynamic> json) {
+    return TimelinePlaceLabel(
+      placeId: _requireString(json, 'place_id'),
+      category: TimelinePlaceCategory.values.byName(
+        _requireString(json, 'category'),
+      ),
+      customName: json['custom_name'] as String?,
+    );
+  }
+
   static HealthAppointment Function(Map<String, dynamic>)
       _parseHealthAppointment(EntityId profileId) {
     return (json) {
@@ -1514,6 +1562,18 @@ class ExportSnapshot extends Equatable {
           knowledgeAreaPlacements.map(_knowledgeAreaPlacementJson).toList(),
       'research_knowledge_links':
           researchKnowledgeLinks.map(_researchKnowledgeLinkJson).toList(),
+      if (version >= 33 && googleTimelineImport != null)
+        'google_timeline_import':
+            _googleTimelineImportJson(googleTimelineImport!),
+      if (version >= 33)
+        'google_timeline_place_labels': [
+          for (final label in googleTimelinePlaceLabels)
+            {
+              'place_id': label.placeId,
+              'category': label.category.name,
+              if (label.customName != null) 'custom_name': label.customName,
+            },
+        ],
     };
   }
 
@@ -2052,6 +2112,17 @@ class ExportSnapshot extends Equatable {
         'linked_at': link.linkedAt.toUtc().toIso8601String(),
       };
 
+  static Map<String, Object?> _googleTimelineImportJson(
+    GoogleTimelineImport import,
+  ) =>
+      {
+        'id': import.id.value,
+        'profile_id': import.profileId.value,
+        'file_name': import.fileName,
+        'imported_at': import.importedAt.toUtc().toIso8601String(),
+        'document': import.document.toJson(),
+      };
+
   static Map<String, Object?> _healthAppointmentJson(HealthAppointment a) => {
         'id': a.id.value,
         'title': a.title,
@@ -2178,5 +2249,7 @@ class ExportSnapshot extends Equatable {
         flashcardReviewLogs,
         knowledgeAreaPlacements,
         researchKnowledgeLinks,
+        googleTimelineImport,
+        googleTimelinePlaceLabels,
       ];
 }

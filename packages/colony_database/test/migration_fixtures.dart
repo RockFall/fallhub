@@ -127,6 +127,9 @@ Future<ColonyDatabase> openMigratedFrom(
   if (fromVersion >= 36) {
     _createPhase36Tables(sqliteDb);
   }
+  if (fromVersion >= 37) {
+    _createPhase37Tables(sqliteDb);
+  }
 
   sqliteDb.userVersion = fromVersion;
   seed?.call(sqliteDb);
@@ -1115,6 +1118,28 @@ void _createPhase36Tables(Database db) {
   db.execute(
     'ALTER TABLE flashcards ADD COLUMN priority INTEGER NOT NULL DEFAULT 5',
   );
+}
+
+void _createPhase37Tables(Database db) {
+  db.execute('''
+    CREATE TABLE google_timeline_imports (
+      id TEXT NOT NULL PRIMARY KEY,
+      profile_id TEXT NOT NULL REFERENCES profiles (id),
+      file_name TEXT NOT NULL,
+      imported_at INTEGER NOT NULL,
+      payload_json TEXT NOT NULL
+    )
+  ''');
+  db.execute('''
+    CREATE TABLE google_timeline_place_labels (
+      profile_id TEXT NOT NULL REFERENCES profiles (id),
+      place_id TEXT NOT NULL,
+      category TEXT NOT NULL,
+      custom_name TEXT,
+      updated_at INTEGER NOT NULL,
+      PRIMARY KEY (profile_id, place_id)
+    )
+  ''');
 }
 
 void seedFlashcardV35(

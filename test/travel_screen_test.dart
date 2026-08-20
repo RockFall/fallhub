@@ -53,8 +53,13 @@ void main() {
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 500));
 
-    expect(find.text(AppStrings.travelEmpty), findsOneWidget);
     expect(find.text(AppStrings.travelDisclaimer), findsOneWidget);
+    expect(find.text(AppStrings.timelineHubTitle), findsOneWidget);
+    expect(find.text(AppStrings.timelineTabTrips), findsWidgets);
+    await tester.tap(find.text(AppStrings.timelineTabTrips));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 200));
+    expect(find.text(AppStrings.travelEmpty), findsOneWidget);
     expect(find.text(AppStrings.tripNew), findsOneWidget);
 
     await _flush(tester);
@@ -106,6 +111,10 @@ void main() {
     );
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 500));
+
+    await tester.tap(find.text(AppStrings.timelineTabTrips));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 200));
 
     expect(find.text('Férias SP'), findsOneWidget);
     expect(find.textContaining('Planejada'), findsOneWidget);

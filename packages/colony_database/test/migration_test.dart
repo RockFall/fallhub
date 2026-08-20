@@ -836,6 +836,69 @@ void main() {
       expect(cards.single.front, 'Dominante');
     });
 
+    test('v36 to v37 adds google timeline import tables', () async {
+      final db = await openMigratedFrom(
+        36,
+        seed: (sqlite) {
+          seedProfile(sqlite);
+        },
+      );
+      addTearDown(() async {
+        await db.close();
+      });
+
+      final repos = ColonyRepositories.create(
+        db,
+        idGenerator: FixedIdGenerator(['tl-1', 'event-1', 'event-2']),
+        clock: () => DateTime.utc(2026, 8, 20, 12),
+      );
+      final profile = (await repos.profiles.getActive())!;
+      final first = await repos.googleTimeline.replaceImport(
+        profileId: profile.id,
+        fileName: 'Linha do tempo.json',
+        document: GoogleTimelineDocument(
+          visits: [
+            TimelineVisit(
+              startAt: DateTime.utc(2026, 8, 1, 12),
+              endAt: DateTime.utc(2026, 8, 1, 14),
+              placeId: 'ChIJ_KEEP',
+              location: const GeoPoint(-19.9167, -43.9345),
+            ),
+          ],
+        ),
+      );
+      await repos.googleTimeline.upsertLabel(
+        profileId: profile.id,
+        label: const TimelinePlaceLabel(
+          placeId: 'ChIJ_KEEP',
+          category: TimelinePlaceCategory.gastronomy,
+          customName: 'Padaria',
+        ),
+      );
+      final second = await repos.googleTimeline.replaceImport(
+        profileId: profile.id,
+        fileName: 'Timeline.json',
+        document: GoogleTimelineDocument(
+          visits: [
+            TimelineVisit(
+              startAt: DateTime.utc(2026, 8, 2, 9),
+              endAt: DateTime.utc(2026, 8, 2, 10),
+              placeId: 'ChIJ_NEW',
+            ),
+          ],
+        ),
+      );
+      expect(second.id, first.id);
+      expect(second.fileName, 'Timeline.json');
+      expect(second.document.visits, hasLength(1));
+      expect(second.document.visits.single.placeId, 'ChIJ_NEW');
+      final listed = await repos.googleTimeline.getForProfile(profile.id);
+      expect(listed!.document.visits, hasLength(1));
+      final labels = await repos.googleTimeline.listLabels(profile.id);
+      expect(labels, hasLength(1));
+      expect(labels.single.customName, 'Padaria');
+    });
+
     test('v31 to v32 adds health_appointments table', () async {
       final db = await openMigratedFrom(
         31,

@@ -225,6 +225,7 @@ class ChronicleScreen extends ConsumerWidget {
       EventType.knowledgeAreaPlacementRemoved => 'Colocação de área removida',
       EventType.researchKnowledgeLinked => 'Pesquisa ligada à área',
       EventType.researchKnowledgeUnlinked => 'Pesquisa desligada da área',
+      EventType.googleTimelineImported => 'Timeline importada',
       _ => event.eventType.name,
     };
   }

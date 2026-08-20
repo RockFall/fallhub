@@ -79,5 +79,9 @@ export 'src/flashcard_srs.dart';
 export 'src/flashcard_study.dart';
 export 'src/flashcard_pace.dart';
 export 'src/flashcard_json_import.dart';
+export 'src/google_timeline.dart';
+export 'src/google_timeline_codec.dart';
+export 'src/google_timeline_analytics.dart';
+export 'src/city_gazetteer.dart';
 
 

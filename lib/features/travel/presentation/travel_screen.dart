@@ -1,98 +1,94 @@
 import 'package:colony_design_system/colony_design_system.dart';
-import 'package:colony_domain/colony_domain.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../app/localization/app_strings.dart';
-import '../application/travel_controllers.dart';
-import '../application/travel_providers.dart';
-import 'widgets/create_trip_sheet.dart';
-import 'widgets/edit_trip_sheet.dart';
+import '../application/timeline_providers.dart';
+import 'widgets/import_timeline_sheet.dart';
+import 'widgets/timeline_hub_tabs.dart';
 
 class TravelScreen extends ConsumerWidget {
   const TravelScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final tripsAsync = ref.watch(tripsProvider);
+    final import = ref.watch(googleTimelineImportProvider).asData?.value;
 
-    return Padding(
-      padding: const EdgeInsets.all(ColonySpacing.lg),
+    return DefaultTabController(
+      length: 8,
+      initialIndex: import == null ? 1 : 0,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text(
-            AppStrings.travelTitle,
-            style: Theme.of(context).textTheme.headlineMedium,
-          ),
-          const SizedBox(height: ColonySpacing.sm),
-          Text(
-            AppStrings.travelDisclaimer,
-            style: Theme.of(context).textTheme.bodySmall,
-          ),
-          const SizedBox(height: ColonySpacing.lg),
-          Expanded(
-            child: tripsAsync.when(
-              loading: () => const Center(child: CircularProgressIndicator()),
-              error: (_, __) => Center(child: Text(AppStrings.errorGeneric)),
-              data: (trips) {
-                final visible = trips
-                    .where((t) => !t.status.isHiddenFromActiveList)
-                    .toList();
-                if (visible.isEmpty) {
-                  return Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(AppStrings.travelEmpty),
-                        const SizedBox(height: ColonySpacing.sm),
-                        Text(
-                          AppStrings.travelEmptyHint,
-                          textAlign: TextAlign.center,
-                          style: Theme.of(context).textTheme.bodyMedium,
-                        ),
-                      ],
-                    ),
-                  );
-                }
-                return ListView.builder(
-                  itemCount: visible.length,
-                  itemBuilder: (context, index) {
-                    final trip = visible[index];
-                    return Card(
-                      margin: const EdgeInsets.only(bottom: ColonySpacing.sm),
-                      child: ListTile(
-                        title: Text(trip.title),
-                        subtitle: Text(
-                          [
-                            AppStrings.tripStatusLabel(trip.status),
-                            if (trip.destinations.isNotEmpty)
-                              trip.destinations.join(', '),
-                            if (trip.purpose != null) trip.purpose!,
-                          ].join(' · '),
-                        ),
-                        onTap: () => EditTripSheet.show(context, trip),
-                        trailing: trip.status == TripStatus.completed
-                            ? null
-                            : IconButton(
-                                tooltip: AppStrings.tripComplete,
-                                icon: const Icon(Icons.check_circle_outline),
-                                onPressed: () => ref
-                                    .read(travelControllerProvider.notifier)
-                                    .setStatus(trip, TripStatus.completed),
-                              ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(
+              ColonySpacing.lg,
+              ColonySpacing.lg,
+              ColonySpacing.lg,
+              ColonySpacing.sm,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        AppStrings.timelineHubTitle,
+                        style: Theme.of(context).textTheme.headlineMedium,
                       ),
-                    );
-                  },
-                );
-              },
+                    ),
+                    IconButton(
+                      tooltip: import == null
+                          ? AppStrings.timelineImport
+                          : AppStrings.timelineReimport,
+                      onPressed: () => ImportTimelineSheet.show(context),
+                      icon: const Icon(Icons.upload_file),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: ColonySpacing.xs),
+                Text(
+                  AppStrings.travelDisclaimer,
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
+                if (import != null) ...[
+                  const SizedBox(height: ColonySpacing.sm),
+                  const Align(
+                    alignment: Alignment.centerLeft,
+                    child: DataProvenanceBadge(kind: ProvenanceDisplay.imported),
+                  ),
+                ],
+              ],
             ),
           ),
-          const SizedBox(height: ColonySpacing.md),
-          FilledButton.icon(
-            onPressed: () => CreateTripSheet.show(context),
-            icon: const Icon(Icons.add),
-            label: Text(AppStrings.tripNew),
+          TabBar(
+            isScrollable: true,
+            tabAlignment: TabAlignment.start,
+            tabs: const [
+              Tab(text: AppStrings.timelineTabDay),
+              Tab(text: AppStrings.timelineTabTrips),
+              Tab(text: AppStrings.timelineTabStats),
+              Tab(text: AppStrings.timelineTabPlaces),
+              Tab(text: AppStrings.timelineTabCities),
+              Tab(text: AppStrings.timelineTabWorld),
+              Tab(text: AppStrings.timelineTabRhythm),
+              Tab(text: AppStrings.timelineTabSignals),
+            ],
+          ),
+          const Expanded(
+            child: TabBarView(
+              children: [
+                TimelineDayTab(),
+                TimelineTripsTab(),
+                TimelineStatsTab(),
+                TimelinePlacesTab(),
+                TimelineCitiesTab(),
+                TimelineWorldTab(),
+                TimelineRhythmTab(),
+                TimelineSignalsTab(),
+              ],
+            ),
           ),
         ],
       ),
