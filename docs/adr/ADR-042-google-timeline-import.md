@@ -173,10 +173,14 @@ Duas formas no sample:
 | HOME / WORK / frequente | Sim (`semanticType` + `frequentPlaces`) | Parser local |
 | Viagem agrupada | Parcial (`timelineMemory`) | Parser + heurística |
 | Nome do sítio (“Aeroporto Confins”) | Quase nunca | Places API **ou** geocodificação reversa |
-| Categoria POI (hotel, café, aeroporto) | **Não** no formato novo | Places `primaryType` / OSM |
+| Categoria POI (hotel, café, aeroporto) | **Não** no formato novo | Places `types` (Essentials) / `primaryType` (Pro) / etiqueta humana |
+| Cidade / país | **Não** | Gazetteer offline (GeoNames) a partir do `latLng` |
+| Fotos de cartão (skyline, POI) | **Não** | Fora; ver brainstorm §12 |
 | Linha de autocarro, paragens, horários | Só Takeout antigo (`transitPath`) | Fora |
 
-**Places API (Place Details com `placeId`)** devolve `displayName`, `primaryType` (`airport`, `lodging`, `restaurant`, …), morada. Custa dinheiro, chave, ToS, rede, atribuição. Quebra “útil sem conta/chave”. **Fora do MVP.** Link opcional `maps/place/?q=place_id:` no preview é gratuito e suficiente.
+**Places API (Place Details com `placeId`)** devolve `types` (SKU Essentials), `displayName` + `primaryType` (SKU Pro), morada, fotos. Custa chave Maps Platform, ToS e rede. **Fora do MVP.** 621 `placeId` únicos cabem na faixa gratuita Pro (~5k/mês) *se* cachearmos para sempre — passo opt-in posterior (brainstorm §12), não importação. Link `maps/place/?q=place_id:` no preview é gratuito.
+
+**Cidades/países** não precisam de Places: gazetteer GeoNames embarcado sobre o `latLng` (brainstorm §12.2).
 
 **OSM/Nominatim** (P2, opt-in, com throttle): geocodificação reversa sem chave Google. Categorias OSM ≠ Google; qualidade variável.
 

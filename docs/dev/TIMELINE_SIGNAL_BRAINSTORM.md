@@ -295,7 +295,7 @@ Não fazer tudo. Fatias que pagam a próxima:
 | E | Overlay ICS vs visitas; zona sugerida (confirmação) | Agenda / work |
 | F | Ledger de horas-sítio opt-in; packing por trip semelhante | Gestão |
 | G | H3 / mapa operacional / replay / GPX | Análise / prazer |
-| H | OSM reverse geocode opt-in | Nomes sem Places API |
+| H | Gazetteer offline (cidades/países) + categorias opt-in | Abas tipo Maps |
 
 A e B são o contrato de dados. C–E são o produto Colony (não um tracker). F–H são tempero.
 
@@ -306,3 +306,127 @@ A e B são o contrato de dados. C–E são o produto Colony (não um tracker). F
 A Timeline não é um feed de GPS. É um **arquivo de evidências de território**. O Colony já sabe o que fazer com evidências: proveniência, confiança, revisão, missões, necessidades, crônica.
 
 O erro seria construir um clone de Maps. O acerto é: o pawn olha para o mapa da colônia e reconhece a vida que já viveu — e decide o que isso *significa*, nunca o app.
+
+---
+
+## 12. Reconstruir as abas do Maps (Lugares / Cidades / Mundo / Estatísticas / Viagens)
+
+As telas do Google Maps **não estão no JSON**. O app junta `placeId` com a base Places (nome, `types`, foto) e faz reverse geocode interno. Ferramentas de terceiros (maps-timeline-viewer, mileage exporters) confirmam: o export traz IDs; nomes e categorias exigem **Place Details** à parte.
+
+Não copiar layout, fotos stock nem IA do Maps. Recriar a *capacidade* no visual Colony.
+
+### 12.1 O que cada aba precisa vs o que o JSON dá
+
+| Aba Maps | O que vês | No `Timeline.json`? | Como obter |
+| --- | --- | --- | --- |
+| **Estatísticas → transporte** | km e tempo a pé / a dirigir / trânsito + sparkline 6 meses | **Sim** | Somar `activity.distanceMeters` e `endTime−startTime` por `topCandidate.type`. Mapear `WALKING`/`RUNNING`/`HIKING` → a pé; `IN_PASSENGER_VEHICLE`/`IN_TAXI`/`MOTORCYCLING` → a dirigir; `IN_BUS`/`IN_TRAIN`/`IN_SUBWAY`/`IN_TRAM` → trânsito; `FLYING` à parte. Sparkline = agrupar por mês do `startTime`. |
+| **Estatísticas → visitas** | horas em gastronomia / compras / cultura / hotéis + “ver N lugares” | **Não** (só duração + `placeId`) | Categorias vêm de `types`/`primaryType` **depois** do lookup. Duração já está no segmento. |
+| **Lugares** | 621 sítios em grelha por categoria (143 compras, 133 gastronomia…) | Contagem de `placeId` únicos **sim**; buckets **não** | Mesmo lookup. Sem categoria → balde “Por classificar”. |
+| **Cidades** | Xangai 6 lugares, BH 321, Confins 5, recência | Coords **sim**; nome da cidade **não** | Reverse geocode das coords do `visit` (não precisa de Places). |
+| **Mundo** | 10 países, N cidades, recência | Idem | País do gazetteer / `country_code`. |
+| **Viagens** | “8 viagens / 59 dias”, cartão Pequim 12–17 ago, foto, mapa | `timelineMemory.trip` **parcial** (datas, `placeId` destino, km origem) | Nome da cidade = gazetteer; foto **não** vem. Heurística extra: noites longe de HOME + `FLYING`. |
+| Fotos dos cartões | skyline, templo, aeroporto | **Não** | Places Photos (pago, ToS) ou Wikimedia por cidade, ou **sem foto** (ColonyPanel). |
+
+### 12.2 Cidades e países — caminho de sucesso *offline*
+
+Não precisa de API Google. Pipeline:
+
+1. Deduplicar visitas por `placeId` (ou por célula ~100 m se não houver ID).
+2. Para cada coordenada, nearest-city num gazetteer embarcado ([GeoNames](http://download.geonames.org/export/dump/) `cities5000` ~5 MB / ~50k sítios — apanha BH, Nova Lima, Confins melhor que `cities15000`).
+3. `country_code` → nome localizado; agrupar cidades por país.
+4. Recência = `max(endTime)` do grupo; “hoje / ontem / há 4 semanas” como no Maps.
+5. Cache local `latlng_bucket → {city, country}` para não repetir o k-d tree.
+
+Dart: k-d tree (ex. `geocoder_offline`) ou tabela nossa. Geocoder do SO (Android/iOS) é plano B *online*, sem chave nossa, qualidade variável.
+
+Isto sozinho entrega as abas **Cidades** e **Mundo** com fidelidade alta. Municípios minúsculos podem cair na cidade vizinha — o utilizador corrige no atlas (uma vez por sítio).
+
+### 12.3 Categorias (Lugares + Estatísticas de visitas) — o fosso
+
+O Maps mostra Compras / Hotéis / Atrações / Gastronomia / Cultura / Aeroportos porque consulta a taxonomia Places. No JSON novo, `semanticType` é HOME/WORK/UNKNOWN — **não** é gastronomia.
+
+Três vias, da mais Colony à mais “igual ao Maps”:
+
+**V1 — Etiqueta humana (local-first, 0 rede)**  
+Os ~50 `placeId` mais visitados pedem uma categoria Colony na primeira vez; o resto herda. 621 sítios não se etiquetam todos; o topo cobre a maior parte das *horas*. Balde “Outros / por classificar”.
+
+**V2 — Gazetteer + heurística (offline, grosseiro)**  
+`FLYING` que termina num sítio → candidato a aeroporto. Visita overnight longe de HOME → candidato a hotel. Não reproduz 133 restaurantes.
+
+**V3 — Places API opt-in (o único jeito de *chegar perto* da grelha do Maps)**  
+`GET places/{placeId}` com field mask. Billing (2026):
+
+| Campo | SKU | Preço | Free / mês |
+| --- | --- | --- | --- |
+| `types` | Essentials | ~$5 / 1k | 10 000 |
+| `displayName`, `primaryType` | **Pro** | ~$17 / 1k | 5 000 |
+| fotos | Photos | ~$7 / 1k | 1 000 |
+
+621 `placeId` únicos com Pro (`displayName`+`primaryType`) cabem na faixa gratuita **numa** corrida, se cachearmos **para sempre** por `placeId`. Reimportações não voltam a pagar. Chave Maps Platform do utilizador (opt-in, ADR-032: sem OAuth obrigatório; isto é “cola a tua chave”). ToS: atribuição Google, sem redistribuir o dump de Places.
+
+Mapa `primaryType`/`types` → buckets Colony (espelho útil, não clone de strings):
+
+| Bucket UI | types / primaryType (exemplos) |
+| --- | --- |
+| Gastronomia | `restaurant`, `cafe`, `bar`, `bakery`, `meal_takeaway` |
+| Compras | `store`, `shopping_mall`, `supermarket`, `clothing_store`, … |
+| Hotéis | `lodging`, `hotel`, `guest_house` |
+| Cultura | `museum`, `art_gallery`, `church`, `hindu_temple`, `tourist_attraction` |
+| Atrações | `tourist_attraction`, `park`, `amusement_park`, `zoo` |
+| Aeroportos | `airport`, `international_airport` |
+| Trânsito | `train_station`, `subway_station`, `bus_station` |
+| Saúde / outro | `hospital`, `pharmacy`, … — só se quisermos; Maps não mostra tudo |
+
+`types` (Essentials, mais barato) já permite o bucket; `primaryType` (Pro) escolhe melhor quando há vários types. Nome legível = `displayName` (Pro) ou rótulo manual.
+
+**OSM/Nominatim** (alternativa sem chave Google): reverse + amenity. Taxonomia diferente, qualidade irregular, rate-limit na instância pública. Preferível gazetteer de cidade (V cidades) do que OSM para POI, a menos que o utilizador recuse Google.
+
+### 12.4 Viagens e estatísticas de transporte — quase só JSON
+
+Já desenhado no ADR-042 / camadas 0–1:
+
+- Cartões de viagem: `timelineMemory.trip` + janela `startTime`/`endTime` + destinos geocodificados.
+- “8 viagens / 59 dias”: count + soma das durações das trips (não do mês civil).
+- Mapa: bounding box dos `latLng` das trips (tiles nossos / OSM; sem estilo Maps).
+- Sparkline 6 meses: exige **histórico** no SQLite, não um único export de 1 dia. Cada import faz merge por `placeId`+janela (dedup).
+
+### 12.5 Fotos
+
+Não usar CDN do Maps. Opções Colony:
+
+1. Sem foto — ícone de categoria + cor do DS (mais honesto, zero ToS).
+2. Snapshot do mapa local (tiles OSM) na bbox da cidade.
+3. Wikimedia por nome da cidade (rede, atribuição, falha silenciosa).
+4. Places Photos só se V3 estiver ligado e o utilizador aceitar custo/ToS.
+
+### 12.6 Arquitetura para “ter essas telas” de verdade
+
+```text
+Timeline.json
+  → GoogleTimelineCodec          # local, sempre
+  → Visit/Activity/Trip facts    # Drift
+  → CityGazetteer (GeoNames)     # local, embarcado
+  → PlaceEnrichmentPort          # opt-in: Places | manual | none
+       cache placeId → {name?, types[], primaryType?, fetchedAt}
+  → queries:
+       transportStats(month)
+       visitsByCategory(month)
+       placesByCategory()
+       cities() / countries()
+       trips()
+  → UI Colony (não clone Maps)
+```
+
+Proveniência: facto de visita = `google_timeline_json`; nome/categoria = `places_api` | `user_label` | `geonames`. Chip de confiança distinto. Sem enriquecimento, as abas Cidades/Mundo/Estatísticas-transporte/Viagens já vivem; Lugares mostra “621 sítios, 0 classificados” + CTA para etiquetar ou colar chave.
+
+### 12.7 Ordem que chega às telas sem mentir
+
+1. Import + atlas (A–B) → número de sítios, mapa de pontos, trips cruas.  
+2. Gazetteer (H′) → **Cidades** e **Mundo**.  
+3. Agregação modal (C) → **Estatísticas de transporte**.  
+4. Etiqueta manual do topo-N → **Lugares** útil sem Google.  
+5. Place Details opt-in + cache → grelha e horas por categoria no nível do Maps.  
+6. Fotos: nunca no caminho crítico.
+
+Isto é o caminho de sucesso: as abas que o JSON já explica nascem offline; a grelha “Gastronomia 133” só nasce com taxonomia (tua ou da Places API), e isso é um passo **explícito**, não magia do ficheiro.
+
