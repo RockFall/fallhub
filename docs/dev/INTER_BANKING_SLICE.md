@@ -32,8 +32,8 @@ Histórico Inter entra por **OFX/CSV uma vez**. Gastos novos entram pelo **leito
 
 ### Persistência e contrato
 
-- Drift **schema 38**: tabela `captured_notifications` (não vai no export JSON — risco de OTP).
-- Export permanece **v33** (tags hierárquicas; notificações não entram no snapshot).
+- Drift **schema 38** nesta fatia: tabela `captured_notifications` (não vai no export JSON — risco de OTP). Após a consolidação o schema vivo é **39** (tags 37 + notificações 38 + Timeline 39).
+- Export permanece **v33** nesta fatia (tags hierárquicas; notificações não entram no snapshot). A Timeline sobe o snapshot para **v34**.
 - `IntegrationKind.notificationListener`.
 - Porta `BankConnector` / `InterLocalConnector` para trocar ingestão no futuro.
 
@@ -43,14 +43,14 @@ Histórico Inter entra por **OFX/CSV uma vez**. Gastos novos entram pelo **leito
 |------|------|
 | Docs (estratégia única) | `docs/dev/INTER_BANKING_INTEGRATION.md`, `docs/adr/ADR-011-…`, addendum em ADR-020 |
 | Domínio | `captured_notification`, pipeline de extratores, `InterStatementCodec`, `BankConnector` |
-| Banco | `captured_notifications`, ingest + `ensureInterAccount`, migration v36→v38 |
+| Banco | `captured_notifications`, ingest + `ensureInterAccount`, migration `from < 38` |
 | Android | `ColonyNotificationListenerService`, inbox JSONL, Method/EventChannel `colony/notifications` |
 | UI | Integrações (setup numerado), Finanças (import OFX/CSV), strings em `app_strings.dart` |
 | Testes | extrator/OFX, ingest no Drift, migration v38, widgets de Integrações e import |
 
 Arquivos novos relevantes: Kotlin em `android/app/src/main/kotlin/com/fallhub/fallhub/`, `notification_capture_platform.dart`, `inter_local_connector.dart`.
 
-O diff grande em `colony_database.g.dart` é o Drift regenerado (schema 38).
+O diff grande em `colony_database.g.dart` é o Drift regenerado (schema 39 na consolidação).
 
 ## Como validar no merge
 
