@@ -32,3 +32,9 @@ Plano de slices A–G, campos da API, casos-limite e repos de referência: o doc
 - Bump Drift + export quando o código existir (previsto v37 / export v33).
 - Beta sideload usa OAuth *Testing* (test users). Play Store exige verificação de sensitive scope + política de privacidade hospedada.
 - Verificar este ADR **antes** da 1.ª PR de código (slice A pode começar assim que aceite).
+
+## Próximos passos após merge deste ADR
+
+1. Marcar este ADR **Aceito** (ou devolver comentários neste PR / follow-up).
+2. Implementar slices A→C do plano (`docs/dev/GOOGLE_CALENDAR_INTEGRATION.md` §13): motor testável → persistência → OAuth Android read-only.
+3. Só então writes (E/F) e poll em background (G). Webhook Google fica defer até existir backend.

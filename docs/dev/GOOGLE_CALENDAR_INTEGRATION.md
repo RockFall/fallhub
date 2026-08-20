@@ -4,6 +4,33 @@ Status: **proposta** (pesquisa + plano; sem código produto nesta entrega).
 Complementa: [ADR-032](../adr/ADR-032-integrations-phase10-spike.md) (ICS stub), [ADR-005](../adr/ADR-005-local-first.md), spec §37.2 / Phase 10.  
 ADR de decisão: [ADR-042](../adr/ADR-042-google-calendar.md).
 
+## Resumo para merge
+
+Entrega **só documentação**. Nenhum pacote Dart, schema, UI ou dependência muda. O stub ICS continua a ser o único conector de calendário no código.
+
+### O que foi feito
+
+Pesquisa da forma oficial de ligar um app Flutter/Android à Google Agenda (Calendar API v3 + OAuth no dispositivo) e um plano para o Colony: poucos cliques, sync fiável (incremental + recovery `410`), leitura completa (atual e histórico) e escrita de eventos com os campos reais da API. Resultado em dois ficheiros novos (este plano + ADR-042).
+
+### O que foi alterado
+
+| Ficheiro | Tipo | Conteúdo |
+|----------|------|----------|
+| `docs/dev/GOOGLE_CALENDAR_INTEGRATION.md` | **novo** | Pesquisa, repos de referência, superfície da API, modelo, fiabilidade, UX, slices A–G |
+| `docs/adr/ADR-042-google-calendar.md` | **novo** | Decisão proposta: API v3 no telemóvel, local-first, ICS mantém-se |
+
+Nada em `lib/`, `packages/`, testes ou `pubspec`.
+
+### Próximos passos (depois do merge)
+
+1. **Aceitar ADR-042** (ou anotar alterações) — tranca a arquitetura antes de código.
+2. **Slice A** — motor de sync puro em `colony_domain` com JSON fake (paginação, `syncToken`, `410`). Sem Google Cloud.
+3. **Slice B** — tabelas Drift (previsto schema v37 / export v33) + `IntegrationKind.googleCalendar`.
+4. **Slice C** — OAuth Android + 1.ª sync só leitura (projeto Cloud em modo Testing).
+5. Slices D–G — grelha Colony, writes, recorrência/Meet, poll em background. Detalhe na [§13](#13-slices-de-implementação-ordem).
+
+Fora deste merge: webhook/`events.watch`, agregadores SaaS, `device_calendar`, OAuth desktop/iOS.
+
 ---
 
 ## 1. Objetivo
