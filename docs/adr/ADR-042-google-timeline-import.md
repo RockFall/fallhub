@@ -12,6 +12,8 @@ Perguntas desta spike:
 2. Que dados vêm no arquivo atual (`Linha do tempo.json` / `Timeline.json`)?
 3. Além de coordenadas, há categorias, tipos de lugar, modos de transporte, “viagens” já agrupadas?
 
+Brainstorm de produto (além de Viagem): [`docs/dev/TIMELINE_SIGNAL_BRAINSTORM.md`](../dev/TIMELINE_SIGNAL_BRAINSTORM.md).
+
 ## Decisão
 
 ### 1. Sem API oficial — export manual é o caminho
@@ -81,6 +83,9 @@ Quatro formas (um segmento usa **uma**):
   - `INFERRED` (sítio frequente que não é HOME/WORK)
   - `SEARCHED_ADDRESS` / `TYPE_SEARCHED_ADDRESS`
   - `TYPE_ALIASED_LOCATION` (rótulo privado no Maps)
+- `visit.probability` vs `topCandidate.probability` — “estavas aqui” vs “é este POI”.
+- `hierarchyLevel` 0 = sítio; **1+** = sítio-filho (campus→edifício). O sample demonstra nível 1.
+- `isTimelessVisit` — bookmark / sítio sem estadia real.
 - **Não** vem `restaurant`, `cafe`, `airport`, `lodging` neste JSON. Isso existia no Takeout antigo (`TYPE_CAFE`, `name`, `address`) e **caiu** no export on-device.
 
 **B. `activity` — deslocamento** (é o snippet do utilizador)
@@ -123,30 +128,41 @@ Modos observados no enum Google (Takeout + campo `type` atual; o parser deve ace
 
 **C. `timelinePath` — trilha GPS**
 
-Pontos `"lat°, lng°"` com `time` ou `durationMinutesOffsetFromStartTime`. Bom para mapa/crônica; pesado; **não** é necessário para criar um `Trip`.
+Pontos `"lat°, lng°"` com `time` **ou** `durationMinutesOffsetFromStartTime`. No sample o offset vem como **string** (`"5"`, `"23"`), não número — o parser aceita os dois. Tempo do ponto = `startTime + N minutos`. Bom para mapa/crônica; pesado; **não** é necessário para criar um `Trip`.
 
-**D. `timelineMemory` — “viagem” já agrupada pelo Google**
+**D. `timelineMemory` — memória do Maps (viagem ou nota)**
+
+Duas formas no sample:
 
 ```json
 "timelineMemory": {
-  "trip": { "distanceFromOriginKms": 420 },
-  "destinations": [
-    { "identifier": { "placeId": "ChIJ…" } }
-  ]
+  "trip": {
+    "destinations": [
+      { "identifier": { "placeId": "ChIJ…" } }
+    ],
+    "distanceFromOriginKms": 1842
+  }
 }
 ```
 
-Isto é o mais próximo de um `Trip` Colony: distância à origem + destinos como `placeId` (ainda **sem nome**). Usar como **candidato** no preview, não como verdade automática.
+```json
+"timelineMemory": {
+  "note": { "note": "texto que a pessoa escreveu no Maps" }
+}
+```
 
-#### 3.2 `userLocationProfile.frequentPlaces[]`
+`destinations` por vezes aparece **dentro** de `trip` (sample) e por vezes como irmão (dumps antigos). Aceitar os dois. `trip` é o candidato a `Trip` Colony; `note` vai para Inbox/crônica, nunca aplicado em silêncio.
 
-`label`: `HOME` / `WORK` (+ coords / `placeId`). Âncora para “saiu de casa” e para zonas §25.
+#### 3.2 `userLocationProfile`
 
-#### 3.3 `rawSignals[]` — **não importar no MVP**
+- `frequentPlaces[]` — `label` `HOME` / `WORK`; entradas **sem** label = terceiro lugar habitual.
+- `persona.travelModeAffinities[]` — `{ mode: WALKING|CYCLING|DRIVING|TRANSIT, affinity: 0..1 }`. Auto-retrato Google; comparar com o mix real do export (digest), não com moral.
 
-- `position` — GPS/Wi‑Fi cru (redundante com `timelinePath`).
-- `activityRecord` — STILL / ON_FOOT / IN_VEHICLE (Android Activity Recognition).
-- `wifiScan.devicesRecords[].mac` — **MACs de redes vizinhas**. Dado excessivo e sensível. **Descartar na parse**; nunca persistir.
+#### 3.3 `rawSignals[]` — agregar no máximo; não persistir cru no MVP
+
+- `position` — campo `LatLng` (L maiúsculo no sample). `source`: `GPS` | `WIFI` | `CELL` | `UNKNOWN`. `accuracyMeters`, `altitudeMeters`, `speedMetersPerSecond`.
+- `activityRecord.probableActivities` — `STILL`, `ON_FOOT`, `WALKING`, `RUNNING`, `IN_VEHICLE`, `UNKNOWN` (confianças 0..1). Corrobora o `activity` semântico.
+- `wifiScan.devicesRecords[].mac` — **MACs de redes vizinhas**. **Descartar na parse**; nunca persistir.
 
 ### 4. Categorias de lugar: o que falta e como (não) completar
 
@@ -174,8 +190,10 @@ Alinha ADR-032 (opt-in, preview, proveniência, sem OAuth) e spec §0.1 (dados d
 | --- | --- |
 | `timelineMemory.trip` ou cluster heurístico | `Trip` (título sugerido, `startAt`/`endAt`, `destinations[]`) |
 | Offsets de timezone no intervalo | futuro `timezone_sequence` |
-| `activity.topCandidate.type` | futuro `itinerary_items[].kind` (voo/trem/carro/a pé) |
-| `visit` (não HOME) | item de itinerário “permanência” / nota de destino |
+| `activity.topCandidate.type` + `distanceMeters` | itinerário; Need `movimento` importado |
+| `visit` (nível 0/1, não HOME) | permanência / sítio-filho; atlas `placeId` |
+| `timelineMemory.note` | Inbox ou crônica (confirmação) |
+| `frequentPlaces` + `persona.travelModeAffinities` | Base/Posto/terceiro; digest modal |
 | `probability` | campo de confiança + proveniência |
 | `placeId` | metadado opaco; link Maps; **não** chave de negócio |
 | `rawSignals.wifiScan` | lixo |
@@ -207,6 +225,7 @@ Política de minimização: importar só o intervalo escolhido (ou só candidato
 - O JSON **é rico em movimento e tempo**, pobre em **rótulos de lugar**. Quem espera “categorias de restaurante/hotel de graça” precisa de um passo extra (Places/OSM) ou de aceitar coords + modo de transporte.
 - ADR-027 (“só registro manual”, “sem scraping”) permanece para o MVP já entregue; esta ADR **estende** com import opt-in, sem conta.
 - Schema DB/export só muda na slice de produto, se persistirmos segmentos ou só `Trip`s confirmados.
+- Mapa amplo de features (needs, zonas, crônica, storyteller, ledger de horas): [`docs/dev/TIMELINE_SIGNAL_BRAINSTORM.md`](../dev/TIMELINE_SIGNAL_BRAINSTORM.md).
 
 ## Fontes (consulta 2026-08)
 
