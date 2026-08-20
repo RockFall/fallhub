@@ -2,6 +2,8 @@
 
 Companheiro de [ADR-042](../adr/ADR-042-google-timeline-import.md). Spike de produto: o que o JSON **já contém**, o que dá para **derivar**, e ideias de funcionalidade da captura básica até o especulativo. Não é roadmap; é mapa de possibilidades com âncoras na spec.
 
+**Estado atual (hub implementado, o que mergear, próximos cortes):** [`TIMELINE_HUB_MERGE.md`](TIMELINE_HUB_MERGE.md)
+
 O sample analisado é um dia em Xangai (coords ~31.23°, 121.47°) + uma expedição de 5 dias a 1842 km da origem.
 
 ## 0. Guardrails (ler antes das ideias)

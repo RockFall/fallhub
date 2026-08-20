@@ -3,6 +3,8 @@
 ## Status
 Aceito (implementado — hub Timeline, DB v37 / export v33)
 
+**Nota de merge (o que mudou + próximos passos):** [`docs/dev/TIMELINE_HUB_MERGE.md`](../dev/TIMELINE_HUB_MERGE.md)
+
 ## Contexto
 Viagem hoje é registro manual (`Trip` em ADR-027: título, destinos livres, datas, status). Spec §26 pede `timezone_sequence`, itinerário (voo/trem/hotel/deslocamento) e modo viagem offline. Um fluxo comum em apps de “criar vídeo / crônica de viagem” é importar o JSON que o Google Maps chama de Timeline / “Linha do tempo”.
 
