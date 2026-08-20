@@ -1,355 +1,295 @@
 # Integração Banco Inter — pesquisa e plano
 
-Status: pesquisa (ago/2026). Não é código de produto. Decisão arquitetural em [`docs/adr/ADR-011-financial-imports-open-finance.md`](../adr/ADR-011-financial-imports-open-finance.md).
+Status: pesquisa revisada (ago/2026). Não é código de produto. Decisão em [`docs/adr/ADR-011-financial-imports-open-finance.md`](../adr/ADR-011-financial-imports-open-finance.md).
 
-Objetivo: importar, com **poucos cliques** e **à prova de falhas**, extrato de débito (conta digital), fatura de cartão (atual e histórica) e metadados úteis (saldo, limites, categorias, parcelas, MCC) do Banco Inter para o ledger local do Life Colony OS.
+Objetivo: **capturar automaticamente** compras novas e acompanhar fatura de **débito** (conta digital) e **crédito** (fatura aberta + fechadas) do Inter PF. Escala: **pouquíssimos usuários** (uso pessoal / família). Setup com poucos cliques; depois disso, **zero export manual recorrente**.
 
-Restrições já fechadas pela spec e pelos ADRs:
+Requisito que invalida o plano anterior: se cada atualização depender de exportar OFX/CSV no Super App, a integração não serve.
 
-- Local-first, app útil offline, sem conta obrigatória (ADR-005, spec §0.1).
-- Finanças **não executam** Pix, boleto, pagamento de fatura nem qualquer operação (§0, ADR-020).
-- Integração sensível: opt-in, granular, revogável, com proveniência (§0, ADR-032).
-- Open Finance **não** é uma API aberta a qualquer app pessoal; a spec §23.9 exige uma camada `BankingDataProvider` e parceiro regulado na fase posterior.
+Restrições que continuam válidas:
+
+- Local-first: app útil offline com o último sync; **sem conta Colony** (ADR-005).
+- Finanças **não executam** Pix, boleto nem pagamento de fatura.
+- Opt-in, granular, revogável, com proveniência.
+- A Colony **não** vira ITP/receptora Open Finance (homologação BC).
 - Widgets não falam com banco; SQL só em `colony_database`.
+
+## 0. Conclusão (o que mudou)
+
+O único caminho PF que é ao mesmo tempo **oficial, automático, de cartão+conta, e barato em escala de 1–N CPFs** é o **Meu Pluggy (conector `200`)**:
+
+1. O usuário consente **uma vez** no Inter, via [meu.pluggy.ai](https://meu.pluggy.ai) (Open Finance regulado).
+2. O Meu Pluggy **atualiza o Inter todo dia**. A Colony **só lê** (`GET`), não dispara lote contra o banco (a Pluggy **proíbe** batch update).
+3. Credenciais são as do **próprio usuário** (aplicação Development no [dashboard.pluggy.ai](https://dashboard.pluggy.ai)). Grátis, sem prazo, **desde que o conector seja MeuPluggy / `200`**. Conectar “Inter” direto no dashboard comercial **pausa em ~14 dias** e cai no plano de ~R$ 2.500/mês.
+4. O telefone **é** o backend: `CLIENT_ID` / `CLIENT_SECRET` no Keystore; HTTP para `api.pluggy.ai`. Não precisamos de servidor Colony nem de webhook público.
+5. Arquivo OFX/CSV vira **backfill pontual** (histórico > janela OF, ou se a Pluggy cair) — nunca o loop diário.
+6. API Inter Empresas continua **irrelevante para PF** (só PJ, sem fatura).
+
+Isso já está em produção em apps pessoais: [meloluan/openfinance-analyst](https://github.com/meloluan/openfinance-analyst) (SQLite local, upsert 35 dias, faturas, parcelas) e o fluxo [Steward / MeuPluggy](https://fi.paired.net/docs/pluggy) (~15 min de setup, cron só de `GET`).
+
+Atraso típico: **horas até o sync diário** (janela OF regulada = hoje + 6 dias). “Compra de agora” entra no ledger no próximo pull. `Atualizar agora` (user-initiated `PATCH` item) é o escape. Notificação do Android como `pending` é fatia posterior, não a fonte da verdade.
 
 ## 1. O que o Colony já tem
 
-O ledger MVP (ADR-020 + CSV Iter 107) já cobre a espinha dorsal de um importador:
-
-| Peça | Onde | Serve para o Inter? |
+| Peça | Onde | Serve? |
 | --- | --- | --- |
-| Contas `checking` e `creditCard` | `FinancialAccount` | Sim — mapear 1:1 conta digital e cartão |
-| Transação imutável + `fingerprint` | `LedgerTransaction` | Deduplicar reimportações |
-| Preview → apply | `FinanceCsvImportPolicy` | Mesmo fluxo para OFX/PDF/API |
-| Categorias lite | `TransactionCategory` (10 valores) | Destino de MCC / regras |
-| Consentimento de integração | `IntegrationConsent` (`calendarIcs` só) | Estender com `financeInterFile` / `financeOpenFinance` |
-| `externalConnectionId` | deferido no ADR-020 | Precisa voltar para sync contínuo |
-| CSV codec | formato **interno** Colony, não o CSV do Inter | Precisa de um parser Inter-nativo |
+| Contas `checking` e `creditCard` | `FinancialAccount` | Mapear 1:1 conta digital e cartão Inter |
+| `fingerprint` | `LedgerTransaction` | Fallback de dedup |
+| Preview → apply CSV | `FinanceCsvImportPolicy` | Reusar o plano; sync automático aplica **sem** pedir confirm toda hora (opt-in explícito na 1ª vez) |
+| Categorias lite | `TransactionCategory` | Destino de MCC / merchant Pluggy |
+| `IntegrationConsent` | só `calendarIcs` | Novo kind `financeMeuPluggy` |
+| `externalConnectionId` | deferido ADR-020 | **Volta a ser obrigatório** (itemId Pluggy) |
 
-Lacunas de domínio (spec §23.5, ainda deferidas): `external_id`, `posted_at`, `merchant_normalized`, `installment_group_id`, `transfer_pair_id`, `import_batch_id`, `status` (`pending`/`posted`), entidade de **fatura** (`CreditCardBill`). Sem elas, cartão fica “lista de gastos” e não “fatura com vencimento, mínimo e pagamento”.
+Lacunas a abrir **antes** do sync contínuo (senão duplica e não dá para faturas):
 
-## 2. Como se faz isso hoje (quatro caminhos reais)
+- `external_id` (id Pluggy / FITID)
+- `status`: `pending` \| `posted`
+- `import_batch_id`, `sourceType=integration`
+- `CreditCardBill` (vencimento, total, mínimo, pagamentos, IOF)
+- `posted_at`, `merchant_normalized`, `installment_group_id` (spec §23.5)
+- Regras: nunca sobrescrever categoria manual; pagamento de fatura na conta = transferência, não despesa duplicada
 
-Não existe um único “SDK Inter para app pessoal”. Há quatro famílias, com trade-offs opostos de cliques vs. regulação vs. cobertura de cartão.
+## 2. Por que os outros caminhos não resolvem “automático PF”
 
-### Caminho A — Arquivos oficiais do Super App / Internet Banking (PF e MEI)
+### Arquivo Super App — oficial, mas manual
 
-O Inter **já exporta** extrato da conta digital em PDF, CSV e OFX.
+Conta digital: PDF/CSV/OFX até **2 anos** (e-mail sob demanda). Cartão: Inter **removeu CSV da fatura** (confirmação do próprio banco no Reclame Aqui; PDF só após o corte). PDF da fatura chega por e-mail até 3 dias úteis após o fechamento, senha = 6 dígitos do CPF.
 
-No Super App: Saldo → filtrar período → seta/exportar → “Enviar por e-mail”. Chegam os três formatos no e-mail cadastrado. No Internet Banking: Conta Digital → Extrato → Exportar → PDF/CSV/OFX no computador.
+Serve como **auditoria / backfill**. Não captura compra nova sem o usuário exportar de novo.
 
-Limite oficial de consulta: **até 2 anos** entre data inicial e final ([ajuda Inter](https://ajuda.inter.co/conta-digital-pessoa-fisica-e-mei/como-acessar-o-extrato-da-conta-digital-pf-ou-mei)).
+IMAP no PDF mensal da fatura **não** substitui o extrato do dia a dia (atrasa dias; fatura aberta não vem).
 
-CSV típico da comunidade (Conta Azul / ERPs):
+### API Inter Empresas — automática, mas não é PF
 
-- Separador `;`, encoding Latin-1 (fallback UTF-8).
-- Metadados nas primeiras linhas, depois cabeçalho.
-- Colunas frequentes: `Data Lançamento; Histórico; Descrição; Valor` (valor BR `1.520,00`).
+OAuth + mTLS, extrato 90 dias, saldo. **Só PJ.** Sem fatura de cartão. Certificado anual. Fora do caso.
 
-OFX é o formato mais estável: `FITID` (id estável), `TRNAMT` com sinal, `DTPOSTED`, `MEMO`/`NAME`. É o que Conta Azul, Fintera e Omie pedem para conciliação.
+### Open Finance comercial (Pluggy/Belvo/TecnoSpeed como produto)
 
-Cartão de crédito no Super App: Cartões → Fatura (aberta em azul, fechada em vermelho) → detalhe da atual, passadas e futuras. Compartilhar boleto / salvar PDF. PDF da fatura Inter vem **protegido por senha = 6 primeiros dígitos do CPF do titular** ([blog Inter](https://blog.inter.co/fatura-inter/)). Não há OFX oficial de fatura tão documentado quanto o da conta digital; o caminho estruturado de cartão, no mundo PF, é Open Finance (abaixo) ou parse do PDF/CSV se o app oferecer.
+É o “2 cliques” multi-usuário, mas o piso (~R$ 540–2.500/mês) é para **servir CPFs de terceiros**. Inútil para pouquíssimos usuários se pagarmos isso. A armadilha: o dashboard Pluggy deixa conectar Inter direto; isso **não** é o caminho pessoal.
 
-**Cliques:** ~5–8 (exportar no Inter + abrir no Colony). **Confiabilidade:** alta (formato do próprio banco). **Local-first:** sim. **Cartão histórico:** PDF/e-mail, parse mais frágil que OFX.
+### Scraping / sessão do Super App
 
-### Caminho B — API Banking Inter Empresas (só PJ)
+Não há `pynubank` estável para o Inter. MFA, ToS, quebra. **Fora.**
 
-Portal: [developers.inter.co](https://developers.inter.co/). Auth: OAuth2 client credentials **+ mTLS** (`.crt` + `.key` gerados no Internet Banking, validade ~12 meses). Token ~60 min. Escopos granulares (`extrato.read`, etc.).
+### Cumbuca MCP
 
-Endpoints úteis (leitura):
+Open Finance per-user, licenciado, bom para chat. Limite ~5 queries/dia no MVP — **não** serve para monitoramento contínuo do ledger.
 
-| Recurso | Path | Janela | Rate limit típico |
-| --- | --- | --- | --- |
-| Extrato simples | `GET /banking/v2/extrato` | máx. **90 dias** por chamada | ~10 req/min |
-| Extrato PDF | `GET /banking/v2/extrato/exportar` | 90 dias | idem |
-| Extrato enriquecido | `GET /banking/v2/extrato/completo` | 90 dias, paginado, filtros tipo | idem |
-| Saldo | `GET /banking/v2/saldo` | snapshot | — |
+### Notificação Android / SMS
 
-Histórico além de 90 dias = várias janelas encadeadas (ex.: 8 chamadas para 2 anos), com checkpoint.
+Complemento de baixa latência (`pending`), incompleto (sem histórico, sem fatura, texto instável). Nunca fonte canônica.
 
-**Não serve para o caso PF.** Conta Azul, Hubpay e a própria comunicação Inter Empresas: API **somente PJ**; PF e MEI **não** geram certificado de integração. A API Banking **não expõe fatura de cartão** — é caixa/extrato/pagamentos/Pix de conta corrente empresarial.
+## 3. Caminho alvo: Meu Pluggy + Colony local
 
-SDKs oficiais: Java e C#. Não há SDK Dart/Flutter oficial.
+Dois portais, dois cadastros ([aviso oficial](https://github.com/pluggyai/meu-pluggy) e README do openfinance-analyst):
 
-**Cliques:** muitos (criar app, baixar zip de cert, colar Client ID/Secret, renovar todo ano). **Cartão:** não. **Encaixa no Colony:** só como adapter opcional *bring-your-own-cert* para quem tiver CNPJ.
+| Portal | Função |
+| --- | --- |
+| [meu.pluggy.ai](https://meu.pluggy.ai) | Consentimento OF. Usuário escolhe Inter, autentica **no Inter**, marca conta e cartão. Pluggy não vê a senha. Refresh **diário** da conexão. |
+| [dashboard.pluggy.ai](https://dashboard.pluggy.ai) | `CLIENT_ID` + `CLIENT_SECRET` de uma **Development Application**. Habilitar conector **MeuPluggy**. Demo → OAuth Meu Pluggy → nasce um **Item** (UUID) por banco. |
 
-### Caminho C — Open Finance Brasil (o caminho “poucos cliques” de verdade para PF)
+Trial de ~14/15 dias do dashboard = recursos **comerciais**. Conector `200` **não expira**. Detectar no sync: se `connector.id != 200`, recusar e explicar (senão o usuário acha que “Inter direto” funcionou até o dia 15).
 
-O Inter é instituição participante. O usuário consente no app/internet banking do Inter; a app receptora lê dados com token de consentimento. **A Colony não pode falar direto com o Inter Open Finance**: só ITP/receptora regulada pelo BC, ou um **agregador** já credenciado.
+Dados que o Inter entrega nesse canal (cobertura Pluggy OF: Accounts, Transactions, Credit Cards, Investments, **Bills** — bills obrigatórios em OF regulado; em direct, Pluggy cita bills para **Inter PF**):
 
-APIs relevantes (Open Finance Brasil, credit-cards v2 / accounts v2):
-
-| Dado | Endpoint (conceitual) | Recorte |
+| Dado | Como vem | Recorte |
 | --- | --- | --- |
-| Conta corrente / poupança | `accounts` + `transactions` | histórico ~**12 meses** |
-| Transações recentes conta | `transactions-current` | ~7 dias |
-| Lista de cartões | `credit-cards-accounts/accounts` | produto, bandeira |
-| Limites | `.../limits` | crédito, saque |
-| Transações cartão históricas | `.../transactions` | ~**12 meses**, pós-clearing |
-| Fatura **aberta** (atual) | `.../transactions-current` | ~7 dias; `billId` pode faltar |
-| Faturas **fechadas** | `.../bills` | só fatura já encerrada |
-| Itens de uma fatura | `.../bills/{billId}/transactions` | conciliadas **e** faturadas |
-| MCC / CNPJ do lojista | campos `payeeMCC`, identificação | categorização |
-| Parcelas | `payeeMCC` + installment metadata | `installment_group_id` |
-| Investimentos | phase 4 OF (cobertura variável) | Pluggy marca Inter 🟢 |
+| Conta digital / Pix / TED / débito | `GET /accounts`, `GET /transactions` | 1º sync ~365 dias na Pluggy; analyst reporta backfill até 24 meses no produto deles |
+| Fatura **aberta** | transações do cartão sem `billId` estável + limites | janela `transactions-current` (~7 dias) a cada sync OF |
+| Faturas **fechadas** | `GET /bills?accountId=` + txs por bill | histórico de faturas; total, mínimo, vencimento, `financeCharges`, `payments[]` |
+| MCC / lojista | `creditCardMetadata.payeeMCC`, `merchant` | categoria sugerida |
+| Parcelas | metadata de installment | `installment_group_id` |
+| Saldo / limite | account + limits | Pluggy às vezes troca saldo por limite; Steward corrige pela fatura em aberto |
 
-IDs de transação de cartão só ficam imutáveis **depois que a fatura fecha** (regra OF). Reimportar fatura aberta exige tratar `pending` → `posted` sem duplicar.
+Sinal do cartão na Pluggy: **positivo = compra**. Normalizar no adapter: gasto negativo / entrada positiva (openfinance-analyst). Sem isso, orçamento explode.
 
-Fluxo UX de agregador (Pluggy, Belvo, TecnoSpeed PlugBank, etc.):
+Consentimento OF: BC removeu o teto rígido de 12 meses (Res. Conjunta 7/2023); renovação simplificada na receptora. Na prática conexões **caem** (Steward cita ~90 dias em alguns bancos). UI: aviso `LOGIN_REQUIRED` / consentimento perto de vencer + WebView “reconectar” (poucos toques, raro).
 
-1. App pede um **connect token** a um **backend** (Client ID/Secret nunca no apk).
-2. WebView abre o widget; usuário escolhe Inter, autentica **no Inter**, marca conta e/ou cartão, confirma.
-3. Webhook/`item.updated` → backend baixa contas, transações, bills.
-4. App aplica no ledger local.
+### Por que não precisamos de servidor Colony
 
-Isso é “poucos cliques” (2–4 no widget + biometria do Inter). Cobertura Pluggy (ago/2026): Inter PF e PJ com Accounts, Transactions, **Credit Cards**, Investments. Bills de cartão são **obrigatórios** em conectores Open Finance regulados; em conectores “direct”, Pluggy cita bills especificamente para **Inter PF** e Itaú Cartões.
+Na arquitetura comercial, o Client Secret não pode ir no APK porque ele acessa **todos os clientes**. Aqui o secret acessa **só o Item do dono do telefone**. É o mesmo modelo de senha IMAP pessoal.
 
-Custo real para um app pessoal (relatos públicos 2026, não contrato):
+O aparelho:
 
-| Agregador | Piso citado | Flutter? | Bills Inter? |
-| --- | --- | --- | --- |
-| Pluggy | ~R$ 2.500/mês | WebView oficial no [pluggyai/quickstart](https://github.com/pluggyai/quickstart) (`frontend/flutter`) | Sim (OF + Inter PF direct) |
-| Belvo | ~R$ 6.000/mês (Launch ~US$ 1.000) | SDKs, não Flutter first-party | Sim (objeto bill OF) |
-| TecnoSpeed PlugBank | ~R$ 1.500 adesão + ~R$ 540/mês | API JSON | Extrato + fatura (2026) |
-| Meu Pluggy (consumidor) | grátis para a pessoa | não é SDK de produto | a pessoa conecta no site deles |
+1. `POST /auth` → apiKey (TTL curto; renovar).
+2. `GET /items/{id}` → status, `connector.id` tem que ser 200.
+3. `GET /accounts?itemId=`, `GET /transactions?accountId=&from=&to=`, `GET /bills?accountId=`.
+4. Upsert local. **Não** `PATCH /items` em cron (batch proibido). Só GET. O Meu Pluggy já rodou o update no banco.
+5. `Atualizar agora` (manual) pode `PATCH` o item — a Pluggy permite update user-initiated, janela OF = hoje+6 dias.
 
-**Bloqueio local-first:** agregador **exige backend** para mintar token e puxar transações (connect token não lê bills/transactions completos — 403). Segredo no app = comprometido no sideload. Sem backend Colony, este caminho não entra em produção.
+Connect token / WebView: o próprio app minta o token com o secret do usuário (setup e reconsentimento). Referência UI: `pluggyai/quickstart` `frontend/flutter`.
 
-Atalho desonesto: scraping da sessão do Super App. Equivalente a `pynubank` não existe de forma estável para o Inter; quebra com MFA, ToS e atualização de app. **Fora de escopo.**
+Background: Android `WorkManager` periódico (horas) só para GET. iOS background fetch é frágil → sync **ao abrir o app** + botão. Isso já é automático no sentido de “não exportar arquivo”. Latência intra-dia: WorkManager + sync on-open.
 
-### Caminho D — Híbrido (recomendado)
+Pouquíssimos usuários:
 
-Arquivos oficiais como fonte **sempre disponível e offline**. Open Finance via parceiro como fonte **opcional** quando (e se) houver backend + contrato. API PJ como fonte **opcional** se o perfil tiver certificado. Os três desaguam no mesmo `BankingDataProvider` e no mesmo preview/apply.
+- 1 CPF: um Meu Pluggy, um par de keys, um Item Inter (conta+cartão no mesmo item).
+- Família: **um setup por CPF** (keys no perfil Colony daquela pessoa). Não embutir Client ID da Colony — isso seria produto comercial.
+- Assistente no app para os ~6 passos (hoje o setup Steward é ~15 min e fácil de errar o conector).
 
-## 3. O que dá para extrair, por fonte
+## 4. Loop automático (contrato à prova de falhas)
 
-| Dado | Arquivo PF | API PJ | Open Finance (agregador) |
-| --- | --- | --- | --- |
-| Extrato débito atual | CSV/OFX | extrato 90d | transactions-current |
-| Extrato débito histórico | CSV/OFX até 2 anos | N×90 dias | ~12 meses |
-| Saldo | no PDF/cabeçalho OFX | `saldo` | account balance |
-| Fatura cartão **aberta** | tela/PDF atual | não | transactions-current (+ limites) |
-| Faturas cartão **fechadas** | PDFs mensais (senha CPF) | não | `bills` + transactions por `billId` |
-| Pagamento da fatura | lançamento na conta + PDF | não | `bills[].payments[]` |
-| Mínimo / vencimento / IOF | PDF fatura | não | `minimumPaymentAmount`, `financeCharges` |
-| Limite do cartão | não estruturado | não | `limits` |
-| MCC / CNPJ lojista | às vezes no histórico CSV | extrato completo (parcial) | sim |
-| Categoria pronta | Inter tem categoria no app, **não** sai limpa no OFX | não | merchant.category (Pluggy Pro) ou MCC nosso |
-| Parcelas | texto “Parcela 3/12” | idem | campos OF de installment |
-| Investimentos Inter | fora deste plano | não nesta API | OF investimentos (cobertura variável) |
-| Pix / TED contraparte | descrição | extrato completo | transaction parties |
+Isto substitui “preview toda vez”. O preview existe na **1ª conexão** (quais contas criar). Depois, sync é upsert silencioso com relatório.
 
-Categorização: a spec §23.6 manda **regras determinísticas primeiro**, sugestão depois, **nunca** sobrescrever correção manual. Mapa proposto:
+1. **Chave estável.** `external_id = pluggyTransaction.id`. Nunca insert cego. Fingerprint só se a Pluggy não mandar id.
+2. **Revisitar 35 dias.** Transação nasce `PENDING`, vira `POSTED`, descrição/MCC enriquecem. Segunda sync atualiza a mesma linha.
+3. **Fatura aberta.** Itens sem `billId` imutável ficam `pending` na conta cartão; ao fechar, ligam no `CreditCardBill`.
+4. **Não duplicar pagamento.** Lançamento na conta digital “PAGTO FATURA” casa com `bills[].payments[]` → par de transferência.
+5. **Apply transacional.** Lote all-or-nothing; cursor `lastSuccessfulPullAt` só avança no commit.
+6. **Raw JSON.** Guardar payload do pull (ADR-015) para replay se o mapper mudar.
+7. **Retry.** 401 → reauth apiKey. 429 → backoff + jitter. 5xx → não avançar cursor. Timeout → idem.
+8. **Saúde da conexão.** Qualquer status ≠ `UPDATED` vira banner acionável (reconectar WebView). Campo `avisos` no digest financeiro (padrão analyst).
+9. **Conector 200.** Recusar sync se não for MeuPluggy.
+10. **Timezone.** Agrupar competência em `America/Sao_Paulo`.
+11. **Categoria.** Sugestão só se `categoryId` vazio; correção manual gera regra local `merchant → category`.
+12. **Segredo.** Keystore/Keychain. **Não** ir no export JSON em claro. Revogar consentimento não apaga o ledger.
+13. **Frequência.** GET a cada abertura + periódico. Sem PATCH em lote.
+14. **D-0.** OF regulado inclui hoje na janela de 7 dias; ainda assim tratar D0 como possivelmente `pending`.
 
-1. MCC Open Finance / `payeeMCC` → `TransactionCategory`.
-2. Palavras do `Histórico` Inter (`IFOOD`, `UBER`, `PIX`, `PAGTO FATURA`, `CASHBACK`).
-3. Lojista normalizado (CNPJ) com tabela local aprendida.
-4. Usuário corrige → regra local (`merchant X → category Y`).
+Testes (domínio, sem rede):
 
-Pagamento de fatura na conta corrente deve virar **transferência** (`transfer_pair_id`), não despesa + despesa. Sem isso o orçamento duplica o cartão.
+- Fixture JSON Pluggy (conta + cartão + 2 bills) → ledger + `CreditCardBill`.
+- Upsert 2× → mesma contagem; `PENDING`→`POSTED` no mesmo `external_id`.
+- Pagamento de fatura não soma duas vezes no orçamento.
+- `connector.id != 200` → erro localizado.
+- Categoria manual preservada.
+- Sinal do cartão invertido corretamente.
 
-## 4. Repositórios que realmente ajudam (e os que não)
+## 5. UX (setup uma vez, depois invisível)
 
-Nenhum repositório é um “drop-in” Flutter para o Colony. Usar como **referência de protocolo**, não como dependência de runtime.
+**Primeira vez (assistente, ~10–15 min, uma vez por CPF):**
 
-### Usar como base de implementação
+1. Disclaimer: somente leitura; dados vão à Pluggy (ITP) e depois ao SQLite local; revogável no Inter e no Colony.
+2. Abrir Meu Pluggy / instruir “conectar Inter, conta **e** cartão”.
+3. Colar `CLIENT_ID`, `CLIENT_SECRET`, `ITEM_ID` **ou** WebView Demo-equivalente se conseguirmos listar items.
+4. Validar conector 200 + puxar contas → preview “Inter Conta”, “Inter Crédito”.
+5. Confirmar → backfill → ligar sync automático.
 
-| Repo | Por quê | Como usar aqui |
-| --- | --- | --- |
-| [OpenBanking-Brasil/openapi](https://github.com/OpenBanking-Brasil/openapi) | Contratos oficiais (`credit-cards/2.2.0.yml`, accounts) | Modelar `CreditCardBill` e IDs estáveis; golden tests com fixtures YAML |
-| [pluggyai/quickstart](https://github.com/pluggyai/quickstart) | Flutter + WebView do Connect; exemplos de token no backend | Copiar **só** o padrão WebView quando houver parceiro; não commitar secrets |
-| [pluggyai/my-expenses](https://github.com/pluggyai/my-expenses) | App de gastos pessoais completo em cima da Pluggy | Ver mapeamento account/bill/transaction → ledger |
-| [lucasrcezimbra/bancointer](https://github.com/lucasrcezimbra/bancointer) | Cliente Python limpo: mTLS, token, `get_statements`, fake client de teste | Espelhar o fluxo OAuth+mTLS num `InterPjApiClient` Dart; reusar a ideia do `ClientFake` |
-| [abstra-app/template-bank-reconciliation](https://github.com/abstra-app/template-bank-reconciliation) | `get_expenses_from_inter_api.py` mínimo (token + `GET /banking/v2/extrato`) | Snippet canônico de headers `x-conta-corrente` + cert tuple |
-| [Maxed-OSS/ofx-normalizer](https://github.com/Maxed-OSS/ofx-normalizer) | OFX/QFX + CSV → schema único (sinal, data, direção) | Portar a ideia para Dart (`OfxStatement` + `InterCsvStatement`); não puxar Go |
-| [kedder/ofxstatement](https://github.com/kedder/ofxstatement) | Ecossistema de plugins banco→OFX | Padrão de plugin por instituição; o nosso “plugin” é Inter |
+**Todo dia (zero cliques):** WorkManager / on-open GET. Snackbar discreto: “12 novas · 3 atualizadas · fatura aberta R$ …”.
 
-### Referência secundária (PJ / cobrança, pouco extrato)
+**Raro:** banner “Inter pediu login de novo” → WebView updateItem.
 
-- [renatojdev/bancointer-python](https://github.com/renatojdev/bancointer-python) — PyPI `bancointer-python`; banking + cobrança; extrato enriquecido ainda “a implementar” em várias tags.
-- [helbertfurbino/api-inter-v2](https://github.com/helbertfurbino/api-inter-v2) (fork da divulgueregional) — PHP com extrato/saldo/PDF.
-- [LuizDMM/inter_api_python_connector](https://github.com/LuizDMM/inter_api_python_connector) — wrapper MIT pequeno, pouco movimento.
+**Nunca no caminho feliz:** exportar OFX, senha de PDF, certificado `.crt`.
 
-### Não usar como base do app
+Tela finanças: fatura aberta (total corrido), fechada (vencimento, mínimo, pago/não), lista de compras da competência, conta digital ao lado. Empty = “ainda sem sync”; erro = acionável; offline = último `pulledAt`.
 
-- Scrapers / “unofficial Inter API” de sessão mobile — frágeis, MFA, risco jurídico.
-- [mcp-dir/inter-mcp](https://github.com/mcp-dir/inter-mcp) — MCP de leitura via Open Finance para agentes; útil para explorar o **shape** dos dados (`openfinance_list_credit_card_bills`), não para embutir no Flutter.
-- Conversors PDF→OFX na nuvem (MeuOFX etc.) — vazam fatura com CPF; o parse tem que ser **on-device**.
-
-Não há pacote `ofx` maduro e óbvio no pub.dev comparável ao normalizer. O parser OFX do Colony deve ser **nosso**, pequeno, com fixtures reais (anonimizadas) de um OFX Inter.
-
-## 5. Recomendação
-
-Para “fácil + confiável” **neste** produto (sideload, local-first, um usuário, sem backend):
-
-1. **Fatia 1 (fazer):** importador Inter por arquivo, com assistente de poucos toques e share-sheet. OFX primeiro (débito), CSV Inter nativo depois, PDF de fatura depois. É a única combinação que é oficial, PF, offline e barata.
-2. **Fatia 2:** modelo de fatura + regras de categoria + detecção de pagamento de fatura como transferência + cursor de importação (à prova de reimport).
-3. **Fatia 3 (opcional, PJ):** adapter `InterPjBankingProvider` com certs no dispositivo (Android Keystore / iOS Keychain), janelas de 90 dias, só leitura `extrato`+`saldo`.
-4. **Fatia 4 (opcional, quando houver parceiro):** `OpenFinanceAggregatorProvider` (Pluggy como primeiro, TecnoSpeed se o piso for o critério). UI = WebView de consentimento. Dados caem no mesmo apply idempotente.
-
-Não implementar scraping. Não colocar Client Secret de agregador no APK. Não fingir sync contínuo sem consentimento visível e revogável.
-
-## 6. UX “poucos cliques” (Fatia 1)
-
-Tela nova a partir de Finanças e de `/settings/integrations`: **Importar do Inter**.
-
-Conta digital (meta: ≤ 6 toques depois da 1ª vez):
-
-1. Escolher conta Colony destino (ou criar “Inter Conta” automaticamente).
-2. Botão **Como exportar** (bottom sheet com os 4 passos oficiais do Super App) + **Abrir arquivos** / receber via share.
-3. Detectar OFX vs CSV vs PDF pelo conteúdo, não pela extensão.
-4. Preview (já existe o padrão CSV): N novos, M duplicados, período, saldo OFX se houver.
-5. Confirmar → apply transacional.
-
-Cartão:
-
-1. Escolher conta `creditCard` destino.
-2. Mesmo picker; se PDF, pedir senha **uma vez**, guardar hash/verificador local, nunca o CPF completo em texto.
-3. Se o PDF for “boleto + resumo” e não o detalhe, avisar e sugerir Open Finance ou CSV se disponível.
-4. Preview agrupa por competência da fatura (vencimento).
-
-Android: `intent-filter` para `*.ofx`, `*.qfx`, `text/csv`, `application/pdf` com origem “share from Gmail/Inter”. iOS: share extension equivalente quando a plataforma estiver no radar.
-
-Empty/loading/error/offline: arquivo ilegível, senha PDF errada, período vazio, encoding, duplicata total (“nada a aplicar” — já existe).
-
-## 7. Arquitetura no monorepo
-
-Seguir camadas da spec. Nada de HTTP em widget.
+## 6. Arquitetura no monorepo
 
 ```text
 colony_domain/
-  BankingDataProvider          # port §23.9
-  BankingStatement             # contas + txs + bills normalizados
-  BankingImportCursor          # fromDate, toDate, page, lastFitId
-  CreditCardBill               # dueDate, total, minimum, payments
-  FinanceCategoryRule          # padrão → TransactionCategory
-  OfxCodec / InterCsvCodec     # parsers puros
+  BankingDataProvider
+  MeuPluggyConnection   # itemId, connector must be 200
+  BankingStatement      # accounts, txs, bills
+  CreditCardBill
+  FinanceCategoryRule
+  PluggyTransactionMapper  # puro; fixtures JSON
 
 colony_database/
-  implementa persistência + raw_payload opcional
-  ledger_transactions.external_id
-  ledger_transactions.import_batch_id
+  external_id, status, import_batch_id
   credit_card_bills
   banking_import_cursors
   finance_category_rules
+  # secrets NÃO no Drift em claro — flutter_secure_storage
 
 lib/features/finance/
-  application/  InterImportController (preview/apply, retry)
-  presentation/ inter_import_sheet.dart
+  application/  meu_pluggy_sync_controller.dart  # GET loop, upsert
+  presentation/ inter_connect_sheet.dart         # setup + saúde
 
 lib/features/integrations/
-  IntegrationKind.financeInterFile | financeInterPj | financeOpenFinance
+  IntegrationKind.financeMeuPluggy
 ```
 
-Mapeamento para o ledger atual:
+HTTP Pluggy fica num client de aplicação (não no widget). Sem pacote `pluggy` Dart oficial — cliente fino nosso (auth + 4 GETs), testável com `http` fake.
 
-- `FITID` OFX / `transactionId` OF / id da API PJ → `external_id` (preferido na dedup).
-- Sem id → `fingerprint` atual (conta+data+valor+descrição).
-- `sourceType = integration` (ou `file`).
-- Categoria só preenchida se vazia; correção manual é sagrada (§23.6).
+Arquivo OFX/CSV: adapter **secundário** no mesmo `BankingDataProvider`, para backfill >12 meses ou disaster recovery. Inter fatura CSV **não** é dependência (foi descontinuado).
 
-Parser OFX: SGML 1.0.2 que o Inter emite (não assumir XML OFX 2). Testes com fixture recortada e anonimizada.
+## 7. Repos para copiar comportamento (não dependência)
 
-Parser CSV Inter: pular linhas até achar cabeçalho conhecido; `;`; decimal BR; datas `dd/MM/yyyy`.
+| Repo | O que reusar |
+| --- | --- |
+| [pluggyai/meu-pluggy](https://github.com/pluggyai/meu-pluggy) | Fluxo oficial conector 200, refresh diário |
+| [meloluan/openfinance-analyst](https://github.com/meloluan/openfinance-analyst) | **Melhor base de produto:** upsert 35d, sinal do cartão, `card_bill`, parcelas, aviso de consentimento, SQLite local, recusar conector ≠ 200, backfill 24m |
+| [pluggyai/quickstart](https://github.com/pluggyai/quickstart) | WebView Flutter Connect / updateItem |
+| [pluggyai/my-expenses](https://github.com/pluggyai/my-expenses) | App de gastos em cima da API |
+| [OpenBanking-Brasil/openapi](https://github.com/OpenBanking-Brasil/openapi) | Shape de bills/txs (golden tests) |
+| Steward docs MeuPluggy | Setup passo a passo; correção saldo vs limite via `/bills` |
 
-## 8. Confiabilidade (à prova de falhas)
+Não copiar: clientes PJ (`lucasrcezimbra/bancointer` etc.) para o loop PF. Úteis só se um perfil for empresa.
 
-Contrato de importação, independente da fonte:
+## 8. Plano de fatias (ordem invertida)
 
-1. **Idempotência.** Dedup por `external_id` se existir, senão fingerprint. Reimportar o mesmo mês é no-op nas linhas já vistas (o CSV apply já faz isso).
-2. **Preview obrigatório.** Nenhuma fonte escreve direto. Mesmo a API PJ e o webhook OF passam por plan/apply (o webhook pode pré-carregar um plan pendente).
-3. **Transação de DB.** Apply all-or-nothing por lote; em falha, cursor não avança.
-4. **Cursor.** Persistir `from`, `to`, `page`, `lastExternalId`, `status`. Retomar janela 90d/12m sem buraco nem overlap destrutivo.
-5. **Raw payload.** Guardar OFX/CSV/JSON cru no attachment store (ADR-015) para replay se o parser evoluir. Não reenviar à nuvem.
-6. **Pending vs posted.** Fatura aberta / D0 da conta: `status=pending`. No próximo sync, promover pelo mesmo `external_id` sem criar segunda linha.
-7. **Retry.** 401 → renovar token (PJ/OF). 429 → backoff exponencial + jitter. 5xx → retry limitado. Timeout → não marcar cursor como done.
-8. **Certificado PJ.** Avisar 30 dias antes de expirar (12 meses). Falha de mTLS = erro acionável, não crash.
-9. **Consentimento OF.** Mostrar escopo, validade (tipicamente 12 meses, refresh periódico), revogar no app **e** instruir revogar no Inter. Revogar **não** apaga histórico local (ADR-032).
-10. **Não duplicar fatura.** Pagamento na conta corrente + itens do cartão: o pagamento casa com `CreditCardBill.payments` e vira transferência. Cashback = inflow `income` ou categoria dedicada, nunca soma no gasto do lojista.
-11. **Janela incompleta.** OFX do dia corrente é instável (dica Fintera/Conta Azul: importar até D-1). Default: `to = yesterday`.
-12. **Encoding e locale.** Latin-1 + UTF-8 BOM; teste com `ç` e `R$`.
-13. **Segredos.** Cert PJ e senha de PDF só em storage cifrado do SO. Agregador só no servidor, se existir.
-14. **Auditoria.** `import_batch`: fonte, horário, contagem, hash do arquivo, erros por linha.
+Cada fatia = PR vertical. Sem sync automático, não fecha o pedido.
 
-Testes mínimos (DoD):
+### Fatia 1 — Sync Meu Pluggy (desbloqueia PF automático)
 
-- Fixture OFX Inter → N txs, fingerprints estáveis.
-- CSV Inter com metadados no topo → mesmo resultado que OFX no overlap.
-- Reimport → 0 novos.
-- PDF senha errada → erro localizado, sem crash.
-- (Futuro) JSON Pluggy bill + transactions → `CreditCardBill` + txs com `billId`.
-- Categoria manual não é sobrescrita na 2ª sync.
-- `flutter analyze` + testes de `colony_domain` / `colony_database` / widget do sheet.
+- Domínio: mapper Pluggy → `LedgerTransaction` + contas; `external_id`; `status`.
+- Secure storage das keys; recusar connector ≠ 200.
+- Sync on-open + WorkManager GET; relatório de delta.
+- UI setup + saúde da conexão + “Atualizar agora” (PATCH item, opcional).
+- 1º pull: backfill (12 meses mínimo).
+- Disclaimer / consent `financeMeuPluggy`.
+- Migration Drift + export bump para `external_id` / status.
+- Strings localizadas. App continua útil offline.
 
-## 9. Plano de fatias (ordem)
+### Fatia 2 — Faturas e categorias
 
-Não estimar calendário; cada fatia é um PR vertical.
+- `CreditCardBill` + fatura aberta vs fechada na UI.
+- MCC / merchant → sugestão; regras locais.
+- Pagamento de fatura = transferência.
+- Parcelas / comprometido (como `installments_outlook` do analyst).
 
-### Fatia 1 — Inter file adapter (desbloqueia PF hoje)
+### Fatia 3 — Robustez
 
-- Domínio: `OfxCodec`, `InterCsvCodec`, `BankingStatement`, estender preview além do CSV interno.
-- UI: sheet “Importar do Inter” + intent-filter Android.
-- Consent `financeInterFile`.
-- Contas: débito via OFX/CSV. Cartão: se CSV/OFX existir no export do usuário; senão adiar PDF.
-- Strings em `lib/app/localization/`.
-- Export schema: só bump se persistir entidades novas (`external_id` / batch). Preferir colunas novas com migration Drift + teste de migration.
+- Banner reconsentimento WebView.
+- Digest “avisos” (stale, LOGIN_REQUIRED).
+- Raw payload + replay.
+- Testes de migration e conflito de fingerprint vs `external_id`.
 
-### Fatia 2 — Fatura como entidade + categorias
+### Fatia 4 — Opcional
 
-- `CreditCardBill` + ligação tx↔fatura.
-- Regras MCC/histórico Inter → categoria sugestão.
-- Detecção `PAGTO FATURA` / Pix para o próprio cartão → transfer pair (pode ficar “soft pair” em notes se o par ainda for defer).
-- Parser PDF on-device (senha CPF) com testes em fixture sintético, **nunca** commitar PDF real.
+- OFX/CSV conta digital como backfill > janela OF.
+- `pending` via NotificationListener (Android) até o GET confirmar.
+- API PJ se um perfil for CNPJ.
+- IMAP do PDF mensal só como checksum da fatura fechada — **não** no caminho feliz (Inter atrasou PDF após o corte).
 
-### Fatia 3 — API PJ opcional
-
-- `InterPjApiClient` (Dart `HttpClient` + `SecurityContext` com `.crt`/`.key`).
-- Upload dos certs uma vez; só `extrato.read` + `saldo.read`.
-- Sync manual (“Atualizar 90 dias”) + cursor para histórico.
-- Sandbox `cdpj-sandbox.partners.uatinter.co` nos testes.
-
-### Fatia 4 — Open Finance via parceiro
-
-- Só depois de ADR de backend mínimo (conflita com “sem conta”) **ou** modo power-user “trago meu Client ID Pluggy + um relay que eu hospedo”.
-- WebView Flutter do quickstart Pluggy.
-- Mapear bills + transactions-current (fatura aberta) + 12 meses.
-- Consentimento visível / revogação.
-- Custo e LGPD: política de privacidade **antes** do código de rede (`docs/dev/PRIVACY_LEGAL_PREP.md`).
-
-## 10. Riscos e decisões abertas
+## 9. Riscos
 
 | Risco | Mitigação |
 | --- | --- |
-| CSV Inter muda cabeçalho | Detecção por aliases; OFX como fonte canônica de débito |
-| PDF fatura muda layout / senha | Parser versionado; fallback “não consegui ler, use OF” |
-| Open Finance só 12 meses vs Inter 2 anos em arquivo | Arquivo para backfill; OF para contínuo |
-| Fatura aberta muda todo dia | `pending` + mesmo id |
-| Agregador caro demais para 1 usuário | Não bloquear o produto; Fatia 1 basta para uso pessoal |
-| mTLS no Flutter | Funciona em Android/iOS via `SecurityContext`; **não** em web |
-| Sideload APK + cert no device | Keystore, não gravar `.key` em texto no backup JSON (ou cifrar) |
-| Ser receptora OF direto | Fora: capital, certificação FAPI, homologação BC |
+| Pluggy encerra o Meu Pluggy grátis | Arquivo/OFX como fallback; dados já estão no SQLite |
+| Usuário conecta Inter direto (trial) | Gate `connector == 200` no 1º sync |
+| Secret no sideload APK | Keystore; um vazamento = só aquele CPF, não uma base de clientes |
+| Sync diário ≠ tempo real | On-open GET; “Atualizar agora”; pending de notificação depois |
+| Conexão cai ~90 dias | Banner + WebView; não é loop manual de extrato |
+| Histórico OF ~12 meses | Backfill OFX **uma vez** se precisar de 2 anos |
+| Saldo cartão = limite | Corrigir pela fatura em aberto (Steward) |
+| Servir terceiros com as keys da Colony | Proibido; cada perfil traz o próprio Meu Pluggy |
+| iOS background | Sync ao abrir é suficiente para PFM pessoal |
+| LGPD / Pluggy como operador | Disclaimer na 1ª conexão; política antes de Play Store (`PRIVACY_LEGAL_PREP.md`) |
 
-Decisão default reversível (spec §53): **arquivo primeiro**, agregador depois. API PJ só se o perfil for empresa Inter.
+Decisão default reversível: **Meu Pluggy primeiro**, arquivo como contingência. Não scrapear. Não pagar agregador comercial para 1 CPF.
 
-## 11. Critérios de aceite (quando a Fatia 1 existir)
+## 10. Critérios de aceite (Fatia 1)
 
-1. Usuário PF importa OFX da conta Inter e vê lançamentos no ledger, com disclaimer de que o app não paga nada.
-2. Reimportar o mesmo arquivo não duplica.
-3. CSV “nativo Inter” (`;`, cabeçalho BR) também importa, ou explica o mismatch.
-4. Empty/loading/error/offline no sheet.
-5. Strings localizadas; proveniência `file`/`integration`.
-6. Sem Client Secret, sem scrape, sem endpoint de pagamento.
+1. Após o setup único, **abrir o app** importa compras novas da conta **e** do cartão sem o usuário mexer no Super App.
+2. Segunda abertura não duplica; ids Pluggy estáveis.
+3. Fatura aberta aparece como total corrido; fechadas na Fatia 2, mas txs de cartão já entram na 1.
+4. Conector ≠ 200 é recusado com texto acionável.
+5. Offline mostra ledger local; erro de rede não corrompe.
+6. Sem Client Secret da Colony, sem scrape, sem endpoint de pagamento.
+7. Revogar no Inter/Pluggy para o sync, mas o histórico local permanece.
 
-Aceite da Fatia 2: uma fatura fechada (PDF ou JSON de fixture OF) vira conta cartão + txs da competência + total/vencimento visíveis.
+Aceite Fatia 2: tela de fatura com vencimento, mínimo, itens da competência, pagamento na conta não duplica gasto.
 
-Aceite da Fatia 4: 4 toques no widget Pluggy/TecnoSpeed → contas débito e crédito preenchidas, bills históricos listados, revogar consentimento não apaga o ledger.
+## 11. Referências
 
-## 12. Referências
-
-- Spec §23 (ledger), §23.9 (Open Finance), §37.4–37.5 (arquivos/share sheet), §52 ADR-011.
-- ADR-005 local-first, ADR-020 ledger, ADR-032 integrações.
-- [developers.inter.co](https://developers.inter.co/) — API Empresas.
-- [Open Finance Brasil — credit cards](https://openfinancebrasil.atlassian.net/wiki/spaces/OF/pages/193691666).
-- [Pluggy coverage Inter](https://docs.pluggy.ai/docs/open-finance-institutions-coverage), [bills](https://docs.pluggy.ai/docs/credit-card-bills).
-- Ajuda Inter: exportar extrato PF; blog fatura + senha PDF.
-- Relato de custo agregadores: [TabNews, 2026](https://www.tabnews.com.br/GuilhermeVieira/estou-desenvolvendo-um-app-de-financas-pessoais-e-nao-consigo-pagar-o-open-finance-pluggy-r2-5k-mes-belvo-r6k-mes-tecnospeed-r1-5k-de-entrada-r540).
+- Spec §23, §23.9, §37.4, §52 ADR-011.
+- ADR-005, ADR-020, ADR-032.
+- [Meu Pluggy (produto)](https://pluggy.ai/meu-pluggy) — API pessoal grátis, sem expiração.
+- [pluggyai/meu-pluggy](https://github.com/pluggyai/meu-pluggy) — conector proxy, refresh diário.
+- [meloluan/openfinance-analyst](https://github.com/meloluan/openfinance-analyst) — implementação pessoal de referência.
+- [Pluggy update item](https://docs.pluggy.ai/docs/data-sync-update-an-item) — daily sync; batch proibido; janela OF 7 dias.
+- [Pluggy bills](https://docs.pluggy.ai/docs/credit-card-bills) — Inter PF.
+- [Steward + MeuPluggy](https://fi.paired.net/docs/pluggy).
+- Res. Conjunta 7/2023 (prazo de consentimento OF).
+- Ajuda Inter: fatura por e-mail; CSV de fatura descontinuado.

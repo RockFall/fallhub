@@ -82,7 +82,7 @@ A spec §23 define finanças multi-entidade com contas, transações, orçamento
 
 ## Addendum — ADR-011 (imports / Open Finance)
 
-Spike em `docs/adr/ADR-011-financial-imports-open-finance.md`. Pesquisa Inter: `docs/dev/INTER_BANKING_INTEGRATION.md`. O ledger MVP permanece manual; a 1ª slice de import automática é arquivo OFX/CSV Inter, não API PF.
+Spike em `docs/adr/ADR-011-financial-imports-open-finance.md`. Pesquisa Inter: `docs/dev/INTER_BANKING_INTEGRATION.md`. O ledger MVP permanece manual; a 1ª slice automática de PF é **Meu Pluggy (conector 200)**, não export OFX recorrente.
 
 ## Referências
 - Spec §23, §62.5, FIN-001, §0 (disclaimers)
