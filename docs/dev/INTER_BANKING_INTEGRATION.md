@@ -14,6 +14,67 @@ Restrições que continuam válidas:
 - A Colony **não** vira ITP/receptora Open Finance (homologação BC).
 - Widgets não falam com banco; SQL só em `colony_database`.
 
+## Leia isto primeiro (o que é, na prática)
+
+O Inter **não deixa** um app pessoal (PF) ligar direto na conta e puxar extrato/fatura. A “API do Inter” que existe na internet é de **empresa (PJ)**. Por isso ninguem “integra o Inter” no Colony do mesmo jeito que se integra um calendário.
+
+O jeito legal de fazer isso no Brasil chama-se **Open Finance**: você, no app do Inter, autoriza uma instituição regulada a **ler** (não a gastar) sua conta e seu cartão. A Colony não é essa instituição. A **Pluggy** é. Eles oferecem um produto de consumidor chamado **Meu Pluggy**, feito para **você ler os seus próprios bancos de graça**.
+
+Pense em três papéis:
+
+| Quem | Faz o quê |
+| --- | --- |
+| **Você** | Uma vez, autoriza o Inter a compartilhar dados com o Meu Pluggy (login e biometria **no Inter**, não no Colony). |
+| **Meu Pluggy / Pluggy** | Todo dia pergunta ao Inter: “o que tem de novo?” e guarda isso nos servidores **deles**. |
+| **Colony** | Quando você abre o app (e de tempos em tempos em segundo plano), pergunta à Pluggy: “o que tem de novo **da minha** conexão?” e grava no celular. Offline o ledger continua lá. |
+
+Depois do setup, **você não exporta OFX, não baixa PDF, não abre o Super App para atualizar o Colony**. A compra de ontem aparece sozinha. A compra de 5 minutos atrás pode demorar até o próximo ciclo (horas / ao abrir o app). Não é o segundo da maquininha.
+
+### Setup (uma vez por pessoa)
+
+São dois sites da Pluggy — fácil confundir:
+
+1. **meu.pluggy.ai** — cadastro de pessoa. Botão conectar → escolhe **Inter** → o Inter pede login/biometria → você marca **conta digital e cartão**. Pronto: o Meu Pluggy já vê seus saldos e faturas.
+2. **dashboard.pluggy.ai** — cadastro de “desenvolvedor” (ainda você). Cria uma aplicação, liga o conector chamado **MeuPluggy** (não o conector “Inter”), gera duas chaves (`CLIENT_ID` e `CLIENT_SECRET`) e, no Demo, autoriza o Meu Pluggy de novo. Isso cria um **Item ID** (um código da conexão Inter).
+3. **No Colony** — cola essas três coisas uma vez (o app guarda no cofre do celular). Primeira sincronização puxa o histórico (~1 ano). Você confirma “esta é a conta, este é o cartão”.
+
+Daí em diante: abrir o Colony atualiza. Umas vezes por ano o Inter pode pedir para **confirmar o compartilhamento de novo** (banner no Colony → 2–3 toques). Isso não é “exportar extrato todo mês”.
+
+### Cada usuário
+
+O Open Finance é por **CPF**.
+
+- Uma pessoa, uma conta Inter: um Meu Pluggy, um par de chaves, um Item. Só ela cola no perfil dela.
+- Casal / família: **cada CPF faz o setup**. O Colony não “pega a conta do marido” com as chaves da esposa. Não existe um login Colony na nuvem compartilhando bancos.
+- As chaves no celular da pessoa A só enxergam os bancos que **A** autorizou. Se vazarem, o estrago é o CPF daquela pessoa, não uma base de clientes.
+
+A Colony **não** vai nascer com Client ID próprio para “conectar Inter em um toque para qualquer um”. Isso transformaria o app em produto financeiro comercial e a Pluggy cobraria o plano de milhares por mês.
+
+### Está de graça mesmo?
+
+**Sim, para uso pessoal do próprio CPF**, enquanto a Pluggy mantiver o Meu Pluggy. Eles dizem isso com todas as letras: sem custo e sem prazo de expiração; o trial de ~15 dias do dashboard é só para **conectar conta de outras pessoas** (modo empresa).
+
+| Caminho | Custa? |
+| --- | --- |
+| Meu Pluggy + conector **MeuPluggy** (código `200`) + suas chaves no Colony | Grátis (você mesmo) |
+| No dashboard, escolher o banco **Inter** direto (como se o Colony fosse um app de clientes) | Trial curto, depois ~R$ 2.500/mês |
+| A Colony virar “banco” Open Finance sozinha | Homologação no BC: inviável |
+
+Armadilha: o dashboard **deixa** clicar em Inter. Funciona uns dias e **para**. O plano manda o Colony **recusar** qualquer conexão que não seja o conector MeuPluggy.
+
+Não é 100% “para sempre, contrato assinado”. É um programa grátis de um terceiro. Se um dia a Pluggy mudar, os dados já baixados continuam no celular; o plano B é importar OFX **uma vez**, não todo dia.
+
+### O que o Colony passa a mostrar
+
+- Conta digital: Pix, TED, débito, entradas — lançamentos novos sozinhos.
+- Cartão: compras da **fatura aberta** (o mês corrente) e das **fechadas** (histórico, vencimento, valor, mínimo).
+- Categorias sugeridas (MCC / lojista); você corrige e a correção não é sobrescrita.
+- O Colony **não paga** a fatura, não faz Pix, não mexe em limite.
+
+### O que isto ainda não é
+
+Não é um botão mágico no primeiro dia de código: precisa da fatia de implementação (sync, ids, faturas). Este documento é o **como**, não o app já ligado.
+
 ## 0. Conclusão (o que mudou)
 
 O único caminho PF que é ao mesmo tempo **oficial, automático, de cartão+conta, e barato em escala de 1–N CPFs** é o **Meu Pluggy (conector `200`)**:
