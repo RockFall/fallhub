@@ -1,7 +1,7 @@
 # ADR-011: Financial imports / Inter local
 
 ## Status
-Aceito — estratégia final (ago/2026). Pesquisa em [`docs/dev/INTER_BANKING_INTEGRATION.md`](../dev/INTER_BANKING_INTEGRATION.md).
+Aceito — estratégia final (ago/2026). Pesquisa em [`docs/dev/INTER_BANKING_INTEGRATION.md`](../dev/INTER_BANKING_INTEGRATION.md). Notas de merge: [`docs/dev/INTER_BANKING_SLICE.md`](../dev/INTER_BANKING_SLICE.md).
 
 ## Contexto
 O Inter PF não tem API de extrato/fatura. Open Finance “um toque” (Pierre) exige ser receptora regulada ou pagar agregador; sync não é instantâneo. Exportar arquivo **toda vez** esvazia o produto.

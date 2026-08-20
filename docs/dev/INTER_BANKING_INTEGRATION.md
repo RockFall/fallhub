@@ -2,6 +2,8 @@
 
 Decisão final (ago/2026). ADR: [`docs/adr/ADR-011-financial-imports-open-finance.md`](../adr/ADR-011-financial-imports-open-finance.md).
 
+Notas de merge desta fatia (o que mudou, próximos passos): [`INTER_BANKING_SLICE.md`](INTER_BANKING_SLICE.md).
+
 ## O que o app faz
 
 1. **Uma vez:** você importa o extrato/fatura que o Inter já exporta (OFX, CSV ou PDF-CSV da conta; PDF da fatura se houver CSV). Até 2 anos de história.
