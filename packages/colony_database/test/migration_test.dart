@@ -888,6 +888,45 @@ void main() {
       expect(links, hasLength(2));
     });
 
+    test('v36 to v38 adds captured_notifications table', () async {
+      final db = await openMigratedFrom(
+        36,
+        seed: (sqlite) {
+          seedProfile(sqlite);
+        },
+      );
+      addTearDown(() async {
+        await db.close();
+      });
+
+      final repos = ColonyRepositories.create(
+        db,
+        idGenerator: FixedIdGenerator(List.generate(40, (i) => 'nid-$i')),
+        clock: () => DateTime.utc(2026, 8, 20, 12),
+      );
+      final profile = (await repos.profiles.getActive())!;
+      await repos.integrations.setConsentEnabled(
+        profileId: profile.id,
+        kind: IntegrationKind.notificationListener,
+        enabled: true,
+      );
+      final result = await repos.integrations.ingestCapturedNotification(
+        profileId: profile.id,
+        payload: NotificationCapturePayload(
+          nativeKey: 'br.com.intermedium|1',
+          packageName: 'br.com.intermedium',
+          title: 'Compra aprovada',
+          text: 'R\$ 42,90 em RESTAURANTE X Cartão final 1234',
+          postedAt: DateTime.utc(2026, 8, 20, 15),
+        ),
+      );
+      expect(result.skipped, isFalse);
+      expect(result.transaction, isNotNull);
+      expect(result.transaction!.amountMinor, 4290);
+      expect(result.notification!.extractorKind, NotificationExtractorKind.finance);
+      final listed = await repos.integrations.listCapturedNotifications(profile.id);
+      expect(listed, hasLength(1));
+    });
 
     test('v31 to v32 adds health_appointments table', () async {
       final db = await openMigratedFrom(

@@ -21,6 +21,8 @@ import 'package:fallhub/features/research/presentation/research_list_screen.dart
 import 'package:fallhub/features/travel/presentation/travel_screen.dart';
 import 'package:fallhub/features/home/presentation/home_maintenance_screen.dart';
 import 'package:fallhub/features/zones/presentation/zones_screen.dart';
+import 'package:fallhub/features/integrations/application/integrations_providers.dart';
+import 'package:fallhub/features/integrations/application/notification_capture_platform.dart';
 import 'package:fallhub/features/integrations/presentation/integrations_screen.dart';
 
 Future<void> _flushDisposeTimers(WidgetTester tester) async {
@@ -43,14 +45,7 @@ void main() {
 
     final repos = ColonyRepositories.create(
       db,
-      idGenerator: FixedIdGenerator([
-        'profile-1',
-        'entity-1',
-        'account-1',
-        'event-1',
-        'event-2',
-        'consent-1',
-      ]),
+      idGenerator: FixedIdGenerator(List.generate(30, (i) => 'id-$i')),
       clock: () => DateTime.utc(2026, 8, 7, 12),
     );
 
@@ -130,7 +125,12 @@ void main() {
 
     await tester.pumpWidget(
       ProviderScope(
-        overrides: [databaseProvider.overrideWithValue(db)],
+        overrides: [
+          databaseProvider.overrideWithValue(db),
+          notificationCapturePlatformProvider.overrideWithValue(
+            FakeNotificationCapturePlatform(android: false),
+          ),
+        ],
         child: MaterialApp.router(
           theme: ColonyTheme.dark(),
           routerConfig: router,

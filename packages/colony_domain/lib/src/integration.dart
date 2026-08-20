@@ -5,6 +5,7 @@ import 'id_generator.dart';
 
 enum IntegrationKind {
   calendarIcs,
+  notificationListener,
 }
 
 /// Opt-in consent for a local integration adapter (ADR-032).

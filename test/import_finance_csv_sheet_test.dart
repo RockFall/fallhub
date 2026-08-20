@@ -419,4 +419,81 @@ void main() {
 
     await _drainTimers(tester);
   });
+
+  testWidgets('ImportFinanceCsvSheet previews Inter CSV into chosen account',
+      (tester) async {
+    tester.view.physicalSize = const Size(800, 1600);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    final db = ColonyDatabase.inMemory();
+    addTearDown(db.close);
+
+    final repos = ColonyRepositories.create(
+      db,
+      idGenerator: FixedIdGenerator(List.generate(20, (i) => 'inter-$i')),
+      clock: () => DateTime.utc(2026, 8, 20, 12),
+    );
+
+    final profile = await repos.profiles.create(
+      colonyName: 'Test',
+      displayName: 'Caio',
+      timezone: 'UTC',
+      locale: 'pt_BR',
+      baseCurrency: 'BRL',
+    );
+    await repos.preferences.save(AppPreferences.defaults().copyWith(
+      onboardingCompleted: true,
+    ));
+    final accounts = await repos.finance.ensureInterAccounts(profile.id);
+    final checking = accounts.firstWhere(
+      (a) => a.type == FinancialAccountType.checking,
+    );
+
+    const csv = '''
+Data Lançamento;Histórico;Descrição;Valor
+01/08/2026;PIX ENVIADO;Maria;-50,00
+''';
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          databaseProvider.overrideWithValue(db),
+          repositoriesProvider.overrideWithValue(repos),
+        ],
+        child: MaterialApp(
+          theme: ColonyTheme.dark(),
+          home: const Scaffold(body: ImportFinanceCsvSheet()),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byType(DropdownButtonFormField<String?>));
+    await tester.pumpAndSettle();
+    await tester.tap(find.textContaining('Inter Conta').last);
+    await tester.pumpAndSettle();
+
+    await tester.enterText(find.byType(TextField).first, csv);
+    await tester.tap(find.text(AppStrings.financeImportCsvPreviewAction));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 50));
+
+    expect(
+      find.text(AppStrings.financeImportCsvPlanSummary(1, 0)),
+      findsOneWidget,
+    );
+
+    await tester.tap(find.text(AppStrings.financeImportCsvApplyAction));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 50));
+
+    final txs = await repos.finance.listTransactions(profile.id);
+    expect(txs, hasLength(1));
+    expect(txs.single.accountId, checking.id);
+    expect(txs.single.amountMinor, 5000);
+
+    await _drainTimers(tester);
+  });
 }

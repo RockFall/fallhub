@@ -203,7 +203,7 @@ class FinanceController extends AsyncNotifier<void> {
     return csv;
   }
 
-  /// Parses CSV and returns a dedup plan without persisting.
+  /// Parses OFX, Inter CSV, or Colony CSV and returns a dedup plan.
   Future<FinanceCsvImportPlan?> planTransactionsCsv(
     String csvText, {
     EntityId? accountOverride,
@@ -213,7 +213,15 @@ class FinanceController extends AsyncNotifier<void> {
     state = await AsyncValue.guard(() async {
       final profile = await ref.read(repositoriesProvider).profiles.getActive();
       if (profile == null) throw StateError('Perfil não configurado');
-      final preview = FinanceCsvCodec.parsePreview(csvText);
+      final needsAccount = InterStatementCodec.looksLikeOfx(csvText) ||
+          InterStatementCodec.looksLikeInterCsv(csvText);
+      if (needsAccount && accountOverride == null) {
+        throw const FormatException('needs_account');
+      }
+      final preview = InterStatementCodec.parse(
+        csvText,
+        accountId: accountOverride?.value ?? '',
+      );
       plan = await ref.read(repositoriesProvider).finance.planCsvImport(
             profileId: profile.id,
             preview: preview,
@@ -258,6 +266,19 @@ class FinanceController extends AsyncNotifier<void> {
     );
     if (plan == null) return null;
     return applyTransactionsCsv(plan);
+  }
+
+  Future<bool> ensureInterAccounts() async {
+    state = const AsyncLoading();
+    state = await AsyncValue.guard(() async {
+      final profile = await ref.read(repositoriesProvider).profiles.getActive();
+      if (profile == null) throw StateError('Perfil não configurado');
+      await ref.read(repositoriesProvider).finance.ensureInterAccounts(profile.id);
+    });
+    if (state.hasError) return false;
+    ref.invalidate(financialAccountsProvider);
+    ref.invalidate(financialEntitiesProvider);
+    return true;
   }
 }
 

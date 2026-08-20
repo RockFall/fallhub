@@ -127,6 +127,12 @@ Future<ColonyDatabase> openMigratedFrom(
   if (fromVersion >= 36) {
     _createPhase36Tables(sqliteDb);
   }
+  if (fromVersion >= 37) {
+    _createPhase37Tables(sqliteDb);
+  }
+  if (fromVersion >= 38) {
+    _createPhase38Tables(sqliteDb);
+  }
 
   sqliteDb.userVersion = fromVersion;
   seed?.call(sqliteDb);
@@ -1115,6 +1121,46 @@ void _createPhase36Tables(Database db) {
   db.execute(
     'ALTER TABLE flashcards ADD COLUMN priority INTEGER NOT NULL DEFAULT 5',
   );
+}
+
+void _createPhase37Tables(Database db) {
+  db.execute('''
+    CREATE TABLE flashcard_tags (
+      id TEXT NOT NULL PRIMARY KEY,
+      profile_id TEXT NOT NULL REFERENCES profiles(id),
+      parent_id TEXT,
+      title TEXT NOT NULL,
+      sort_order INTEGER NOT NULL DEFAULT 0,
+      created_at INTEGER NOT NULL
+    )
+  ''');
+  db.execute('''
+    CREATE TABLE flashcard_tag_links (
+      card_id TEXT NOT NULL REFERENCES flashcards(id),
+      tag_id TEXT NOT NULL REFERENCES flashcard_tags(id),
+      linked_at INTEGER NOT NULL,
+      PRIMARY KEY (card_id, tag_id)
+    )
+  ''');
+}
+
+void _createPhase38Tables(Database db) {
+  db.execute('''
+    CREATE TABLE captured_notifications (
+      id TEXT NOT NULL PRIMARY KEY,
+      profile_id TEXT NOT NULL REFERENCES profiles(id),
+      package_name TEXT NOT NULL,
+      app_label TEXT,
+      title TEXT NOT NULL,
+      body_text TEXT NOT NULL,
+      posted_at INTEGER NOT NULL,
+      native_key TEXT NOT NULL,
+      extractor_kind TEXT NOT NULL,
+      ledger_transaction_id TEXT REFERENCES ledger_transactions(id),
+      created_at INTEGER NOT NULL,
+      UNIQUE(profile_id, native_key)
+    )
+  ''');
 }
 
 void seedFlashcardV35(

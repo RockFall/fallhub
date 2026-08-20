@@ -968,3 +968,30 @@ class FlashcardTagLinks extends Table {
   @override
   Set<Column<Object>> get primaryKey => {cardId, tagId};
 }
+
+@DataClassName('CapturedNotificationRow')
+class CapturedNotifications extends Table {
+  @override
+  String get tableName => 'captured_notifications';
+
+  TextColumn get id => text()();
+  TextColumn get profileId => text().references(Profiles, #id)();
+  TextColumn get packageName => text()();
+  TextColumn get appLabel => text().nullable()();
+  TextColumn get title => text()();
+  TextColumn get bodyText => text()();
+  IntColumn get postedAt => integer()();
+  TextColumn get nativeKey => text()();
+  TextColumn get extractorKind => text()();
+  TextColumn get ledgerTransactionId =>
+      text().nullable().references(LedgerTransactions, #id)();
+  IntColumn get createdAt => integer()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+
+  @override
+  List<Set<Column<Object>>> get uniqueKeys => [
+        {profileId, nativeKey},
+      ];
+}

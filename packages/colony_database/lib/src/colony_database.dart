@@ -68,12 +68,13 @@ part 'colony_database.g.dart';
   ResearchKnowledgeLinks,
   FlashcardTags,
   FlashcardTagLinks,
+  CapturedNotifications,
 ])
 class ColonyDatabase extends _$ColonyDatabase {
   ColonyDatabase(super.e);
 
   @override
-  int get schemaVersion => 37;
+  int get schemaVersion => 38;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -223,6 +224,9 @@ class ColonyDatabase extends _$ColonyDatabase {
             await m.createTable(flashcardTags);
             await m.createTable(flashcardTagLinks);
             await _backfillFlashcardTags(m);
+          }
+          if (from < 38) {
+            await m.createTable(capturedNotifications);
           }
         },
       );
@@ -2099,6 +2103,45 @@ class ColonyMappers {
       cardId: link.cardId.value,
       tagId: link.tagId.value,
       linkedAt: link.linkedAt.millisecondsSinceEpoch,
+    );
+  }
+
+  static domain.CapturedNotification toCapturedNotification(
+    CapturedNotificationRow row,
+  ) {
+    return domain.CapturedNotification(
+      id: domain.EntityId(row.id),
+      profileId: domain.EntityId(row.profileId),
+      packageName: row.packageName,
+      appLabel: row.appLabel,
+      title: row.title,
+      text: row.bodyText,
+      postedAt: DateTime.fromMillisecondsSinceEpoch(row.postedAt, isUtc: true),
+      nativeKey: row.nativeKey,
+      extractorKind:
+          domain.NotificationExtractorKind.values.byName(row.extractorKind),
+      ledgerTransactionId: row.ledgerTransactionId == null
+          ? null
+          : domain.EntityId(row.ledgerTransactionId!),
+      createdAt: DateTime.fromMillisecondsSinceEpoch(row.createdAt, isUtc: true),
+    );
+  }
+
+  static CapturedNotificationsCompanion fromCapturedNotification(
+    domain.CapturedNotification notification,
+  ) {
+    return CapturedNotificationsCompanion.insert(
+      id: notification.id.value,
+      profileId: notification.profileId.value,
+      packageName: notification.packageName,
+      appLabel: Value(notification.appLabel),
+      title: notification.title,
+      bodyText: notification.text,
+      postedAt: notification.postedAt.millisecondsSinceEpoch,
+      nativeKey: notification.nativeKey,
+      extractorKind: notification.extractorKind.name,
+      ledgerTransactionId: Value(notification.ledgerTransactionId?.value),
+      createdAt: notification.createdAt.millisecondsSinceEpoch,
     );
   }
 }

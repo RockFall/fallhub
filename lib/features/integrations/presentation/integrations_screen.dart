@@ -15,13 +15,42 @@ class IntegrationsScreen extends ConsumerStatefulWidget {
   ConsumerState<IntegrationsScreen> createState() => _IntegrationsScreenState();
 }
 
-class _IntegrationsScreenState extends ConsumerState<IntegrationsScreen> {
+class _IntegrationsScreenState extends ConsumerState<IntegrationsScreen>
+    with WidgetsBindingObserver {
+  bool _androidListenerEnabled = false;
+
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(integrationsControllerProvider.notifier).ensureCalendarConsent();
+      final controller = ref.read(integrationsControllerProvider.notifier);
+      controller.ensureCalendarConsent();
+      controller.ensureNotificationConsent();
+      _refreshAndroidPermission();
     });
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      _refreshAndroidPermission();
+      ref.read(integrationsControllerProvider.notifier).syncNotificationIngest();
+    }
+  }
+
+  Future<void> _refreshAndroidPermission() async {
+    final enabled = await ref
+        .read(integrationsControllerProvider.notifier)
+        .isAndroidListenerEnabled();
+    if (!mounted) return;
+    setState(() => _androidListenerEnabled = enabled);
   }
 
   Future<void> _importIcs() async {
@@ -177,18 +206,22 @@ class _IntegrationsScreenState extends ConsumerState<IntegrationsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final consent = ref.watch(calendarIcsConsentProvider);
+    final icsConsent = ref.watch(calendarIcsConsentProvider);
+    final notifConsent = ref.watch(notificationListenerConsentProvider);
     final eventsAsync = ref.watch(externalCalendarEventsProvider);
+    final capturesAsync = ref.watch(capturedNotificationsProvider);
     final busy = ref.watch(integrationsControllerProvider).isLoading;
+    final platform = ref.watch(notificationCapturePlatformProvider);
+    final appOn = notifConsent?.enabled == true;
+    final androidOn = _androidListenerEnabled;
+    final ready = appOn && androidOn;
 
     return Semantics(
       container: true,
       identifier: 'integrations.screen',
       label: AppStrings.integrationsTitle,
-      child: Padding(
-      padding: const EdgeInsets.all(ColonySpacing.lg),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
+      child: ListView(
+        padding: const EdgeInsets.all(ColonySpacing.lg),
         children: [
           Text(
             AppStrings.integrationsTitle,
@@ -201,19 +234,150 @@ class _IntegrationsScreenState extends ConsumerState<IntegrationsScreen> {
           ),
           const SizedBox(height: ColonySpacing.lg),
           ColonyPanel(
+            title: AppStrings.integrationsNotificationsTitle,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Text(
+                  AppStrings.integrationsNotificationsWarning,
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
+                const SizedBox(height: ColonySpacing.md),
+                if (!platform.isAndroid)
+                  Text(
+                    AppStrings.integrationsNotificationsIos,
+                    style: Theme.of(context).textTheme.bodySmall,
+                  )
+                else ...[
+                  _SetupStep(
+                    number: '1',
+                    title: AppStrings.integrationsNotificationsStep1Title,
+                    subtitle: AppStrings.integrationsNotificationsStep1Body,
+                    done: true,
+                  ),
+                  _SetupStep(
+                    number: '2',
+                    title: AppStrings.integrationsNotificationsStep2Title,
+                    subtitle: appOn
+                        ? AppStrings.integrationsNotificationsAppOn
+                        : AppStrings.integrationsNotificationsAppOff,
+                    done: appOn,
+                    trailing: Semantics(
+                      label: AppStrings.integrationsNotificationsOptIn,
+                      toggled: appOn,
+                      child: Switch(
+                        value: appOn,
+                        onChanged: busy
+                            ? null
+                            : (v) => ref
+                                .read(integrationsControllerProvider.notifier)
+                                .setNotificationListenerEnabled(v),
+                      ),
+                    ),
+                  ),
+                  _SetupStep(
+                    number: '3',
+                    title: AppStrings.integrationsNotificationsStep3Title,
+                    subtitle: androidOn
+                        ? AppStrings.integrationsNotificationsAndroidOn
+                        : AppStrings.integrationsNotificationsAndroidOff,
+                    done: androidOn,
+                    trailing: Semantics(
+                      button: true,
+                      identifier: 'integrations.open_listener_settings',
+                      label: AppStrings.integrationsNotificationsOpenAndroid,
+                      child: OutlinedButton(
+                        onPressed: busy
+                            ? null
+                            : () async {
+                                await ref
+                                    .read(
+                                      integrationsControllerProvider.notifier,
+                                    )
+                                    .openAndroidListenerSettings();
+                                await _refreshAndroidPermission();
+                              },
+                        child: const Text(
+                          AppStrings.integrationsNotificationsOpenAndroid,
+                        ),
+                      ),
+                    ),
+                  ),
+                  _SetupStep(
+                    number: '4',
+                    title: AppStrings.integrationsNotificationsStep4Title,
+                    subtitle: ready
+                        ? AppStrings.integrationsNotificationsReady
+                        : AppStrings.integrationsNotificationsNotReady,
+                    done: ready,
+                  ),
+                ],
+              ],
+            ),
+          ),
+          const SizedBox(height: ColonySpacing.md),
+          Text(
+            AppStrings.integrationsNotificationsRecent,
+            style: Theme.of(context).textTheme.titleMedium,
+          ),
+          const SizedBox(height: ColonySpacing.sm),
+          capturesAsync.when(
+            loading: () => const Padding(
+              padding: EdgeInsets.all(ColonySpacing.lg),
+              child: Center(child: CircularProgressIndicator()),
+            ),
+            error: (_, __) => Text(AppStrings.errorGeneric),
+            data: (items) {
+              if (items.isEmpty) {
+                return Text(
+                  AppStrings.integrationsNotificationsEmpty,
+                  style: Theme.of(context).textTheme.bodyMedium,
+                );
+              }
+              return Column(
+                children: [
+                  for (final item in items.take(12))
+                    Card(
+                      margin: const EdgeInsets.only(bottom: ColonySpacing.sm),
+                      child: ListTile(
+                        title: Text(
+                          item.title.isEmpty
+                              ? (item.appLabel ?? item.packageName)
+                              : item.title,
+                        ),
+                        subtitle: Text(
+                          item.bookedAsFinance
+                              ? AppStrings.integrationsNotificationsBooked
+                              : (item.text.isEmpty
+                                  ? item.packageName
+                                  : item.text),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        trailing: item.bookedAsFinance
+                            ? const Icon(Icons.payments_outlined)
+                            : null,
+                      ),
+                    ),
+                ],
+              );
+            },
+          ),
+          const SizedBox(height: ColonySpacing.lg),
+          ColonyPanel(
             title: AppStrings.integrationsCalendarIcs,
             child: Semantics(
               label: AppStrings.integrationsOptIn,
-              toggled: consent?.enabled ?? false,
+              toggled: icsConsent?.enabled ?? false,
               child: SwitchListTile(
                 contentPadding: EdgeInsets.zero,
                 title: Text(AppStrings.integrationsOptIn),
                 subtitle: Text(
-                  consent?.enabled == true
+                  icsConsent?.enabled == true
                       ? AppStrings.integrationsEnabled
                       : AppStrings.integrationsDisabled,
                 ),
-                value: consent?.enabled ?? false,
+                value: icsConsent?.enabled ?? false,
                 onChanged: busy
                     ? null
                     : (v) => ref
@@ -257,50 +421,90 @@ class _IntegrationsScreenState extends ConsumerState<IntegrationsScreen> {
             style: Theme.of(context).textTheme.titleMedium,
           ),
           const SizedBox(height: ColonySpacing.sm),
-          Expanded(
-            child: eventsAsync.when(
-              loading: () => const Center(child: CircularProgressIndicator()),
-              error: (_, __) =>
-                  Center(child: Text(AppStrings.errorGeneric)),
-              data: (events) {
-                if (events.isEmpty) {
-                  return Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(AppStrings.integrationsEmpty),
-                        const SizedBox(height: ColonySpacing.sm),
-                        Text(
-                          AppStrings.integrationsEmptyHint,
-                          textAlign: TextAlign.center,
-                          style: Theme.of(context).textTheme.bodyMedium,
-                        ),
-                      ],
+          eventsAsync.when(
+            loading: () => const Center(child: CircularProgressIndicator()),
+            error: (_, __) => Center(child: Text(AppStrings.errorGeneric)),
+            data: (events) {
+              if (events.isEmpty) {
+                return Column(
+                  children: [
+                    Text(AppStrings.integrationsEmpty),
+                    const SizedBox(height: ColonySpacing.sm),
+                    Text(
+                      AppStrings.integrationsEmptyHint,
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context).textTheme.bodyMedium,
                     ),
-                  );
-                }
-                return ListView.builder(
-                  itemCount: events.length,
-                  itemBuilder: (context, index) {
-                    final e = events[index];
-                    return Card(
-                      margin:
-                          const EdgeInsets.only(bottom: ColonySpacing.sm),
+                  ],
+                );
+              }
+              return Column(
+                children: [
+                  for (final e in events)
+                    Card(
+                      margin: const EdgeInsets.only(bottom: ColonySpacing.sm),
                       child: ListTile(
                         title: Text(e.title),
                         subtitle: Text(
                           '${e.startAt.toUtc().toIso8601String()} · ${e.sourceType.name}',
                         ),
                       ),
-                    );
-                  },
-                );
-              },
-            ),
+                    ),
+                ],
+              );
+            },
           ),
         ],
       ),
-    ),
+    );
+  }
+}
+
+class _SetupStep extends StatelessWidget {
+  const _SetupStep({
+    required this.number,
+    required this.title,
+    required this.subtitle,
+    required this.done,
+    this.trailing,
+  });
+
+  final String number;
+  final String title;
+  final String subtitle;
+  final bool done;
+  final Widget? trailing;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: ColonySpacing.md),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          CircleAvatar(
+            radius: 14,
+            backgroundColor: done
+                ? Theme.of(context).colorScheme.primary
+                : Theme.of(context).colorScheme.surfaceContainerHighest,
+            child: Text(
+              done ? '✓' : number,
+              style: Theme.of(context).textTheme.labelMedium,
+            ),
+          ),
+          const SizedBox(width: ColonySpacing.md),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(title, style: Theme.of(context).textTheme.titleSmall),
+                Text(subtitle, style: Theme.of(context).textTheme.bodySmall),
+              ],
+            ),
+          ),
+          if (trailing != null) trailing!,
+        ],
+      ),
     );
   }
 }
