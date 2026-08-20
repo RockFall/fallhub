@@ -31036,6 +31036,701 @@ class ResearchKnowledgeLinksCompanion
   }
 }
 
+class $CapturedNotificationsTable extends CapturedNotifications
+    with TableInfo<$CapturedNotificationsTable, CapturedNotificationRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $CapturedNotificationsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _profileIdMeta = const VerificationMeta(
+    'profileId',
+  );
+  @override
+  late final GeneratedColumn<String> profileId = GeneratedColumn<String>(
+    'profile_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES profiles (id)',
+    ),
+  );
+  static const VerificationMeta _packageNameMeta = const VerificationMeta(
+    'packageName',
+  );
+  @override
+  late final GeneratedColumn<String> packageName = GeneratedColumn<String>(
+    'package_name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _appLabelMeta = const VerificationMeta(
+    'appLabel',
+  );
+  @override
+  late final GeneratedColumn<String> appLabel = GeneratedColumn<String>(
+    'app_label',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _titleMeta = const VerificationMeta('title');
+  @override
+  late final GeneratedColumn<String> title = GeneratedColumn<String>(
+    'title',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _bodyTextMeta = const VerificationMeta(
+    'bodyText',
+  );
+  @override
+  late final GeneratedColumn<String> bodyText = GeneratedColumn<String>(
+    'body_text',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _postedAtMeta = const VerificationMeta(
+    'postedAt',
+  );
+  @override
+  late final GeneratedColumn<int> postedAt = GeneratedColumn<int>(
+    'posted_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _nativeKeyMeta = const VerificationMeta(
+    'nativeKey',
+  );
+  @override
+  late final GeneratedColumn<String> nativeKey = GeneratedColumn<String>(
+    'native_key',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _extractorKindMeta = const VerificationMeta(
+    'extractorKind',
+  );
+  @override
+  late final GeneratedColumn<String> extractorKind = GeneratedColumn<String>(
+    'extractor_kind',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _ledgerTransactionIdMeta =
+      const VerificationMeta('ledgerTransactionId');
+  @override
+  late final GeneratedColumn<String> ledgerTransactionId =
+      GeneratedColumn<String>(
+        'ledger_transaction_id',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+        defaultConstraints: GeneratedColumn.constraintIsAlways(
+          'REFERENCES ledger_transactions (id)',
+        ),
+      );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<int> createdAt = GeneratedColumn<int>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    profileId,
+    packageName,
+    appLabel,
+    title,
+    bodyText,
+    postedAt,
+    nativeKey,
+    extractorKind,
+    ledgerTransactionId,
+    createdAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'captured_notifications';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<CapturedNotificationRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('profile_id')) {
+      context.handle(
+        _profileIdMeta,
+        profileId.isAcceptableOrUnknown(data['profile_id']!, _profileIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_profileIdMeta);
+    }
+    if (data.containsKey('package_name')) {
+      context.handle(
+        _packageNameMeta,
+        packageName.isAcceptableOrUnknown(
+          data['package_name']!,
+          _packageNameMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_packageNameMeta);
+    }
+    if (data.containsKey('app_label')) {
+      context.handle(
+        _appLabelMeta,
+        appLabel.isAcceptableOrUnknown(data['app_label']!, _appLabelMeta),
+      );
+    }
+    if (data.containsKey('title')) {
+      context.handle(
+        _titleMeta,
+        title.isAcceptableOrUnknown(data['title']!, _titleMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_titleMeta);
+    }
+    if (data.containsKey('body_text')) {
+      context.handle(
+        _bodyTextMeta,
+        bodyText.isAcceptableOrUnknown(data['body_text']!, _bodyTextMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_bodyTextMeta);
+    }
+    if (data.containsKey('posted_at')) {
+      context.handle(
+        _postedAtMeta,
+        postedAt.isAcceptableOrUnknown(data['posted_at']!, _postedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_postedAtMeta);
+    }
+    if (data.containsKey('native_key')) {
+      context.handle(
+        _nativeKeyMeta,
+        nativeKey.isAcceptableOrUnknown(data['native_key']!, _nativeKeyMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nativeKeyMeta);
+    }
+    if (data.containsKey('extractor_kind')) {
+      context.handle(
+        _extractorKindMeta,
+        extractorKind.isAcceptableOrUnknown(
+          data['extractor_kind']!,
+          _extractorKindMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_extractorKindMeta);
+    }
+    if (data.containsKey('ledger_transaction_id')) {
+      context.handle(
+        _ledgerTransactionIdMeta,
+        ledgerTransactionId.isAcceptableOrUnknown(
+          data['ledger_transaction_id']!,
+          _ledgerTransactionIdMeta,
+        ),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  List<Set<GeneratedColumn>> get uniqueKeys => [
+    {profileId, nativeKey},
+  ];
+  @override
+  CapturedNotificationRow map(
+    Map<String, dynamic> data, {
+    String? tablePrefix,
+  }) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return CapturedNotificationRow(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      profileId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}profile_id'],
+      )!,
+      packageName: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}package_name'],
+      )!,
+      appLabel: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}app_label'],
+      ),
+      title: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}title'],
+      )!,
+      bodyText: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}body_text'],
+      )!,
+      postedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}posted_at'],
+      )!,
+      nativeKey: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}native_key'],
+      )!,
+      extractorKind: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}extractor_kind'],
+      )!,
+      ledgerTransactionId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}ledger_transaction_id'],
+      ),
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}created_at'],
+      )!,
+    );
+  }
+
+  @override
+  $CapturedNotificationsTable createAlias(String alias) {
+    return $CapturedNotificationsTable(attachedDatabase, alias);
+  }
+}
+
+class CapturedNotificationRow extends DataClass
+    implements Insertable<CapturedNotificationRow> {
+  final String id;
+  final String profileId;
+  final String packageName;
+  final String? appLabel;
+  final String title;
+  final String bodyText;
+  final int postedAt;
+  final String nativeKey;
+  final String extractorKind;
+  final String? ledgerTransactionId;
+  final int createdAt;
+  const CapturedNotificationRow({
+    required this.id,
+    required this.profileId,
+    required this.packageName,
+    this.appLabel,
+    required this.title,
+    required this.bodyText,
+    required this.postedAt,
+    required this.nativeKey,
+    required this.extractorKind,
+    this.ledgerTransactionId,
+    required this.createdAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['profile_id'] = Variable<String>(profileId);
+    map['package_name'] = Variable<String>(packageName);
+    if (!nullToAbsent || appLabel != null) {
+      map['app_label'] = Variable<String>(appLabel);
+    }
+    map['title'] = Variable<String>(title);
+    map['body_text'] = Variable<String>(bodyText);
+    map['posted_at'] = Variable<int>(postedAt);
+    map['native_key'] = Variable<String>(nativeKey);
+    map['extractor_kind'] = Variable<String>(extractorKind);
+    if (!nullToAbsent || ledgerTransactionId != null) {
+      map['ledger_transaction_id'] = Variable<String>(ledgerTransactionId);
+    }
+    map['created_at'] = Variable<int>(createdAt);
+    return map;
+  }
+
+  CapturedNotificationsCompanion toCompanion(bool nullToAbsent) {
+    return CapturedNotificationsCompanion(
+      id: Value(id),
+      profileId: Value(profileId),
+      packageName: Value(packageName),
+      appLabel: appLabel == null && nullToAbsent
+          ? const Value.absent()
+          : Value(appLabel),
+      title: Value(title),
+      bodyText: Value(bodyText),
+      postedAt: Value(postedAt),
+      nativeKey: Value(nativeKey),
+      extractorKind: Value(extractorKind),
+      ledgerTransactionId: ledgerTransactionId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(ledgerTransactionId),
+      createdAt: Value(createdAt),
+    );
+  }
+
+  factory CapturedNotificationRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return CapturedNotificationRow(
+      id: serializer.fromJson<String>(json['id']),
+      profileId: serializer.fromJson<String>(json['profileId']),
+      packageName: serializer.fromJson<String>(json['packageName']),
+      appLabel: serializer.fromJson<String?>(json['appLabel']),
+      title: serializer.fromJson<String>(json['title']),
+      bodyText: serializer.fromJson<String>(json['bodyText']),
+      postedAt: serializer.fromJson<int>(json['postedAt']),
+      nativeKey: serializer.fromJson<String>(json['nativeKey']),
+      extractorKind: serializer.fromJson<String>(json['extractorKind']),
+      ledgerTransactionId: serializer.fromJson<String?>(
+        json['ledgerTransactionId'],
+      ),
+      createdAt: serializer.fromJson<int>(json['createdAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'profileId': serializer.toJson<String>(profileId),
+      'packageName': serializer.toJson<String>(packageName),
+      'appLabel': serializer.toJson<String?>(appLabel),
+      'title': serializer.toJson<String>(title),
+      'bodyText': serializer.toJson<String>(bodyText),
+      'postedAt': serializer.toJson<int>(postedAt),
+      'nativeKey': serializer.toJson<String>(nativeKey),
+      'extractorKind': serializer.toJson<String>(extractorKind),
+      'ledgerTransactionId': serializer.toJson<String?>(ledgerTransactionId),
+      'createdAt': serializer.toJson<int>(createdAt),
+    };
+  }
+
+  CapturedNotificationRow copyWith({
+    String? id,
+    String? profileId,
+    String? packageName,
+    Value<String?> appLabel = const Value.absent(),
+    String? title,
+    String? bodyText,
+    int? postedAt,
+    String? nativeKey,
+    String? extractorKind,
+    Value<String?> ledgerTransactionId = const Value.absent(),
+    int? createdAt,
+  }) => CapturedNotificationRow(
+    id: id ?? this.id,
+    profileId: profileId ?? this.profileId,
+    packageName: packageName ?? this.packageName,
+    appLabel: appLabel.present ? appLabel.value : this.appLabel,
+    title: title ?? this.title,
+    bodyText: bodyText ?? this.bodyText,
+    postedAt: postedAt ?? this.postedAt,
+    nativeKey: nativeKey ?? this.nativeKey,
+    extractorKind: extractorKind ?? this.extractorKind,
+    ledgerTransactionId: ledgerTransactionId.present
+        ? ledgerTransactionId.value
+        : this.ledgerTransactionId,
+    createdAt: createdAt ?? this.createdAt,
+  );
+  CapturedNotificationRow copyWithCompanion(
+    CapturedNotificationsCompanion data,
+  ) {
+    return CapturedNotificationRow(
+      id: data.id.present ? data.id.value : this.id,
+      profileId: data.profileId.present ? data.profileId.value : this.profileId,
+      packageName: data.packageName.present
+          ? data.packageName.value
+          : this.packageName,
+      appLabel: data.appLabel.present ? data.appLabel.value : this.appLabel,
+      title: data.title.present ? data.title.value : this.title,
+      bodyText: data.bodyText.present ? data.bodyText.value : this.bodyText,
+      postedAt: data.postedAt.present ? data.postedAt.value : this.postedAt,
+      nativeKey: data.nativeKey.present ? data.nativeKey.value : this.nativeKey,
+      extractorKind: data.extractorKind.present
+          ? data.extractorKind.value
+          : this.extractorKind,
+      ledgerTransactionId: data.ledgerTransactionId.present
+          ? data.ledgerTransactionId.value
+          : this.ledgerTransactionId,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CapturedNotificationRow(')
+          ..write('id: $id, ')
+          ..write('profileId: $profileId, ')
+          ..write('packageName: $packageName, ')
+          ..write('appLabel: $appLabel, ')
+          ..write('title: $title, ')
+          ..write('bodyText: $bodyText, ')
+          ..write('postedAt: $postedAt, ')
+          ..write('nativeKey: $nativeKey, ')
+          ..write('extractorKind: $extractorKind, ')
+          ..write('ledgerTransactionId: $ledgerTransactionId, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    profileId,
+    packageName,
+    appLabel,
+    title,
+    bodyText,
+    postedAt,
+    nativeKey,
+    extractorKind,
+    ledgerTransactionId,
+    createdAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is CapturedNotificationRow &&
+          other.id == this.id &&
+          other.profileId == this.profileId &&
+          other.packageName == this.packageName &&
+          other.appLabel == this.appLabel &&
+          other.title == this.title &&
+          other.bodyText == this.bodyText &&
+          other.postedAt == this.postedAt &&
+          other.nativeKey == this.nativeKey &&
+          other.extractorKind == this.extractorKind &&
+          other.ledgerTransactionId == this.ledgerTransactionId &&
+          other.createdAt == this.createdAt);
+}
+
+class CapturedNotificationsCompanion
+    extends UpdateCompanion<CapturedNotificationRow> {
+  final Value<String> id;
+  final Value<String> profileId;
+  final Value<String> packageName;
+  final Value<String?> appLabel;
+  final Value<String> title;
+  final Value<String> bodyText;
+  final Value<int> postedAt;
+  final Value<String> nativeKey;
+  final Value<String> extractorKind;
+  final Value<String?> ledgerTransactionId;
+  final Value<int> createdAt;
+  final Value<int> rowid;
+  const CapturedNotificationsCompanion({
+    this.id = const Value.absent(),
+    this.profileId = const Value.absent(),
+    this.packageName = const Value.absent(),
+    this.appLabel = const Value.absent(),
+    this.title = const Value.absent(),
+    this.bodyText = const Value.absent(),
+    this.postedAt = const Value.absent(),
+    this.nativeKey = const Value.absent(),
+    this.extractorKind = const Value.absent(),
+    this.ledgerTransactionId = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  CapturedNotificationsCompanion.insert({
+    required String id,
+    required String profileId,
+    required String packageName,
+    this.appLabel = const Value.absent(),
+    required String title,
+    required String bodyText,
+    required int postedAt,
+    required String nativeKey,
+    required String extractorKind,
+    this.ledgerTransactionId = const Value.absent(),
+    required int createdAt,
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       profileId = Value(profileId),
+       packageName = Value(packageName),
+       title = Value(title),
+       bodyText = Value(bodyText),
+       postedAt = Value(postedAt),
+       nativeKey = Value(nativeKey),
+       extractorKind = Value(extractorKind),
+       createdAt = Value(createdAt);
+  static Insertable<CapturedNotificationRow> custom({
+    Expression<String>? id,
+    Expression<String>? profileId,
+    Expression<String>? packageName,
+    Expression<String>? appLabel,
+    Expression<String>? title,
+    Expression<String>? bodyText,
+    Expression<int>? postedAt,
+    Expression<String>? nativeKey,
+    Expression<String>? extractorKind,
+    Expression<String>? ledgerTransactionId,
+    Expression<int>? createdAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (profileId != null) 'profile_id': profileId,
+      if (packageName != null) 'package_name': packageName,
+      if (appLabel != null) 'app_label': appLabel,
+      if (title != null) 'title': title,
+      if (bodyText != null) 'body_text': bodyText,
+      if (postedAt != null) 'posted_at': postedAt,
+      if (nativeKey != null) 'native_key': nativeKey,
+      if (extractorKind != null) 'extractor_kind': extractorKind,
+      if (ledgerTransactionId != null)
+        'ledger_transaction_id': ledgerTransactionId,
+      if (createdAt != null) 'created_at': createdAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  CapturedNotificationsCompanion copyWith({
+    Value<String>? id,
+    Value<String>? profileId,
+    Value<String>? packageName,
+    Value<String?>? appLabel,
+    Value<String>? title,
+    Value<String>? bodyText,
+    Value<int>? postedAt,
+    Value<String>? nativeKey,
+    Value<String>? extractorKind,
+    Value<String?>? ledgerTransactionId,
+    Value<int>? createdAt,
+    Value<int>? rowid,
+  }) {
+    return CapturedNotificationsCompanion(
+      id: id ?? this.id,
+      profileId: profileId ?? this.profileId,
+      packageName: packageName ?? this.packageName,
+      appLabel: appLabel ?? this.appLabel,
+      title: title ?? this.title,
+      bodyText: bodyText ?? this.bodyText,
+      postedAt: postedAt ?? this.postedAt,
+      nativeKey: nativeKey ?? this.nativeKey,
+      extractorKind: extractorKind ?? this.extractorKind,
+      ledgerTransactionId: ledgerTransactionId ?? this.ledgerTransactionId,
+      createdAt: createdAt ?? this.createdAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (profileId.present) {
+      map['profile_id'] = Variable<String>(profileId.value);
+    }
+    if (packageName.present) {
+      map['package_name'] = Variable<String>(packageName.value);
+    }
+    if (appLabel.present) {
+      map['app_label'] = Variable<String>(appLabel.value);
+    }
+    if (title.present) {
+      map['title'] = Variable<String>(title.value);
+    }
+    if (bodyText.present) {
+      map['body_text'] = Variable<String>(bodyText.value);
+    }
+    if (postedAt.present) {
+      map['posted_at'] = Variable<int>(postedAt.value);
+    }
+    if (nativeKey.present) {
+      map['native_key'] = Variable<String>(nativeKey.value);
+    }
+    if (extractorKind.present) {
+      map['extractor_kind'] = Variable<String>(extractorKind.value);
+    }
+    if (ledgerTransactionId.present) {
+      map['ledger_transaction_id'] = Variable<String>(
+        ledgerTransactionId.value,
+      );
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<int>(createdAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CapturedNotificationsCompanion(')
+          ..write('id: $id, ')
+          ..write('profileId: $profileId, ')
+          ..write('packageName: $packageName, ')
+          ..write('appLabel: $appLabel, ')
+          ..write('title: $title, ')
+          ..write('bodyText: $bodyText, ')
+          ..write('postedAt: $postedAt, ')
+          ..write('nativeKey: $nativeKey, ')
+          ..write('extractorKind: $extractorKind, ')
+          ..write('ledgerTransactionId: $ledgerTransactionId, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$ColonyDatabase extends GeneratedDatabase {
   _$ColonyDatabase(QueryExecutor e) : super(e);
   $ColonyDatabaseManager get managers => $ColonyDatabaseManager(this);
@@ -31120,6 +31815,8 @@ abstract class _$ColonyDatabase extends GeneratedDatabase {
       $KnowledgeAreaPlacementsTable(this);
   late final $ResearchKnowledgeLinksTable researchKnowledgeLinks =
       $ResearchKnowledgeLinksTable(this);
+  late final $CapturedNotificationsTable capturedNotifications =
+      $CapturedNotificationsTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -31179,6 +31876,7 @@ abstract class _$ColonyDatabase extends GeneratedDatabase {
     flashcardReviewLogs,
     knowledgeAreaPlacements,
     researchKnowledgeLinks,
+    capturedNotifications,
   ];
 }
 
@@ -31961,6 +32659,34 @@ final class $$ProfilesTableReferences
     ).filter((f) => f.profileId.id.sqlEquals($_itemColumn<String>('id')!));
 
     final cache = $_typedResult.readTableOrNull(_flashcardsRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<
+    $CapturedNotificationsTable,
+    List<CapturedNotificationRow>
+  >
+  _capturedNotificationsRefsTable(_$ColonyDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.capturedNotifications,
+        aliasName: $_aliasNameGenerator(
+          db.profiles.id,
+          db.capturedNotifications.profileId,
+        ),
+      );
+
+  $$CapturedNotificationsTableProcessedTableManager
+  get capturedNotificationsRefs {
+    final manager = $$CapturedNotificationsTableTableManager(
+      $_db,
+      $_db.capturedNotifications,
+    ).filter((f) => f.profileId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _capturedNotificationsRefsTable($_db),
+    );
     return ProcessedTableManager(
       manager.$state.copyWith(prefetchedData: cache),
     );
@@ -32875,6 +33601,32 @@ class $$ProfilesTableFilterComposer
                 $removeJoinBuilderFromRootComposer,
           ),
     );
+    return f(composer);
+  }
+
+  Expression<bool> capturedNotificationsRefs(
+    Expression<bool> Function($$CapturedNotificationsTableFilterComposer f) f,
+  ) {
+    final $$CapturedNotificationsTableFilterComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.capturedNotifications,
+          getReferencedColumn: (t) => t.profileId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$CapturedNotificationsTableFilterComposer(
+                $db: $db,
+                $table: $db.capturedNotifications,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
     return f(composer);
   }
 }
@@ -33842,6 +34594,32 @@ class $$ProfilesTableAnnotationComposer
     );
     return f(composer);
   }
+
+  Expression<T> capturedNotificationsRefs<T extends Object>(
+    Expression<T> Function($$CapturedNotificationsTableAnnotationComposer a) f,
+  ) {
+    final $$CapturedNotificationsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.capturedNotifications,
+          getReferencedColumn: (t) => t.profileId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$CapturedNotificationsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.capturedNotifications,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
 }
 
 class $$ProfilesTableTableManager
@@ -33892,6 +34670,7 @@ class $$ProfilesTableTableManager
             bool knowledgeAreasRefs,
             bool flashcardDecksRefs,
             bool flashcardsRefs,
+            bool capturedNotificationsRefs,
           })
         > {
   $$ProfilesTableTableManager(_$ColonyDatabase db, $ProfilesTable table)
@@ -34001,6 +34780,7 @@ class $$ProfilesTableTableManager
                 knowledgeAreasRefs = false,
                 flashcardDecksRefs = false,
                 flashcardsRefs = false,
+                capturedNotificationsRefs = false,
               }) {
                 return PrefetchHooks(
                   db: db,
@@ -34039,6 +34819,7 @@ class $$ProfilesTableTableManager
                     if (knowledgeAreasRefs) db.knowledgeAreas,
                     if (flashcardDecksRefs) db.flashcardDecks,
                     if (flashcardsRefs) db.flashcards,
+                    if (capturedNotificationsRefs) db.capturedNotifications,
                   ],
                   addJoins: null,
                   getPrefetchedDataCallback: (items) async {
@@ -34757,6 +35538,27 @@ class $$ProfilesTableTableManager
                               ),
                           typedResults: items,
                         ),
+                      if (capturedNotificationsRefs)
+                        await $_getPrefetchedData<
+                          Profile,
+                          $ProfilesTable,
+                          CapturedNotificationRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$ProfilesTableReferences
+                              ._capturedNotificationsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$ProfilesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).capturedNotificationsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.profileId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
                     ];
                   },
                 );
@@ -34812,6 +35614,7 @@ typedef $$ProfilesTableProcessedTableManager =
         bool knowledgeAreasRefs,
         bool flashcardDecksRefs,
         bool flashcardsRefs,
+        bool capturedNotificationsRefs,
       })
     >;
 typedef $$DomainEventsTableCreateCompanionBuilder =
@@ -47167,6 +47970,38 @@ final class $$LedgerTransactionsTableReferences
       manager.$state.copyWith(prefetchedData: [item]),
     );
   }
+
+  static MultiTypedResultKey<
+    $CapturedNotificationsTable,
+    List<CapturedNotificationRow>
+  >
+  _capturedNotificationsRefsTable(_$ColonyDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.capturedNotifications,
+        aliasName: $_aliasNameGenerator(
+          db.ledgerTransactions.id,
+          db.capturedNotifications.ledgerTransactionId,
+        ),
+      );
+
+  $$CapturedNotificationsTableProcessedTableManager
+  get capturedNotificationsRefs {
+    final manager =
+        $$CapturedNotificationsTableTableManager(
+          $_db,
+          $_db.capturedNotifications,
+        ).filter(
+          (f) =>
+              f.ledgerTransactionId.id.sqlEquals($_itemColumn<String>('id')!),
+        );
+
+    final cache = $_typedResult.readTableOrNull(
+      _capturedNotificationsRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
 }
 
 class $$LedgerTransactionsTableFilterComposer
@@ -47277,6 +48112,32 @@ class $$LedgerTransactionsTableFilterComposer
           ),
     );
     return composer;
+  }
+
+  Expression<bool> capturedNotificationsRefs(
+    Expression<bool> Function($$CapturedNotificationsTableFilterComposer f) f,
+  ) {
+    final $$CapturedNotificationsTableFilterComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.capturedNotifications,
+          getReferencedColumn: (t) => t.ledgerTransactionId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$CapturedNotificationsTableFilterComposer(
+                $db: $db,
+                $table: $db.capturedNotifications,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
   }
 }
 
@@ -47489,6 +48350,32 @@ class $$LedgerTransactionsTableAnnotationComposer
         );
     return composer;
   }
+
+  Expression<T> capturedNotificationsRefs<T extends Object>(
+    Expression<T> Function($$CapturedNotificationsTableAnnotationComposer a) f,
+  ) {
+    final $$CapturedNotificationsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.capturedNotifications,
+          getReferencedColumn: (t) => t.ledgerTransactionId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$CapturedNotificationsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.capturedNotifications,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
 }
 
 class $$LedgerTransactionsTableTableManager
@@ -47504,7 +48391,11 @@ class $$LedgerTransactionsTableTableManager
           $$LedgerTransactionsTableUpdateCompanionBuilder,
           (LedgerTransactionRow, $$LedgerTransactionsTableReferences),
           LedgerTransactionRow,
-          PrefetchHooks Function({bool profileId, bool accountId})
+          PrefetchHooks Function({
+            bool profileId,
+            bool accountId,
+            bool capturedNotificationsRefs,
+          })
         > {
   $$LedgerTransactionsTableTableManager(
     _$ColonyDatabase db,
@@ -47594,64 +48485,93 @@ class $$LedgerTransactionsTableTableManager
                 ),
               )
               .toList(),
-          prefetchHooksCallback: ({profileId = false, accountId = false}) {
-            return PrefetchHooks(
-              db: db,
-              explicitlyWatchedTables: [],
-              addJoins:
-                  <
-                    T extends TableManagerState<
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic
-                    >
-                  >(state) {
-                    if (profileId) {
-                      state =
-                          state.withJoin(
-                                currentTable: table,
-                                currentColumn: table.profileId,
-                                referencedTable:
-                                    $$LedgerTransactionsTableReferences
-                                        ._profileIdTable(db),
-                                referencedColumn:
-                                    $$LedgerTransactionsTableReferences
-                                        ._profileIdTable(db)
-                                        .id,
-                              )
-                              as T;
-                    }
-                    if (accountId) {
-                      state =
-                          state.withJoin(
-                                currentTable: table,
-                                currentColumn: table.accountId,
-                                referencedTable:
-                                    $$LedgerTransactionsTableReferences
-                                        ._accountIdTable(db),
-                                referencedColumn:
-                                    $$LedgerTransactionsTableReferences
-                                        ._accountIdTable(db)
-                                        .id,
-                              )
-                              as T;
-                    }
+          prefetchHooksCallback:
+              ({
+                profileId = false,
+                accountId = false,
+                capturedNotificationsRefs = false,
+              }) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [
+                    if (capturedNotificationsRefs) db.capturedNotifications,
+                  ],
+                  addJoins:
+                      <
+                        T extends TableManagerState<
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic
+                        >
+                      >(state) {
+                        if (profileId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.profileId,
+                                    referencedTable:
+                                        $$LedgerTransactionsTableReferences
+                                            ._profileIdTable(db),
+                                    referencedColumn:
+                                        $$LedgerTransactionsTableReferences
+                                            ._profileIdTable(db)
+                                            .id,
+                                  )
+                                  as T;
+                        }
+                        if (accountId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.accountId,
+                                    referencedTable:
+                                        $$LedgerTransactionsTableReferences
+                                            ._accountIdTable(db),
+                                    referencedColumn:
+                                        $$LedgerTransactionsTableReferences
+                                            ._accountIdTable(db)
+                                            .id,
+                                  )
+                                  as T;
+                        }
 
-                    return state;
+                        return state;
+                      },
+                  getPrefetchedDataCallback: (items) async {
+                    return [
+                      if (capturedNotificationsRefs)
+                        await $_getPrefetchedData<
+                          LedgerTransactionRow,
+                          $LedgerTransactionsTable,
+                          CapturedNotificationRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$LedgerTransactionsTableReferences
+                              ._capturedNotificationsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$LedgerTransactionsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).capturedNotificationsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.ledgerTransactionId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                    ];
                   },
-              getPrefetchedDataCallback: (items) async {
-                return [];
+                );
               },
-            );
-          },
         ),
       );
 }
@@ -47668,7 +48588,11 @@ typedef $$LedgerTransactionsTableProcessedTableManager =
       $$LedgerTransactionsTableUpdateCompanionBuilder,
       (LedgerTransactionRow, $$LedgerTransactionsTableReferences),
       LedgerTransactionRow,
-      PrefetchHooks Function({bool profileId, bool accountId})
+      PrefetchHooks Function({
+        bool profileId,
+        bool accountId,
+        bool capturedNotificationsRefs,
+      })
     >;
 typedef $$HealthConditionsTableCreateCompanionBuilder =
     HealthConditionsCompanion Function({
@@ -61364,6 +62288,564 @@ typedef $$ResearchKnowledgeLinksTableProcessedTableManager =
       ResearchKnowledgeLinkRow,
       PrefetchHooks Function({bool researchNodeId, bool areaId})
     >;
+typedef $$CapturedNotificationsTableCreateCompanionBuilder =
+    CapturedNotificationsCompanion Function({
+      required String id,
+      required String profileId,
+      required String packageName,
+      Value<String?> appLabel,
+      required String title,
+      required String bodyText,
+      required int postedAt,
+      required String nativeKey,
+      required String extractorKind,
+      Value<String?> ledgerTransactionId,
+      required int createdAt,
+      Value<int> rowid,
+    });
+typedef $$CapturedNotificationsTableUpdateCompanionBuilder =
+    CapturedNotificationsCompanion Function({
+      Value<String> id,
+      Value<String> profileId,
+      Value<String> packageName,
+      Value<String?> appLabel,
+      Value<String> title,
+      Value<String> bodyText,
+      Value<int> postedAt,
+      Value<String> nativeKey,
+      Value<String> extractorKind,
+      Value<String?> ledgerTransactionId,
+      Value<int> createdAt,
+      Value<int> rowid,
+    });
+
+final class $$CapturedNotificationsTableReferences
+    extends
+        BaseReferences<
+          _$ColonyDatabase,
+          $CapturedNotificationsTable,
+          CapturedNotificationRow
+        > {
+  $$CapturedNotificationsTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $ProfilesTable _profileIdTable(_$ColonyDatabase db) =>
+      db.profiles.createAlias(
+        $_aliasNameGenerator(
+          db.capturedNotifications.profileId,
+          db.profiles.id,
+        ),
+      );
+
+  $$ProfilesTableProcessedTableManager get profileId {
+    final $_column = $_itemColumn<String>('profile_id')!;
+
+    final manager = $$ProfilesTableTableManager(
+      $_db,
+      $_db.profiles,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_profileIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $LedgerTransactionsTable _ledgerTransactionIdTable(
+    _$ColonyDatabase db,
+  ) => db.ledgerTransactions.createAlias(
+    $_aliasNameGenerator(
+      db.capturedNotifications.ledgerTransactionId,
+      db.ledgerTransactions.id,
+    ),
+  );
+
+  $$LedgerTransactionsTableProcessedTableManager? get ledgerTransactionId {
+    final $_column = $_itemColumn<String>('ledger_transaction_id');
+    if ($_column == null) return null;
+    final manager = $$LedgerTransactionsTableTableManager(
+      $_db,
+      $_db.ledgerTransactions,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_ledgerTransactionIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$CapturedNotificationsTableFilterComposer
+    extends Composer<_$ColonyDatabase, $CapturedNotificationsTable> {
+  $$CapturedNotificationsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get packageName => $composableBuilder(
+    column: $table.packageName,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get appLabel => $composableBuilder(
+    column: $table.appLabel,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get title => $composableBuilder(
+    column: $table.title,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get bodyText => $composableBuilder(
+    column: $table.bodyText,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get postedAt => $composableBuilder(
+    column: $table.postedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get nativeKey => $composableBuilder(
+    column: $table.nativeKey,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get extractorKind => $composableBuilder(
+    column: $table.extractorKind,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$ProfilesTableFilterComposer get profileId {
+    final $$ProfilesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.profileId,
+      referencedTable: $db.profiles,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProfilesTableFilterComposer(
+            $db: $db,
+            $table: $db.profiles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$LedgerTransactionsTableFilterComposer get ledgerTransactionId {
+    final $$LedgerTransactionsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.ledgerTransactionId,
+      referencedTable: $db.ledgerTransactions,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$LedgerTransactionsTableFilterComposer(
+            $db: $db,
+            $table: $db.ledgerTransactions,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$CapturedNotificationsTableOrderingComposer
+    extends Composer<_$ColonyDatabase, $CapturedNotificationsTable> {
+  $$CapturedNotificationsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get packageName => $composableBuilder(
+    column: $table.packageName,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get appLabel => $composableBuilder(
+    column: $table.appLabel,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get title => $composableBuilder(
+    column: $table.title,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get bodyText => $composableBuilder(
+    column: $table.bodyText,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get postedAt => $composableBuilder(
+    column: $table.postedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get nativeKey => $composableBuilder(
+    column: $table.nativeKey,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get extractorKind => $composableBuilder(
+    column: $table.extractorKind,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$ProfilesTableOrderingComposer get profileId {
+    final $$ProfilesTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.profileId,
+      referencedTable: $db.profiles,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProfilesTableOrderingComposer(
+            $db: $db,
+            $table: $db.profiles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$LedgerTransactionsTableOrderingComposer get ledgerTransactionId {
+    final $$LedgerTransactionsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.ledgerTransactionId,
+      referencedTable: $db.ledgerTransactions,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$LedgerTransactionsTableOrderingComposer(
+            $db: $db,
+            $table: $db.ledgerTransactions,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$CapturedNotificationsTableAnnotationComposer
+    extends Composer<_$ColonyDatabase, $CapturedNotificationsTable> {
+  $$CapturedNotificationsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get packageName => $composableBuilder(
+    column: $table.packageName,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get appLabel =>
+      $composableBuilder(column: $table.appLabel, builder: (column) => column);
+
+  GeneratedColumn<String> get title =>
+      $composableBuilder(column: $table.title, builder: (column) => column);
+
+  GeneratedColumn<String> get bodyText =>
+      $composableBuilder(column: $table.bodyText, builder: (column) => column);
+
+  GeneratedColumn<int> get postedAt =>
+      $composableBuilder(column: $table.postedAt, builder: (column) => column);
+
+  GeneratedColumn<String> get nativeKey =>
+      $composableBuilder(column: $table.nativeKey, builder: (column) => column);
+
+  GeneratedColumn<String> get extractorKind => $composableBuilder(
+    column: $table.extractorKind,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  $$ProfilesTableAnnotationComposer get profileId {
+    final $$ProfilesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.profileId,
+      referencedTable: $db.profiles,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProfilesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.profiles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$LedgerTransactionsTableAnnotationComposer get ledgerTransactionId {
+    final $$LedgerTransactionsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.ledgerTransactionId,
+          referencedTable: $db.ledgerTransactions,
+          getReferencedColumn: (t) => t.id,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$LedgerTransactionsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.ledgerTransactions,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return composer;
+  }
+}
+
+class $$CapturedNotificationsTableTableManager
+    extends
+        RootTableManager<
+          _$ColonyDatabase,
+          $CapturedNotificationsTable,
+          CapturedNotificationRow,
+          $$CapturedNotificationsTableFilterComposer,
+          $$CapturedNotificationsTableOrderingComposer,
+          $$CapturedNotificationsTableAnnotationComposer,
+          $$CapturedNotificationsTableCreateCompanionBuilder,
+          $$CapturedNotificationsTableUpdateCompanionBuilder,
+          (CapturedNotificationRow, $$CapturedNotificationsTableReferences),
+          CapturedNotificationRow,
+          PrefetchHooks Function({bool profileId, bool ledgerTransactionId})
+        > {
+  $$CapturedNotificationsTableTableManager(
+    _$ColonyDatabase db,
+    $CapturedNotificationsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$CapturedNotificationsTableFilterComposer(
+                $db: db,
+                $table: table,
+              ),
+          createOrderingComposer: () =>
+              $$CapturedNotificationsTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$CapturedNotificationsTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> profileId = const Value.absent(),
+                Value<String> packageName = const Value.absent(),
+                Value<String?> appLabel = const Value.absent(),
+                Value<String> title = const Value.absent(),
+                Value<String> bodyText = const Value.absent(),
+                Value<int> postedAt = const Value.absent(),
+                Value<String> nativeKey = const Value.absent(),
+                Value<String> extractorKind = const Value.absent(),
+                Value<String?> ledgerTransactionId = const Value.absent(),
+                Value<int> createdAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => CapturedNotificationsCompanion(
+                id: id,
+                profileId: profileId,
+                packageName: packageName,
+                appLabel: appLabel,
+                title: title,
+                bodyText: bodyText,
+                postedAt: postedAt,
+                nativeKey: nativeKey,
+                extractorKind: extractorKind,
+                ledgerTransactionId: ledgerTransactionId,
+                createdAt: createdAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String profileId,
+                required String packageName,
+                Value<String?> appLabel = const Value.absent(),
+                required String title,
+                required String bodyText,
+                required int postedAt,
+                required String nativeKey,
+                required String extractorKind,
+                Value<String?> ledgerTransactionId = const Value.absent(),
+                required int createdAt,
+                Value<int> rowid = const Value.absent(),
+              }) => CapturedNotificationsCompanion.insert(
+                id: id,
+                profileId: profileId,
+                packageName: packageName,
+                appLabel: appLabel,
+                title: title,
+                bodyText: bodyText,
+                postedAt: postedAt,
+                nativeKey: nativeKey,
+                extractorKind: extractorKind,
+                ledgerTransactionId: ledgerTransactionId,
+                createdAt: createdAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$CapturedNotificationsTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback:
+              ({profileId = false, ledgerTransactionId = false}) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [],
+                  addJoins:
+                      <
+                        T extends TableManagerState<
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic
+                        >
+                      >(state) {
+                        if (profileId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.profileId,
+                                    referencedTable:
+                                        $$CapturedNotificationsTableReferences
+                                            ._profileIdTable(db),
+                                    referencedColumn:
+                                        $$CapturedNotificationsTableReferences
+                                            ._profileIdTable(db)
+                                            .id,
+                                  )
+                                  as T;
+                        }
+                        if (ledgerTransactionId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.ledgerTransactionId,
+                                    referencedTable:
+                                        $$CapturedNotificationsTableReferences
+                                            ._ledgerTransactionIdTable(db),
+                                    referencedColumn:
+                                        $$CapturedNotificationsTableReferences
+                                            ._ledgerTransactionIdTable(db)
+                                            .id,
+                                  )
+                                  as T;
+                        }
+
+                        return state;
+                      },
+                  getPrefetchedDataCallback: (items) async {
+                    return [];
+                  },
+                );
+              },
+        ),
+      );
+}
+
+typedef $$CapturedNotificationsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$ColonyDatabase,
+      $CapturedNotificationsTable,
+      CapturedNotificationRow,
+      $$CapturedNotificationsTableFilterComposer,
+      $$CapturedNotificationsTableOrderingComposer,
+      $$CapturedNotificationsTableAnnotationComposer,
+      $$CapturedNotificationsTableCreateCompanionBuilder,
+      $$CapturedNotificationsTableUpdateCompanionBuilder,
+      (CapturedNotificationRow, $$CapturedNotificationsTableReferences),
+      CapturedNotificationRow,
+      PrefetchHooks Function({bool profileId, bool ledgerTransactionId})
+    >;
 
 class $ColonyDatabaseManager {
   final _$ColonyDatabase _db;
@@ -61485,4 +62967,6 @@ class $ColonyDatabaseManager {
         _db,
         _db.researchKnowledgeLinks,
       );
+  $$CapturedNotificationsTableTableManager get capturedNotifications =>
+      $$CapturedNotificationsTableTableManager(_db, _db.capturedNotifications);
 }

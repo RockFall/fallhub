@@ -127,6 +127,9 @@ Future<ColonyDatabase> openMigratedFrom(
   if (fromVersion >= 36) {
     _createPhase36Tables(sqliteDb);
   }
+  if (fromVersion >= 37) {
+    _createPhase37Tables(sqliteDb);
+  }
 
   sqliteDb.userVersion = fromVersion;
   seed?.call(sqliteDb);
@@ -1115,6 +1118,25 @@ void _createPhase36Tables(Database db) {
   db.execute(
     'ALTER TABLE flashcards ADD COLUMN priority INTEGER NOT NULL DEFAULT 5',
   );
+}
+
+void _createPhase37Tables(Database db) {
+  db.execute('''
+    CREATE TABLE captured_notifications (
+      id TEXT NOT NULL PRIMARY KEY,
+      profile_id TEXT NOT NULL REFERENCES profiles(id),
+      package_name TEXT NOT NULL,
+      app_label TEXT,
+      title TEXT NOT NULL,
+      body_text TEXT NOT NULL,
+      posted_at INTEGER NOT NULL,
+      native_key TEXT NOT NULL,
+      extractor_kind TEXT NOT NULL,
+      ledger_transaction_id TEXT REFERENCES ledger_transactions(id),
+      created_at INTEGER NOT NULL,
+      UNIQUE(profile_id, native_key)
+    )
+  ''');
 }
 
 void seedFlashcardV35(

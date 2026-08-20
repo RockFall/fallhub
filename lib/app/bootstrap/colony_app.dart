@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../app/localization/app_strings.dart';
 import '../../core/providers/app_providers.dart';
+import '../../features/integrations/application/integrations_controllers.dart';
 import '../routing/app_router.dart';
 
 class ColonyApp extends ConsumerWidget {
@@ -12,6 +13,7 @@ class ColonyApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    ref.watch(notificationIngestRuntimeProvider);
     final router = ref.watch(routerProvider);
     final prefs = ref.watch(preferencesProvider);
 

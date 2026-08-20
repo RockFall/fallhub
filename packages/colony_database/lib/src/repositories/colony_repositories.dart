@@ -553,6 +553,7 @@ class RestoreRepository {
   }
 
   Future<void> _wipeAll() async {
+    await _db.delete(_db.capturedNotifications).go();
     await _db.delete(_db.researchKnowledgeLinks).go();
     await _db.delete(_db.knowledgeAreaPlacements).go();
     await _db.delete(_db.flashcardReviewLogs).go();
@@ -2587,6 +2588,65 @@ class FinanceRepository {
     return updated;
   }
 
+  Future<bool> fingerprintExists({
+    required EntityId profileId,
+    required String fingerprint,
+  }) async {
+    final row = await (_db.select(_db.ledgerTransactions)
+          ..where(
+            (t) =>
+                t.profileId.equals(profileId.value) &
+                t.fingerprint.equals(fingerprint),
+          )
+          ..limit(1))
+        .getSingleOrNull();
+    return row != null;
+  }
+
+  /// Checking (`Inter Conta`) or credit (`Inter Cartão`) created on demand.
+  Future<FinancialAccount> ensureInterAccount({
+    required EntityId profileId,
+    required FinancialAccountType type,
+  }) async {
+    await seedDefaults(profileId);
+    final name = type == FinancialAccountType.creditCard
+        ? 'Inter Cartão'
+        : 'Inter Conta';
+    final existing = await listAccounts(profileId);
+    for (final account in existing) {
+      if (account.isArchived) continue;
+      if (account.type != type) continue;
+      final institution = account.institution.trim().toLowerCase();
+      if (institution == 'inter' || account.name == name) {
+        return account;
+      }
+    }
+    final entities = await listEntities(profileId);
+    if (entities.isEmpty) {
+      throw StateError('Nenhuma entidade financeira para contas Inter');
+    }
+    return createAccount(
+      profileId: profileId,
+      entityId: entities.first.id,
+      institution: 'Inter',
+      name: name,
+      type: type,
+      currency: 'BRL',
+    );
+  }
+
+  Future<List<FinancialAccount>> ensureInterAccounts(EntityId profileId) async {
+    final checking = await ensureInterAccount(
+      profileId: profileId,
+      type: FinancialAccountType.checking,
+    );
+    final card = await ensureInterAccount(
+      profileId: profileId,
+      type: FinancialAccountType.creditCard,
+    );
+    return [checking, card];
+  }
+
   Future<void> deleteTransaction(EntityId id) async {
     final existing = await getTransactionById(id);
     if (existing == null) return;
@@ -4481,12 +4541,19 @@ class CommitmentRepository {
 }
 
 class IntegrationRepository {
-  IntegrationRepository(this._db, this._ids, this._clock, this._events);
+  IntegrationRepository(
+    this._db,
+    this._ids,
+    this._clock,
+    this._events,
+    this._finance,
+  );
 
   final ColonyDatabase _db;
   final IdGenerator _ids;
   final DateTime Function() _clock;
   final DomainEventRepository _events;
+  final FinanceRepository _finance;
 
   Stream<List<IntegrationConsent>> watchConsents(EntityId profileId) {
     return (_db.select(_db.integrationConsents)
@@ -4612,6 +4679,130 @@ class IntegrationRepository {
       );
     });
     return created;
+  }
+
+  Stream<List<CapturedNotification>> watchCapturedNotifications(
+    EntityId profileId,
+  ) {
+    return (_db.select(_db.capturedNotifications)
+          ..where((t) => t.profileId.equals(profileId.value))
+          ..orderBy([(t) => OrderingTerm.desc(t.postedAt)]))
+        .watch()
+        .map((rows) => rows.map(ColonyMappers.toCapturedNotification).toList());
+  }
+
+  Future<List<CapturedNotification>> listCapturedNotifications(
+    EntityId profileId,
+  ) async {
+    final rows = await (_db.select(_db.capturedNotifications)
+          ..where((t) => t.profileId.equals(profileId.value))
+          ..orderBy([(t) => OrderingTerm.desc(t.postedAt)]))
+        .get();
+    return rows.map(ColonyMappers.toCapturedNotification).toList();
+  }
+
+  /// Persist a captured notification and book finance spends when extracted.
+  /// OTP/ignored payloads are dropped. Duplicate [nativeKey] is a no-op.
+  /// Requires notificationListener consent enabled.
+  Future<NotificationIngestResult> ingestCapturedNotification({
+    required EntityId profileId,
+    required NotificationCapturePayload payload,
+  }) async {
+    final consent = await ensureConsent(
+      profileId: profileId,
+      kind: IntegrationKind.notificationListener,
+    );
+    if (!consent.enabled) {
+      throw StateError(
+        'Leitor de notificações desativado; conceda opt-in primeiro',
+      );
+    }
+    if (payload.nativeKey.trim().isEmpty) {
+      return NotificationIngestResult.skipped();
+    }
+
+    final kind = NotificationExtractionPipeline.classify(payload.extractInput);
+    if (kind == NotificationExtractorKind.ignored) {
+      return NotificationIngestResult.skipped();
+    }
+
+    final existing = await (_db.select(_db.capturedNotifications)
+          ..where(
+            (t) =>
+                t.profileId.equals(profileId.value) &
+                t.nativeKey.equals(payload.nativeKey),
+          ))
+        .getSingleOrNull();
+    if (existing != null) {
+      final captured = ColonyMappers.toCapturedNotification(existing);
+      LedgerTransaction? tx;
+      if (captured.ledgerTransactionId != null) {
+        tx = await _finance.getTransactionById(captured.ledgerTransactionId!);
+      }
+      return NotificationIngestResult(
+        skipped: false,
+        notification: captured,
+        transaction: tx,
+        duplicate: true,
+      );
+    }
+
+    LedgerTransaction? booked;
+    var extractorKind = kind;
+    if (kind == NotificationExtractorKind.finance) {
+      final spend = FinanceNotificationExtractor.tryParse(payload.extractInput);
+      if (spend != null) {
+        final account = await _finance.ensureInterAccount(
+          profileId: profileId,
+          type: spend.accountType,
+        );
+        const fingerprintPrefix = 'notif:';
+        final fingerprint = '$fingerprintPrefix${payload.nativeKey}';
+        final already = await _finance.fingerprintExists(
+          profileId: profileId,
+          fingerprint: fingerprint,
+        );
+        if (!already) {
+          booked = await _finance.createTransaction(
+            profileId: profileId,
+            accountId: account.id,
+            occurredAt: spend.occurredAt,
+            descriptionOriginal: spend.description,
+            amountMinor: spend.amountMinor,
+            currency: spend.currency,
+            direction: spend.direction,
+            fingerprint: fingerprint,
+            notes: 'Leitor de notificações · ${payload.packageName}',
+            sourceType: SourceType.integration,
+          );
+        }
+      } else {
+        extractorKind = NotificationExtractorKind.unknown;
+      }
+    }
+
+    final now = _clock();
+    final captured = CapturedNotification(
+      id: EntityId(_ids.newId()),
+      profileId: profileId,
+      packageName: payload.packageName,
+      appLabel: payload.appLabel,
+      title: payload.title,
+      text: payload.text,
+      postedAt: payload.postedAt.toUtc(),
+      nativeKey: payload.nativeKey,
+      extractorKind: extractorKind,
+      ledgerTransactionId: booked?.id,
+      createdAt: now,
+    );
+    await _db
+        .into(_db.capturedNotifications)
+        .insert(ColonyMappers.fromCapturedNotification(captured));
+    return NotificationIngestResult(
+      skipped: false,
+      notification: captured,
+      transaction: booked,
+    );
   }
 }
 
@@ -5894,7 +6085,7 @@ class ColonyRepositories {
     final zonesRepo =
         ContextZoneRepository(database, ids, now, events, syncRepo);
     final integrationsRepo =
-        IntegrationRepository(database, ids, now, events);
+        IntegrationRepository(database, ids, now, events, finance);
     final flashcardsRepo = FlashcardRepository(database, ids, now, events);
     final dailyReviews = DailyReviewRepository(database, ids, now, events);
     final weeklyReviews = WeeklyReviewRepository(database, ids, now, events);

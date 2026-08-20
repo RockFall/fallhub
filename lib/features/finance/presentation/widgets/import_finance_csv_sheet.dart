@@ -1,5 +1,8 @@
+import 'dart:convert';
+
 import 'package:colony_design_system/colony_design_system.dart';
 import 'package:colony_domain/colony_domain.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -39,11 +42,59 @@ class _ImportFinanceCsvSheetState extends ConsumerState<ImportFinanceCsvSheet> {
   EntityId? get _accountOverride =>
       _accountOverrideId == null ? null : EntityId(_accountOverrideId!);
 
+  bool _needsAccount(String text) =>
+      InterStatementCodec.looksLikeOfx(text) ||
+      InterStatementCodec.looksLikeInterCsv(text);
+
+  Future<void> _pickFile() async {
+    final result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: const ['csv', 'ofx', 'txt'],
+      withData: true,
+    );
+    if (result == null || result.files.isEmpty) return;
+    final bytes = result.files.first.bytes;
+    if (bytes == null) {
+      setState(() => _error = AppStrings.financeImportCsvInvalid);
+      return;
+    }
+    String text;
+    try {
+      text = utf8.decode(bytes);
+    } catch (_) {
+      text = latin1.decode(bytes);
+    }
+    setState(() {
+      _csvController.text = text;
+      _plan = null;
+      _error = null;
+    });
+  }
+
+  Future<void> _prepareInterAccounts() async {
+    setState(() => _busy = true);
+    final ok = await ref
+        .read(financeControllerProvider.notifier)
+        .ensureInterAccounts();
+    if (!mounted) return;
+    setState(() => _busy = false);
+    if (!ok) {
+      setState(() => _error = AppStrings.errorGeneric);
+    }
+  }
+
   Future<void> _preview() async {
     final text = _csvController.text.trim();
     if (text.isEmpty) {
       setState(() {
         _error = AppStrings.financeImportCsvEmpty;
+        _plan = null;
+      });
+      return;
+    }
+    if (_needsAccount(text) && _accountOverride == null) {
+      setState(() {
+        _error = AppStrings.financeImportNeedsAccount;
         _plan = null;
       });
       return;
@@ -59,7 +110,14 @@ class _ImportFinanceCsvSheetState extends ConsumerState<ImportFinanceCsvSheet> {
     if (!mounted) return;
     setState(() => _busy = false);
     if (plan == null) {
-      setState(() => _error = AppStrings.financeImportCsvInvalid);
+      final err = ref.read(financeControllerProvider).error;
+      final needsAccount = err is FormatException &&
+          err.message.contains('needs_account');
+      setState(() {
+        _error = needsAccount
+            ? AppStrings.financeImportNeedsAccount
+            : AppStrings.financeImportCsvInvalid;
+      });
       return;
     }
     setState(() => _plan = plan);
@@ -143,37 +201,56 @@ class _ImportFinanceCsvSheetState extends ConsumerState<ImportFinanceCsvSheet> {
                 alignLabelWithHint: true,
               ),
             ),
+            const SizedBox(height: ColonySpacing.sm),
+            OutlinedButton.icon(
+              onPressed: _busy ? null : _pickFile,
+              icon: const Icon(Icons.attach_file),
+              label: const Text(AppStrings.financeImportCsvPickFile),
+            ),
             const SizedBox(height: ColonySpacing.md),
             accountsAsync.when(
               loading: () => const SizedBox.shrink(),
               error: (_, __) => const SizedBox.shrink(),
               data: (accounts) {
                 final active = accounts.where((a) => !a.isArchived).toList();
-                if (active.isEmpty) return const SizedBox.shrink();
-                return DropdownButtonFormField<String?>(
-                  value: _accountOverrideId,
-                  decoration: const InputDecoration(
-                    labelText: AppStrings.financeImportCsvAccountOverride,
-                  ),
-                  items: [
-                    const DropdownMenuItem<String?>(
-                      value: null,
-                      child: Text(AppStrings.financeImportCsvAccountFromCsv),
-                    ),
-                    for (final a in active)
-                      DropdownMenuItem<String?>(
-                        value: a.id.value,
-                        child: Text('${a.name} · ${a.institution}'),
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    if (active.isNotEmpty)
+                      DropdownButtonFormField<String?>(
+                        value: _accountOverrideId,
+                        decoration: const InputDecoration(
+                          labelText: AppStrings.financeImportCsvAccountOverride,
+                        ),
+                        items: [
+                          const DropdownMenuItem<String?>(
+                            value: null,
+                            child: Text(
+                              AppStrings.financeImportCsvAccountFromCsv,
+                            ),
+                          ),
+                          for (final a in active)
+                            DropdownMenuItem<String?>(
+                              value: a.id.value,
+                              child: Text('${a.name} · ${a.institution}'),
+                            ),
+                        ],
+                        onChanged: _busy
+                            ? null
+                            : (value) {
+                                setState(() {
+                                  _accountOverrideId = value;
+                                  _plan = null;
+                                });
+                              },
                       ),
+                    TextButton(
+                      onPressed: _busy ? null : _prepareInterAccounts,
+                      child: const Text(
+                        AppStrings.financeImportPrepareInterAccounts,
+                      ),
+                    ),
                   ],
-                  onChanged: _busy
-                      ? null
-                      : (value) {
-                          setState(() {
-                            _accountOverrideId = value;
-                            _plan = null;
-                          });
-                        },
                 );
               },
             ),

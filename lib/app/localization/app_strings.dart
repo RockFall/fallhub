@@ -1318,7 +1318,38 @@ abstract final class AppStrings {
 
   static const integrationsTitle = 'Integrações';
   static const integrationsDisclaimer =
-      'Opt-in local. Importação ICS somente leitura; sem conta nem write-back no calendário do SO.';
+      'Tudo local neste aparelho: leitor de notificações (gastos e outros sinais) e importação ICS. Sem conta, sem nuvem, sem write-back.';
+  static const integrationsNotificationsTitle = 'Leitor de notificações';
+  static const integrationsNotificationsWarning =
+      'Com a permissão ligada, o Colony passa a ver todas as notificações deste celular — não só as do banco. O conteúdo fica só aqui, para extrair gastos agora e outros sinais depois. Códigos de verificação são ignorados. Dá para desligar a qualquer momento; o extrato já lançado permanece.';
+  static const integrationsNotificationsIos =
+      'Neste sistema o leitor em tempo real não está disponível. Use Finanças → Importar OFX/CSV para o histórico.';
+  static const integrationsNotificationsOptIn =
+      'Permitir leitor de notificações';
+  static const integrationsNotificationsStep1Title = 'Leia o aviso';
+  static const integrationsNotificationsStep1Body =
+      'O Colony não envia essas notificações para a internet e não paga boletos nem faz Pix.';
+  static const integrationsNotificationsStep2Title =
+      'Ative o interruptor no Colony';
+  static const integrationsNotificationsAppOn = 'Passo do app: ligado';
+  static const integrationsNotificationsAppOff =
+      'Ligue para gravar e extrair o que chegar.';
+  static const integrationsNotificationsStep3Title =
+      'Autorize no Android';
+  static const integrationsNotificationsOpenAndroid = 'Abrir ajustes';
+  static const integrationsNotificationsAndroidOn =
+      'Acesso a notificações: Colônia está na lista.';
+  static const integrationsNotificationsAndroidOff =
+      'Toque em Abrir ajustes → ative Colônia na lista “acesso a notificações”.';
+  static const integrationsNotificationsStep4Title = 'Confira os dois verdes';
+  static const integrationsNotificationsReady =
+      'Pronto. Faça uma compra de teste: o push do Inter vira lançamento em segundos.';
+  static const integrationsNotificationsNotReady =
+      'App e Android precisam estar ligados. Depois volte a esta tela.';
+  static const integrationsNotificationsRecent = 'Capturas recentes';
+  static const integrationsNotificationsEmpty =
+      'Nenhuma notificação capturada ainda. Com os dois passos verdes, a próxima aparece aqui.';
+  static const integrationsNotificationsBooked = 'Virou lançamento no ledger';
   static const integrationsCalendarIcs = 'Calendário ICS';
   static const integrationsOptIn = 'Permitir importação ICS';
   static const integrationsEnabled = 'Ativa — pode importar arquivos .ics';
@@ -1551,20 +1582,24 @@ abstract final class AppStrings {
   static const financeExportCsvEmpty = 'Nenhuma transação para exportar.';
   static const financeExportCsvHint =
       'CSV local com fingerprint para deduplicação futura. Não envia dados a bancos.';
-  static const financeImportCsv = 'Importar CSV';
+  static const financeImportCsv = 'Importar OFX/CSV';
   static const financeImportCsvHint =
-      'Cola o CSV exportado, analise o plano e confirme. Fingerprints existentes são ignorados. Local-only.';
-  static const financeImportCsvPaste = 'Conteúdo CSV';
+      'Histórico Inter: exporte OFX ou CSV no Super App (até 2 anos) e cole ou escolha o arquivo. Escolha a conta destino (Inter Conta ou Inter Cartão). Fingerprints existentes são ignorados. Local-only.';
+  static const financeImportCsvPaste = 'Conteúdo OFX ou CSV';
   static const financeImportCsvPreviewAction = 'Analisar';
   static const financeImportCsvApplyAction = 'Aplicar importação';
   static const financeImportCsvAction = 'Importar';
-  static const financeImportCsvEmpty = 'Cole o conteúdo CSV';
+  static const financeImportCsvEmpty = 'Cole o conteúdo OFX/CSV ou escolha um arquivo';
   static const financeImportCsvInvalid =
-      'CSV inválido. Verifique o cabeçalho e as linhas.';
+      'Arquivo inválido. Use OFX, CSV do Inter (Data/Valor) ou o CSV exportado pelo Colony.';
   static const financeImportCsvNothingToApply =
       'Nada novo para importar (todas as linhas são duplicadas).';
-  static const financeImportCsvAccountOverride = 'Conta destino (opcional)';
-  static const financeImportCsvAccountFromCsv = 'Usar account_id do CSV';
+  static const financeImportCsvAccountOverride = 'Conta destino';
+  static const financeImportCsvAccountFromCsv = 'Usar account_id do CSV Colony';
+  static const financeImportCsvPickFile = 'Escolher arquivo';
+  static const financeImportNeedsAccount =
+      'Extrato Inter/OFX precisa de uma conta destino. Crie Inter Conta / Inter Cartão ou escolha uma conta.';
+  static const financeImportPrepareInterAccounts = 'Criar contas Inter';
 
   static String financeImportCsvPlanSummary(int imported, int duplicates) =>
       'Novas: $imported · Duplicadas: $duplicates';
