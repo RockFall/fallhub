@@ -4,7 +4,7 @@
 Implementado (Iter 19)
 
 ## Contexto
-A spec §23 define finanças multi-entidade com contas, transações, orçamento, patrimônio e importações. Phase 6 (FIN-001) ainda não tem ADR dedicado; ADR-011 (Open Finance) **não existe** no repositório. Iter 17 registra o escopo MVP **manual local-first** antes de qualquer código de produto.
+A spec §23 define finanças multi-entidade com contas, transações, orçamento, patrimônio e importações. Phase 6 (FIN-001) ainda não tem ADR dedicado; ADR-011 (Open Finance) **não existia** no repositório na Iter 17. Iter 17 registra o escopo MVP **manual local-first** antes de qualquer código de produto. ADR-011 foi registrado depois como spike de imports/Open Finance (pesquisa Inter em `docs/dev/INTER_BANKING_INTEGRATION.md`).
 
 ## Decisão
 
@@ -80,8 +80,13 @@ A spec §23 define finanças multi-entidade com contas, transações, orçamento
 - **Export:** permanece **v11** (campo `category_id` já serializado)
 - **Deferido:** categorias customizadas, subcategorias, regras automáticas, edição em massa
 
+## Addendum — ADR-011 (imports / Open Finance)
+
+Spike em `docs/adr/ADR-011-financial-imports-open-finance.md`. Pesquisa Inter: `docs/dev/INTER_BANKING_INTEGRATION.md`. O ledger MVP permanece manual; a 1ª slice de import automática é arquivo OFX/CSV Inter, não API PF.
+
 ## Referências
 - Spec §23, §62.5, FIN-001, §0 (disclaimers)
 - ADR-015 (export v11 outline)
 - ADR-005 (local-first)
+- ADR-011 (financial imports / Open Finance)
 - Plan Iter 17 (866a5322)
