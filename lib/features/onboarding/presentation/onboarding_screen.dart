@@ -36,7 +36,9 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
           displayName: _nameController.text,
           sectors: _sectors.toList(),
         );
-    if (mounted) context.go('/colony');
+    if (!mounted) return;
+    if (ref.read(onboardingControllerProvider).hasError) return;
+    context.go('/colony');
   }
 
   @override
@@ -105,6 +107,15 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                         .toList(),
                   ),
                   const SizedBox(height: ColonySpacing.xl),
+                  if (state.hasError) ...[
+                    Text(
+                      AppStrings.errorGeneric,
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            color: Theme.of(context).colorScheme.error,
+                          ),
+                    ),
+                    const SizedBox(height: ColonySpacing.md),
+                  ],
                   FilledButton(
                     onPressed: state.isLoading ? null : _submit,
                     child: Text(

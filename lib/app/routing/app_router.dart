@@ -47,13 +47,25 @@ import '../../features/integrations/presentation/integrations_screen.dart';
 import '../../features/zones/presentation/zones_screen.dart';
 import '../../core/widgets/command_palette.dart';
 
-final routerProvider = Provider<GoRouter>((ref) {
-  final prefsAsync = ref.watch(preferencesProvider);
-  final profileAsync = ref.watch(profileProvider);
+class _GoRouterRefresh extends ChangeNotifier {
+  void ping() => notifyListeners();
+}
 
-  return GoRouter(
+final routerProvider = Provider<GoRouter>((ref) {
+  final refresh = _GoRouterRefresh();
+  ref.onDispose(refresh.dispose);
+
+  final router = GoRouter(
     initialLocation: '/colony',
+    refreshListenable: refresh,
     redirect: (context, state) {
+      final prefsAsync = ref.read(preferencesProvider);
+      final profileAsync = ref.read(profileProvider);
+      // While providers reload, keep the current route. Treating loading as
+      // "not onboarded" remounted this screen and bounced Iniciar colônia.
+      if (prefsAsync.isLoading || profileAsync.isLoading) {
+        return null;
+      }
       final onboardingDone = prefsAsync.maybeWhen(
         data: (p) => p.onboardingCompleted,
         orElse: () => false,
@@ -279,6 +291,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
     ],
   );
+  ref.listen(preferencesProvider, (previous, next) => refresh.ping(), fireImmediately: true);
+  ref.listen(profileProvider, (previous, next) => refresh.ping(), fireImmediately: true);
+  ref.onDispose(router.dispose);
+  return router;
 });
 
 class AppShell extends ConsumerStatefulWidget {

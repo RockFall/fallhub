@@ -83,26 +83,25 @@ class OnboardingController extends AsyncNotifier<void> {
     state = const AsyncLoading();
     state = await AsyncValue.guard(() async {
       final repos = ref.read(repositoriesProvider);
-      final existing = await repos.profiles.getActive();
-      if (existing != null) return;
-
-      final profile = await repos.profiles.create(
-        colonyName: colonyName.trim(),
-        displayName: displayName.trim(),
-        timezone: DateTime.now().timeZoneName,
-        locale: 'pt_BR',
-        baseCurrency: 'BRL',
-      );
-
-      await repos.events.record(
-        aggregateType: AggregateType.profile,
-        aggregateId: profile.id,
-        eventType: EventType.profileCreated,
-        payload: {
-          'colony_name': profile.colonyName,
-          'display_name': profile.displayName,
-        },
-      );
+      var profile = await repos.profiles.getActive();
+      if (profile == null) {
+        profile = await repos.profiles.create(
+          colonyName: colonyName.trim(),
+          displayName: displayName.trim(),
+          timezone: DateTime.now().timeZoneName,
+          locale: 'pt_BR',
+          baseCurrency: 'BRL',
+        );
+        await repos.events.record(
+          aggregateType: AggregateType.profile,
+          aggregateId: profile.id,
+          eventType: EventType.profileCreated,
+          payload: {
+            'colony_name': profile.colonyName,
+            'display_name': profile.displayName,
+          },
+        );
+      }
 
       final prefs = AppPreferences.defaults().copyWith(
         sectorsEnabled: sectors,
@@ -113,6 +112,9 @@ class OnboardingController extends AsyncNotifier<void> {
     });
     ref.invalidate(profileProvider);
     ref.invalidate(preferencesProvider);
+    if (state.hasError) return;
+    await ref.read(profileProvider.future);
+    await ref.read(preferencesProvider.future);
   }
 }
 
