@@ -31718,6 +31718,1466 @@ class FlashcardTagLinksCompanion extends UpdateCompanion<FlashcardTagLinkRow> {
   }
 }
 
+class $CapturedNotificationsTable extends CapturedNotifications
+    with TableInfo<$CapturedNotificationsTable, CapturedNotificationRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $CapturedNotificationsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _profileIdMeta = const VerificationMeta(
+    'profileId',
+  );
+  @override
+  late final GeneratedColumn<String> profileId = GeneratedColumn<String>(
+    'profile_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES profiles (id)',
+    ),
+  );
+  static const VerificationMeta _packageNameMeta = const VerificationMeta(
+    'packageName',
+  );
+  @override
+  late final GeneratedColumn<String> packageName = GeneratedColumn<String>(
+    'package_name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _appLabelMeta = const VerificationMeta(
+    'appLabel',
+  );
+  @override
+  late final GeneratedColumn<String> appLabel = GeneratedColumn<String>(
+    'app_label',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _titleMeta = const VerificationMeta('title');
+  @override
+  late final GeneratedColumn<String> title = GeneratedColumn<String>(
+    'title',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _bodyTextMeta = const VerificationMeta(
+    'bodyText',
+  );
+  @override
+  late final GeneratedColumn<String> bodyText = GeneratedColumn<String>(
+    'body_text',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _postedAtMeta = const VerificationMeta(
+    'postedAt',
+  );
+  @override
+  late final GeneratedColumn<int> postedAt = GeneratedColumn<int>(
+    'posted_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _nativeKeyMeta = const VerificationMeta(
+    'nativeKey',
+  );
+  @override
+  late final GeneratedColumn<String> nativeKey = GeneratedColumn<String>(
+    'native_key',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _extractorKindMeta = const VerificationMeta(
+    'extractorKind',
+  );
+  @override
+  late final GeneratedColumn<String> extractorKind = GeneratedColumn<String>(
+    'extractor_kind',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _ledgerTransactionIdMeta =
+      const VerificationMeta('ledgerTransactionId');
+  @override
+  late final GeneratedColumn<String> ledgerTransactionId =
+      GeneratedColumn<String>(
+        'ledger_transaction_id',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+        defaultConstraints: GeneratedColumn.constraintIsAlways(
+          'REFERENCES ledger_transactions (id)',
+        ),
+      );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<int> createdAt = GeneratedColumn<int>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    profileId,
+    packageName,
+    appLabel,
+    title,
+    bodyText,
+    postedAt,
+    nativeKey,
+    extractorKind,
+    ledgerTransactionId,
+    createdAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'captured_notifications';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<CapturedNotificationRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('profile_id')) {
+      context.handle(
+        _profileIdMeta,
+        profileId.isAcceptableOrUnknown(data['profile_id']!, _profileIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_profileIdMeta);
+    }
+    if (data.containsKey('package_name')) {
+      context.handle(
+        _packageNameMeta,
+        packageName.isAcceptableOrUnknown(
+          data['package_name']!,
+          _packageNameMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_packageNameMeta);
+    }
+    if (data.containsKey('app_label')) {
+      context.handle(
+        _appLabelMeta,
+        appLabel.isAcceptableOrUnknown(data['app_label']!, _appLabelMeta),
+      );
+    }
+    if (data.containsKey('title')) {
+      context.handle(
+        _titleMeta,
+        title.isAcceptableOrUnknown(data['title']!, _titleMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_titleMeta);
+    }
+    if (data.containsKey('body_text')) {
+      context.handle(
+        _bodyTextMeta,
+        bodyText.isAcceptableOrUnknown(data['body_text']!, _bodyTextMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_bodyTextMeta);
+    }
+    if (data.containsKey('posted_at')) {
+      context.handle(
+        _postedAtMeta,
+        postedAt.isAcceptableOrUnknown(data['posted_at']!, _postedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_postedAtMeta);
+    }
+    if (data.containsKey('native_key')) {
+      context.handle(
+        _nativeKeyMeta,
+        nativeKey.isAcceptableOrUnknown(data['native_key']!, _nativeKeyMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nativeKeyMeta);
+    }
+    if (data.containsKey('extractor_kind')) {
+      context.handle(
+        _extractorKindMeta,
+        extractorKind.isAcceptableOrUnknown(
+          data['extractor_kind']!,
+          _extractorKindMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_extractorKindMeta);
+    }
+    if (data.containsKey('ledger_transaction_id')) {
+      context.handle(
+        _ledgerTransactionIdMeta,
+        ledgerTransactionId.isAcceptableOrUnknown(
+          data['ledger_transaction_id']!,
+          _ledgerTransactionIdMeta,
+        ),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  List<Set<GeneratedColumn>> get uniqueKeys => [
+    {profileId, nativeKey},
+  ];
+  @override
+  CapturedNotificationRow map(
+    Map<String, dynamic> data, {
+    String? tablePrefix,
+  }) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return CapturedNotificationRow(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      profileId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}profile_id'],
+      )!,
+      packageName: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}package_name'],
+      )!,
+      appLabel: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}app_label'],
+      ),
+      title: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}title'],
+      )!,
+      bodyText: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}body_text'],
+      )!,
+      postedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}posted_at'],
+      )!,
+      nativeKey: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}native_key'],
+      )!,
+      extractorKind: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}extractor_kind'],
+      )!,
+      ledgerTransactionId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}ledger_transaction_id'],
+      ),
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}created_at'],
+      )!,
+    );
+  }
+
+  @override
+  $CapturedNotificationsTable createAlias(String alias) {
+    return $CapturedNotificationsTable(attachedDatabase, alias);
+  }
+}
+
+class CapturedNotificationRow extends DataClass
+    implements Insertable<CapturedNotificationRow> {
+  final String id;
+  final String profileId;
+  final String packageName;
+  final String? appLabel;
+  final String title;
+  final String bodyText;
+  final int postedAt;
+  final String nativeKey;
+  final String extractorKind;
+  final String? ledgerTransactionId;
+  final int createdAt;
+  const CapturedNotificationRow({
+    required this.id,
+    required this.profileId,
+    required this.packageName,
+    this.appLabel,
+    required this.title,
+    required this.bodyText,
+    required this.postedAt,
+    required this.nativeKey,
+    required this.extractorKind,
+    this.ledgerTransactionId,
+    required this.createdAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['profile_id'] = Variable<String>(profileId);
+    map['package_name'] = Variable<String>(packageName);
+    if (!nullToAbsent || appLabel != null) {
+      map['app_label'] = Variable<String>(appLabel);
+    }
+    map['title'] = Variable<String>(title);
+    map['body_text'] = Variable<String>(bodyText);
+    map['posted_at'] = Variable<int>(postedAt);
+    map['native_key'] = Variable<String>(nativeKey);
+    map['extractor_kind'] = Variable<String>(extractorKind);
+    if (!nullToAbsent || ledgerTransactionId != null) {
+      map['ledger_transaction_id'] = Variable<String>(ledgerTransactionId);
+    }
+    map['created_at'] = Variable<int>(createdAt);
+    return map;
+  }
+
+  CapturedNotificationsCompanion toCompanion(bool nullToAbsent) {
+    return CapturedNotificationsCompanion(
+      id: Value(id),
+      profileId: Value(profileId),
+      packageName: Value(packageName),
+      appLabel: appLabel == null && nullToAbsent
+          ? const Value.absent()
+          : Value(appLabel),
+      title: Value(title),
+      bodyText: Value(bodyText),
+      postedAt: Value(postedAt),
+      nativeKey: Value(nativeKey),
+      extractorKind: Value(extractorKind),
+      ledgerTransactionId: ledgerTransactionId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(ledgerTransactionId),
+      createdAt: Value(createdAt),
+    );
+  }
+
+  factory CapturedNotificationRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return CapturedNotificationRow(
+      id: serializer.fromJson<String>(json['id']),
+      profileId: serializer.fromJson<String>(json['profileId']),
+      packageName: serializer.fromJson<String>(json['packageName']),
+      appLabel: serializer.fromJson<String?>(json['appLabel']),
+      title: serializer.fromJson<String>(json['title']),
+      bodyText: serializer.fromJson<String>(json['bodyText']),
+      postedAt: serializer.fromJson<int>(json['postedAt']),
+      nativeKey: serializer.fromJson<String>(json['nativeKey']),
+      extractorKind: serializer.fromJson<String>(json['extractorKind']),
+      ledgerTransactionId: serializer.fromJson<String?>(
+        json['ledgerTransactionId'],
+      ),
+      createdAt: serializer.fromJson<int>(json['createdAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'profileId': serializer.toJson<String>(profileId),
+      'packageName': serializer.toJson<String>(packageName),
+      'appLabel': serializer.toJson<String?>(appLabel),
+      'title': serializer.toJson<String>(title),
+      'bodyText': serializer.toJson<String>(bodyText),
+      'postedAt': serializer.toJson<int>(postedAt),
+      'nativeKey': serializer.toJson<String>(nativeKey),
+      'extractorKind': serializer.toJson<String>(extractorKind),
+      'ledgerTransactionId': serializer.toJson<String?>(ledgerTransactionId),
+      'createdAt': serializer.toJson<int>(createdAt),
+    };
+  }
+
+  CapturedNotificationRow copyWith({
+    String? id,
+    String? profileId,
+    String? packageName,
+    Value<String?> appLabel = const Value.absent(),
+    String? title,
+    String? bodyText,
+    int? postedAt,
+    String? nativeKey,
+    String? extractorKind,
+    Value<String?> ledgerTransactionId = const Value.absent(),
+    int? createdAt,
+  }) => CapturedNotificationRow(
+    id: id ?? this.id,
+    profileId: profileId ?? this.profileId,
+    packageName: packageName ?? this.packageName,
+    appLabel: appLabel.present ? appLabel.value : this.appLabel,
+    title: title ?? this.title,
+    bodyText: bodyText ?? this.bodyText,
+    postedAt: postedAt ?? this.postedAt,
+    nativeKey: nativeKey ?? this.nativeKey,
+    extractorKind: extractorKind ?? this.extractorKind,
+    ledgerTransactionId: ledgerTransactionId.present
+        ? ledgerTransactionId.value
+        : this.ledgerTransactionId,
+    createdAt: createdAt ?? this.createdAt,
+  );
+  CapturedNotificationRow copyWithCompanion(
+    CapturedNotificationsCompanion data,
+  ) {
+    return CapturedNotificationRow(
+      id: data.id.present ? data.id.value : this.id,
+      profileId: data.profileId.present ? data.profileId.value : this.profileId,
+      packageName: data.packageName.present
+          ? data.packageName.value
+          : this.packageName,
+      appLabel: data.appLabel.present ? data.appLabel.value : this.appLabel,
+      title: data.title.present ? data.title.value : this.title,
+      bodyText: data.bodyText.present ? data.bodyText.value : this.bodyText,
+      postedAt: data.postedAt.present ? data.postedAt.value : this.postedAt,
+      nativeKey: data.nativeKey.present ? data.nativeKey.value : this.nativeKey,
+      extractorKind: data.extractorKind.present
+          ? data.extractorKind.value
+          : this.extractorKind,
+      ledgerTransactionId: data.ledgerTransactionId.present
+          ? data.ledgerTransactionId.value
+          : this.ledgerTransactionId,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CapturedNotificationRow(')
+          ..write('id: $id, ')
+          ..write('profileId: $profileId, ')
+          ..write('packageName: $packageName, ')
+          ..write('appLabel: $appLabel, ')
+          ..write('title: $title, ')
+          ..write('bodyText: $bodyText, ')
+          ..write('postedAt: $postedAt, ')
+          ..write('nativeKey: $nativeKey, ')
+          ..write('extractorKind: $extractorKind, ')
+          ..write('ledgerTransactionId: $ledgerTransactionId, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    profileId,
+    packageName,
+    appLabel,
+    title,
+    bodyText,
+    postedAt,
+    nativeKey,
+    extractorKind,
+    ledgerTransactionId,
+    createdAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is CapturedNotificationRow &&
+          other.id == this.id &&
+          other.profileId == this.profileId &&
+          other.packageName == this.packageName &&
+          other.appLabel == this.appLabel &&
+          other.title == this.title &&
+          other.bodyText == this.bodyText &&
+          other.postedAt == this.postedAt &&
+          other.nativeKey == this.nativeKey &&
+          other.extractorKind == this.extractorKind &&
+          other.ledgerTransactionId == this.ledgerTransactionId &&
+          other.createdAt == this.createdAt);
+}
+
+class CapturedNotificationsCompanion
+    extends UpdateCompanion<CapturedNotificationRow> {
+  final Value<String> id;
+  final Value<String> profileId;
+  final Value<String> packageName;
+  final Value<String?> appLabel;
+  final Value<String> title;
+  final Value<String> bodyText;
+  final Value<int> postedAt;
+  final Value<String> nativeKey;
+  final Value<String> extractorKind;
+  final Value<String?> ledgerTransactionId;
+  final Value<int> createdAt;
+  final Value<int> rowid;
+  const CapturedNotificationsCompanion({
+    this.id = const Value.absent(),
+    this.profileId = const Value.absent(),
+    this.packageName = const Value.absent(),
+    this.appLabel = const Value.absent(),
+    this.title = const Value.absent(),
+    this.bodyText = const Value.absent(),
+    this.postedAt = const Value.absent(),
+    this.nativeKey = const Value.absent(),
+    this.extractorKind = const Value.absent(),
+    this.ledgerTransactionId = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  CapturedNotificationsCompanion.insert({
+    required String id,
+    required String profileId,
+    required String packageName,
+    this.appLabel = const Value.absent(),
+    required String title,
+    required String bodyText,
+    required int postedAt,
+    required String nativeKey,
+    required String extractorKind,
+    this.ledgerTransactionId = const Value.absent(),
+    required int createdAt,
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       profileId = Value(profileId),
+       packageName = Value(packageName),
+       title = Value(title),
+       bodyText = Value(bodyText),
+       postedAt = Value(postedAt),
+       nativeKey = Value(nativeKey),
+       extractorKind = Value(extractorKind),
+       createdAt = Value(createdAt);
+  static Insertable<CapturedNotificationRow> custom({
+    Expression<String>? id,
+    Expression<String>? profileId,
+    Expression<String>? packageName,
+    Expression<String>? appLabel,
+    Expression<String>? title,
+    Expression<String>? bodyText,
+    Expression<int>? postedAt,
+    Expression<String>? nativeKey,
+    Expression<String>? extractorKind,
+    Expression<String>? ledgerTransactionId,
+    Expression<int>? createdAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (profileId != null) 'profile_id': profileId,
+      if (packageName != null) 'package_name': packageName,
+      if (appLabel != null) 'app_label': appLabel,
+      if (title != null) 'title': title,
+      if (bodyText != null) 'body_text': bodyText,
+      if (postedAt != null) 'posted_at': postedAt,
+      if (nativeKey != null) 'native_key': nativeKey,
+      if (extractorKind != null) 'extractor_kind': extractorKind,
+      if (ledgerTransactionId != null)
+        'ledger_transaction_id': ledgerTransactionId,
+      if (createdAt != null) 'created_at': createdAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  CapturedNotificationsCompanion copyWith({
+    Value<String>? id,
+    Value<String>? profileId,
+    Value<String>? packageName,
+    Value<String?>? appLabel,
+    Value<String>? title,
+    Value<String>? bodyText,
+    Value<int>? postedAt,
+    Value<String>? nativeKey,
+    Value<String>? extractorKind,
+    Value<String?>? ledgerTransactionId,
+    Value<int>? createdAt,
+    Value<int>? rowid,
+  }) {
+    return CapturedNotificationsCompanion(
+      id: id ?? this.id,
+      profileId: profileId ?? this.profileId,
+      packageName: packageName ?? this.packageName,
+      appLabel: appLabel ?? this.appLabel,
+      title: title ?? this.title,
+      bodyText: bodyText ?? this.bodyText,
+      postedAt: postedAt ?? this.postedAt,
+      nativeKey: nativeKey ?? this.nativeKey,
+      extractorKind: extractorKind ?? this.extractorKind,
+      ledgerTransactionId: ledgerTransactionId ?? this.ledgerTransactionId,
+      createdAt: createdAt ?? this.createdAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (profileId.present) {
+      map['profile_id'] = Variable<String>(profileId.value);
+    }
+    if (packageName.present) {
+      map['package_name'] = Variable<String>(packageName.value);
+    }
+    if (appLabel.present) {
+      map['app_label'] = Variable<String>(appLabel.value);
+    }
+    if (title.present) {
+      map['title'] = Variable<String>(title.value);
+    }
+    if (bodyText.present) {
+      map['body_text'] = Variable<String>(bodyText.value);
+    }
+    if (postedAt.present) {
+      map['posted_at'] = Variable<int>(postedAt.value);
+    }
+    if (nativeKey.present) {
+      map['native_key'] = Variable<String>(nativeKey.value);
+    }
+    if (extractorKind.present) {
+      map['extractor_kind'] = Variable<String>(extractorKind.value);
+    }
+    if (ledgerTransactionId.present) {
+      map['ledger_transaction_id'] = Variable<String>(
+        ledgerTransactionId.value,
+      );
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<int>(createdAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CapturedNotificationsCompanion(')
+          ..write('id: $id, ')
+          ..write('profileId: $profileId, ')
+          ..write('packageName: $packageName, ')
+          ..write('appLabel: $appLabel, ')
+          ..write('title: $title, ')
+          ..write('bodyText: $bodyText, ')
+          ..write('postedAt: $postedAt, ')
+          ..write('nativeKey: $nativeKey, ')
+          ..write('extractorKind: $extractorKind, ')
+          ..write('ledgerTransactionId: $ledgerTransactionId, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $GoogleTimelineImportsTable extends GoogleTimelineImports
+    with TableInfo<$GoogleTimelineImportsTable, GoogleTimelineImportRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $GoogleTimelineImportsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _profileIdMeta = const VerificationMeta(
+    'profileId',
+  );
+  @override
+  late final GeneratedColumn<String> profileId = GeneratedColumn<String>(
+    'profile_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES profiles (id)',
+    ),
+  );
+  static const VerificationMeta _fileNameMeta = const VerificationMeta(
+    'fileName',
+  );
+  @override
+  late final GeneratedColumn<String> fileName = GeneratedColumn<String>(
+    'file_name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _importedAtMeta = const VerificationMeta(
+    'importedAt',
+  );
+  @override
+  late final GeneratedColumn<int> importedAt = GeneratedColumn<int>(
+    'imported_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _payloadJsonMeta = const VerificationMeta(
+    'payloadJson',
+  );
+  @override
+  late final GeneratedColumn<String> payloadJson = GeneratedColumn<String>(
+    'payload_json',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    profileId,
+    fileName,
+    importedAt,
+    payloadJson,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'google_timeline_imports';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<GoogleTimelineImportRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('profile_id')) {
+      context.handle(
+        _profileIdMeta,
+        profileId.isAcceptableOrUnknown(data['profile_id']!, _profileIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_profileIdMeta);
+    }
+    if (data.containsKey('file_name')) {
+      context.handle(
+        _fileNameMeta,
+        fileName.isAcceptableOrUnknown(data['file_name']!, _fileNameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_fileNameMeta);
+    }
+    if (data.containsKey('imported_at')) {
+      context.handle(
+        _importedAtMeta,
+        importedAt.isAcceptableOrUnknown(data['imported_at']!, _importedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_importedAtMeta);
+    }
+    if (data.containsKey('payload_json')) {
+      context.handle(
+        _payloadJsonMeta,
+        payloadJson.isAcceptableOrUnknown(
+          data['payload_json']!,
+          _payloadJsonMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_payloadJsonMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  GoogleTimelineImportRow map(
+    Map<String, dynamic> data, {
+    String? tablePrefix,
+  }) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return GoogleTimelineImportRow(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      profileId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}profile_id'],
+      )!,
+      fileName: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}file_name'],
+      )!,
+      importedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}imported_at'],
+      )!,
+      payloadJson: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}payload_json'],
+      )!,
+    );
+  }
+
+  @override
+  $GoogleTimelineImportsTable createAlias(String alias) {
+    return $GoogleTimelineImportsTable(attachedDatabase, alias);
+  }
+}
+
+class GoogleTimelineImportRow extends DataClass
+    implements Insertable<GoogleTimelineImportRow> {
+  final String id;
+  final String profileId;
+  final String fileName;
+  final int importedAt;
+  final String payloadJson;
+  const GoogleTimelineImportRow({
+    required this.id,
+    required this.profileId,
+    required this.fileName,
+    required this.importedAt,
+    required this.payloadJson,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['profile_id'] = Variable<String>(profileId);
+    map['file_name'] = Variable<String>(fileName);
+    map['imported_at'] = Variable<int>(importedAt);
+    map['payload_json'] = Variable<String>(payloadJson);
+    return map;
+  }
+
+  GoogleTimelineImportsCompanion toCompanion(bool nullToAbsent) {
+    return GoogleTimelineImportsCompanion(
+      id: Value(id),
+      profileId: Value(profileId),
+      fileName: Value(fileName),
+      importedAt: Value(importedAt),
+      payloadJson: Value(payloadJson),
+    );
+  }
+
+  factory GoogleTimelineImportRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return GoogleTimelineImportRow(
+      id: serializer.fromJson<String>(json['id']),
+      profileId: serializer.fromJson<String>(json['profileId']),
+      fileName: serializer.fromJson<String>(json['fileName']),
+      importedAt: serializer.fromJson<int>(json['importedAt']),
+      payloadJson: serializer.fromJson<String>(json['payloadJson']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'profileId': serializer.toJson<String>(profileId),
+      'fileName': serializer.toJson<String>(fileName),
+      'importedAt': serializer.toJson<int>(importedAt),
+      'payloadJson': serializer.toJson<String>(payloadJson),
+    };
+  }
+
+  GoogleTimelineImportRow copyWith({
+    String? id,
+    String? profileId,
+    String? fileName,
+    int? importedAt,
+    String? payloadJson,
+  }) => GoogleTimelineImportRow(
+    id: id ?? this.id,
+    profileId: profileId ?? this.profileId,
+    fileName: fileName ?? this.fileName,
+    importedAt: importedAt ?? this.importedAt,
+    payloadJson: payloadJson ?? this.payloadJson,
+  );
+  GoogleTimelineImportRow copyWithCompanion(
+    GoogleTimelineImportsCompanion data,
+  ) {
+    return GoogleTimelineImportRow(
+      id: data.id.present ? data.id.value : this.id,
+      profileId: data.profileId.present ? data.profileId.value : this.profileId,
+      fileName: data.fileName.present ? data.fileName.value : this.fileName,
+      importedAt: data.importedAt.present
+          ? data.importedAt.value
+          : this.importedAt,
+      payloadJson: data.payloadJson.present
+          ? data.payloadJson.value
+          : this.payloadJson,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('GoogleTimelineImportRow(')
+          ..write('id: $id, ')
+          ..write('profileId: $profileId, ')
+          ..write('fileName: $fileName, ')
+          ..write('importedAt: $importedAt, ')
+          ..write('payloadJson: $payloadJson')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(id, profileId, fileName, importedAt, payloadJson);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is GoogleTimelineImportRow &&
+          other.id == this.id &&
+          other.profileId == this.profileId &&
+          other.fileName == this.fileName &&
+          other.importedAt == this.importedAt &&
+          other.payloadJson == this.payloadJson);
+}
+
+class GoogleTimelineImportsCompanion
+    extends UpdateCompanion<GoogleTimelineImportRow> {
+  final Value<String> id;
+  final Value<String> profileId;
+  final Value<String> fileName;
+  final Value<int> importedAt;
+  final Value<String> payloadJson;
+  final Value<int> rowid;
+  const GoogleTimelineImportsCompanion({
+    this.id = const Value.absent(),
+    this.profileId = const Value.absent(),
+    this.fileName = const Value.absent(),
+    this.importedAt = const Value.absent(),
+    this.payloadJson = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  GoogleTimelineImportsCompanion.insert({
+    required String id,
+    required String profileId,
+    required String fileName,
+    required int importedAt,
+    required String payloadJson,
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       profileId = Value(profileId),
+       fileName = Value(fileName),
+       importedAt = Value(importedAt),
+       payloadJson = Value(payloadJson);
+  static Insertable<GoogleTimelineImportRow> custom({
+    Expression<String>? id,
+    Expression<String>? profileId,
+    Expression<String>? fileName,
+    Expression<int>? importedAt,
+    Expression<String>? payloadJson,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (profileId != null) 'profile_id': profileId,
+      if (fileName != null) 'file_name': fileName,
+      if (importedAt != null) 'imported_at': importedAt,
+      if (payloadJson != null) 'payload_json': payloadJson,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  GoogleTimelineImportsCompanion copyWith({
+    Value<String>? id,
+    Value<String>? profileId,
+    Value<String>? fileName,
+    Value<int>? importedAt,
+    Value<String>? payloadJson,
+    Value<int>? rowid,
+  }) {
+    return GoogleTimelineImportsCompanion(
+      id: id ?? this.id,
+      profileId: profileId ?? this.profileId,
+      fileName: fileName ?? this.fileName,
+      importedAt: importedAt ?? this.importedAt,
+      payloadJson: payloadJson ?? this.payloadJson,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (profileId.present) {
+      map['profile_id'] = Variable<String>(profileId.value);
+    }
+    if (fileName.present) {
+      map['file_name'] = Variable<String>(fileName.value);
+    }
+    if (importedAt.present) {
+      map['imported_at'] = Variable<int>(importedAt.value);
+    }
+    if (payloadJson.present) {
+      map['payload_json'] = Variable<String>(payloadJson.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('GoogleTimelineImportsCompanion(')
+          ..write('id: $id, ')
+          ..write('profileId: $profileId, ')
+          ..write('fileName: $fileName, ')
+          ..write('importedAt: $importedAt, ')
+          ..write('payloadJson: $payloadJson, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $GoogleTimelinePlaceLabelsTable extends GoogleTimelinePlaceLabels
+    with
+        TableInfo<
+          $GoogleTimelinePlaceLabelsTable,
+          GoogleTimelinePlaceLabelRow
+        > {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $GoogleTimelinePlaceLabelsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _profileIdMeta = const VerificationMeta(
+    'profileId',
+  );
+  @override
+  late final GeneratedColumn<String> profileId = GeneratedColumn<String>(
+    'profile_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES profiles (id)',
+    ),
+  );
+  static const VerificationMeta _placeIdMeta = const VerificationMeta(
+    'placeId',
+  );
+  @override
+  late final GeneratedColumn<String> placeId = GeneratedColumn<String>(
+    'place_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _categoryMeta = const VerificationMeta(
+    'category',
+  );
+  @override
+  late final GeneratedColumn<String> category = GeneratedColumn<String>(
+    'category',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _customNameMeta = const VerificationMeta(
+    'customName',
+  );
+  @override
+  late final GeneratedColumn<String> customName = GeneratedColumn<String>(
+    'custom_name',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<int> updatedAt = GeneratedColumn<int>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    profileId,
+    placeId,
+    category,
+    customName,
+    updatedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'google_timeline_place_labels';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<GoogleTimelinePlaceLabelRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('profile_id')) {
+      context.handle(
+        _profileIdMeta,
+        profileId.isAcceptableOrUnknown(data['profile_id']!, _profileIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_profileIdMeta);
+    }
+    if (data.containsKey('place_id')) {
+      context.handle(
+        _placeIdMeta,
+        placeId.isAcceptableOrUnknown(data['place_id']!, _placeIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_placeIdMeta);
+    }
+    if (data.containsKey('category')) {
+      context.handle(
+        _categoryMeta,
+        category.isAcceptableOrUnknown(data['category']!, _categoryMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_categoryMeta);
+    }
+    if (data.containsKey('custom_name')) {
+      context.handle(
+        _customNameMeta,
+        customName.isAcceptableOrUnknown(data['custom_name']!, _customNameMeta),
+      );
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {profileId, placeId};
+  @override
+  GoogleTimelinePlaceLabelRow map(
+    Map<String, dynamic> data, {
+    String? tablePrefix,
+  }) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return GoogleTimelinePlaceLabelRow(
+      profileId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}profile_id'],
+      )!,
+      placeId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}place_id'],
+      )!,
+      category: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}category'],
+      )!,
+      customName: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}custom_name'],
+      ),
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}updated_at'],
+      )!,
+    );
+  }
+
+  @override
+  $GoogleTimelinePlaceLabelsTable createAlias(String alias) {
+    return $GoogleTimelinePlaceLabelsTable(attachedDatabase, alias);
+  }
+}
+
+class GoogleTimelinePlaceLabelRow extends DataClass
+    implements Insertable<GoogleTimelinePlaceLabelRow> {
+  final String profileId;
+  final String placeId;
+  final String category;
+  final String? customName;
+  final int updatedAt;
+  const GoogleTimelinePlaceLabelRow({
+    required this.profileId,
+    required this.placeId,
+    required this.category,
+    this.customName,
+    required this.updatedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['profile_id'] = Variable<String>(profileId);
+    map['place_id'] = Variable<String>(placeId);
+    map['category'] = Variable<String>(category);
+    if (!nullToAbsent || customName != null) {
+      map['custom_name'] = Variable<String>(customName);
+    }
+    map['updated_at'] = Variable<int>(updatedAt);
+    return map;
+  }
+
+  GoogleTimelinePlaceLabelsCompanion toCompanion(bool nullToAbsent) {
+    return GoogleTimelinePlaceLabelsCompanion(
+      profileId: Value(profileId),
+      placeId: Value(placeId),
+      category: Value(category),
+      customName: customName == null && nullToAbsent
+          ? const Value.absent()
+          : Value(customName),
+      updatedAt: Value(updatedAt),
+    );
+  }
+
+  factory GoogleTimelinePlaceLabelRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return GoogleTimelinePlaceLabelRow(
+      profileId: serializer.fromJson<String>(json['profileId']),
+      placeId: serializer.fromJson<String>(json['placeId']),
+      category: serializer.fromJson<String>(json['category']),
+      customName: serializer.fromJson<String?>(json['customName']),
+      updatedAt: serializer.fromJson<int>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'profileId': serializer.toJson<String>(profileId),
+      'placeId': serializer.toJson<String>(placeId),
+      'category': serializer.toJson<String>(category),
+      'customName': serializer.toJson<String?>(customName),
+      'updatedAt': serializer.toJson<int>(updatedAt),
+    };
+  }
+
+  GoogleTimelinePlaceLabelRow copyWith({
+    String? profileId,
+    String? placeId,
+    String? category,
+    Value<String?> customName = const Value.absent(),
+    int? updatedAt,
+  }) => GoogleTimelinePlaceLabelRow(
+    profileId: profileId ?? this.profileId,
+    placeId: placeId ?? this.placeId,
+    category: category ?? this.category,
+    customName: customName.present ? customName.value : this.customName,
+    updatedAt: updatedAt ?? this.updatedAt,
+  );
+  GoogleTimelinePlaceLabelRow copyWithCompanion(
+    GoogleTimelinePlaceLabelsCompanion data,
+  ) {
+    return GoogleTimelinePlaceLabelRow(
+      profileId: data.profileId.present ? data.profileId.value : this.profileId,
+      placeId: data.placeId.present ? data.placeId.value : this.placeId,
+      category: data.category.present ? data.category.value : this.category,
+      customName: data.customName.present
+          ? data.customName.value
+          : this.customName,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('GoogleTimelinePlaceLabelRow(')
+          ..write('profileId: $profileId, ')
+          ..write('placeId: $placeId, ')
+          ..write('category: $category, ')
+          ..write('customName: $customName, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(profileId, placeId, category, customName, updatedAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is GoogleTimelinePlaceLabelRow &&
+          other.profileId == this.profileId &&
+          other.placeId == this.placeId &&
+          other.category == this.category &&
+          other.customName == this.customName &&
+          other.updatedAt == this.updatedAt);
+}
+
+class GoogleTimelinePlaceLabelsCompanion
+    extends UpdateCompanion<GoogleTimelinePlaceLabelRow> {
+  final Value<String> profileId;
+  final Value<String> placeId;
+  final Value<String> category;
+  final Value<String?> customName;
+  final Value<int> updatedAt;
+  final Value<int> rowid;
+  const GoogleTimelinePlaceLabelsCompanion({
+    this.profileId = const Value.absent(),
+    this.placeId = const Value.absent(),
+    this.category = const Value.absent(),
+    this.customName = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  GoogleTimelinePlaceLabelsCompanion.insert({
+    required String profileId,
+    required String placeId,
+    required String category,
+    this.customName = const Value.absent(),
+    required int updatedAt,
+    this.rowid = const Value.absent(),
+  }) : profileId = Value(profileId),
+       placeId = Value(placeId),
+       category = Value(category),
+       updatedAt = Value(updatedAt);
+  static Insertable<GoogleTimelinePlaceLabelRow> custom({
+    Expression<String>? profileId,
+    Expression<String>? placeId,
+    Expression<String>? category,
+    Expression<String>? customName,
+    Expression<int>? updatedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (profileId != null) 'profile_id': profileId,
+      if (placeId != null) 'place_id': placeId,
+      if (category != null) 'category': category,
+      if (customName != null) 'custom_name': customName,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  GoogleTimelinePlaceLabelsCompanion copyWith({
+    Value<String>? profileId,
+    Value<String>? placeId,
+    Value<String>? category,
+    Value<String?>? customName,
+    Value<int>? updatedAt,
+    Value<int>? rowid,
+  }) {
+    return GoogleTimelinePlaceLabelsCompanion(
+      profileId: profileId ?? this.profileId,
+      placeId: placeId ?? this.placeId,
+      category: category ?? this.category,
+      customName: customName ?? this.customName,
+      updatedAt: updatedAt ?? this.updatedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (profileId.present) {
+      map['profile_id'] = Variable<String>(profileId.value);
+    }
+    if (placeId.present) {
+      map['place_id'] = Variable<String>(placeId.value);
+    }
+    if (category.present) {
+      map['category'] = Variable<String>(category.value);
+    }
+    if (customName.present) {
+      map['custom_name'] = Variable<String>(customName.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<int>(updatedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('GoogleTimelinePlaceLabelsCompanion(')
+          ..write('profileId: $profileId, ')
+          ..write('placeId: $placeId, ')
+          ..write('category: $category, ')
+          ..write('customName: $customName, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$ColonyDatabase extends GeneratedDatabase {
   _$ColonyDatabase(QueryExecutor e) : super(e);
   $ColonyDatabaseManager get managers => $ColonyDatabaseManager(this);
@@ -31805,6 +33265,12 @@ abstract class _$ColonyDatabase extends GeneratedDatabase {
   late final $FlashcardTagsTable flashcardTags = $FlashcardTagsTable(this);
   late final $FlashcardTagLinksTable flashcardTagLinks =
       $FlashcardTagLinksTable(this);
+  late final $CapturedNotificationsTable capturedNotifications =
+      $CapturedNotificationsTable(this);
+  late final $GoogleTimelineImportsTable googleTimelineImports =
+      $GoogleTimelineImportsTable(this);
+  late final $GoogleTimelinePlaceLabelsTable googleTimelinePlaceLabels =
+      $GoogleTimelinePlaceLabelsTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -31866,6 +33332,9 @@ abstract class _$ColonyDatabase extends GeneratedDatabase {
     researchKnowledgeLinks,
     flashcardTags,
     flashcardTagLinks,
+    capturedNotifications,
+    googleTimelineImports,
+    googleTimelinePlaceLabels,
   ];
 }
 
@@ -32666,6 +34135,90 @@ final class $$ProfilesTableReferences
     ).filter((f) => f.profileId.id.sqlEquals($_itemColumn<String>('id')!));
 
     final cache = $_typedResult.readTableOrNull(_flashcardTagsRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<
+    $CapturedNotificationsTable,
+    List<CapturedNotificationRow>
+  >
+  _capturedNotificationsRefsTable(_$ColonyDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.capturedNotifications,
+        aliasName: $_aliasNameGenerator(
+          db.profiles.id,
+          db.capturedNotifications.profileId,
+        ),
+      );
+
+  $$CapturedNotificationsTableProcessedTableManager
+  get capturedNotificationsRefs {
+    final manager = $$CapturedNotificationsTableTableManager(
+      $_db,
+      $_db.capturedNotifications,
+    ).filter((f) => f.profileId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _capturedNotificationsRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<
+    $GoogleTimelineImportsTable,
+    List<GoogleTimelineImportRow>
+  >
+  _googleTimelineImportsRefsTable(_$ColonyDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.googleTimelineImports,
+        aliasName: $_aliasNameGenerator(
+          db.profiles.id,
+          db.googleTimelineImports.profileId,
+        ),
+      );
+
+  $$GoogleTimelineImportsTableProcessedTableManager
+  get googleTimelineImportsRefs {
+    final manager = $$GoogleTimelineImportsTableTableManager(
+      $_db,
+      $_db.googleTimelineImports,
+    ).filter((f) => f.profileId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _googleTimelineImportsRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<
+    $GoogleTimelinePlaceLabelsTable,
+    List<GoogleTimelinePlaceLabelRow>
+  >
+  _googleTimelinePlaceLabelsRefsTable(_$ColonyDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.googleTimelinePlaceLabels,
+        aliasName: $_aliasNameGenerator(
+          db.profiles.id,
+          db.googleTimelinePlaceLabels.profileId,
+        ),
+      );
+
+  $$GoogleTimelinePlaceLabelsTableProcessedTableManager
+  get googleTimelinePlaceLabelsRefs {
+    final manager = $$GoogleTimelinePlaceLabelsTableTableManager(
+      $_db,
+      $_db.googleTimelinePlaceLabels,
+    ).filter((f) => f.profileId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _googleTimelinePlaceLabelsRefsTable($_db),
+    );
     return ProcessedTableManager(
       manager.$state.copyWith(prefetchedData: cache),
     );
@@ -33605,6 +35158,85 @@ class $$ProfilesTableFilterComposer
                 $removeJoinBuilderFromRootComposer,
           ),
     );
+    return f(composer);
+  }
+
+  Expression<bool> capturedNotificationsRefs(
+    Expression<bool> Function($$CapturedNotificationsTableFilterComposer f) f,
+  ) {
+    final $$CapturedNotificationsTableFilterComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.capturedNotifications,
+          getReferencedColumn: (t) => t.profileId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$CapturedNotificationsTableFilterComposer(
+                $db: $db,
+                $table: $db.capturedNotifications,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+
+  Expression<bool> googleTimelineImportsRefs(
+    Expression<bool> Function($$GoogleTimelineImportsTableFilterComposer f) f,
+  ) {
+    final $$GoogleTimelineImportsTableFilterComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.googleTimelineImports,
+          getReferencedColumn: (t) => t.profileId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$GoogleTimelineImportsTableFilterComposer(
+                $db: $db,
+                $table: $db.googleTimelineImports,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+
+  Expression<bool> googleTimelinePlaceLabelsRefs(
+    Expression<bool> Function($$GoogleTimelinePlaceLabelsTableFilterComposer f)
+    f,
+  ) {
+    final $$GoogleTimelinePlaceLabelsTableFilterComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.googleTimelinePlaceLabels,
+          getReferencedColumn: (t) => t.profileId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$GoogleTimelinePlaceLabelsTableFilterComposer(
+                $db: $db,
+                $table: $db.googleTimelinePlaceLabels,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
     return f(composer);
   }
 }
@@ -34597,6 +36229,85 @@ class $$ProfilesTableAnnotationComposer
     );
     return f(composer);
   }
+
+  Expression<T> capturedNotificationsRefs<T extends Object>(
+    Expression<T> Function($$CapturedNotificationsTableAnnotationComposer a) f,
+  ) {
+    final $$CapturedNotificationsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.capturedNotifications,
+          getReferencedColumn: (t) => t.profileId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$CapturedNotificationsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.capturedNotifications,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+
+  Expression<T> googleTimelineImportsRefs<T extends Object>(
+    Expression<T> Function($$GoogleTimelineImportsTableAnnotationComposer a) f,
+  ) {
+    final $$GoogleTimelineImportsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.googleTimelineImports,
+          getReferencedColumn: (t) => t.profileId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$GoogleTimelineImportsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.googleTimelineImports,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+
+  Expression<T> googleTimelinePlaceLabelsRefs<T extends Object>(
+    Expression<T> Function($$GoogleTimelinePlaceLabelsTableAnnotationComposer a)
+    f,
+  ) {
+    final $$GoogleTimelinePlaceLabelsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.googleTimelinePlaceLabels,
+          getReferencedColumn: (t) => t.profileId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$GoogleTimelinePlaceLabelsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.googleTimelinePlaceLabels,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
 }
 
 class $$ProfilesTableTableManager
@@ -34648,6 +36359,9 @@ class $$ProfilesTableTableManager
             bool flashcardDecksRefs,
             bool flashcardsRefs,
             bool flashcardTagsRefs,
+            bool capturedNotificationsRefs,
+            bool googleTimelineImportsRefs,
+            bool googleTimelinePlaceLabelsRefs,
           })
         > {
   $$ProfilesTableTableManager(_$ColonyDatabase db, $ProfilesTable table)
@@ -34758,6 +36472,9 @@ class $$ProfilesTableTableManager
                 flashcardDecksRefs = false,
                 flashcardsRefs = false,
                 flashcardTagsRefs = false,
+                capturedNotificationsRefs = false,
+                googleTimelineImportsRefs = false,
+                googleTimelinePlaceLabelsRefs = false,
               }) {
                 return PrefetchHooks(
                   db: db,
@@ -34797,6 +36514,10 @@ class $$ProfilesTableTableManager
                     if (flashcardDecksRefs) db.flashcardDecks,
                     if (flashcardsRefs) db.flashcards,
                     if (flashcardTagsRefs) db.flashcardTags,
+                    if (capturedNotificationsRefs) db.capturedNotifications,
+                    if (googleTimelineImportsRefs) db.googleTimelineImports,
+                    if (googleTimelinePlaceLabelsRefs)
+                      db.googleTimelinePlaceLabels,
                   ],
                   addJoins: null,
                   getPrefetchedDataCallback: (items) async {
@@ -35536,6 +37257,69 @@ class $$ProfilesTableTableManager
                               ),
                           typedResults: items,
                         ),
+                      if (capturedNotificationsRefs)
+                        await $_getPrefetchedData<
+                          Profile,
+                          $ProfilesTable,
+                          CapturedNotificationRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$ProfilesTableReferences
+                              ._capturedNotificationsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$ProfilesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).capturedNotificationsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.profileId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (googleTimelineImportsRefs)
+                        await $_getPrefetchedData<
+                          Profile,
+                          $ProfilesTable,
+                          GoogleTimelineImportRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$ProfilesTableReferences
+                              ._googleTimelineImportsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$ProfilesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).googleTimelineImportsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.profileId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (googleTimelinePlaceLabelsRefs)
+                        await $_getPrefetchedData<
+                          Profile,
+                          $ProfilesTable,
+                          GoogleTimelinePlaceLabelRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$ProfilesTableReferences
+                              ._googleTimelinePlaceLabelsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$ProfilesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).googleTimelinePlaceLabelsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.profileId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
                     ];
                   },
                 );
@@ -35592,6 +37376,9 @@ typedef $$ProfilesTableProcessedTableManager =
         bool flashcardDecksRefs,
         bool flashcardsRefs,
         bool flashcardTagsRefs,
+        bool capturedNotificationsRefs,
+        bool googleTimelineImportsRefs,
+        bool googleTimelinePlaceLabelsRefs,
       })
     >;
 typedef $$DomainEventsTableCreateCompanionBuilder =
@@ -47947,6 +49734,38 @@ final class $$LedgerTransactionsTableReferences
       manager.$state.copyWith(prefetchedData: [item]),
     );
   }
+
+  static MultiTypedResultKey<
+    $CapturedNotificationsTable,
+    List<CapturedNotificationRow>
+  >
+  _capturedNotificationsRefsTable(_$ColonyDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.capturedNotifications,
+        aliasName: $_aliasNameGenerator(
+          db.ledgerTransactions.id,
+          db.capturedNotifications.ledgerTransactionId,
+        ),
+      );
+
+  $$CapturedNotificationsTableProcessedTableManager
+  get capturedNotificationsRefs {
+    final manager =
+        $$CapturedNotificationsTableTableManager(
+          $_db,
+          $_db.capturedNotifications,
+        ).filter(
+          (f) =>
+              f.ledgerTransactionId.id.sqlEquals($_itemColumn<String>('id')!),
+        );
+
+    final cache = $_typedResult.readTableOrNull(
+      _capturedNotificationsRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
 }
 
 class $$LedgerTransactionsTableFilterComposer
@@ -48057,6 +49876,32 @@ class $$LedgerTransactionsTableFilterComposer
           ),
     );
     return composer;
+  }
+
+  Expression<bool> capturedNotificationsRefs(
+    Expression<bool> Function($$CapturedNotificationsTableFilterComposer f) f,
+  ) {
+    final $$CapturedNotificationsTableFilterComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.capturedNotifications,
+          getReferencedColumn: (t) => t.ledgerTransactionId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$CapturedNotificationsTableFilterComposer(
+                $db: $db,
+                $table: $db.capturedNotifications,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
   }
 }
 
@@ -48269,6 +50114,32 @@ class $$LedgerTransactionsTableAnnotationComposer
         );
     return composer;
   }
+
+  Expression<T> capturedNotificationsRefs<T extends Object>(
+    Expression<T> Function($$CapturedNotificationsTableAnnotationComposer a) f,
+  ) {
+    final $$CapturedNotificationsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.capturedNotifications,
+          getReferencedColumn: (t) => t.ledgerTransactionId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$CapturedNotificationsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.capturedNotifications,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
 }
 
 class $$LedgerTransactionsTableTableManager
@@ -48284,7 +50155,11 @@ class $$LedgerTransactionsTableTableManager
           $$LedgerTransactionsTableUpdateCompanionBuilder,
           (LedgerTransactionRow, $$LedgerTransactionsTableReferences),
           LedgerTransactionRow,
-          PrefetchHooks Function({bool profileId, bool accountId})
+          PrefetchHooks Function({
+            bool profileId,
+            bool accountId,
+            bool capturedNotificationsRefs,
+          })
         > {
   $$LedgerTransactionsTableTableManager(
     _$ColonyDatabase db,
@@ -48374,64 +50249,93 @@ class $$LedgerTransactionsTableTableManager
                 ),
               )
               .toList(),
-          prefetchHooksCallback: ({profileId = false, accountId = false}) {
-            return PrefetchHooks(
-              db: db,
-              explicitlyWatchedTables: [],
-              addJoins:
-                  <
-                    T extends TableManagerState<
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic
-                    >
-                  >(state) {
-                    if (profileId) {
-                      state =
-                          state.withJoin(
-                                currentTable: table,
-                                currentColumn: table.profileId,
-                                referencedTable:
-                                    $$LedgerTransactionsTableReferences
-                                        ._profileIdTable(db),
-                                referencedColumn:
-                                    $$LedgerTransactionsTableReferences
-                                        ._profileIdTable(db)
-                                        .id,
-                              )
-                              as T;
-                    }
-                    if (accountId) {
-                      state =
-                          state.withJoin(
-                                currentTable: table,
-                                currentColumn: table.accountId,
-                                referencedTable:
-                                    $$LedgerTransactionsTableReferences
-                                        ._accountIdTable(db),
-                                referencedColumn:
-                                    $$LedgerTransactionsTableReferences
-                                        ._accountIdTable(db)
-                                        .id,
-                              )
-                              as T;
-                    }
+          prefetchHooksCallback:
+              ({
+                profileId = false,
+                accountId = false,
+                capturedNotificationsRefs = false,
+              }) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [
+                    if (capturedNotificationsRefs) db.capturedNotifications,
+                  ],
+                  addJoins:
+                      <
+                        T extends TableManagerState<
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic
+                        >
+                      >(state) {
+                        if (profileId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.profileId,
+                                    referencedTable:
+                                        $$LedgerTransactionsTableReferences
+                                            ._profileIdTable(db),
+                                    referencedColumn:
+                                        $$LedgerTransactionsTableReferences
+                                            ._profileIdTable(db)
+                                            .id,
+                                  )
+                                  as T;
+                        }
+                        if (accountId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.accountId,
+                                    referencedTable:
+                                        $$LedgerTransactionsTableReferences
+                                            ._accountIdTable(db),
+                                    referencedColumn:
+                                        $$LedgerTransactionsTableReferences
+                                            ._accountIdTable(db)
+                                            .id,
+                                  )
+                                  as T;
+                        }
 
-                    return state;
+                        return state;
+                      },
+                  getPrefetchedDataCallback: (items) async {
+                    return [
+                      if (capturedNotificationsRefs)
+                        await $_getPrefetchedData<
+                          LedgerTransactionRow,
+                          $LedgerTransactionsTable,
+                          CapturedNotificationRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$LedgerTransactionsTableReferences
+                              ._capturedNotificationsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$LedgerTransactionsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).capturedNotificationsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.ledgerTransactionId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                    ];
                   },
-              getPrefetchedDataCallback: (items) async {
-                return [];
+                );
               },
-            );
-          },
         ),
       );
 }
@@ -48448,7 +50352,11 @@ typedef $$LedgerTransactionsTableProcessedTableManager =
       $$LedgerTransactionsTableUpdateCompanionBuilder,
       (LedgerTransactionRow, $$LedgerTransactionsTableReferences),
       LedgerTransactionRow,
-      PrefetchHooks Function({bool profileId, bool accountId})
+      PrefetchHooks Function({
+        bool profileId,
+        bool accountId,
+        bool capturedNotificationsRefs,
+      })
     >;
 typedef $$HealthConditionsTableCreateCompanionBuilder =
     HealthConditionsCompanion Function({
@@ -63078,6 +64986,1261 @@ typedef $$FlashcardTagLinksTableProcessedTableManager =
       FlashcardTagLinkRow,
       PrefetchHooks Function({bool cardId, bool tagId})
     >;
+typedef $$CapturedNotificationsTableCreateCompanionBuilder =
+    CapturedNotificationsCompanion Function({
+      required String id,
+      required String profileId,
+      required String packageName,
+      Value<String?> appLabel,
+      required String title,
+      required String bodyText,
+      required int postedAt,
+      required String nativeKey,
+      required String extractorKind,
+      Value<String?> ledgerTransactionId,
+      required int createdAt,
+      Value<int> rowid,
+    });
+typedef $$CapturedNotificationsTableUpdateCompanionBuilder =
+    CapturedNotificationsCompanion Function({
+      Value<String> id,
+      Value<String> profileId,
+      Value<String> packageName,
+      Value<String?> appLabel,
+      Value<String> title,
+      Value<String> bodyText,
+      Value<int> postedAt,
+      Value<String> nativeKey,
+      Value<String> extractorKind,
+      Value<String?> ledgerTransactionId,
+      Value<int> createdAt,
+      Value<int> rowid,
+    });
+
+final class $$CapturedNotificationsTableReferences
+    extends
+        BaseReferences<
+          _$ColonyDatabase,
+          $CapturedNotificationsTable,
+          CapturedNotificationRow
+        > {
+  $$CapturedNotificationsTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $ProfilesTable _profileIdTable(_$ColonyDatabase db) =>
+      db.profiles.createAlias(
+        $_aliasNameGenerator(
+          db.capturedNotifications.profileId,
+          db.profiles.id,
+        ),
+      );
+
+  $$ProfilesTableProcessedTableManager get profileId {
+    final $_column = $_itemColumn<String>('profile_id')!;
+
+    final manager = $$ProfilesTableTableManager(
+      $_db,
+      $_db.profiles,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_profileIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $LedgerTransactionsTable _ledgerTransactionIdTable(
+    _$ColonyDatabase db,
+  ) => db.ledgerTransactions.createAlias(
+    $_aliasNameGenerator(
+      db.capturedNotifications.ledgerTransactionId,
+      db.ledgerTransactions.id,
+    ),
+  );
+
+  $$LedgerTransactionsTableProcessedTableManager? get ledgerTransactionId {
+    final $_column = $_itemColumn<String>('ledger_transaction_id');
+    if ($_column == null) return null;
+    final manager = $$LedgerTransactionsTableTableManager(
+      $_db,
+      $_db.ledgerTransactions,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_ledgerTransactionIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$CapturedNotificationsTableFilterComposer
+    extends Composer<_$ColonyDatabase, $CapturedNotificationsTable> {
+  $$CapturedNotificationsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get packageName => $composableBuilder(
+    column: $table.packageName,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get appLabel => $composableBuilder(
+    column: $table.appLabel,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get title => $composableBuilder(
+    column: $table.title,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get bodyText => $composableBuilder(
+    column: $table.bodyText,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get postedAt => $composableBuilder(
+    column: $table.postedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get nativeKey => $composableBuilder(
+    column: $table.nativeKey,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get extractorKind => $composableBuilder(
+    column: $table.extractorKind,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$ProfilesTableFilterComposer get profileId {
+    final $$ProfilesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.profileId,
+      referencedTable: $db.profiles,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProfilesTableFilterComposer(
+            $db: $db,
+            $table: $db.profiles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$LedgerTransactionsTableFilterComposer get ledgerTransactionId {
+    final $$LedgerTransactionsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.ledgerTransactionId,
+      referencedTable: $db.ledgerTransactions,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$LedgerTransactionsTableFilterComposer(
+            $db: $db,
+            $table: $db.ledgerTransactions,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$CapturedNotificationsTableOrderingComposer
+    extends Composer<_$ColonyDatabase, $CapturedNotificationsTable> {
+  $$CapturedNotificationsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get packageName => $composableBuilder(
+    column: $table.packageName,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get appLabel => $composableBuilder(
+    column: $table.appLabel,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get title => $composableBuilder(
+    column: $table.title,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get bodyText => $composableBuilder(
+    column: $table.bodyText,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get postedAt => $composableBuilder(
+    column: $table.postedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get nativeKey => $composableBuilder(
+    column: $table.nativeKey,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get extractorKind => $composableBuilder(
+    column: $table.extractorKind,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$ProfilesTableOrderingComposer get profileId {
+    final $$ProfilesTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.profileId,
+      referencedTable: $db.profiles,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProfilesTableOrderingComposer(
+            $db: $db,
+            $table: $db.profiles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$LedgerTransactionsTableOrderingComposer get ledgerTransactionId {
+    final $$LedgerTransactionsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.ledgerTransactionId,
+      referencedTable: $db.ledgerTransactions,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$LedgerTransactionsTableOrderingComposer(
+            $db: $db,
+            $table: $db.ledgerTransactions,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$CapturedNotificationsTableAnnotationComposer
+    extends Composer<_$ColonyDatabase, $CapturedNotificationsTable> {
+  $$CapturedNotificationsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get packageName => $composableBuilder(
+    column: $table.packageName,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get appLabel =>
+      $composableBuilder(column: $table.appLabel, builder: (column) => column);
+
+  GeneratedColumn<String> get title =>
+      $composableBuilder(column: $table.title, builder: (column) => column);
+
+  GeneratedColumn<String> get bodyText =>
+      $composableBuilder(column: $table.bodyText, builder: (column) => column);
+
+  GeneratedColumn<int> get postedAt =>
+      $composableBuilder(column: $table.postedAt, builder: (column) => column);
+
+  GeneratedColumn<String> get nativeKey =>
+      $composableBuilder(column: $table.nativeKey, builder: (column) => column);
+
+  GeneratedColumn<String> get extractorKind => $composableBuilder(
+    column: $table.extractorKind,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  $$ProfilesTableAnnotationComposer get profileId {
+    final $$ProfilesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.profileId,
+      referencedTable: $db.profiles,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProfilesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.profiles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$LedgerTransactionsTableAnnotationComposer get ledgerTransactionId {
+    final $$LedgerTransactionsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.ledgerTransactionId,
+          referencedTable: $db.ledgerTransactions,
+          getReferencedColumn: (t) => t.id,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$LedgerTransactionsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.ledgerTransactions,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return composer;
+  }
+}
+
+class $$CapturedNotificationsTableTableManager
+    extends
+        RootTableManager<
+          _$ColonyDatabase,
+          $CapturedNotificationsTable,
+          CapturedNotificationRow,
+          $$CapturedNotificationsTableFilterComposer,
+          $$CapturedNotificationsTableOrderingComposer,
+          $$CapturedNotificationsTableAnnotationComposer,
+          $$CapturedNotificationsTableCreateCompanionBuilder,
+          $$CapturedNotificationsTableUpdateCompanionBuilder,
+          (CapturedNotificationRow, $$CapturedNotificationsTableReferences),
+          CapturedNotificationRow,
+          PrefetchHooks Function({bool profileId, bool ledgerTransactionId})
+        > {
+  $$CapturedNotificationsTableTableManager(
+    _$ColonyDatabase db,
+    $CapturedNotificationsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$CapturedNotificationsTableFilterComposer(
+                $db: db,
+                $table: table,
+              ),
+          createOrderingComposer: () =>
+              $$CapturedNotificationsTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$CapturedNotificationsTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> profileId = const Value.absent(),
+                Value<String> packageName = const Value.absent(),
+                Value<String?> appLabel = const Value.absent(),
+                Value<String> title = const Value.absent(),
+                Value<String> bodyText = const Value.absent(),
+                Value<int> postedAt = const Value.absent(),
+                Value<String> nativeKey = const Value.absent(),
+                Value<String> extractorKind = const Value.absent(),
+                Value<String?> ledgerTransactionId = const Value.absent(),
+                Value<int> createdAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => CapturedNotificationsCompanion(
+                id: id,
+                profileId: profileId,
+                packageName: packageName,
+                appLabel: appLabel,
+                title: title,
+                bodyText: bodyText,
+                postedAt: postedAt,
+                nativeKey: nativeKey,
+                extractorKind: extractorKind,
+                ledgerTransactionId: ledgerTransactionId,
+                createdAt: createdAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String profileId,
+                required String packageName,
+                Value<String?> appLabel = const Value.absent(),
+                required String title,
+                required String bodyText,
+                required int postedAt,
+                required String nativeKey,
+                required String extractorKind,
+                Value<String?> ledgerTransactionId = const Value.absent(),
+                required int createdAt,
+                Value<int> rowid = const Value.absent(),
+              }) => CapturedNotificationsCompanion.insert(
+                id: id,
+                profileId: profileId,
+                packageName: packageName,
+                appLabel: appLabel,
+                title: title,
+                bodyText: bodyText,
+                postedAt: postedAt,
+                nativeKey: nativeKey,
+                extractorKind: extractorKind,
+                ledgerTransactionId: ledgerTransactionId,
+                createdAt: createdAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$CapturedNotificationsTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback:
+              ({profileId = false, ledgerTransactionId = false}) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [],
+                  addJoins:
+                      <
+                        T extends TableManagerState<
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic
+                        >
+                      >(state) {
+                        if (profileId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.profileId,
+                                    referencedTable:
+                                        $$CapturedNotificationsTableReferences
+                                            ._profileIdTable(db),
+                                    referencedColumn:
+                                        $$CapturedNotificationsTableReferences
+                                            ._profileIdTable(db)
+                                            .id,
+                                  )
+                                  as T;
+                        }
+                        if (ledgerTransactionId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.ledgerTransactionId,
+                                    referencedTable:
+                                        $$CapturedNotificationsTableReferences
+                                            ._ledgerTransactionIdTable(db),
+                                    referencedColumn:
+                                        $$CapturedNotificationsTableReferences
+                                            ._ledgerTransactionIdTable(db)
+                                            .id,
+                                  )
+                                  as T;
+                        }
+
+                        return state;
+                      },
+                  getPrefetchedDataCallback: (items) async {
+                    return [];
+                  },
+                );
+              },
+        ),
+      );
+}
+
+typedef $$CapturedNotificationsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$ColonyDatabase,
+      $CapturedNotificationsTable,
+      CapturedNotificationRow,
+      $$CapturedNotificationsTableFilterComposer,
+      $$CapturedNotificationsTableOrderingComposer,
+      $$CapturedNotificationsTableAnnotationComposer,
+      $$CapturedNotificationsTableCreateCompanionBuilder,
+      $$CapturedNotificationsTableUpdateCompanionBuilder,
+      (CapturedNotificationRow, $$CapturedNotificationsTableReferences),
+      CapturedNotificationRow,
+      PrefetchHooks Function({bool profileId, bool ledgerTransactionId})
+    >;
+typedef $$GoogleTimelineImportsTableCreateCompanionBuilder =
+    GoogleTimelineImportsCompanion Function({
+      required String id,
+      required String profileId,
+      required String fileName,
+      required int importedAt,
+      required String payloadJson,
+      Value<int> rowid,
+    });
+typedef $$GoogleTimelineImportsTableUpdateCompanionBuilder =
+    GoogleTimelineImportsCompanion Function({
+      Value<String> id,
+      Value<String> profileId,
+      Value<String> fileName,
+      Value<int> importedAt,
+      Value<String> payloadJson,
+      Value<int> rowid,
+    });
+
+final class $$GoogleTimelineImportsTableReferences
+    extends
+        BaseReferences<
+          _$ColonyDatabase,
+          $GoogleTimelineImportsTable,
+          GoogleTimelineImportRow
+        > {
+  $$GoogleTimelineImportsTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $ProfilesTable _profileIdTable(_$ColonyDatabase db) =>
+      db.profiles.createAlias(
+        $_aliasNameGenerator(
+          db.googleTimelineImports.profileId,
+          db.profiles.id,
+        ),
+      );
+
+  $$ProfilesTableProcessedTableManager get profileId {
+    final $_column = $_itemColumn<String>('profile_id')!;
+
+    final manager = $$ProfilesTableTableManager(
+      $_db,
+      $_db.profiles,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_profileIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$GoogleTimelineImportsTableFilterComposer
+    extends Composer<_$ColonyDatabase, $GoogleTimelineImportsTable> {
+  $$GoogleTimelineImportsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get fileName => $composableBuilder(
+    column: $table.fileName,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get importedAt => $composableBuilder(
+    column: $table.importedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get payloadJson => $composableBuilder(
+    column: $table.payloadJson,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$ProfilesTableFilterComposer get profileId {
+    final $$ProfilesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.profileId,
+      referencedTable: $db.profiles,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProfilesTableFilterComposer(
+            $db: $db,
+            $table: $db.profiles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$GoogleTimelineImportsTableOrderingComposer
+    extends Composer<_$ColonyDatabase, $GoogleTimelineImportsTable> {
+  $$GoogleTimelineImportsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get fileName => $composableBuilder(
+    column: $table.fileName,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get importedAt => $composableBuilder(
+    column: $table.importedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get payloadJson => $composableBuilder(
+    column: $table.payloadJson,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$ProfilesTableOrderingComposer get profileId {
+    final $$ProfilesTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.profileId,
+      referencedTable: $db.profiles,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProfilesTableOrderingComposer(
+            $db: $db,
+            $table: $db.profiles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$GoogleTimelineImportsTableAnnotationComposer
+    extends Composer<_$ColonyDatabase, $GoogleTimelineImportsTable> {
+  $$GoogleTimelineImportsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get fileName =>
+      $composableBuilder(column: $table.fileName, builder: (column) => column);
+
+  GeneratedColumn<int> get importedAt => $composableBuilder(
+    column: $table.importedAt,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get payloadJson => $composableBuilder(
+    column: $table.payloadJson,
+    builder: (column) => column,
+  );
+
+  $$ProfilesTableAnnotationComposer get profileId {
+    final $$ProfilesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.profileId,
+      referencedTable: $db.profiles,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProfilesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.profiles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$GoogleTimelineImportsTableTableManager
+    extends
+        RootTableManager<
+          _$ColonyDatabase,
+          $GoogleTimelineImportsTable,
+          GoogleTimelineImportRow,
+          $$GoogleTimelineImportsTableFilterComposer,
+          $$GoogleTimelineImportsTableOrderingComposer,
+          $$GoogleTimelineImportsTableAnnotationComposer,
+          $$GoogleTimelineImportsTableCreateCompanionBuilder,
+          $$GoogleTimelineImportsTableUpdateCompanionBuilder,
+          (GoogleTimelineImportRow, $$GoogleTimelineImportsTableReferences),
+          GoogleTimelineImportRow,
+          PrefetchHooks Function({bool profileId})
+        > {
+  $$GoogleTimelineImportsTableTableManager(
+    _$ColonyDatabase db,
+    $GoogleTimelineImportsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$GoogleTimelineImportsTableFilterComposer(
+                $db: db,
+                $table: table,
+              ),
+          createOrderingComposer: () =>
+              $$GoogleTimelineImportsTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$GoogleTimelineImportsTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> profileId = const Value.absent(),
+                Value<String> fileName = const Value.absent(),
+                Value<int> importedAt = const Value.absent(),
+                Value<String> payloadJson = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => GoogleTimelineImportsCompanion(
+                id: id,
+                profileId: profileId,
+                fileName: fileName,
+                importedAt: importedAt,
+                payloadJson: payloadJson,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String profileId,
+                required String fileName,
+                required int importedAt,
+                required String payloadJson,
+                Value<int> rowid = const Value.absent(),
+              }) => GoogleTimelineImportsCompanion.insert(
+                id: id,
+                profileId: profileId,
+                fileName: fileName,
+                importedAt: importedAt,
+                payloadJson: payloadJson,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$GoogleTimelineImportsTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({profileId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (profileId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.profileId,
+                                referencedTable:
+                                    $$GoogleTimelineImportsTableReferences
+                                        ._profileIdTable(db),
+                                referencedColumn:
+                                    $$GoogleTimelineImportsTableReferences
+                                        ._profileIdTable(db)
+                                        .id,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$GoogleTimelineImportsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$ColonyDatabase,
+      $GoogleTimelineImportsTable,
+      GoogleTimelineImportRow,
+      $$GoogleTimelineImportsTableFilterComposer,
+      $$GoogleTimelineImportsTableOrderingComposer,
+      $$GoogleTimelineImportsTableAnnotationComposer,
+      $$GoogleTimelineImportsTableCreateCompanionBuilder,
+      $$GoogleTimelineImportsTableUpdateCompanionBuilder,
+      (GoogleTimelineImportRow, $$GoogleTimelineImportsTableReferences),
+      GoogleTimelineImportRow,
+      PrefetchHooks Function({bool profileId})
+    >;
+typedef $$GoogleTimelinePlaceLabelsTableCreateCompanionBuilder =
+    GoogleTimelinePlaceLabelsCompanion Function({
+      required String profileId,
+      required String placeId,
+      required String category,
+      Value<String?> customName,
+      required int updatedAt,
+      Value<int> rowid,
+    });
+typedef $$GoogleTimelinePlaceLabelsTableUpdateCompanionBuilder =
+    GoogleTimelinePlaceLabelsCompanion Function({
+      Value<String> profileId,
+      Value<String> placeId,
+      Value<String> category,
+      Value<String?> customName,
+      Value<int> updatedAt,
+      Value<int> rowid,
+    });
+
+final class $$GoogleTimelinePlaceLabelsTableReferences
+    extends
+        BaseReferences<
+          _$ColonyDatabase,
+          $GoogleTimelinePlaceLabelsTable,
+          GoogleTimelinePlaceLabelRow
+        > {
+  $$GoogleTimelinePlaceLabelsTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $ProfilesTable _profileIdTable(_$ColonyDatabase db) =>
+      db.profiles.createAlias(
+        $_aliasNameGenerator(
+          db.googleTimelinePlaceLabels.profileId,
+          db.profiles.id,
+        ),
+      );
+
+  $$ProfilesTableProcessedTableManager get profileId {
+    final $_column = $_itemColumn<String>('profile_id')!;
+
+    final manager = $$ProfilesTableTableManager(
+      $_db,
+      $_db.profiles,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_profileIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$GoogleTimelinePlaceLabelsTableFilterComposer
+    extends Composer<_$ColonyDatabase, $GoogleTimelinePlaceLabelsTable> {
+  $$GoogleTimelinePlaceLabelsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get placeId => $composableBuilder(
+    column: $table.placeId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get category => $composableBuilder(
+    column: $table.category,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get customName => $composableBuilder(
+    column: $table.customName,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$ProfilesTableFilterComposer get profileId {
+    final $$ProfilesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.profileId,
+      referencedTable: $db.profiles,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProfilesTableFilterComposer(
+            $db: $db,
+            $table: $db.profiles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$GoogleTimelinePlaceLabelsTableOrderingComposer
+    extends Composer<_$ColonyDatabase, $GoogleTimelinePlaceLabelsTable> {
+  $$GoogleTimelinePlaceLabelsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get placeId => $composableBuilder(
+    column: $table.placeId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get category => $composableBuilder(
+    column: $table.category,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get customName => $composableBuilder(
+    column: $table.customName,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$ProfilesTableOrderingComposer get profileId {
+    final $$ProfilesTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.profileId,
+      referencedTable: $db.profiles,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProfilesTableOrderingComposer(
+            $db: $db,
+            $table: $db.profiles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$GoogleTimelinePlaceLabelsTableAnnotationComposer
+    extends Composer<_$ColonyDatabase, $GoogleTimelinePlaceLabelsTable> {
+  $$GoogleTimelinePlaceLabelsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get placeId =>
+      $composableBuilder(column: $table.placeId, builder: (column) => column);
+
+  GeneratedColumn<String> get category =>
+      $composableBuilder(column: $table.category, builder: (column) => column);
+
+  GeneratedColumn<String> get customName => $composableBuilder(
+    column: $table.customName,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  $$ProfilesTableAnnotationComposer get profileId {
+    final $$ProfilesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.profileId,
+      referencedTable: $db.profiles,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProfilesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.profiles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$GoogleTimelinePlaceLabelsTableTableManager
+    extends
+        RootTableManager<
+          _$ColonyDatabase,
+          $GoogleTimelinePlaceLabelsTable,
+          GoogleTimelinePlaceLabelRow,
+          $$GoogleTimelinePlaceLabelsTableFilterComposer,
+          $$GoogleTimelinePlaceLabelsTableOrderingComposer,
+          $$GoogleTimelinePlaceLabelsTableAnnotationComposer,
+          $$GoogleTimelinePlaceLabelsTableCreateCompanionBuilder,
+          $$GoogleTimelinePlaceLabelsTableUpdateCompanionBuilder,
+          (
+            GoogleTimelinePlaceLabelRow,
+            $$GoogleTimelinePlaceLabelsTableReferences,
+          ),
+          GoogleTimelinePlaceLabelRow,
+          PrefetchHooks Function({bool profileId})
+        > {
+  $$GoogleTimelinePlaceLabelsTableTableManager(
+    _$ColonyDatabase db,
+    $GoogleTimelinePlaceLabelsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$GoogleTimelinePlaceLabelsTableFilterComposer(
+                $db: db,
+                $table: table,
+              ),
+          createOrderingComposer: () =>
+              $$GoogleTimelinePlaceLabelsTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$GoogleTimelinePlaceLabelsTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> profileId = const Value.absent(),
+                Value<String> placeId = const Value.absent(),
+                Value<String> category = const Value.absent(),
+                Value<String?> customName = const Value.absent(),
+                Value<int> updatedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => GoogleTimelinePlaceLabelsCompanion(
+                profileId: profileId,
+                placeId: placeId,
+                category: category,
+                customName: customName,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String profileId,
+                required String placeId,
+                required String category,
+                Value<String?> customName = const Value.absent(),
+                required int updatedAt,
+                Value<int> rowid = const Value.absent(),
+              }) => GoogleTimelinePlaceLabelsCompanion.insert(
+                profileId: profileId,
+                placeId: placeId,
+                category: category,
+                customName: customName,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$GoogleTimelinePlaceLabelsTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({profileId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (profileId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.profileId,
+                                referencedTable:
+                                    $$GoogleTimelinePlaceLabelsTableReferences
+                                        ._profileIdTable(db),
+                                referencedColumn:
+                                    $$GoogleTimelinePlaceLabelsTableReferences
+                                        ._profileIdTable(db)
+                                        .id,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$GoogleTimelinePlaceLabelsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$ColonyDatabase,
+      $GoogleTimelinePlaceLabelsTable,
+      GoogleTimelinePlaceLabelRow,
+      $$GoogleTimelinePlaceLabelsTableFilterComposer,
+      $$GoogleTimelinePlaceLabelsTableOrderingComposer,
+      $$GoogleTimelinePlaceLabelsTableAnnotationComposer,
+      $$GoogleTimelinePlaceLabelsTableCreateCompanionBuilder,
+      $$GoogleTimelinePlaceLabelsTableUpdateCompanionBuilder,
+      (GoogleTimelinePlaceLabelRow, $$GoogleTimelinePlaceLabelsTableReferences),
+      GoogleTimelinePlaceLabelRow,
+      PrefetchHooks Function({bool profileId})
+    >;
 
 class $ColonyDatabaseManager {
   final _$ColonyDatabase _db;
@@ -63203,4 +66366,13 @@ class $ColonyDatabaseManager {
       $$FlashcardTagsTableTableManager(_db, _db.flashcardTags);
   $$FlashcardTagLinksTableTableManager get flashcardTagLinks =>
       $$FlashcardTagLinksTableTableManager(_db, _db.flashcardTagLinks);
+  $$CapturedNotificationsTableTableManager get capturedNotifications =>
+      $$CapturedNotificationsTableTableManager(_db, _db.capturedNotifications);
+  $$GoogleTimelineImportsTableTableManager get googleTimelineImports =>
+      $$GoogleTimelineImportsTableTableManager(_db, _db.googleTimelineImports);
+  $$GoogleTimelinePlaceLabelsTableTableManager get googleTimelinePlaceLabels =>
+      $$GoogleTimelinePlaceLabelsTableTableManager(
+        _db,
+        _db.googleTimelinePlaceLabels,
+      );
 }

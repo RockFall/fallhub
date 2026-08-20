@@ -19,7 +19,7 @@ Pesquisa da forma oficial de ligar um app Flutter/Android à Google Agenda (Cale
 | `docs/dev/GOOGLE_CALENDAR_INTEGRATION.md` | **novo** | Pesquisa, repos de referência, superfície da API, modelo, fiabilidade, UX, slices A–G |
 | `docs/adr/ADR-043-google-calendar.md` | **novo** | Decisão proposta: API v3 no telemóvel, local-first, ICS mantém-se |
 
-Nada em `lib/`, `packages/`, testes ou `pubspec`.
+Nada em `lib/`, `packages/`, testes ou `pubspec`. ADR-042 ficou com a Timeline do Maps nesta consolidação; o plano de Agenda é **ADR-043**.
 
 ### Próximos passos (depois do merge)
 
