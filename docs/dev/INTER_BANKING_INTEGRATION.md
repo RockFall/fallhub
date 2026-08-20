@@ -64,6 +64,24 @@ Armadilha: o dashboard **deixa** clicar em Inter. Funciona uns dias e **para**. 
 
 Não é 100% “para sempre, contrato assinado”. É um programa grátis de um terceiro. Se um dia a Pluggy mudar, os dados já baixados continuam no celular; o plano B é importar OFX **uma vez**, não todo dia.
 
+### E o Pierre? (por que lá foi só um toque)
+
+O que você fez no Pierre **é** Open Finance. A tela de “escolher Inter → permitir no banco → dados chegam” é o fluxo oficial. A senha ficou no Inter; o Pierre só recebeu permissão de leitura.
+
+A diferença não é o cano — é **quem está do outro lado da autorização**:
+
+| | **Pierre** | **Colony (plano Meu Pluggy)** |
+| --- | --- | --- |
+| Quem o Inter autoriza | O Pierre / CloudWalk (Instituição de Pagamento) ou a Pluggy no contrato deles | A Pluggy, na **sua** conta Meu Pluggy |
+| O que você vê | Lista de bancos dentro do app | Setup uma vez (Meu Pluggy + colar chaves); depois o Colony puxa sozinho |
+| Servidor | Sim: o secret fica no **backend deles**, nunca no celular | Não: o secret é **seu**, no cofre do aparelho |
+| Por que o 1º uso é tão curto | Eles já pagaram o ingresso de “app autorizado a receber dados de qualquer CPF” | Não somos instituição do BC e não vamos pagar o plano comercial da Pluggy (~R$ 2.500/mês) para 1–3 pessoas |
+| Você paga | Plano do Pierre (grátis 1 banco; Pro/Premium depois) | R$ 0 à Pluggy, no caminho pessoal |
+
+A Pluggy lista o Pierre como cliente pagante. Na prática o app já nasceu receptora: você não cria dashboard nem copia `CLIENT_ID`.
+
+Dá para o Colony copiar **a mesma tela** se um dia contratarmos o plano comercial + um backend mínimo. Aí o setup fica idêntico ao Pierre — e o custo mensal também. Com pouquíssimos usuários, o Meu Pluggy é o mesmo cano sem a mensalidade: o preço é o cadastro extra na primeira vez.
+
 ### O que o Colony passa a mostrar
 
 - Conta digital: Pix, TED, débito, entradas — lançamentos novos sozinhos.
