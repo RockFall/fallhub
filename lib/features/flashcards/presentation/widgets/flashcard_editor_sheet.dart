@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../app/localization/app_strings.dart';
 import '../../application/flashcard_controllers.dart';
 import '../../application/flashcard_providers.dart';
+import 'flashcard_tag_field.dart';
 import 'knowledge_area_typeahead.dart';
 
 class FlashcardEditorSheet extends ConsumerStatefulWidget {
@@ -47,7 +48,8 @@ class _FlashcardEditorSheetState extends ConsumerState<FlashcardEditorSheet> {
   late final TextEditingController _front;
   late final TextEditingController _back;
   late final TextEditingController _extra;
-  late final TextEditingController _tags;
+  late List<String> _tagLabels;
+  var _tagsHydrated = false;
   late FlashcardKind _kind;
   var _bidirectional = false;
   EntityId? _areaId;
@@ -59,7 +61,7 @@ class _FlashcardEditorSheetState extends ConsumerState<FlashcardEditorSheet> {
     _front = TextEditingController(text: existing?.front ?? '');
     _back = TextEditingController(text: existing?.back ?? '');
     _extra = TextEditingController(text: existing?.extra ?? '');
-    _tags = TextEditingController(text: existing?.tags.join(', ') ?? '');
+    _tagLabels = [...?existing?.tags];
     _kind = existing?.kind ?? FlashcardKind.basic;
     _bidirectional = existing?.kind == FlashcardKind.reverse;
     _areaId = existing?.areaId ?? widget.areaId;
@@ -70,8 +72,24 @@ class _FlashcardEditorSheetState extends ConsumerState<FlashcardEditorSheet> {
     _front.dispose();
     _back.dispose();
     _extra.dispose();
-    _tags.dispose();
     super.dispose();
+  }
+
+  void _hydrateTagLabels(
+    List<FlashcardTag> tags,
+    List<FlashcardTagLink> links,
+  ) {
+    if (_tagsHydrated || widget.existing == null) return;
+    _tagsHydrated = true;
+    final ids = FlashcardTagPolicy.tagIdsForCard(
+      cardId: widget.existing!.id,
+      links: links,
+    );
+    if (ids.isEmpty) return;
+    _tagLabels = [
+      for (final id in ids)
+        FlashcardTagPolicy.pathLabel(tagId: id, tags: tags),
+    ];
   }
 
   @override
@@ -86,6 +104,13 @@ class _FlashcardEditorSheetState extends ConsumerState<FlashcardEditorSheet> {
       areas: areas,
       placements: placements,
     );
+    final tagsAsync = ref.watch(flashcardTagsProvider);
+    final tagLinksAsync = ref.watch(flashcardTagLinksProvider);
+    final tags = tagsAsync.asData?.value ?? const [];
+    final tagLinks = tagLinksAsync.asData?.value ?? const [];
+    if (tagsAsync.hasValue && tagLinksAsync.hasValue) {
+      _hydrateTagLabels(tags, tagLinks);
+    }
     return Padding(
       padding: EdgeInsets.fromLTRB(
         ColonySpacing.lg,
@@ -193,18 +218,14 @@ class _FlashcardEditorSheetState extends ConsumerState<FlashcardEditorSheet> {
                     front: _front.text,
                     back: _back.text,
                     extra: _extra.text,
-                    tags: _tags.text
-                        .split(',')
-                        .map((t) => t.trim())
-                        .where((t) => t.isNotEmpty)
-                        .toList(),
+                    tags: _tagLabels,
                     areaId: _areaId,
                     clearArea: _areaId == null,
                     clearExtra: _extra.text.trim().isEmpty,
                   );
                   await ref
                       .read(flashcardControllerProvider.notifier)
-                      .updateCard(updated);
+                      .updateCard(updated, tagLabels: _tagLabels);
                   if (existing.scheduleMode ==
                       FlashcardScheduleMode.scheduled) {
                     await ref
@@ -264,11 +285,10 @@ class _FlashcardEditorSheetState extends ConsumerState<FlashcardEditorSheet> {
                     ),
                   ),
                   const SizedBox(height: ColonySpacing.sm),
-                  TextField(
-                    controller: _tags,
-                    decoration: const InputDecoration(
-                      labelText: AppStrings.flashcardsTags,
-                    ),
+                  FlashcardTagField(
+                    labels: _tagLabels,
+                    tags: tags,
+                    onChanged: (labels) => setState(() => _tagLabels = labels),
                   ),
                   if (widget.existing == null &&
                       (_kind == FlashcardKind.basic ||
@@ -290,11 +310,7 @@ class _FlashcardEditorSheetState extends ConsumerState<FlashcardEditorSheet> {
   }
 
   Future<void> _save(FlashcardCaptureIntent intent) async {
-    final tags = _tags.text
-        .split(',')
-        .map((t) => t.trim())
-        .where((t) => t.isNotEmpty)
-        .toList();
+    final tags = _tagLabels;
     final existing = widget.existing;
     final scheduleMode = intent == FlashcardCaptureIntent.schedule
         ? FlashcardScheduleMode.scheduled
@@ -333,6 +349,7 @@ class _FlashcardEditorSheetState extends ConsumerState<FlashcardEditorSheet> {
                 clearArea: _areaId == null,
                 clearExtra: _extra.text.trim().isEmpty,
               ),
+              tagLabels: tags,
             );
         if (mounted) Navigator.of(context).pop();
       }

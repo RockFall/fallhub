@@ -56,6 +56,8 @@ const exportV24RequiredKeys = <String>{
   'flashcard_review_logs',
   'knowledge_area_placements',
   'research_knowledge_links',
+  'flashcard_tags',
+  'flashcard_tag_links',
 };
 
 void main() {

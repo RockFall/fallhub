@@ -48,6 +48,30 @@ final flashcardSrsProvider =
       );
 });
 
+final flashcardTagsProvider = StreamProvider<List<FlashcardTag>>((ref) {
+  final profile = ref.watch(profileProvider).asData?.value;
+  if (profile == null) return const Stream.empty();
+  return ref.watch(repositoriesProvider).flashcards.watchTags(profile.id);
+});
+
+final flashcardTagLinksProvider = StreamProvider<List<FlashcardTagLink>>((ref) {
+  final profile = ref.watch(profileProvider).asData?.value;
+  if (profile == null) return const Stream.empty();
+  return ref.watch(repositoriesProvider).flashcards.watchTagLinks(profile.id);
+});
+
+final flashcardTagForestProvider = Provider<List<FlashcardTagNode>>((ref) {
+  return ref.watch(flashcardTagsProvider).maybeWhen(
+        data: FlashcardTagPolicy.buildForest,
+        orElse: () => const [],
+      );
+});
+
+final flashcardTagProvider = Provider.family<FlashcardTag?, String>((ref, tagId) {
+  final tags = ref.watch(flashcardTagsProvider).asData?.value ?? const [];
+  return tags.where((t) => t.id.value == tagId).firstOrNull;
+});
+
 final flashcardLogsProvider = StreamProvider<List<FlashcardReviewLog>>((ref) {
   final profile = ref.watch(profileProvider).asData?.value;
   if (profile == null) return const Stream.empty();
@@ -76,6 +100,7 @@ final flashcardJsonPromptProvider = Provider<String>((ref) {
     areas: ref.watch(knowledgeAreasProvider).asData?.value ?? const [],
     placements: ref.watch(knowledgePlacementsProvider).asData?.value ?? const [],
     decks: ref.watch(flashcardDecksProvider).asData?.value ?? const [],
+    tags: ref.watch(flashcardTagsProvider).asData?.value ?? const [],
   );
 });
 

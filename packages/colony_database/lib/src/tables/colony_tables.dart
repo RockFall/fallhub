@@ -939,3 +939,32 @@ class ResearchKnowledgeLinks extends Table {
   @override
   Set<Column<Object>> get primaryKey => {researchNodeId, areaId};
 }
+
+@DataClassName('FlashcardTagRow')
+class FlashcardTags extends Table {
+  @override
+  String get tableName => 'flashcard_tags';
+
+  TextColumn get id => text()();
+  TextColumn get profileId => text().references(Profiles, #id)();
+  TextColumn get parentId => text().nullable()();
+  TextColumn get title => text()();
+  IntColumn get sortOrder => integer().withDefault(const Constant(0))();
+  IntColumn get createdAt => integer()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+}
+
+@DataClassName('FlashcardTagLinkRow')
+class FlashcardTagLinks extends Table {
+  @override
+  String get tableName => 'flashcard_tag_links';
+
+  TextColumn get cardId => text().references(Flashcards, #id)();
+  TextColumn get tagId => text().references(FlashcardTags, #id)();
+  IntColumn get linkedAt => integer()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {cardId, tagId};
+}

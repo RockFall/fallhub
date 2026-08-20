@@ -453,10 +453,12 @@ class ExportRepository {
         await _flashcards.listPlacements(profile.id);
     final researchKnowledgeLinks =
         await _flashcards.listResearchLinks(profile.id);
+    final flashcardTags = await _flashcards.listTags(profile.id);
+    final flashcardTagLinks = await _flashcards.listTagLinks(profile.id);
 
     return ExportSnapshot(
       exportedAt: _clock(),
-      version: 32,
+      version: 33,
       profile: profile,
       preferences: prefs,
       tasks: tasks,
@@ -509,6 +511,8 @@ class ExportRepository {
       flashcardReviewLogs: flashcardReviewLogs,
       knowledgeAreaPlacements: knowledgeAreaPlacements,
       researchKnowledgeLinks: researchKnowledgeLinks,
+      flashcardTags: flashcardTags,
+      flashcardTagLinks: flashcardTagLinks,
     );
   }
 
@@ -555,6 +559,8 @@ class RestoreRepository {
   Future<void> _wipeAll() async {
     await _db.delete(_db.researchKnowledgeLinks).go();
     await _db.delete(_db.knowledgeAreaPlacements).go();
+    await _db.delete(_db.flashcardTagLinks).go();
+    await _db.delete(_db.flashcardTags).go();
     await _db.delete(_db.flashcardReviewLogs).go();
     await _db.delete(_db.flashcardSrs).go();
     await _db.delete(_db.flashcards).go();
@@ -650,6 +656,30 @@ class RestoreRepository {
     }
     for (final card in snapshot.flashcards) {
       await _db.into(_db.flashcards).insert(ColonyMappers.fromFlashcard(card));
+    }
+    final remainingTags = [...snapshot.flashcardTags];
+    final insertedTagIds = <String>{};
+    while (remainingTags.isNotEmpty) {
+      final ready = remainingTags
+          .where(
+            (tag) =>
+                tag.parentId == null ||
+                insertedTagIds.contains(tag.parentId!.value),
+          )
+          .toList();
+      final batch = ready.isEmpty ? [remainingTags.first] : ready;
+      for (final tag in batch) {
+        await _db
+            .into(_db.flashcardTags)
+            .insert(ColonyMappers.fromFlashcardTag(tag));
+        insertedTagIds.add(tag.id.value);
+        remainingTags.remove(tag);
+      }
+    }
+    for (final link in snapshot.flashcardTagLinks) {
+      await _db
+          .into(_db.flashcardTagLinks)
+          .insert(ColonyMappers.fromFlashcardTagLink(link));
     }
     for (final srs in snapshot.flashcardSrs) {
       await _db.into(_db.flashcardSrs).insert(ColonyMappers.fromFlashcardSrs(srs));
@@ -5145,6 +5175,197 @@ class FlashcardRepository {
     });
   }
 
+  Stream<List<FlashcardTag>> watchTags(EntityId profileId) {
+    return (_db.select(_db.flashcardTags)
+          ..where((t) => t.profileId.equals(profileId.value)))
+        .watch()
+        .map((rows) => rows.map(ColonyMappers.toFlashcardTag).toList());
+  }
+
+  Future<List<FlashcardTag>> listTags(EntityId profileId) async {
+    final rows = await (_db.select(_db.flashcardTags)
+          ..where((t) => t.profileId.equals(profileId.value)))
+        .get();
+    return rows.map(ColonyMappers.toFlashcardTag).toList();
+  }
+
+  Stream<List<FlashcardTagLink>> watchTagLinks(EntityId profileId) {
+    return _db.select(_db.flashcardTagLinks).watch().asyncMap((_) async {
+      return listTagLinks(profileId);
+    });
+  }
+
+  Future<List<FlashcardTagLink>> listTagLinks(EntityId profileId) async {
+    final cards = await listCards(profileId);
+    final ids = {for (final card in cards) card.id.value};
+    if (ids.isEmpty) return const [];
+    final rows = await (_db.select(_db.flashcardTagLinks)
+          ..where((t) => t.cardId.isIn(ids)))
+        .get();
+    return rows.map(ColonyMappers.toFlashcardTagLink).toList();
+  }
+
+  Future<FlashcardTag> createTag({
+    required EntityId profileId,
+    required String title,
+    EntityId? parentId,
+    int sortOrder = 0,
+  }) async {
+    if (title.trim().isEmpty) {
+      throw StateError('Título de tag vazio');
+    }
+    final existing = await listTags(profileId);
+    final found = FlashcardTagPolicy.childNamed(
+      parentId: parentId,
+      title: title,
+      tags: existing,
+    );
+    if (found != null) return found;
+    final tag = FlashcardTag.create(
+      id: EntityId(_ids.newId()),
+      profileId: profileId,
+      title: title,
+      parentId: parentId,
+      sortOrder: sortOrder,
+      createdAt: _clock(),
+    );
+    FlashcardTagPolicy.assertAcyclic(
+      tagId: tag.id,
+      parentId: parentId,
+      parentById: {for (final item in existing) item.id: item.parentId},
+    );
+    await _db.transaction(() async {
+      await _db.into(_db.flashcardTags).insert(ColonyMappers.fromFlashcardTag(tag));
+      await _events.record(
+        aggregateType: AggregateType.flashcard,
+        aggregateId: tag.id,
+        eventType: EventType.flashcardTagCreated,
+        payload: {'title': tag.title},
+        sourceType: SourceType.manual,
+      );
+    });
+    return tag;
+  }
+
+  Future<void> updateTag(FlashcardTag tag) async {
+    if (tag.title.trim().isEmpty) {
+      throw StateError('Título de tag vazio');
+    }
+    final existing = await listTags(tag.profileId);
+    final clash = FlashcardTagPolicy.childNamed(
+      parentId: tag.parentId,
+      title: tag.title,
+      tags: [for (final item in existing) if (item.id != tag.id) item],
+    );
+    if (clash != null) {
+      throw StateError('Já existe uma tag com este nome neste nível.');
+    }
+    FlashcardTagPolicy.assertAcyclic(
+      tagId: tag.id,
+      parentId: tag.parentId,
+      parentById: {
+        for (final item in existing)
+          if (item.id != tag.id) item.id: item.parentId,
+      },
+    );
+    await _db.transaction(() async {
+      await (_db.update(_db.flashcardTags)..where((t) => t.id.equals(tag.id.value)))
+          .write(ColonyMappers.fromFlashcardTag(tag));
+      await _events.record(
+        aggregateType: AggregateType.flashcard,
+        aggregateId: tag.id,
+        eventType: EventType.flashcardTagUpdated,
+        payload: {'title': tag.title},
+        sourceType: SourceType.manual,
+      );
+    });
+  }
+
+  Future<FlashcardTag> ensureTagPath({
+    required EntityId profileId,
+    required List<String> path,
+  }) async {
+    EntityId? parentId;
+    FlashcardTag? last;
+    for (final title in path) {
+      last = await createTag(
+        profileId: profileId,
+        title: title,
+        parentId: parentId,
+      );
+      parentId = last.id;
+    }
+    if (last == null) {
+      throw StateError('Caminho de tag vazio');
+    }
+    return last;
+  }
+
+  Future<void> setCardTags({
+    required Flashcard card,
+    required List<EntityId> tagIds,
+  }) async {
+    final unique = <EntityId>{...tagIds};
+    final tags = await listTags(card.profileId);
+    final byId = {for (final tag in tags) tag.id: tag};
+    final titles = [
+      for (final id in unique)
+        if (byId[id] != null) byId[id]!.title,
+    ];
+    await _db.transaction(() async {
+      await (_db.delete(_db.flashcardTagLinks)
+            ..where((t) => t.cardId.equals(card.id.value)))
+          .go();
+      final now = _clock();
+      for (final id in unique) {
+        if (byId[id] == null) continue;
+        await _db.into(_db.flashcardTagLinks).insert(
+              ColonyMappers.fromFlashcardTagLink(
+                FlashcardTagLink(
+                  cardId: card.id,
+                  tagId: id,
+                  linkedAt: now,
+                ),
+              ),
+            );
+      }
+      final updated = card.copyWith(
+        tags: titles,
+        updatedAt: now,
+        version: card.version + 1,
+      );
+      await (_db.update(_db.flashcards)
+            ..where((t) => t.id.equals(card.id.value)))
+          .write(ColonyMappers.fromFlashcard(updated));
+      await _events.record(
+        aggregateType: AggregateType.flashcard,
+        aggregateId: card.id,
+        eventType: EventType.flashcardTagged,
+        payload: {'tag_ids': [for (final id in unique) id.value]},
+        sourceType: SourceType.manual,
+      );
+    });
+  }
+
+  Future<void> _applyTagLabels({
+    required EntityId profileId,
+    required Iterable<Flashcard> cards,
+    required List<String> labels,
+    bool replace = false,
+  }) async {
+    final tagIds = <EntityId>[];
+    for (final label in labels) {
+      final path = FlashcardTagPolicy.parsePath(label);
+      if (path.isEmpty) continue;
+      final tag = await ensureTagPath(profileId: profileId, path: path);
+      tagIds.add(tag.id);
+    }
+    if (tagIds.isEmpty && !replace) return;
+    for (final card in cards) {
+      await setCardTags(card: card, tagIds: tagIds);
+    }
+  }
+
   Stream<List<FlashcardDeck>> watchDecks(EntityId profileId) {
     return (_db.select(_db.flashcardDecks)
           ..where((t) => t.profileId.equals(profileId.value)))
@@ -5409,6 +5630,11 @@ class FlashcardRepository {
         }
       }
     });
+    await _applyTagLabels(
+      profileId: profileId,
+      cards: created,
+      labels: tags,
+    );
     return created;
   }
 
@@ -5430,6 +5656,18 @@ class FlashcardRepository {
         sourceType: SourceType.manual,
       );
     });
+  }
+
+  Future<void> applyCardTagLabels({
+    required Flashcard card,
+    required List<String> labels,
+  }) {
+    return _applyTagLabels(
+      profileId: card.profileId,
+      cards: [card],
+      labels: labels,
+      replace: true,
+    );
   }
 
   Future<void> setSuspended(Flashcard card, bool suspended) async {
@@ -5623,6 +5861,9 @@ class FlashcardRepository {
           .get();
       final ids = [for (final row in related) row.id];
       if (ids.isEmpty) return const <EntityId>[];
+      await (_db.delete(_db.flashcardTagLinks)
+            ..where((t) => t.cardId.isIn(ids)))
+          .go();
       await (_db.delete(_db.flashcardReviewLogs)
             ..where((t) => t.cardId.isIn(ids)))
           .go();
@@ -5740,15 +5981,18 @@ class FlashcardRepository {
           for (final id in step.existingIds) {
             final current = byId[id];
             if (current == null) continue;
-            await updateCard(
-              current.copyWith(
-                back: step.card.back,
-                extra: step.card.extra,
-                tags: step.card.tags,
-                areaId: areaId ?? current.areaId,
-                priority: step.card.priority,
-                clearExtra: (step.card.extra ?? '').trim().isEmpty,
-              ),
+            final updated = current.copyWith(
+              back: step.card.back,
+              extra: step.card.extra,
+              tags: step.card.tags,
+              areaId: areaId ?? current.areaId,
+              priority: step.card.priority,
+              clearExtra: (step.card.extra ?? '').trim().isEmpty,
+            );
+            await updateCard(updated);
+            await applyCardTagLabels(
+              card: updated,
+              labels: step.card.tags,
             );
           }
           overwrittenCards += 1;

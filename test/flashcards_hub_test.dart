@@ -318,4 +318,67 @@ void main() {
 
     await _flushDisposeTimers(tester);
   });
+
+  testWidgets('FlashcardsHubScreen tags tab lists hierarchical tags', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(800, 1600);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    final now = DateTime.utc(2026, 8, 17, 12);
+    final db = ColonyDatabase.inMemory();
+    addTearDown(db.close);
+    final repos = ColonyRepositories.create(
+      db,
+      idGenerator: FixedIdGenerator([
+        for (var i = 1; i <= 40; i++) 'id-$i',
+      ]),
+      clock: () => now,
+    );
+    final profile = await repos.profiles.create(
+      colonyName: 'Test',
+      displayName: 'Caio',
+      timezone: 'UTC',
+      locale: 'pt_BR',
+      baseCurrency: 'BRL',
+    );
+    await repos.preferences.save(
+      AppPreferences.defaults().copyWith(onboardingCompleted: true),
+    );
+    final music = await repos.flashcards.createTag(
+      profileId: profile.id,
+      title: 'Música',
+    );
+    await repos.flashcards.createTag(
+      profileId: profile.id,
+      title: 'Harmonia',
+      parentId: music.id,
+    );
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          databaseProvider.overrideWithValue(db),
+          clockProvider.overrideWithValue(() => now),
+        ],
+        child: MaterialApp(
+          theme: ColonyTheme.dark(),
+          home: const Scaffold(
+            body: FlashcardsHubScreen(openTags: true),
+          ),
+        ),
+      ),
+    );
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 500));
+
+    expect(find.text(AppStrings.flashcardsBrowseTags), findsWidgets);
+    expect(find.text('Música'), findsWidgets);
+    expect(find.text('Harmonia'), findsWidgets);
+    expect(find.text(AppStrings.flashcardsTagsEmptyHint), findsNothing);
+
+    await _flushDisposeTimers(tester);
+  });
 }

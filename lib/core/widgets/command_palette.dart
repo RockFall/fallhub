@@ -50,6 +50,7 @@ class _CommandPaletteState extends ConsumerState<CommandPalette> {
       Icons.upload_file_outlined,
     ),
     _PaletteCommand('Novo baralho', '/flashcards', Icons.add),
+    _PaletteCommand('Tags de flashcards', '/flashcards?tab=tags', Icons.label_outline),
     _PaletteCommand('Novo nó de pesquisa', '/research?create=1', Icons.add),
     _PaletteCommand('Finanças', '/resources/finance', Icons.account_balance_wallet_outlined),
     _PaletteCommand('Nova conta financeira', '/resources/finance?create=account', Icons.add),

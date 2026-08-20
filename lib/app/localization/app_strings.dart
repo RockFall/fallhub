@@ -654,7 +654,7 @@ abstract final class AppStrings {
       'Nenhum cartão ainda. Crie um baralho ou semeie o mapa.';
   static const flashcardsEmptyHint =
       'Conhecimento não precisa virar cartão. Use o mapa para áreas e revise só o que importa.';
-  static const flashcardsSearchHint = 'Buscar cartões, baralhos ou áreas';
+  static const flashcardsSearchHint = 'Buscar cartões, baralhos, áreas ou tags';
   static const flashcardsNoResults = 'Nada corresponde à busca.';
   static const flashcardsMapTitle = 'Mapa de conhecimento';
   static const flashcardsMapEmpty = 'Nenhuma área no mapa.';
@@ -680,7 +680,27 @@ abstract final class AppStrings {
   static const flashcardsFront = 'Frente';
   static const flashcardsBack = 'Verso';
   static const flashcardsExtra = 'Nota extra (opcional)';
-  static const flashcardsTags = 'Tags (vírgula)';
+  static const flashcardsTags = 'Tags';
+  static const flashcardsTagsTitle = 'Tags';
+  static const flashcardsBrowseMap = 'Mapa';
+  static const flashcardsBrowseDecks = 'Baralhos';
+  static const flashcardsBrowseTags = 'Tags';
+  static const flashcardsNewTag = 'Nova tag';
+  static const flashcardsNewSubtag = 'Nova subtag';
+  static const flashcardsEditTag = 'Editar tag';
+  static const flashcardsTagTitle = 'Nome da tag';
+  static const flashcardsTagTitleRequired = 'Informe o nome da tag';
+  static const flashcardsParentTag = 'Tag pai (opcional)';
+  static const flashcardsNoParentTag = 'Raiz das tags';
+  static const flashcardsTagsEmpty = 'Nenhuma tag ainda.';
+  static const flashcardsTagsEmptyHint =
+      'Uma tag agrupa cartões de vários baralhos. Pode ter subtags; estudar o pai inclui os filhos.';
+  static const flashcardsTagsHint = 'Tag ou caminho (ex. Música / Harmonia)';
+  static const flashcardsAddTag = 'Adicionar';
+  static const flashcardsSubtags = 'Subtags';
+  static const flashcardsNoCardsInTag = 'Nenhum cartão com esta tag ou subtags.';
+  static const flashcardsStudyTag = 'Estudar tag';
+  static const flashcardsPracticeTag = 'Praticar tag';
   static const flashcardsBidirectional = 'Também criar o inverso';
   static const flashcardsClozeHint =
       'Use {{c1::resposta}} para lacunas. Cada cN vira um cartão.';
