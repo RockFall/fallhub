@@ -69,12 +69,14 @@ part 'colony_database.g.dart';
   FlashcardTags,
   FlashcardTagLinks,
   CapturedNotifications,
+  GoogleTimelineImports,
+  GoogleTimelinePlaceLabels,
 ])
 class ColonyDatabase extends _$ColonyDatabase {
   ColonyDatabase(super.e);
 
   @override
-  int get schemaVersion => 38;
+  int get schemaVersion => 39;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -227,6 +229,10 @@ class ColonyDatabase extends _$ColonyDatabase {
           }
           if (from < 38) {
             await m.createTable(capturedNotifications);
+          }
+          if (from < 39) {
+            await m.createTable(googleTimelineImports);
+            await m.createTable(googleTimelinePlaceLabels);
           }
         },
       );
@@ -2142,6 +2148,58 @@ class ColonyMappers {
       extractorKind: notification.extractorKind.name,
       ledgerTransactionId: Value(notification.ledgerTransactionId?.value),
       createdAt: notification.createdAt.millisecondsSinceEpoch,
+    );
+  }
+
+  static domain.GoogleTimelineImport toGoogleTimelineImport(
+    GoogleTimelineImportRow row,
+  ) {
+    final decoded = jsonDecode(row.payloadJson);
+    final document = decoded is Map<String, dynamic>
+        ? domain.GoogleTimelineDocument.fromJson(decoded)
+        : const domain.GoogleTimelineDocument();
+    return domain.GoogleTimelineImport(
+      id: domain.EntityId(row.id),
+      profileId: domain.EntityId(row.profileId),
+      fileName: row.fileName,
+      importedAt: DateTime.fromMillisecondsSinceEpoch(row.importedAt, isUtc: true),
+      document: document,
+    );
+  }
+
+  static GoogleTimelineImportsCompanion fromGoogleTimelineImport(
+    domain.GoogleTimelineImport import,
+  ) {
+    return GoogleTimelineImportsCompanion.insert(
+      id: import.id.value,
+      profileId: import.profileId.value,
+      fileName: import.fileName,
+      importedAt: import.importedAt.millisecondsSinceEpoch,
+      payloadJson: jsonEncode(import.document.toJson()),
+    );
+  }
+
+  static domain.TimelinePlaceLabel toTimelinePlaceLabel(
+    GoogleTimelinePlaceLabelRow row,
+  ) {
+    return domain.TimelinePlaceLabel(
+      placeId: row.placeId,
+      category: domain.TimelinePlaceCategory.values.byName(row.category),
+      customName: row.customName,
+    );
+  }
+
+  static GoogleTimelinePlaceLabelsCompanion fromTimelinePlaceLabel({
+    required domain.EntityId profileId,
+    required domain.TimelinePlaceLabel label,
+    required DateTime updatedAt,
+  }) {
+    return GoogleTimelinePlaceLabelsCompanion.insert(
+      profileId: profileId.value,
+      placeId: label.placeId,
+      category: label.category.name,
+      customName: Value(label.customName),
+      updatedAt: updatedAt.millisecondsSinceEpoch,
     );
   }
 }

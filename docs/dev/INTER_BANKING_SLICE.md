@@ -46,7 +46,7 @@ Histórico Inter entra por **OFX/CSV uma vez**. Gastos novos entram pelo **leito
 | Banco | `captured_notifications`, ingest + `ensureInterAccount`, migration v36→v38 |
 | Android | `ColonyNotificationListenerService`, inbox JSONL, Method/EventChannel `colony/notifications` |
 | UI | Integrações (setup numerado), Finanças (import OFX/CSV), strings em `app_strings.dart` |
-| Testes | extrator/OFX, ingest no Drift, migration v37, widgets de Integrações e import |
+| Testes | extrator/OFX, ingest no Drift, migration v38, widgets de Integrações e import |
 
 Arquivos novos relevantes: Kotlin em `android/app/src/main/kotlin/com/fallhub/fallhub/`, `notification_capture_platform.dart`, `inter_local_connector.dart`.
 

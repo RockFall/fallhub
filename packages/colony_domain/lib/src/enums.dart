@@ -111,6 +111,7 @@ enum AggregateType {
   knowledgeArea,
   flashcardDeck,
   flashcard,
+  googleTimeline,
   domainEvent,
 }
 
@@ -213,6 +214,7 @@ enum EventType {
   knowledgeAreaPlacementRemoved,
   researchKnowledgeLinked,
   researchKnowledgeUnlinked,
+  googleTimelineImported,
 }
 
 enum UndoActionType {

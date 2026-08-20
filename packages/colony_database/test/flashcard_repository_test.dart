@@ -92,7 +92,7 @@ void main() {
     expect(buried.dueAt.isAfter(now), isTrue);
 
     final snapshot = await repos.export.buildSnapshot();
-    expect(snapshot.version, 33);
+    expect(snapshot.version, 34);
     expect(snapshot.knowledgeAreas, isNotEmpty);
     expect(snapshot.flashcardDecks, hasLength(1));
     expect(snapshot.flashcards.length, greaterThanOrEqualTo(4));
@@ -288,7 +288,7 @@ void main() {
     expect(stored.priority, 1);
 
     final snapshot = await repos.export.buildSnapshot();
-    expect(snapshot.version, 33);
+    expect(snapshot.version, 34);
     expect(snapshot.flashcards.single.priority, 1);
 
     await repos.restore.restore(snapshot);

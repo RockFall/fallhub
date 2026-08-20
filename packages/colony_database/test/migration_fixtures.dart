@@ -133,6 +133,9 @@ Future<ColonyDatabase> openMigratedFrom(
   if (fromVersion >= 38) {
     _createPhase38Tables(sqliteDb);
   }
+  if (fromVersion >= 39) {
+    _createPhase39Tables(sqliteDb);
+  }
 
   sqliteDb.userVersion = fromVersion;
   seed?.call(sqliteDb);
@@ -1159,6 +1162,28 @@ void _createPhase38Tables(Database db) {
       ledger_transaction_id TEXT REFERENCES ledger_transactions(id),
       created_at INTEGER NOT NULL,
       UNIQUE(profile_id, native_key)
+    )
+  ''');
+}
+
+void _createPhase39Tables(Database db) {
+  db.execute('''
+    CREATE TABLE google_timeline_imports (
+      id TEXT NOT NULL PRIMARY KEY,
+      profile_id TEXT NOT NULL REFERENCES profiles (id),
+      file_name TEXT NOT NULL,
+      imported_at INTEGER NOT NULL,
+      payload_json TEXT NOT NULL
+    )
+  ''');
+  db.execute('''
+    CREATE TABLE google_timeline_place_labels (
+      profile_id TEXT NOT NULL REFERENCES profiles (id),
+      place_id TEXT NOT NULL,
+      category TEXT NOT NULL,
+      custom_name TEXT,
+      updated_at INTEGER NOT NULL,
+      PRIMARY KEY (profile_id, place_id)
     )
   ''');
 }

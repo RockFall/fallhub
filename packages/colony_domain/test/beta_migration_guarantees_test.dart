@@ -3,7 +3,7 @@ import 'package:test/test.dart';
 
 /// Documents supported export band for beta (ADR-034 / Iter 92).
 void main() {
-  test('export parser accepts band 1..33 and rejects 34', () {
+  test('export parser accepts band 1..34 and rejects 35', () {
     final now = DateTime.utc(2026, 8, 7, 12);
     Map<String, dynamic> minimal(int version) => {
           'exported_at': now.toIso8601String(),
@@ -36,8 +36,9 @@ void main() {
     expect(ExportSnapshot.fromJson(minimal(31)).version, 31);
     expect(ExportSnapshot.fromJson(minimal(32)).version, 32);
     expect(ExportSnapshot.fromJson(minimal(33)).version, 33);
+    expect(ExportSnapshot.fromJson(minimal(34)).version, 34);
     expect(
-      () => ExportSnapshot.fromJson(minimal(34)),
+      () => ExportSnapshot.fromJson(minimal(35)),
       throwsA(isA<ExportSnapshotException>()),
     );
     expect(

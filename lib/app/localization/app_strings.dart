@@ -1223,6 +1223,174 @@ abstract final class AppStrings {
   static const tripUnlinkInventoryItem = 'Desvincular item';
   static const tripInventoryPickerEmpty = 'Nenhum item de inventário disponível.';
 
+  static const timelineHubTitle = 'Linha do tempo';
+  static const timelineImport = 'Importar Timeline';
+  static const timelineReimport = 'Substituir JSON';
+  static const timelineImportedBadge = 'Importado do Google Maps';
+  static const timelineHowToTitle = 'Como exportar no telemóvel';
+  static const timelineHowToLead =
+      'A Timeline vive no aparelho. Não há API: exporte o JSON no Maps e traga o ficheiro para a colónia. Um novo import apaga o anterior e grava este.';
+  static const timelineAndroidTitle = 'Android';
+  static const timelineAndroidSteps =
+      '1. Abra Ajustes → Localização.\n'
+      '2. Serviços de localização → Timeline.\n'
+      '3. Exportar dados da Timeline.\n'
+      '4. Guarde o ficheiro (Timeline.json ou Linha do tempo.json).\n'
+      '5. Volte aqui e escolha o JSON.';
+  static const timelineIosTitle = 'iPhone / iPad';
+  static const timelineIosSteps =
+      '1. Abra o Google Maps.\n'
+      '2. Toque na foto de perfil.\n'
+      '3. Ajustes → Conteúdo pessoal.\n'
+      '4. Exportar dados da Timeline.\n'
+      '5. Partilhe/guarde o JSON e abra-o neste ecrã.';
+  static const timelineHelpLink = 'Ajuda oficial do Google Maps';
+  static const timelinePickJson = 'Escolher ficheiro JSON';
+  static const timelinePasteJson = 'Colar JSON';
+  static const timelinePasteHint = 'Cole o conteúdo de Timeline.json';
+  static const timelineReadError = 'Não foi possível ler o ficheiro.';
+  static const timelineParseError = 'JSON inválido ou não é a Timeline on-device.';
+  static const timelinePreviewTitle = 'Pré-visualização';
+  static const timelineOverwriteTitle = 'Substituir Timeline importada?';
+  static const timelineOverwriteBody =
+      'Já existe um import. O JSON antigo será apagado e este passa a ser a fonte. Os nomes e categorias que você atribuiu aos lugares são mantidos.';
+  static const timelineOverwriteConfirm = 'Apagar o antigo e importar';
+  static const timelineImportConfirm = 'Importar para a colónia';
+  static const timelineImportSuccess = 'Timeline importada.';
+  static const timelineEmptyHub =
+      'Importe a Timeline do Google Maps para reconstruir dia, viagens, estatísticas, lugares, cidades e o mundo.';
+  static const timelineEmptyHint =
+      'Categorias do Maps (gastronomia, hotéis…) não vêm no JSON. Inferimos por horário e você pode rotular cada lugar.';
+  static const timelineTabDay = 'Dia';
+  static const timelineTabTrips = 'Viagens';
+  static const timelineTabStats = 'Estatísticas';
+  static const timelineTabPlaces = 'Lugares';
+  static const timelineTabCities = 'Cidades';
+  static const timelineTabWorld = 'Mundo';
+  static const timelineTabRhythm = 'Ritmo';
+  static const timelineTabSignals = 'Sinais';
+  static const timelineNoDayData = 'Nenhum segmento neste dia.';
+  static const timelinePickDay = 'Dias com dados';
+  static const timelineMemoryTrips = 'Viagens da Timeline';
+  static const timelineManualTrips = 'Viagens manuais';
+  static const timelineNoMemoryTrips =
+      'O JSON não trouxe blocos timelineMemory.trip. Distâncias e destinos aparecem quando o Maps os agrupou.';
+  static const timelineTransportTitle = 'Deslocamentos';
+  static const timelineVisitHoursTitle = 'Horas em lugares';
+  static const timelineHomeWorkTitle = 'Casa e trabalho';
+  static const timelineQualityTitle = 'Qualidade do rasto';
+  static const timelineParkingTitle = 'Estacionamentos';
+  static const timelineNotesTitle = 'Notas da Timeline';
+  static const timelinePersonaTitle = 'Persona vs. real';
+  static const timelineFrequentTitle = 'Lugares frequentes';
+  static const timelineLabelPlace = 'Rotular lugar';
+  static const timelineCustomName = 'Nome (opcional)';
+  static const timelineCategory = 'Categoria';
+  static const timelineSaveLabel = 'Guardar rótulo';
+  static const timelineWalk = 'A pé';
+  static const timelineDrive = 'Carro';
+  static const timelineTransit = 'Transportes';
+  static const timelineFly = 'Avião';
+  static const timelineCycling = 'Bicicleta';
+  static const timelineOtherMode = 'Outro';
+  static const timelineUnknownPlace = 'Lugar sem nome';
+  static const timelineInferred = 'Categoria inferida';
+  static const timelineProvenanceHint =
+      'Fonte: importação local. Sem diagnóstico médico. Sem nomes oficiais do Maps.';
+  static const timelineHelpUrl =
+      'https://support.google.com/maps/answer/14164705';
+  static const timelineHeatmapHint =
+      'Minutos parados por hora da semana (segunda → domingo).';
+  static const timelineNightsAway = 'Noites fora';
+  static const timelineRadius = 'Raio desde casa';
+  static const timelineCommuteDays = 'Dias casa+trabalho';
+  static const timelineGaps = 'Buracos > 2 h';
+  static const timelineImplausible = 'Trechos implausíveis';
+  static const timelineNoPlaces = 'Nenhuma visita geolocalizada.';
+  static const timelineNoCities =
+      'Sem cidades no gazeteer para estas coordenadas.';
+  static const timelineNoCountries = 'Nenhum país identificado.';
+  static const timelineNoParking = 'Nenhum estacionamento no JSON.';
+  static const timelineNoNotes = 'Nenhuma nota timelineMemory.';
+  static const timelineAffinityDeclared = 'Afinidade (Maps)';
+  static const timelineAffinityActual = 'Quilómetros reais';
+  static const timelinePlacesInCategory = 'lugares';
+  static const timelineVisits = 'visitas';
+  static const timelineHoursShort = 'h';
+  static const timelineKmShort = 'km';
+  static const timelineDestinations = 'destinos';
+  static const timelineHierarchyNested = 'Aninhado';
+  static const timelineTimeless = 'Sem tempo';
+  static const timelineSensorTitle = 'Sensores brutos';
+  static const timelineRawPositions = 'posições GPS';
+  static const timelineSensorHits = 'leituras de atividade';
+  static const timelineRange = 'Período no ficheiro';
+  static const timelineFileMeta = 'Ficheiro';
+
+  static String timelineCategoryLabel(TimelinePlaceCategory category) =>
+      switch (category) {
+        TimelinePlaceCategory.home => 'Casa',
+        TimelinePlaceCategory.work => 'Trabalho',
+        TimelinePlaceCategory.gastronomy => 'Gastronomia',
+        TimelinePlaceCategory.shopping => 'Compras',
+        TimelinePlaceCategory.hotels => 'Hotéis',
+        TimelinePlaceCategory.culture => 'Cultura',
+        TimelinePlaceCategory.attractions => 'Atrações',
+        TimelinePlaceCategory.airports => 'Aeroportos',
+        TimelinePlaceCategory.transit => 'Trânsito',
+        TimelinePlaceCategory.other => 'Outros',
+      };
+
+  static String timelineModeLabel(String id) => switch (id) {
+        'walking' => timelineWalk,
+        'driving' => timelineDrive,
+        'transit' => timelineTransit,
+        'flying' => timelineFly,
+        'cycling' => timelineCycling,
+        'other' => timelineOtherMode,
+        'unknown' => 'Desconhecido',
+        _ => id,
+      };
+
+  static String timelineDurationHours(Duration d) {
+    final hours = d.inMinutes / 60.0;
+    if (hours >= 10) return '${hours.round()} h';
+    if (hours >= 1) return '${hours.toStringAsFixed(1)} h';
+    return '${d.inMinutes} min';
+  }
+
+  static String timelineKm(double km) {
+    if (km >= 100) return '${km.round()} km';
+    if (km >= 10) return '${km.toStringAsFixed(1)} km';
+    return '${km.toStringAsFixed(2)} km';
+  }
+
+  static String timelinePreviewCounts({
+    required int visits,
+    required int activities,
+    required int trips,
+    required int places,
+  }) {
+    return '$visits visitas · $activities deslocamentos · $trips viagens · $places placeIds';
+  }
+
+  static String timelineOverwriteSummary(String fileName, DateTime at) {
+    final d = at.toLocal();
+    final stamp =
+        '${d.day.toString().padLeft(2, '0')}/${d.month.toString().padLeft(2, '0')}/${d.year}';
+    return 'Import atual: $fileName ($stamp)';
+  }
+
+  static String timelineWeekdayShort(int mondayIndex) => const [
+        'Seg',
+        'Ter',
+        'Qua',
+        'Qui',
+        'Sex',
+        'Sáb',
+        'Dom',
+      ][mondayIndex.clamp(0, 6)];
+
   static String tripStatusLabel(TripStatus status) => switch (status) {
         TripStatus.planned => 'Planejada',
         TripStatus.active => 'Ativa',
@@ -1733,6 +1901,8 @@ abstract final class AppStrings {
       'flashcard_review_logs' => 'Revisões de flashcards',
       'knowledge_area_placements' => 'Colocações de áreas',
       'research_knowledge_links' => 'Pontes pesquisa↔conhecimento',
+      'google_timeline_import' => 'Timeline importada',
+      'google_timeline_place_labels' => 'Rótulos de lugares',
       _ => key,
     };
     return '$label: $count';

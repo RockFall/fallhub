@@ -228,6 +228,7 @@ class ChronicleScreen extends ConsumerWidget {
       EventType.flashcardTagCreated => 'Tag de flashcard criada',
       EventType.flashcardTagUpdated => 'Tag de flashcard atualizada',
       EventType.flashcardTagged => 'Flashcard etiquetado',
+      EventType.googleTimelineImported => 'Timeline importada',
       _ => event.eventType.name,
     };
   }

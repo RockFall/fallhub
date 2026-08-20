@@ -1127,14 +1127,22 @@ void main() {
     expect(snapshot.flashcardTagLinks, isEmpty);
   });
 
-  test('rejects unsupported version 34', () {
+  test('parses export version 34 with empty timeline import', () {
     final json = Map<String, dynamic>.from(baseJson)..['version'] = 34;
+    final snapshot = ExportSnapshot.fromJson(json);
+    expect(snapshot.version, 34);
+    expect(snapshot.googleTimelineImport, isNull);
+    expect(snapshot.googleTimelinePlaceLabels, isEmpty);
+  });
+
+  test('rejects unsupported version 35', () {
+    final json = Map<String, dynamic>.from(baseJson)..['version'] = 35;
 
     expect(
       () => ExportSnapshot.fromJson(json),
       throwsA(
         predicate<ExportSnapshotException>(
-          (e) => e.message.contains('34'),
+          (e) => e.message.contains('35'),
         ),
       ),
     );

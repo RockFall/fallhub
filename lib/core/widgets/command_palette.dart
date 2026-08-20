@@ -59,6 +59,8 @@ class _CommandPaletteState extends ConsumerState<CommandPalette> {
     _PaletteCommand('Inventário', '/resources/inventory', Icons.inventory_2_outlined),
     _PaletteCommand('Novo item de inventário', '/resources/inventory', Icons.add),
     _PaletteCommand('Viagens', '/resources/travel', Icons.luggage_outlined),
+    _PaletteCommand('Linha do tempo', '/resources/travel', Icons.map_outlined),
+    _PaletteCommand('Importar Timeline', '/resources/travel', Icons.upload_file),
     _PaletteCommand('Nova viagem', '/resources/travel', Icons.add),
     _PaletteCommand('Casa', '/resources/home', Icons.home_repair_service_outlined),
     _PaletteCommand('Nova manutenção', '/resources/home', Icons.add),
