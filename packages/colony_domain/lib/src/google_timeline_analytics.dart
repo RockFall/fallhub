@@ -18,10 +18,7 @@ class TransportBucket {
 }
 
 class MonthTransportStats {
-  const MonthTransportStats({
-    required this.yearMonth,
-    required this.buckets,
-  });
+  const MonthTransportStats({required this.yearMonth, required this.buckets});
 
   final String yearMonth;
   final Map<String, TransportBucket> buckets;
@@ -179,6 +176,7 @@ class TimelineInsights {
   final Map<String, double> actualModeShare;
   final int gaps;
   final int implausibleLegs;
+
   /// 7 weekdays × 24 hours of visit minutes (Monday = 0).
   final List<int> hourHeatmapMinutes;
   final int commuteDays;
@@ -188,7 +186,8 @@ class TimelineInsights {
   int get placeCount => places.length;
   int get cityCount => cities.length;
   int get countryCount => countries.length;
-  double get totalKm => walkKm + driveKm + transitKm + flyKm + cyclingKm + otherKm;
+  double get totalKm =>
+      walkKm + driveKm + transitKm + flyKm + cyclingKm + otherKm;
 }
 
 abstract final class GoogleTimelineAnalytics {
@@ -253,11 +252,23 @@ abstract final class GoogleTimelineAnalytics {
     return u == 'WORK' || u == 'TYPE_WORK';
   }
 
+  static List<GeoPoint> flyingAnchors(GoogleTimelineDocument doc) {
+    final out = <GeoPoint>[];
+    for (final a in doc.activities) {
+      final type = a.activityType;
+      if (type == null || !flyingTypes.contains(type.toUpperCase())) continue;
+      if (a.startLocation != null) out.add(a.startLocation!);
+      if (a.endLocation != null) out.add(a.endLocation!);
+    }
+    return out;
+  }
+
   static TimelinePlaceCategory categoryFor(
     TimelineVisit visit, {
     required GoogleTimelineDocument doc,
     required Map<String, TimelinePlaceLabel> labels,
     GeoPoint? home,
+    List<GeoPoint>? flyingAnchors,
   }) {
     final placeId = visit.placeId;
     if (placeId != null && labels[placeId] != null) {
@@ -273,19 +284,16 @@ abstract final class GoogleTimelineAnalytics {
       }
     }
     final loc = visit.location;
+    final anchors = flyingAnchors ?? GoogleTimelineAnalytics.flyingAnchors(doc);
     if (loc != null) {
-      for (final a in doc.activities) {
-        if (a.activityType != null &&
-            flyingTypes.contains(a.activityType!.toUpperCase())) {
-          final nearStart = a.startLocation != null &&
-              CityGazetteer.distanceKm(loc, a.startLocation!) < 3;
-          final nearEnd = a.endLocation != null &&
-              CityGazetteer.distanceKm(loc, a.endLocation!) < 3;
-          if (nearStart || nearEnd) return TimelinePlaceCategory.airports;
+      for (final anchor in anchors) {
+        if (CityGazetteer.distanceKm(loc, anchor) < 3) {
+          return TimelinePlaceCategory.airports;
         }
       }
     }
-    final overnight = (visit.duration >= const Duration(hours: 8) &&
+    final overnight =
+        (visit.duration >= const Duration(hours: 8) &&
             visit.startAt.toUtc().hour >= 20) ||
         (visit.endAt.toUtc().hour <= 8 &&
             visit.duration >= const Duration(hours: 6));
@@ -314,6 +322,7 @@ abstract final class GoogleTimelineAnalytics {
     Map<String, TimelinePlaceLabel> labels = const {},
   }) {
     final home = homeOf(doc);
+    final flyAnchors = flyingAnchors(doc);
     final places = <String, PlaceRollup>{};
     var homeHours = Duration.zero;
     var workHours = Duration.zero;
@@ -333,8 +342,15 @@ abstract final class GoogleTimelineAnalytics {
 
     for (final visit in doc.visits) {
       span(visit.startAt, visit.endAt);
-      final cat = categoryFor(visit, doc: doc, labels: labels, home: home);
-      categoryHours[cat] = (categoryHours[cat] ?? Duration.zero) + visit.duration;
+      final cat = categoryFor(
+        visit,
+        doc: doc,
+        labels: labels,
+        home: home,
+        flyingAnchors: flyAnchors,
+      );
+      categoryHours[cat] =
+          (categoryHours[cat] ?? Duration.zero) + visit.duration;
       if (cat == TimelinePlaceCategory.home) {
         homeHours += visit.duration;
         homeDays.add(_dayKey(visit.startAt));
@@ -350,7 +366,8 @@ abstract final class GoogleTimelineAnalytics {
       vacc.total += visit.duration;
       vacc.visits += 1;
       _addHeat(heatmap, visit.startAt, visit.endAt);
-      final key = visit.placeId ??
+      final key =
+          visit.placeId ??
           (visit.location == null
               ? '${visit.startAt.toIso8601String()}'
               : '${visit.location!.latitude.toStringAsFixed(4)},${visit.location!.longitude.toStringAsFixed(4)}');
@@ -467,8 +484,9 @@ abstract final class GoogleTimelineAnalytics {
     }
 
     final transportByMonth = [
-      for (final e in (monthBuckets.entries.toList()
-        ..sort((a, b) => a.key.compareTo(b.key))))
+      for (final e
+          in (monthBuckets.entries.toList()
+            ..sort((a, b) => a.key.compareTo(b.key))))
         MonthTransportStats(
           yearMonth: e.key,
           buckets: {
@@ -494,8 +512,9 @@ abstract final class GoogleTimelineAnalytics {
     };
 
     final visitHoursByMonth = [
-      for (final e in (visitMonthAcc.entries.toList()
-        ..sort((a, b) => a.key.compareTo(b.key))))
+      for (final e
+          in (visitMonthAcc.entries.toList()
+            ..sort((a, b) => a.key.compareTo(b.key))))
         MonthVisitStats(
           yearMonth: e.key,
           total: e.value.total,
@@ -601,19 +620,29 @@ abstract final class GoogleTimelineAnalytics {
   }) {
     final start = DateTime.utc(dayUtc.year, dayUtc.month, dayUtc.day);
     final end = start.add(const Duration(days: 1));
-    bool overlaps(DateTime a, DateTime b) => a.isBefore(end) && b.isAfter(start);
+    bool overlaps(DateTime a, DateTime b) =>
+        a.isBefore(end) && b.isAfter(start);
     final items = <DayItem>[];
+    final flyAnchors = flyingAnchors(doc);
 
     for (final v in doc.visits) {
       if (!overlaps(v.startAt, v.endAt)) continue;
-      final cat = categoryFor(v, doc: doc, labels: labels);
-      final city = v.location == null ? null : CityGazetteer.nearest(v.location!);
+      final cat = categoryFor(
+        v,
+        doc: doc,
+        labels: labels,
+        flyingAnchors: flyAnchors,
+      );
+      final city = v.location == null
+          ? null
+          : CityGazetteer.nearest(v.location!);
       items.add(
         DayItem(
           startAt: v.startAt,
           endAt: v.endAt,
           kind: 'visit',
-          title: labels[v.placeId]?.customName ??
+          title:
+              labels[v.placeId]?.customName ??
               city?.name ??
               v.semanticType ??
               'Visita',
@@ -646,7 +675,8 @@ abstract final class GoogleTimelineAnalytics {
           probability: a.candidateProbability ?? a.probability,
         ),
       );
-      if (a.parking != null && overlaps(a.parking!.startAt, a.parking!.startAt)) {
+      if (a.parking != null &&
+          overlaps(a.parking!.startAt, a.parking!.startAt)) {
         items.add(
           DayItem(
             startAt: a.parking!.startAt,

@@ -11,6 +11,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../app/localization/app_strings.dart';
 import '../../application/timeline_controllers.dart';
+import '../../application/timeline_import_parse.dart';
 import '../../application/timeline_providers.dart';
 
 class ImportTimelineSheet extends ConsumerStatefulWidget {
@@ -40,6 +41,13 @@ class _ImportTimelineSheetState extends ConsumerState<ImportTimelineSheet> {
     await launchUrl(uri, mode: LaunchMode.externalApplication);
   }
 
+  String _errorMessage(Object e) {
+    if (e is TimelineImportTooLarge) {
+      return AppStrings.timelineFileTooLargeBytes(e.megaBytes);
+    }
+    return '${AppStrings.timelineParseError} ($e)';
+  }
+
   Future<void> _pickFile() async {
     setState(() {
       _error = null;
@@ -49,32 +57,39 @@ class _ImportTimelineSheetState extends ConsumerState<ImportTimelineSheet> {
       final result = await FilePicker.platform.pickFiles(
         type: FileType.custom,
         allowedExtensions: const ['json', 'txt'],
-        withData: true,
+        withData: false,
       );
       if (result == null || result.files.isEmpty) {
         if (mounted) setState(() => _busy = false);
         return;
       }
       final file = result.files.first;
-      String? source;
-      if (file.bytes != null && file.bytes!.isNotEmpty) {
-        source = utf8.decode(file.bytes!);
-      } else if (!kIsWeb && file.path != null) {
-        source = await File(file.path!).readAsString();
-      }
-      if (source == null || source.trim().isEmpty) {
-        setState(() {
-          _busy = false;
-          _error = AppStrings.timelineReadError;
-        });
+      if (!kIsWeb && file.path != null && file.path!.isNotEmpty) {
+        await _parsePath(file.path!, file.name);
         return;
       }
-      await _parse(source, file.name);
+      if (file.bytes != null && file.bytes!.isNotEmpty) {
+        if (file.bytes!.length > timelineImportMaxBytes) {
+          setState(() {
+            _busy = false;
+            _error = AppStrings.timelineFileTooLargeBytes(
+              (file.bytes!.length / (1024 * 1024)).ceil(),
+            );
+          });
+          return;
+        }
+        await _parseSource(utf8.decode(file.bytes!), file.name);
+        return;
+      }
+      setState(() {
+        _busy = false;
+        _error = AppStrings.timelineReadError;
+      });
     } catch (e) {
       if (!mounted) return;
       setState(() {
         _busy = false;
-        _error = '${AppStrings.timelineParseError} ($e)';
+        _error = _errorMessage(e);
       });
     }
   }
@@ -110,27 +125,56 @@ class _ImportTimelineSheetState extends ConsumerState<ImportTimelineSheet> {
       _error = null;
       _busy = true;
     });
-    await _parse(source, 'colado.json');
+    await _parseSource(source, 'colado.json');
   }
 
-  Future<void> _parse(String source, String fileName) async {
+  Future<void> _parsePath(String path, String fileName) async {
     try {
-      final doc = await compute(GoogleTimelineCodec.parse, source);
-      if (!mounted) return;
-      setState(() {
-        _preview = doc;
-        _fileName = fileName;
-        _busy = false;
-        _error = null;
-      });
+      final length = await File(path).length();
+      if (length > timelineImportMaxBytes) {
+        if (!mounted) return;
+        setState(() {
+          _busy = false;
+          _error = AppStrings.timelineFileTooLargeBytes(
+            (length / (1024 * 1024)).ceil(),
+          );
+        });
+        return;
+      }
+      final json = await compute(parseGoogleTimelineFile, path);
+      _acceptPreview(json, fileName);
     } catch (e) {
       if (!mounted) return;
       setState(() {
         _busy = false;
         _preview = null;
-        _error = '${AppStrings.timelineParseError} ($e)';
+        _error = _errorMessage(e);
       });
     }
+  }
+
+  Future<void> _parseSource(String source, String fileName) async {
+    try {
+      final json = await compute(parseGoogleTimelineSource, source);
+      _acceptPreview(json, fileName);
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _busy = false;
+        _preview = null;
+        _error = _errorMessage(e);
+      });
+    }
+  }
+
+  void _acceptPreview(Map<String, dynamic> json, String fileName) {
+    if (!mounted) return;
+    setState(() {
+      _preview = GoogleTimelineDocument.fromJson(json);
+      _fileName = fileName;
+      _busy = false;
+      _error = null;
+    });
   }
 
   Future<void> _confirm() async {
@@ -204,9 +248,9 @@ class _ImportTimelineSheetState extends ConsumerState<ImportTimelineSheet> {
               const SizedBox(height: ColonySpacing.sm),
               Text(
                 AppStrings.timelineHowToLead,
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: ColonyColors.textMuted,
-                    ),
+                style: Theme.of(
+                  context,
+                ).textTheme.bodyMedium?.copyWith(color: ColonyColors.textMuted),
               ),
               const SizedBox(height: ColonySpacing.lg),
               ColonyPanel(
@@ -258,8 +302,8 @@ class _ImportTimelineSheetState extends ConsumerState<ImportTimelineSheet> {
                 Text(
                   _error!,
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: ColonyColors.statusRisk,
-                      ),
+                    color: ColonyColors.statusRisk,
+                  ),
                 ),
               ],
               if (preview != null) ...[
@@ -288,7 +332,10 @@ class _ImportTimelineSheetState extends ConsumerState<ImportTimelineSheet> {
                       FilledButton(
                         onPressed: _busy ? null : _confirm,
                         child: Text(
-                          ref.watch(googleTimelineImportProvider).asData?.value ==
+                          ref
+                                      .watch(googleTimelineImportProvider)
+                                      .asData
+                                      ?.value ==
                                   null
                               ? AppStrings.timelineImportConfirm
                               : AppStrings.timelineOverwriteConfirm,

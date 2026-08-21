@@ -73,7 +73,10 @@ part 'colony_database.g.dart';
   GoogleTimelinePlaceLabels,
 ])
 class ColonyDatabase extends _$ColonyDatabase {
-  ColonyDatabase(super.e);
+  ColonyDatabase(super.e, {this.dataDirectory});
+
+  /// App documents dir when opened from disk. Null for in-memory tests.
+  final String? dataDirectory;
 
   @override
   int get schemaVersion => 39;
@@ -424,7 +427,7 @@ class ColonyDatabase extends _$ColonyDatabase {
   static Future<ColonyDatabase> open({String? fileName}) async {
     final dir = await getApplicationDocumentsDirectory();
     final file = File(p.join(dir.path, fileName ?? 'colony.db'));
-    final db = ColonyDatabase(NativeDatabase(file));
+    final db = ColonyDatabase(NativeDatabase(file), dataDirectory: dir.path);
     // Force isolate + migrations before the first frame. Otherwise the UI
     // mounts the main shell while SQLite is still upgrading.
     await db.customSelect('SELECT 1').get();
@@ -437,6 +440,8 @@ class ColonyDatabase extends _$ColonyDatabase {
 }
 
 class ColonyMappers {
+  static const googleTimelineExternalFileKey = '__external_payload_file';
+
   static domain.ColonyProfile toProfile(Profile row) {
     return domain.ColonyProfile(
       id: domain.EntityId(row.id),
@@ -2238,8 +2243,23 @@ class ColonyMappers {
     GoogleTimelineImportRow row,
   ) {
     final decoded = jsonDecode(row.payloadJson);
-    final document = decoded is Map<String, dynamic>
-        ? domain.GoogleTimelineDocument.fromJson(decoded)
+    if (decoded is Map &&
+        decoded[googleTimelineExternalFileKey] is String) {
+      return domain.GoogleTimelineImport(
+        id: domain.EntityId(row.id),
+        profileId: domain.EntityId(row.profileId),
+        fileName: row.fileName,
+        importedAt:
+            DateTime.fromMillisecondsSinceEpoch(row.importedAt, isUtc: true),
+        document: const domain.GoogleTimelineDocument(),
+      );
+    }
+    final document = decoded is Map
+        ? domain.GoogleTimelineDocument.fromJson(
+            decoded is Map<String, dynamic>
+                ? decoded
+                : Map<String, dynamic>.from(decoded),
+          )
         : const domain.GoogleTimelineDocument();
     return domain.GoogleTimelineImport(
       id: domain.EntityId(row.id),

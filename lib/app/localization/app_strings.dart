@@ -1254,6 +1254,10 @@ abstract final class AppStrings {
   static const timelinePasteHint = 'Cole o conteúdo de Timeline.json';
   static const timelineReadError = 'Não foi possível ler o ficheiro.';
   static const timelineParseError = 'JSON inválido ou não é a Timeline on-device.';
+  static const timelineFileTooLarge =
+      'Este JSON é demasiado grande para importar neste telemóvel (limite 150 MB). Exporte um intervalo menor no Maps.';
+  static String timelineFileTooLargeBytes(int megaBytes) =>
+      'Este JSON tem $megaBytes MB (limite 150 MB). Exporte um intervalo menor no Maps.';
   static const timelinePreviewTitle = 'Pré-visualização';
   static const timelineOverwriteTitle = 'Substituir Timeline importada?';
   static const timelineOverwriteBody =

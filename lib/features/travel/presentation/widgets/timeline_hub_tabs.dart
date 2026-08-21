@@ -512,70 +512,96 @@ class _TimelinePlacesTabState extends ConsumerState<TimelinePlacesTab> {
         .where((c) => (counts[c] ?? 0) > 0)
         .toList();
 
-    return ListView(
-      padding: const EdgeInsets.all(ColonySpacing.lg),
-      children: [
-        GridView.count(
-          crossAxisCount: 2,
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          mainAxisSpacing: ColonySpacing.sm,
-          crossAxisSpacing: ColonySpacing.sm,
-          childAspectRatio: 1.05,
-          children: [
-            for (final cat in cats)
-              TimelineCategoryCard(
-                category: cat,
-                count: counts[cat] ?? 0,
-                hours: insights.categoryHours[cat] ?? Duration.zero,
-                onTap: () => setState(() {
-                  _filter = _filter == cat ? null : cat;
-                }),
-              ),
-          ],
-        ),
-        const SizedBox(height: ColonySpacing.lg),
-        if (filtered.isEmpty)
-          const Text(AppStrings.timelineNoPlaces)
-        else
-          for (final place in filtered)
-            Padding(
-              padding: const EdgeInsets.only(bottom: ColonySpacing.sm),
-              child: ColonySurface(
-                kind: ColonySurfaceKind.panel,
-                child: ListTile(
-                  leading: CircleAvatar(
-                    backgroundColor: TimelineVisuals.categoryColor(place.category)
-                        .withValues(alpha: 0.2),
-                    child: Icon(
-                      TimelineVisuals.categoryIcon(place.category),
-                      color: TimelineVisuals.categoryColor(place.category),
-                    ),
-                  ),
-                  title: Text(
-                    place.customName ??
-                        place.city?.name ??
-                        place.semanticType ??
-                        AppStrings.timelineUnknownPlace,
-                  ),
-                  subtitle: Text(
-                    [
-                      AppStrings.timelineCategoryLabel(place.category),
-                      '${place.visitCount} ${AppStrings.timelineVisits}',
-                      AppStrings.timelineDurationHours(place.total),
-                      if (place.customName == null) AppStrings.timelineInferred,
-                    ].join(' · '),
-                  ),
-                  onTap: place.placeId == null
-                      ? null
-                      : () => LabelPlaceSheet.show(
-                            context,
-                            placeId: place.placeId!,
-                            current: insights.labels[place.placeId!],
-                          ),
+    return CustomScrollView(
+      slivers: [
+        SliverPadding(
+          padding: const EdgeInsets.fromLTRB(
+            ColonySpacing.lg,
+            ColonySpacing.lg,
+            ColonySpacing.lg,
+            ColonySpacing.md,
+          ),
+          sliver: SliverGrid.count(
+            crossAxisCount: 2,
+            mainAxisSpacing: ColonySpacing.sm,
+            crossAxisSpacing: ColonySpacing.sm,
+            childAspectRatio: 1.05,
+            children: [
+              for (final cat in cats)
+                TimelineCategoryCard(
+                  category: cat,
+                  count: counts[cat] ?? 0,
+                  hours: insights.categoryHours[cat] ?? Duration.zero,
+                  onTap: () => setState(() {
+                    _filter = _filter == cat ? null : cat;
+                  }),
                 ),
+            ],
+          ),
+        ),
+        if (filtered.isEmpty)
+          const SliverPadding(
+            padding: EdgeInsets.symmetric(horizontal: ColonySpacing.lg),
+            sliver: SliverToBoxAdapter(
+              child: Text(AppStrings.timelineNoPlaces),
+            ),
+          )
+        else
+          SliverPadding(
+            padding: const EdgeInsets.fromLTRB(
+              ColonySpacing.lg,
+              0,
+              ColonySpacing.lg,
+              ColonySpacing.xl,
+            ),
+            sliver: SliverList(
+              delegate: SliverChildBuilderDelegate(
+                (context, index) {
+                  final place = filtered[index];
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: ColonySpacing.sm),
+                    child: ColonySurface(
+                      kind: ColonySurfaceKind.panel,
+                      child: ListTile(
+                        leading: CircleAvatar(
+                          backgroundColor:
+                              TimelineVisuals.categoryColor(place.category)
+                                  .withValues(alpha: 0.2),
+                          child: Icon(
+                            TimelineVisuals.categoryIcon(place.category),
+                            color: TimelineVisuals.categoryColor(place.category),
+                          ),
+                        ),
+                        title: Text(
+                          place.customName ??
+                              place.city?.name ??
+                              place.semanticType ??
+                              AppStrings.timelineUnknownPlace,
+                        ),
+                        subtitle: Text(
+                          [
+                            AppStrings.timelineCategoryLabel(place.category),
+                            '${place.visitCount} ${AppStrings.timelineVisits}',
+                            AppStrings.timelineDurationHours(place.total),
+                            if (place.customName == null)
+                              AppStrings.timelineInferred,
+                          ].join(' · '),
+                        ),
+                        onTap: place.placeId == null
+                            ? null
+                            : () => LabelPlaceSheet.show(
+                                  context,
+                                  placeId: place.placeId!,
+                                  current: insights.labels[place.placeId!],
+                                ),
+                      ),
+                    ),
+                  );
+                },
+                childCount: filtered.length,
               ),
             ),
+          ),
       ],
     );
   }

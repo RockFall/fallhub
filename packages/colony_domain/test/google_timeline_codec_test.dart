@@ -171,7 +171,7 @@ const sample = r'''
 
 void main() {
   test('parses on-device Timeline sample', () {
-    final doc = GoogleTimelineCodec.parse(sample);
+    final doc = GoogleTimelineCodec.parse(sample, includeRawSignals: true);
     expect(doc.visits, hasLength(2));
     expect(doc.visits.first.hierarchyLevel, 0);
     expect(doc.visits.last.hierarchyLevel, 1);
@@ -180,7 +180,10 @@ void main() {
     expect(doc.activities[1].activityType, 'WALKING');
     expect(doc.activities.last.parking, isNotNull);
     expect(doc.paths, hasLength(2));
-    expect(doc.paths.last.points.first.time.isAfter(doc.paths.last.startAt), isTrue);
+    expect(
+      doc.paths.last.points.first.time.isAfter(doc.paths.last.startAt),
+      isTrue,
+    );
     expect(doc.trips, hasLength(1));
     expect(doc.trips.single.distanceFromOriginKms, 1842);
     expect(doc.trips.single.destinationPlaceIds, hasLength(2));
@@ -192,7 +195,7 @@ void main() {
   });
 
   test('round-trips normalized document JSON', () {
-    final doc = GoogleTimelineCodec.parse(sample);
+    final doc = GoogleTimelineCodec.parse(sample, includeRawSignals: true);
     final again = GoogleTimelineDocument.fromJson(doc.toJson());
     expect(again.visits.length, doc.visits.length);
     expect(again.activities.length, doc.activities.length);
@@ -219,5 +222,55 @@ void main() {
       () => GoogleTimelineCodec.parse('{"locations":[]}'),
       throwsFormatException,
     );
+  });
+
+  test('default parse drops rawSignals and still keeps visits', () {
+    final doc = GoogleTimelineCodec.parse(sample);
+    expect(doc.visits, hasLength(2));
+    expect(doc.activities, hasLength(3));
+    expect(doc.positions, isEmpty);
+    expect(doc.sensorActivities, isEmpty);
+  });
+
+  test('stripRawSignals omits GPS array before decode', () {
+    final stripped = GoogleTimelineCodec.stripRawSignals(sample);
+    expect(stripped.contains('"rawSignals"'), isFalse);
+    expect(stripped.contains('"semanticSegments"'), isTrue);
+    final doc = GoogleTimelineCodec.parse(stripped, includeRawSignals: true);
+    expect(doc.positions, isEmpty);
+    expect(doc.visits, hasLength(2));
+  });
+
+  test('parseToJson is isolate-safe maps and lists', () {
+    final json = GoogleTimelineCodec.parseToJson(sample);
+    expect(json['visits'], isA<List>());
+    expect(json['activities'], isA<List>());
+    final again = GoogleTimelineDocument.fromJson(json);
+    expect(again.visits, hasLength(2));
+  });
+
+  test('non-string placeId does not throw', () {
+    const weird = '''
+{
+  "semanticSegments": [
+    {
+      "startTime": "2026-08-20T08:00:00.000Z",
+      "endTime": "2026-08-20T09:00:00.000Z",
+      "visit": {
+        "topCandidate": {
+          "placeId": {"id": "not-a-string"},
+          "semanticType": 1,
+          "placeLocation": { "latLng": "-19.91°, -43.93°" }
+        }
+      }
+    }
+  ]
+}
+''';
+    final doc = GoogleTimelineCodec.parse(weird);
+    expect(doc.visits, hasLength(1));
+    expect(doc.visits.single.placeId, isNull);
+    expect(doc.visits.single.semanticType, isNull);
+    expect(doc.visits.single.location, isNotNull);
   });
 }

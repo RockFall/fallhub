@@ -5,7 +5,63 @@ import 'google_timeline.dart';
 /// Parses on-device Google Timeline JSON (`semanticSegments` / array variant).
 /// Drops `wifiScan` MAC records. Throws [FormatException].
 abstract final class GoogleTimelineCodec {
-  static GoogleTimelineDocument parse(String source) {
+  /// Default cap for `timelinePath` points persisted per segment.
+  static const defaultMaxPathPoints = 16;
+
+  /// Isolate-safe parse: returns JSON maps/lists, never Equatable or records.
+  static Map<String, dynamic> parseToJson(
+    String source, {
+    bool includeRawSignals = false,
+    int maxPathPoints = defaultMaxPathPoints,
+  }) {
+    return parse(
+      source,
+      includeRawSignals: includeRawSignals,
+      maxPathPoints: maxPathPoints,
+    ).toJson();
+  }
+
+  /// Removes the `rawSignals` property (GPS / wifi MACs) before [jsonDecode]
+  /// so a real on-device export does not allocate hundreds of MB. ADR-042.
+  static String stripRawSignals(String source) {
+    return omitJsonProperty(source, 'rawSignals');
+  }
+
+  /// Drops a JSON object property by key. Best-effort; returns [source] unchanged
+  /// if the value cannot be skipped.
+  static String omitJsonProperty(String source, String key) {
+    final needle = '"$key"';
+    var from = 0;
+    while (true) {
+      final keyAt = source.indexOf(needle, from);
+      if (keyAt < 0) return source;
+      var i = _skipWs(source, keyAt + needle.length);
+      if (i >= source.length || source.codeUnitAt(i) != 0x3A) {
+        from = keyAt + 1;
+        continue;
+      }
+      i = _skipWs(source, i + 1);
+      final valueEnd = _skipJsonValue(source, i);
+      if (valueEnd < 0) return source;
+      var start = keyAt;
+      var end = valueEnd;
+      final before = _rskipWs(source, start - 1);
+      final after = _skipWs(source, end);
+      if (before >= 0 && source.codeUnitAt(before) == 0x2C) {
+        start = before;
+      } else if (after < source.length && source.codeUnitAt(after) == 0x2C) {
+        end = after + 1;
+      }
+      source = '${source.substring(0, start)}${source.substring(end)}';
+      from = start;
+    }
+  }
+
+  static GoogleTimelineDocument parse(
+    String source, {
+    bool includeRawSignals = false,
+    int maxPathPoints = defaultMaxPathPoints,
+  }) {
     final trimmed = source.trim();
     if (trimmed.isEmpty) {
       throw const FormatException('JSON da Timeline vazio');
@@ -17,31 +73,28 @@ abstract final class GoogleTimelineCodec {
       throw FormatException('JSON inválido: ${e.message}');
     }
 
-    Map<String, dynamic>? root;
     List<dynamic> segments = const [];
     List<dynamic> rawSignals = const [];
     Map<String, dynamic>? profile;
 
-    if (decoded is Map<String, dynamic>) {
-      root = decoded;
-      final sem = decoded['semanticSegments'];
+    final root = _asStringMap(decoded);
+    if (root != null) {
+      final sem = root['semanticSegments'];
       if (sem is List) {
         segments = sem;
-      } else if (decoded['timelineObjects'] is List) {
+      } else if (root['timelineObjects'] is List) {
         throw const FormatException(
           'Este ficheiro é o Takeout antigo (timelineObjects). Exporte a Timeline no telemóvel.',
         );
-      } else if (decoded['locations'] is List) {
+      } else if (root['locations'] is List) {
         throw const FormatException(
           'Este ficheiro é Records.json (pings brutos). Exporte a Timeline no telemóvel.',
         );
       }
-      if (decoded['rawSignals'] is List) {
-        rawSignals = decoded['rawSignals'] as List;
+      if (includeRawSignals && root['rawSignals'] is List) {
+        rawSignals = root['rawSignals'] as List;
       }
-      if (decoded['userLocationProfile'] is Map<String, dynamic>) {
-        profile = decoded['userLocationProfile'] as Map<String, dynamic>;
-      }
+      profile = _asStringMap(root['userLocationProfile']);
     } else if (decoded is List) {
       segments = decoded;
     } else {
@@ -63,34 +116,22 @@ abstract final class GoogleTimelineCodec {
     final notes = <TimelineMemoryNote>[];
 
     for (final raw in segments) {
-      if (raw is! Map) continue;
-      final map = Map<String, dynamic>.from(raw);
+      final map = _asStringMap(raw);
+      if (map == null) continue;
       final startAt = _parseTime(map['startTime']);
       final endAt = _parseTime(map['endTime']) ?? startAt;
       if (startAt == null || endAt == null) continue;
       final startOff = _asInt(map['startTimeTimezoneUtcOffsetMinutes']);
       final endOff = _asInt(map['endTimeTimezoneUtcOffsetMinutes']);
 
-      if (map['visit'] is Map) {
-        visits.add(
-          _parseVisit(
-            startAt,
-            endAt,
-            startOff,
-            endOff,
-            Map<String, dynamic>.from(map['visit'] as Map),
-          ),
-        );
+      final visitMap = _asStringMap(map['visit']);
+      if (visitMap != null) {
+        visits.add(_parseVisit(startAt, endAt, startOff, endOff, visitMap));
       }
-      if (map['activity'] is Map) {
+      final activityMap = _asStringMap(map['activity']);
+      if (activityMap != null) {
         activities.add(
-          _parseActivity(
-            startAt,
-            endAt,
-            startOff,
-            endOff,
-            Map<String, dynamic>.from(map['activity'] as Map),
-          ),
+          _parseActivity(startAt, endAt, startOff, endOff, activityMap),
         );
       }
       if (map['timelinePath'] is List) {
@@ -101,64 +142,55 @@ abstract final class GoogleTimelineCodec {
             startOff,
             endOff,
             map['timelinePath'] as List,
+            maxPathPoints,
           ),
         );
       }
-      if (map['timelineMemory'] is Map) {
-        final memory = Map<String, dynamic>.from(map['timelineMemory'] as Map);
-        final tripRaw = memory['trip'] ?? memory;
-        if (tripRaw is Map &&
-            (tripRaw['destinations'] != null ||
-                tripRaw['distanceFromOriginKms'] != null ||
-                memory['destinations'] != null)) {
+      final memory = _asStringMap(map['timelineMemory']);
+      if (memory != null) {
+        final tripMap = _asStringMap(memory['trip']) ?? memory;
+        if (tripMap['destinations'] != null ||
+            tripMap['distanceFromOriginKms'] != null ||
+            memory['destinations'] != null) {
           final dests = <String>[];
           void collect(Object? node) {
             if (node is List) {
               for (final d in node) {
-                if (d is Map) {
-                  final id = d['identifier'];
-                  if (id is Map && id['placeId'] is String) {
-                    dests.add(id['placeId'] as String);
-                  } else if (d['placeId'] is String) {
-                    dests.add(d['placeId'] as String);
-                  } else if (id is String) {
-                    dests.add(id);
-                  }
+                final dest = _asStringMap(d);
+                if (dest == null) continue;
+                final id = dest['identifier'];
+                final idMap = _asStringMap(id);
+                final placeId =
+                    _asString(idMap?['placeId']) ??
+                    _asString(dest['placeId']) ??
+                    _asString(id);
+                if (placeId != null && placeId.isNotEmpty) {
+                  dests.add(placeId);
                 }
               }
             }
           }
 
-          collect(tripRaw is Map ? tripRaw['destinations'] : null);
+          collect(tripMap['destinations']);
           collect(memory['destinations']);
           trips.add(
             TimelineMemoryTrip(
               startAt: startAt,
               endAt: endAt,
-              distanceFromOriginKms: _asInt(
-                tripRaw is Map
-                    ? tripRaw['distanceFromOriginKms']
-                    : memory['distanceFromOriginKms'],
-              ),
+              distanceFromOriginKms: _asInt(tripMap['distanceFromOriginKms']),
               destinationPlaceIds: dests,
             ),
           );
         }
         final noteRaw = memory['note'];
-        if (noteRaw is Map && noteRaw['note'] is String) {
+        final noteMap = _asStringMap(noteRaw);
+        final noteText = _asString(noteMap?['note']) ?? _asString(noteRaw);
+        if (noteText != null && noteText.trim().isNotEmpty) {
           notes.add(
             TimelineMemoryNote(
               startAt: startAt,
               endAt: endAt,
-              text: (noteRaw['note'] as String).trim(),
-            ),
-          );
-        } else if (noteRaw is String && noteRaw.trim().isNotEmpty) {
-          notes.add(
-            TimelineMemoryNote(
-              startAt: startAt,
-              endAt: endAt,
-              text: noteRaw.trim(),
+              text: noteText.trim(),
             ),
           );
         }
@@ -168,10 +200,10 @@ abstract final class GoogleTimelineCodec {
     final positions = <TimelineRawPosition>[];
     final sensors = <TimelineSensorActivity>[];
     for (final raw in rawSignals) {
-      if (raw is! Map) continue;
-      final map = Map<String, dynamic>.from(raw);
-      if (map['position'] is Map) {
-        final pos = Map<String, dynamic>.from(map['position'] as Map);
+      final map = _asStringMap(raw);
+      if (map == null) continue;
+      final pos = _asStringMap(map['position']);
+      if (pos != null) {
         final point = parseLatLng(pos['LatLng'] ?? pos['latLng']);
         final time = _parseTime(pos['timestamp']);
         if (point != null && time != null) {
@@ -181,14 +213,14 @@ abstract final class GoogleTimelineCodec {
               timestamp: time,
               accuracyMeters: _asDouble(pos['accuracyMeters']),
               altitudeMeters: _asDouble(pos['altitudeMeters']),
-              source: pos['source'] as String?,
+              source: _asString(pos['source']),
               speedMetersPerSecond: _asDouble(pos['speedMetersPerSecond']),
             ),
           );
         }
       }
-      if (map['activityRecord'] is Map) {
-        final rec = Map<String, dynamic>.from(map['activityRecord'] as Map);
+      final rec = _asStringMap(map['activityRecord']);
+      if (rec != null) {
         final time = _parseTime(rec['timestamp']);
         final list = rec['probableActivities'];
         if (time != null && list is List) {
@@ -196,7 +228,7 @@ abstract final class GoogleTimelineCodec {
             for (final a in list)
               if (a is Map)
                 (
-                  type: (a['type'] as String?) ?? 'UNKNOWN',
+                  type: _asString(a['type']) ?? 'UNKNOWN',
                   confidence: _asDouble(a['confidence']) ?? 0,
                 ),
           ];
@@ -215,24 +247,27 @@ abstract final class GoogleTimelineCodec {
       final places = profile['frequentPlaces'];
       if (places is List) {
         for (final p in places) {
-          if (p is! Map) continue;
+          final place = _asStringMap(p);
+          if (place == null) continue;
           frequent.add(
             TimelineFrequentPlace(
-              placeId: p['placeId'] as String?,
-              location: parseLatLng(p['placeLocation']),
-              label: p['label'] as String?,
+              placeId: _asString(place['placeId']),
+              location: parseLatLng(place['placeLocation']),
+              label: _asString(place['label']),
             ),
           );
         }
       }
-      final persona = profile['persona'];
-      if (persona is Map && persona['travelModeAffinities'] is List) {
-        for (final a in persona['travelModeAffinities'] as List) {
-          if (a is! Map) continue;
+      final persona = _asStringMap(profile['persona']);
+      final affinitiesRaw = persona?['travelModeAffinities'];
+      if (affinitiesRaw is List) {
+        for (final a in affinitiesRaw) {
+          final aff = _asStringMap(a);
+          if (aff == null) continue;
           affinities.add(
             TimelineModeAffinity(
-              mode: (a['mode'] as String?) ?? 'UNKNOWN',
-              affinity: _asDouble(a['affinity']) ?? 0,
+              mode: _asString(aff['mode']) ?? 'UNKNOWN',
+              affinity: _asDouble(aff['affinity']) ?? 0,
             ),
           );
         }
@@ -263,25 +298,27 @@ abstract final class GoogleTimelineCodec {
     int? endOff,
     Map<String, dynamic> visit,
   ) {
-    final top = visit['topCandidate'] is Map
-        ? Map<String, dynamic>.from(visit['topCandidate'] as Map)
-        : const <String, dynamic>{};
+    final top =
+        _asStringMap(visit['topCandidate']) ?? const <String, dynamic>{};
+    final placeLocation = top['placeLocation'];
+    final placeMap = _asStringMap(placeLocation);
     return TimelineVisit(
       startAt: startAt,
       endAt: endAt,
       startOffsetMinutes: startOff,
       endOffsetMinutes: endOff,
-      placeId: (top['placeId'] ?? top['placeID']) as String?,
-      semanticType: top['semanticType'] as String?,
+      placeId: _asString(top['placeId'] ?? top['placeID']),
+      semanticType: _asString(top['semanticType']),
       location: parseLatLng(
-        top['placeLocation'] is Map
-            ? (top['placeLocation'] as Map)['latLng']
-            : top['placeLocation'],
+        placeMap != null
+            ? placeMap['latLng'] ?? placeMap['LatLng']
+            : placeLocation,
       ),
       probability: _asDouble(visit['probability']),
       candidateProbability: _asDouble(top['probability']),
       hierarchyLevel: _asInt(visit['hierarchyLevel']) ?? 0,
-      isTimeless: visit['isTimelessVisit'] == true ||
+      isTimeless:
+          visit['isTimelessVisit'] == true ||
           visit['isTimelessVisit'] == 'true',
     );
   }
@@ -293,34 +330,37 @@ abstract final class GoogleTimelineCodec {
     int? endOff,
     Map<String, dynamic> activity,
   ) {
-    final top = activity['topCandidate'] is Map
-        ? Map<String, dynamic>.from(activity['topCandidate'] as Map)
-        : const <String, dynamic>{};
+    final top =
+        _asStringMap(activity['topCandidate']) ?? const <String, dynamic>{};
     TimelineParking? parking;
-    if (activity['parking'] is Map) {
-      final p = Map<String, dynamic>.from(activity['parking'] as Map);
-      final loc = p['location'] is Map
-          ? parseLatLng((p['location'] as Map)['latLng'])
-          : parseLatLng(p['location']);
-      final time = _parseTime(p['startTime']);
+    final parkingMap = _asStringMap(activity['parking']);
+    if (parkingMap != null) {
+      final locRaw = parkingMap['location'];
+      final locMap = _asStringMap(locRaw);
+      final loc = locMap != null
+          ? parseLatLng(locMap['latLng'] ?? locMap['LatLng'])
+          : parseLatLng(locRaw);
+      final time = _parseTime(parkingMap['startTime']);
       if (loc != null && time != null) {
         parking = TimelineParking(location: loc, startAt: time);
       }
     }
+    final startMap = _asStringMap(activity['start']);
+    final endMap = _asStringMap(activity['end']);
     return TimelineActivity(
       startAt: startAt,
       endAt: endAt,
       startOffsetMinutes: startOff,
       endOffsetMinutes: endOff,
-      startLocation: activity['start'] is Map
-          ? parseLatLng((activity['start'] as Map)['latLng'])
-          : null,
-      endLocation: activity['end'] is Map
-          ? parseLatLng((activity['end'] as Map)['latLng'])
-          : null,
+      startLocation: startMap == null
+          ? null
+          : parseLatLng(startMap['latLng'] ?? startMap['LatLng']),
+      endLocation: endMap == null
+          ? null
+          : parseLatLng(endMap['latLng'] ?? endMap['LatLng']),
       distanceMeters: _asDouble(activity['distanceMeters']),
       probability: _asDouble(activity['probability']),
-      activityType: top['type'] as String?,
+      activityType: _asString(top['type']),
       candidateProbability: _asDouble(top['probability']),
       parking: parking,
     );
@@ -332,18 +372,19 @@ abstract final class GoogleTimelineCodec {
     int? startOff,
     int? endOff,
     List<dynamic> rawPoints,
+    int maxPathPoints,
   ) {
     final points = <TimelinePathPoint>[];
     for (final p in rawPoints) {
-      if (p is! Map) continue;
-      final point = parseLatLng(p['point']);
+      final map = _asStringMap(p);
+      if (map == null) continue;
+      final point = parseLatLng(map['point']);
       if (point == null) continue;
-      final explicit = _parseTime(p['time']);
-      final offset = _asInt(p['durationMinutesOffsetFromStartTime']);
-      final time = explicit ??
-          (offset != null
-              ? startAt.add(Duration(minutes: offset))
-              : startAt);
+      final explicit = _parseTime(map['time']);
+      final offset = _asInt(map['durationMinutesOffsetFromStartTime']);
+      final time =
+          explicit ??
+          (offset != null ? startAt.add(Duration(minutes: offset)) : startAt);
       points.add(TimelinePathPoint(point: point, time: time));
     }
     return TimelinePathSegment(
@@ -351,8 +392,26 @@ abstract final class GoogleTimelineCodec {
       endAt: endAt,
       startOffsetMinutes: startOff,
       endOffsetMinutes: endOff,
-      points: points,
+      points: _downsamplePath(points, maxPathPoints),
     );
+  }
+
+  static List<TimelinePathPoint> _downsamplePath(
+    List<TimelinePathPoint> points,
+    int maxPoints,
+  ) {
+    if (maxPoints <= 0 || points.length <= maxPoints) return points;
+    if (maxPoints == 1) return [points.first];
+    final out = <TimelinePathPoint>[];
+    for (var i = 0; i < maxPoints; i++) {
+      final idx = i == maxPoints - 1
+          ? points.length - 1
+          : ((i * (points.length - 1)) / (maxPoints - 1)).round();
+      if (out.isEmpty || out.last != points[idx]) {
+        out.add(points[idx]);
+      }
+    }
+    return out;
   }
 
   static GeoPoint? parseLatLng(Object? raw) {
@@ -380,6 +439,17 @@ abstract final class GoogleTimelineCodec {
     }
   }
 
+  static Map<String, dynamic>? _asStringMap(Object? raw) {
+    if (raw is Map<String, dynamic>) return raw;
+    if (raw is Map) return Map<String, dynamic>.from(raw);
+    return null;
+  }
+
+  static String? _asString(Object? raw) {
+    if (raw is String) return raw;
+    return null;
+  }
+
   static int? _asInt(Object? raw) {
     if (raw == null) return null;
     if (raw is int) return raw;
@@ -392,5 +462,90 @@ abstract final class GoogleTimelineCodec {
     if (raw is double) return raw;
     if (raw is num) return raw.toDouble();
     return double.tryParse(raw.toString());
+  }
+
+  static bool _isWs(int code) =>
+      code == 0x20 || code == 0x09 || code == 0x0A || code == 0x0D;
+
+  static int _skipWs(String s, int i) {
+    while (i < s.length && _isWs(s.codeUnitAt(i))) {
+      i++;
+    }
+    return i;
+  }
+
+  static int _rskipWs(String s, int i) {
+    while (i >= 0 && _isWs(s.codeUnitAt(i))) {
+      i--;
+    }
+    return i;
+  }
+
+  /// Returns the index after a JSON value starting at [i], or -1.
+  static int _skipJsonValue(String s, int i) {
+    if (i >= s.length) return -1;
+    i = _skipWs(s, i);
+    if (i >= s.length) return -1;
+    final c = s.codeUnitAt(i);
+    if (c == 0x22) {
+      i++;
+      while (i < s.length) {
+        final ch = s.codeUnitAt(i);
+        if (ch == 0x5C) {
+          i += 2;
+          continue;
+        }
+        if (ch == 0x22) return i + 1;
+        i++;
+      }
+      return -1;
+    }
+    if (c == 0x7B || c == 0x5B) {
+      final stack = <int>[c];
+      i++;
+      var inStr = false;
+      while (i < s.length && stack.isNotEmpty) {
+        final ch = s.codeUnitAt(i);
+        if (inStr) {
+          if (ch == 0x5C) {
+            i += 2;
+            continue;
+          }
+          if (ch == 0x22) inStr = false;
+          i++;
+          continue;
+        }
+        if (ch == 0x22) {
+          inStr = true;
+          i++;
+          continue;
+        }
+        if (ch == 0x7B || ch == 0x5B) {
+          stack.add(ch);
+          i++;
+          continue;
+        }
+        if (ch == 0x7D) {
+          if (stack.last != 0x7B) return -1;
+          stack.removeLast();
+          i++;
+          continue;
+        }
+        if (ch == 0x5D) {
+          if (stack.last != 0x5B) return -1;
+          stack.removeLast();
+          i++;
+          continue;
+        }
+        i++;
+      }
+      return stack.isEmpty ? i : -1;
+    }
+    while (i < s.length) {
+      final ch = s.codeUnitAt(i);
+      if (ch == 0x2C || ch == 0x7D || ch == 0x5D || _isWs(ch)) break;
+      i++;
+    }
+    return i;
   }
 }
