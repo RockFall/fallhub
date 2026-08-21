@@ -86,7 +86,7 @@ export 'src/flashcard_tag.dart';
 export 'src/flashcard_json_import.dart';
 export 'src/google_timeline.dart';
 export 'src/google_timeline_codec.dart';
+export 'src/timeline_byte_source.dart';
 export 'src/google_timeline_analytics.dart';
 export 'src/city_gazetteer.dart';
-
 

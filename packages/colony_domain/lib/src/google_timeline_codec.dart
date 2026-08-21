@@ -1,259 +1,495 @@
 import 'dart:convert';
 
 import 'google_timeline.dart';
+import 'timeline_byte_source.dart';
 
 /// Parses on-device Google Timeline JSON (`semanticSegments` / array variant).
 /// Drops `wifiScan` MAC records. Throws [FormatException].
 abstract final class GoogleTimelineCodec {
-  static GoogleTimelineDocument parse(String source) {
+  /// Default cap for `timelinePath` points persisted per segment.
+  static const defaultMaxPathPoints = 16;
+
+  /// Isolate-safe parse: returns JSON maps/lists, never Equatable or records.
+  static Map<String, dynamic> parseToJson(
+    String source, {
+    bool includeRawSignals = false,
+    int maxPathPoints = defaultMaxPathPoints,
+  }) {
+    return parse(
+      source,
+      includeRawSignals: includeRawSignals,
+      maxPathPoints: maxPathPoints,
+    ).toJson();
+  }
+
+  /// Removes the `rawSignals` property (GPS / wifi MACs) before [jsonDecode]
+  /// so a real on-device export does not allocate hundreds of MB. ADR-042.
+  static String stripRawSignals(String source) {
+    return omitJsonProperty(source, 'rawSignals');
+  }
+
+  /// Drops a JSON object property by key. Best-effort; returns [source] unchanged
+  /// if the value cannot be skipped.
+  static String omitJsonProperty(String source, String key) {
+    final needle = '"$key"';
+    var from = 0;
+    while (true) {
+      final keyAt = source.indexOf(needle, from);
+      if (keyAt < 0) return source;
+      var i = _skipWs(source, keyAt + needle.length);
+      if (i >= source.length || source.codeUnitAt(i) != 0x3A) {
+        from = keyAt + 1;
+        continue;
+      }
+      i = _skipWs(source, i + 1);
+      final valueEnd = _skipJsonValue(source, i);
+      if (valueEnd < 0) return source;
+      var start = keyAt;
+      var end = valueEnd;
+      final before = _rskipWs(source, start - 1);
+      final after = _skipWs(source, end);
+      if (before >= 0 && source.codeUnitAt(before) == 0x2C) {
+        start = before;
+      } else if (after < source.length && source.codeUnitAt(after) == 0x2C) {
+        end = after + 1;
+      }
+      source = '${source.substring(0, start)}${source.substring(end)}';
+      from = start;
+    }
+  }
+
+  static GoogleTimelineDocument parse(
+    String source, {
+    bool includeRawSignals = false,
+    int maxPathPoints = defaultMaxPathPoints,
+  }) {
     final trimmed = source.trim();
     if (trimmed.isEmpty) {
       throw const FormatException('JSON da Timeline vazio');
     }
-    final Object decoded;
-    try {
-      decoded = jsonDecode(trimmed);
-    } on FormatException catch (e) {
-      throw FormatException('JSON inválido: ${e.message}');
+    return parseSource(
+      Uint8ListTimelineByteSource(utf8.encode(trimmed)),
+      includeRawSignals: includeRawSignals,
+      maxPathPoints: maxPathPoints,
+    );
+  }
+
+  /// Streaming parse. Walks the top-level JSON with a sliding window so a
+  /// 200 MB `rawSignals` array is skipped on disk instead of `jsonDecode`d.
+  static GoogleTimelineDocument parseSource(
+    TimelineByteSource source, {
+    bool includeRawSignals = false,
+    int maxPathPoints = defaultMaxPathPoints,
+  }) {
+    if (source.length == 0) {
+      throw const FormatException('JSON da Timeline vazio');
     }
-
-    Map<String, dynamic>? root;
-    List<dynamic> segments = const [];
-    List<dynamic> rawSignals = const [];
-    Map<String, dynamic>? profile;
-
-    if (decoded is Map<String, dynamic>) {
-      root = decoded;
-      final sem = decoded['semanticSegments'];
-      if (sem is List) {
-        segments = sem;
-      } else if (decoded['timelineObjects'] is List) {
-        throw const FormatException(
-          'Este ficheiro é o Takeout antigo (timelineObjects). Exporte a Timeline no telemóvel.',
-        );
-      } else if (decoded['locations'] is List) {
-        throw const FormatException(
-          'Este ficheiro é Records.json (pings brutos). Exporte a Timeline no telemóvel.',
-        );
-      }
-      if (decoded['rawSignals'] is List) {
-        rawSignals = decoded['rawSignals'] as List;
-      }
-      if (decoded['userLocationProfile'] is Map<String, dynamic>) {
-        profile = decoded['userLocationProfile'] as Map<String, dynamic>;
-      }
-    } else if (decoded is List) {
-      segments = decoded;
+    final cursor = TimelineByteCursor(source);
+    cursor.skipBom();
+    cursor.skipWs();
+    final acc = _TimelineAcc();
+    final first = cursor.peek();
+    if (first == 0x5B) {
+      _readSegmentArray(cursor, acc, maxPathPoints);
+    } else if (first == 0x7B) {
+      _readRootObject(
+        cursor,
+        includeRawSignals: includeRawSignals,
+        maxPathPoints: maxPathPoints,
+        acc: acc,
+      );
     } else {
       throw const FormatException('JSON raiz deve ser objeto ou lista');
     }
 
-    if (segments.isEmpty &&
-        rawSignals.isEmpty &&
-        (profile == null || profile.isEmpty)) {
+    final doc = acc.build();
+    if (doc.isEmpty) {
       throw const FormatException(
         'Nenhum semanticSegments encontrado. Confirme que é um export da Timeline.',
       );
     }
+    return doc;
+  }
 
-    final visits = <TimelineVisit>[];
-    final activities = <TimelineActivity>[];
-    final paths = <TimelinePathSegment>[];
-    final trips = <TimelineMemoryTrip>[];
-    final notes = <TimelineMemoryNote>[];
+  static void _readRootObject(
+    TimelineByteCursor cursor, {
+    required bool includeRawSignals,
+    required int maxPathPoints,
+    required _TimelineAcc acc,
+  }) {
+    cursor.expectByte(0x7B);
+    cursor.skipWs();
+    var sawUseful = false;
+    while (!cursor.isEof && cursor.peek() != 0x7D) {
+      final key = cursor.readString();
+      cursor.skipWs();
+      cursor.expectByte(0x3A);
+      cursor.skipWs();
+      switch (key) {
+        case 'semanticSegments':
+          sawUseful = true;
+          if (cursor.peek() == 0x5B) {
+            _readSegmentArray(cursor, acc, maxPathPoints);
+          } else {
+            cursor.skipValue();
+          }
+        case 'timelineObjects':
+          throw const FormatException(
+            'Este ficheiro é o Takeout antigo (timelineObjects). Exporte a Timeline no telemóvel.',
+          );
+        case 'locations':
+          throw const FormatException(
+            'Este ficheiro é Records.json (pings brutos). Exporte a Timeline no telemóvel.',
+          );
+        case 'rawSignals':
+          if (includeRawSignals && cursor.peek() == 0x5B) {
+            _readJsonArray(cursor, (map) {
+              _ingestRawSignal(map, acc);
+            });
+          } else {
+            cursor.skipValue();
+          }
+        case 'userLocationProfile':
+          sawUseful = true;
+          final profile = _asStringMap(_decodeCurrent(cursor));
+          if (profile != null) _ingestProfile(profile, acc);
+        default:
+          cursor.skipValue();
+      }
+      cursor.skipWs();
+      if (cursor.peek() == 0x2C) {
+        cursor.next();
+        cursor.skipWs();
+      }
+    }
+    if (cursor.peek() != 0x7D) {
+      throw const FormatException('JSON truncado');
+    }
+    cursor.next();
+    if (!sawUseful && acc.build().isEmpty) {
+      throw const FormatException(
+        'Nenhum semanticSegments encontrado. Confirme que é um export da Timeline.',
+      );
+    }
+  }
 
-    for (final raw in segments) {
-      if (raw is! Map) continue;
-      final map = Map<String, dynamic>.from(raw);
-      final startAt = _parseTime(map['startTime']);
-      final endAt = _parseTime(map['endTime']) ?? startAt;
-      if (startAt == null || endAt == null) continue;
-      final startOff = _asInt(map['startTimeTimezoneUtcOffsetMinutes']);
-      final endOff = _asInt(map['endTimeTimezoneUtcOffsetMinutes']);
+  static void _readJsonArray(
+    TimelineByteCursor cursor,
+    void Function(Map<String, dynamic> map) onObject,
+  ) {
+    cursor.expectByte(0x5B);
+    cursor.skipWs();
+    while (!cursor.isEof && cursor.peek() != 0x5D) {
+      cursor.skipWs();
+      if (cursor.peek() == 0x5D) break;
+      if (cursor.peek() == 0x7B) {
+        final map = _asStringMap(_decodeCurrent(cursor));
+        if (map != null) onObject(map);
+      } else {
+        cursor.skipValue();
+      }
+      cursor.skipWs();
+      if (cursor.peek() == 0x2C) {
+        cursor.next();
+        cursor.skipWs();
+      }
+    }
+    if (cursor.peek() != 0x5D) {
+      throw const FormatException('JSON truncado: array sem fecho');
+    }
+    cursor.next();
+  }
 
-      if (map['visit'] is Map) {
-        visits.add(
-          _parseVisit(
-            startAt,
-            endAt,
-            startOff,
-            endOff,
-            Map<String, dynamic>.from(map['visit'] as Map),
-          ),
-        );
+  static void _readSegmentArray(
+    TimelineByteCursor cursor,
+    _TimelineAcc acc,
+    int maxPathPoints,
+  ) {
+    cursor.expectByte(0x5B);
+    cursor.skipWs();
+    while (!cursor.isEof && cursor.peek() != 0x5D) {
+      cursor.skipWs();
+      if (cursor.peek() == 0x5D) break;
+      if (cursor.peek() == 0x7B) {
+        _readSegmentObject(cursor, acc, maxPathPoints);
+      } else {
+        cursor.skipValue();
       }
-      if (map['activity'] is Map) {
-        activities.add(
-          _parseActivity(
-            startAt,
-            endAt,
-            startOff,
-            endOff,
-            Map<String, dynamic>.from(map['activity'] as Map),
-          ),
-        );
+      cursor.skipWs();
+      if (cursor.peek() == 0x2C) {
+        cursor.next();
+        cursor.skipWs();
       }
-      if (map['timelinePath'] is List) {
-        paths.add(
-          _parsePath(
-            startAt,
-            endAt,
-            startOff,
-            endOff,
-            map['timelinePath'] as List,
-          ),
-        );
+    }
+    if (cursor.peek() != 0x5D) {
+      throw const FormatException('JSON truncado: array sem fecho');
+    }
+    cursor.next();
+  }
+
+  /// Walks one `semanticSegments[]` object key-by-key so a dense
+  /// `timelinePath` is downsampled without `jsonDecode` of the whole segment,
+  /// and unknown blobs are `skipValue`'d.
+  static void _readSegmentObject(
+    TimelineByteCursor cursor,
+    _TimelineAcc acc,
+    int maxPathPoints,
+  ) {
+    cursor.expectByte(0x7B);
+    cursor.skipWs();
+    DateTime? startAt;
+    DateTime? endAt;
+    int? startOff;
+    int? endOff;
+    Map<String, dynamic>? visitMap;
+    Map<String, dynamic>? activityMap;
+    Map<String, dynamic>? memoryMap;
+    final pathRaw = <_PendingPathPoint>[];
+
+    while (!cursor.isEof && cursor.peek() != 0x7D) {
+      final key = cursor.readString();
+      cursor.skipWs();
+      cursor.expectByte(0x3A);
+      cursor.skipWs();
+      switch (key) {
+        case 'startTime':
+          startAt = _parseTime(_decodeCurrent(cursor));
+        case 'endTime':
+          endAt = _parseTime(_decodeCurrent(cursor));
+        case 'startTimeTimezoneUtcOffsetMinutes':
+          startOff = _asInt(_decodeCurrent(cursor));
+        case 'endTimeTimezoneUtcOffsetMinutes':
+          endOff = _asInt(_decodeCurrent(cursor));
+        case 'visit':
+          visitMap = _asStringMap(_decodeCurrent(cursor));
+        case 'activity':
+          activityMap = _asStringMap(_decodeCurrent(cursor));
+        case 'timelineMemory':
+          memoryMap = _asStringMap(_decodeCurrent(cursor));
+        case 'timelinePath':
+          _readPathPointArray(cursor, pathRaw);
+        default:
+          cursor.skipValue();
       }
-      if (map['timelineMemory'] is Map) {
-        final memory = Map<String, dynamic>.from(map['timelineMemory'] as Map);
-        final tripRaw = memory['trip'] ?? memory;
-        if (tripRaw is Map &&
-            (tripRaw['destinations'] != null ||
-                tripRaw['distanceFromOriginKms'] != null ||
-                memory['destinations'] != null)) {
-          final dests = <String>[];
-          void collect(Object? node) {
-            if (node is List) {
-              for (final d in node) {
-                if (d is Map) {
-                  final id = d['identifier'];
-                  if (id is Map && id['placeId'] is String) {
-                    dests.add(id['placeId'] as String);
-                  } else if (d['placeId'] is String) {
-                    dests.add(d['placeId'] as String);
-                  } else if (id is String) {
-                    dests.add(id);
-                  }
-                }
-              }
+      cursor.skipWs();
+      if (cursor.peek() == 0x2C) {
+        cursor.next();
+        cursor.skipWs();
+      }
+    }
+    if (cursor.peek() != 0x7D) {
+      throw const FormatException('JSON truncado');
+    }
+    cursor.next();
+
+    endAt ??= startAt;
+    if (startAt == null || endAt == null) return;
+    if (visitMap != null) {
+      acc.visits.add(_parseVisit(startAt, endAt, startOff, endOff, visitMap));
+    }
+    if (activityMap != null) {
+      acc.activities.add(
+        _parseActivity(startAt, endAt, startOff, endOff, activityMap),
+      );
+    }
+    if (pathRaw.isNotEmpty) {
+      final points = <TimelinePathPoint>[
+        for (final p in pathRaw)
+          TimelinePathPoint(
+            point: p.point,
+            time:
+                p.time ??
+                (p.offsetMinutes != null
+                    ? startAt.add(Duration(minutes: p.offsetMinutes!))
+                    : startAt),
+          ),
+      ];
+      acc.paths.add(
+        TimelinePathSegment(
+          startAt: startAt,
+          endAt: endAt,
+          startOffsetMinutes: startOff,
+          endOffsetMinutes: endOff,
+          points: _downsamplePath(points, maxPathPoints),
+        ),
+      );
+    }
+    if (memoryMap != null) {
+      _ingestMemory(memoryMap, acc, startAt, endAt);
+    }
+  }
+
+  static void _readPathPointArray(
+    TimelineByteCursor cursor,
+    List<_PendingPathPoint> out,
+  ) {
+    if (cursor.peek() != 0x5B) {
+      cursor.skipValue();
+      return;
+    }
+    cursor.expectByte(0x5B);
+    cursor.skipWs();
+    while (!cursor.isEof && cursor.peek() != 0x5D) {
+      if (cursor.peek() == 0x7B) {
+        final map = _asStringMap(_decodeCurrent(cursor));
+        if (map != null) {
+          final point = parseLatLng(map['point']);
+          if (point != null) {
+            out.add(
+              _PendingPathPoint(
+                point: point,
+                time: _parseTime(map['time']),
+                offsetMinutes: _asInt(
+                  map['durationMinutesOffsetFromStartTime'],
+                ),
+              ),
+            );
+          }
+        }
+      } else {
+        cursor.skipValue();
+      }
+      cursor.skipWs();
+      if (cursor.peek() == 0x2C) {
+        cursor.next();
+        cursor.skipWs();
+      }
+    }
+    if (cursor.peek() != 0x5D) {
+      throw const FormatException('JSON truncado: array sem fecho');
+    }
+    cursor.next();
+  }
+
+  static Object? _decodeCurrent(TimelineByteCursor cursor) {
+    cursor.skipWs();
+    final start = cursor.pos;
+    cursor.skipValue();
+    return jsonDecode(utf8.decode(cursor.slice(start, cursor.pos)));
+  }
+
+  static void _ingestMemory(
+    Map<String, dynamic> memory,
+    _TimelineAcc acc,
+    DateTime startAt,
+    DateTime endAt,
+  ) {
+    final tripMap = _asStringMap(memory['trip']) ?? memory;
+    if (tripMap['destinations'] != null ||
+        tripMap['distanceFromOriginKms'] != null ||
+        memory['destinations'] != null) {
+      final dests = <String>[];
+      void collect(Object? node) {
+        if (node is List) {
+          for (final d in node) {
+            final dest = _asStringMap(d);
+            if (dest == null) continue;
+            final id = dest['identifier'];
+            final idMap = _asStringMap(id);
+            final placeId =
+                _asString(idMap?['placeId']) ??
+                _asString(dest['placeId']) ??
+                _asString(id);
+            if (placeId != null && placeId.isNotEmpty) {
+              dests.add(placeId);
             }
           }
+        }
+      }
 
-          collect(tripRaw is Map ? tripRaw['destinations'] : null);
-          collect(memory['destinations']);
-          trips.add(
-            TimelineMemoryTrip(
-              startAt: startAt,
-              endAt: endAt,
-              distanceFromOriginKms: _asInt(
-                tripRaw is Map
-                    ? tripRaw['distanceFromOriginKms']
-                    : memory['distanceFromOriginKms'],
+      collect(tripMap['destinations']);
+      collect(memory['destinations']);
+      acc.trips.add(
+        TimelineMemoryTrip(
+          startAt: startAt,
+          endAt: endAt,
+          distanceFromOriginKms: _asInt(tripMap['distanceFromOriginKms']),
+          destinationPlaceIds: dests,
+        ),
+      );
+    }
+    final noteRaw = memory['note'];
+    final noteMap = _asStringMap(noteRaw);
+    final noteText = _asString(noteMap?['note']) ?? _asString(noteRaw);
+    if (noteText != null && noteText.trim().isNotEmpty) {
+      acc.notes.add(
+        TimelineMemoryNote(
+          startAt: startAt,
+          endAt: endAt,
+          text: noteText.trim(),
+        ),
+      );
+    }
+  }
+
+  static void _ingestRawSignal(Map<String, dynamic> map, _TimelineAcc acc) {
+    final pos = _asStringMap(map['position']);
+    if (pos != null) {
+      final point = parseLatLng(pos['LatLng'] ?? pos['latLng']);
+      final time = _parseTime(pos['timestamp']);
+      if (point != null && time != null) {
+        acc.positions.add(
+          TimelineRawPosition(
+            location: point,
+            timestamp: time,
+            accuracyMeters: _asDouble(pos['accuracyMeters']),
+            altitudeMeters: _asDouble(pos['altitudeMeters']),
+            source: _asString(pos['source']),
+            speedMetersPerSecond: _asDouble(pos['speedMetersPerSecond']),
+          ),
+        );
+      }
+    }
+    final rec = _asStringMap(map['activityRecord']);
+    if (rec != null) {
+      final time = _parseTime(rec['timestamp']);
+      final list = rec['probableActivities'];
+      if (time != null && list is List) {
+        final acts = <({String type, double confidence})>[
+          for (final a in list)
+            if (a is Map)
+              (
+                type: _asString(a['type']) ?? 'UNKNOWN',
+                confidence: _asDouble(a['confidence']) ?? 0,
               ),
-              destinationPlaceIds: dests,
-            ),
-          );
-        }
-        final noteRaw = memory['note'];
-        if (noteRaw is Map && noteRaw['note'] is String) {
-          notes.add(
-            TimelineMemoryNote(
-              startAt: startAt,
-              endAt: endAt,
-              text: (noteRaw['note'] as String).trim(),
-            ),
-          );
-        } else if (noteRaw is String && noteRaw.trim().isNotEmpty) {
-          notes.add(
-            TimelineMemoryNote(
-              startAt: startAt,
-              endAt: endAt,
-              text: noteRaw.trim(),
-            ),
-          );
-        }
+        ];
+        acts.sort((a, b) => b.confidence.compareTo(a.confidence));
+        acc.sensors.add(
+          TimelineSensorActivity(timestamp: time, activities: acts),
+        );
       }
     }
+  }
 
-    final positions = <TimelineRawPosition>[];
-    final sensors = <TimelineSensorActivity>[];
-    for (final raw in rawSignals) {
-      if (raw is! Map) continue;
-      final map = Map<String, dynamic>.from(raw);
-      if (map['position'] is Map) {
-        final pos = Map<String, dynamic>.from(map['position'] as Map);
-        final point = parseLatLng(pos['LatLng'] ?? pos['latLng']);
-        final time = _parseTime(pos['timestamp']);
-        if (point != null && time != null) {
-          positions.add(
-            TimelineRawPosition(
-              location: point,
-              timestamp: time,
-              accuracyMeters: _asDouble(pos['accuracyMeters']),
-              altitudeMeters: _asDouble(pos['altitudeMeters']),
-              source: pos['source'] as String?,
-              speedMetersPerSecond: _asDouble(pos['speedMetersPerSecond']),
-            ),
-          );
-        }
-      }
-      if (map['activityRecord'] is Map) {
-        final rec = Map<String, dynamic>.from(map['activityRecord'] as Map);
-        final time = _parseTime(rec['timestamp']);
-        final list = rec['probableActivities'];
-        if (time != null && list is List) {
-          final acts = <({String type, double confidence})>[
-            for (final a in list)
-              if (a is Map)
-                (
-                  type: (a['type'] as String?) ?? 'UNKNOWN',
-                  confidence: _asDouble(a['confidence']) ?? 0,
-                ),
-          ];
-          acts.sort((a, b) => b.confidence.compareTo(a.confidence));
-          sensors.add(
-            TimelineSensorActivity(timestamp: time, activities: acts),
-          );
-        }
-      }
-      // wifiScan intentionally ignored.
-    }
-
-    final frequent = <TimelineFrequentPlace>[];
-    final affinities = <TimelineModeAffinity>[];
-    if (profile != null) {
-      final places = profile['frequentPlaces'];
-      if (places is List) {
-        for (final p in places) {
-          if (p is! Map) continue;
-          frequent.add(
-            TimelineFrequentPlace(
-              placeId: p['placeId'] as String?,
-              location: parseLatLng(p['placeLocation']),
-              label: p['label'] as String?,
-            ),
-          );
-        }
-      }
-      final persona = profile['persona'];
-      if (persona is Map && persona['travelModeAffinities'] is List) {
-        for (final a in persona['travelModeAffinities'] as List) {
-          if (a is! Map) continue;
-          affinities.add(
-            TimelineModeAffinity(
-              mode: (a['mode'] as String?) ?? 'UNKNOWN',
-              affinity: _asDouble(a['affinity']) ?? 0,
-            ),
-          );
-        }
+  static void _ingestProfile(Map<String, dynamic> profile, _TimelineAcc acc) {
+    final places = profile['frequentPlaces'];
+    if (places is List) {
+      for (final p in places) {
+        final place = _asStringMap(p);
+        if (place == null) continue;
+        acc.frequent.add(
+          TimelineFrequentPlace(
+            placeId: _asString(place['placeId']),
+            location: parseLatLng(place['placeLocation']),
+            label: _asString(place['label']),
+          ),
+        );
       }
     }
-
-    final doc = GoogleTimelineDocument(
-      visits: visits,
-      activities: activities,
-      paths: paths,
-      trips: trips,
-      notes: notes.where((n) => n.text.isNotEmpty).toList(),
-      frequentPlaces: frequent,
-      affinities: affinities,
-      positions: positions,
-      sensorActivities: sensors,
-    );
-    if (doc.isEmpty) {
-      throw const FormatException('Nenhum segmento útil na Timeline');
+    final persona = _asStringMap(profile['persona']);
+    final affinitiesRaw = persona?['travelModeAffinities'];
+    if (affinitiesRaw is List) {
+      for (final a in affinitiesRaw) {
+        final aff = _asStringMap(a);
+        if (aff == null) continue;
+        acc.affinities.add(
+          TimelineModeAffinity(
+            mode: _asString(aff['mode']) ?? 'UNKNOWN',
+            affinity: _asDouble(aff['affinity']) ?? 0,
+          ),
+        );
+      }
     }
-    return doc;
   }
 
   static TimelineVisit _parseVisit(
@@ -263,25 +499,27 @@ abstract final class GoogleTimelineCodec {
     int? endOff,
     Map<String, dynamic> visit,
   ) {
-    final top = visit['topCandidate'] is Map
-        ? Map<String, dynamic>.from(visit['topCandidate'] as Map)
-        : const <String, dynamic>{};
+    final top =
+        _asStringMap(visit['topCandidate']) ?? const <String, dynamic>{};
+    final placeLocation = top['placeLocation'];
+    final placeMap = _asStringMap(placeLocation);
     return TimelineVisit(
       startAt: startAt,
       endAt: endAt,
       startOffsetMinutes: startOff,
       endOffsetMinutes: endOff,
-      placeId: (top['placeId'] ?? top['placeID']) as String?,
-      semanticType: top['semanticType'] as String?,
+      placeId: _asString(top['placeId'] ?? top['placeID']),
+      semanticType: _asString(top['semanticType']),
       location: parseLatLng(
-        top['placeLocation'] is Map
-            ? (top['placeLocation'] as Map)['latLng']
-            : top['placeLocation'],
+        placeMap != null
+            ? placeMap['latLng'] ?? placeMap['LatLng']
+            : placeLocation,
       ),
       probability: _asDouble(visit['probability']),
       candidateProbability: _asDouble(top['probability']),
       hierarchyLevel: _asInt(visit['hierarchyLevel']) ?? 0,
-      isTimeless: visit['isTimelessVisit'] == true ||
+      isTimeless:
+          visit['isTimelessVisit'] == true ||
           visit['isTimelessVisit'] == 'true',
     );
   }
@@ -293,66 +531,58 @@ abstract final class GoogleTimelineCodec {
     int? endOff,
     Map<String, dynamic> activity,
   ) {
-    final top = activity['topCandidate'] is Map
-        ? Map<String, dynamic>.from(activity['topCandidate'] as Map)
-        : const <String, dynamic>{};
+    final top =
+        _asStringMap(activity['topCandidate']) ?? const <String, dynamic>{};
     TimelineParking? parking;
-    if (activity['parking'] is Map) {
-      final p = Map<String, dynamic>.from(activity['parking'] as Map);
-      final loc = p['location'] is Map
-          ? parseLatLng((p['location'] as Map)['latLng'])
-          : parseLatLng(p['location']);
-      final time = _parseTime(p['startTime']);
+    final parkingMap = _asStringMap(activity['parking']);
+    if (parkingMap != null) {
+      final locRaw = parkingMap['location'];
+      final locMap = _asStringMap(locRaw);
+      final loc = locMap != null
+          ? parseLatLng(locMap['latLng'] ?? locMap['LatLng'])
+          : parseLatLng(locRaw);
+      final time = _parseTime(parkingMap['startTime']);
       if (loc != null && time != null) {
         parking = TimelineParking(location: loc, startAt: time);
       }
     }
+    final startMap = _asStringMap(activity['start']);
+    final endMap = _asStringMap(activity['end']);
     return TimelineActivity(
       startAt: startAt,
       endAt: endAt,
       startOffsetMinutes: startOff,
       endOffsetMinutes: endOff,
-      startLocation: activity['start'] is Map
-          ? parseLatLng((activity['start'] as Map)['latLng'])
-          : null,
-      endLocation: activity['end'] is Map
-          ? parseLatLng((activity['end'] as Map)['latLng'])
-          : null,
+      startLocation: startMap == null
+          ? null
+          : parseLatLng(startMap['latLng'] ?? startMap['LatLng']),
+      endLocation: endMap == null
+          ? null
+          : parseLatLng(endMap['latLng'] ?? endMap['LatLng']),
       distanceMeters: _asDouble(activity['distanceMeters']),
       probability: _asDouble(activity['probability']),
-      activityType: top['type'] as String?,
+      activityType: _asString(top['type']),
       candidateProbability: _asDouble(top['probability']),
       parking: parking,
     );
   }
 
-  static TimelinePathSegment _parsePath(
-    DateTime startAt,
-    DateTime endAt,
-    int? startOff,
-    int? endOff,
-    List<dynamic> rawPoints,
+  static List<TimelinePathPoint> _downsamplePath(
+    List<TimelinePathPoint> points,
+    int maxPoints,
   ) {
-    final points = <TimelinePathPoint>[];
-    for (final p in rawPoints) {
-      if (p is! Map) continue;
-      final point = parseLatLng(p['point']);
-      if (point == null) continue;
-      final explicit = _parseTime(p['time']);
-      final offset = _asInt(p['durationMinutesOffsetFromStartTime']);
-      final time = explicit ??
-          (offset != null
-              ? startAt.add(Duration(minutes: offset))
-              : startAt);
-      points.add(TimelinePathPoint(point: point, time: time));
+    if (maxPoints <= 0 || points.length <= maxPoints) return points;
+    if (maxPoints == 1) return [points.first];
+    final out = <TimelinePathPoint>[];
+    for (var i = 0; i < maxPoints; i++) {
+      final idx = i == maxPoints - 1
+          ? points.length - 1
+          : ((i * (points.length - 1)) / (maxPoints - 1)).round();
+      if (out.isEmpty || out.last != points[idx]) {
+        out.add(points[idx]);
+      }
     }
-    return TimelinePathSegment(
-      startAt: startAt,
-      endAt: endAt,
-      startOffsetMinutes: startOff,
-      endOffsetMinutes: endOff,
-      points: points,
-    );
+    return out;
   }
 
   static GeoPoint? parseLatLng(Object? raw) {
@@ -380,6 +610,17 @@ abstract final class GoogleTimelineCodec {
     }
   }
 
+  static Map<String, dynamic>? _asStringMap(Object? raw) {
+    if (raw is Map<String, dynamic>) return raw;
+    if (raw is Map) return Map<String, dynamic>.from(raw);
+    return null;
+  }
+
+  static String? _asString(Object? raw) {
+    if (raw is String) return raw;
+    return null;
+  }
+
   static int? _asInt(Object? raw) {
     if (raw == null) return null;
     if (raw is int) return raw;
@@ -392,5 +633,124 @@ abstract final class GoogleTimelineCodec {
     if (raw is double) return raw;
     if (raw is num) return raw.toDouble();
     return double.tryParse(raw.toString());
+  }
+
+  static bool _isWs(int code) =>
+      code == 0x20 || code == 0x09 || code == 0x0A || code == 0x0D;
+
+  static int _skipWs(String s, int i) {
+    while (i < s.length && _isWs(s.codeUnitAt(i))) {
+      i++;
+    }
+    return i;
+  }
+
+  static int _rskipWs(String s, int i) {
+    while (i >= 0 && _isWs(s.codeUnitAt(i))) {
+      i--;
+    }
+    return i;
+  }
+
+  /// Returns the index after a JSON value starting at [i], or -1.
+  static int _skipJsonValue(String s, int i) {
+    if (i >= s.length) return -1;
+    i = _skipWs(s, i);
+    if (i >= s.length) return -1;
+    final c = s.codeUnitAt(i);
+    if (c == 0x22) {
+      i++;
+      while (i < s.length) {
+        final ch = s.codeUnitAt(i);
+        if (ch == 0x5C) {
+          i += 2;
+          continue;
+        }
+        if (ch == 0x22) return i + 1;
+        i++;
+      }
+      return -1;
+    }
+    if (c == 0x7B || c == 0x5B) {
+      final stack = <int>[c];
+      i++;
+      var inStr = false;
+      while (i < s.length && stack.isNotEmpty) {
+        final ch = s.codeUnitAt(i);
+        if (inStr) {
+          if (ch == 0x5C) {
+            i += 2;
+            continue;
+          }
+          if (ch == 0x22) inStr = false;
+          i++;
+          continue;
+        }
+        if (ch == 0x22) {
+          inStr = true;
+          i++;
+          continue;
+        }
+        if (ch == 0x7B || ch == 0x5B) {
+          stack.add(ch);
+          i++;
+          continue;
+        }
+        if (ch == 0x7D) {
+          if (stack.last != 0x7B) return -1;
+          stack.removeLast();
+          i++;
+          continue;
+        }
+        if (ch == 0x5D) {
+          if (stack.last != 0x5B) return -1;
+          stack.removeLast();
+          i++;
+          continue;
+        }
+        i++;
+      }
+      return stack.isEmpty ? i : -1;
+    }
+    while (i < s.length) {
+      final ch = s.codeUnitAt(i);
+      if (ch == 0x2C || ch == 0x7D || ch == 0x5D || _isWs(ch)) break;
+      i++;
+    }
+    return i;
+  }
+}
+
+class _PendingPathPoint {
+  const _PendingPathPoint({required this.point, this.time, this.offsetMinutes});
+
+  final GeoPoint point;
+  final DateTime? time;
+  final int? offsetMinutes;
+}
+
+class _TimelineAcc {
+  final visits = <TimelineVisit>[];
+  final activities = <TimelineActivity>[];
+  final paths = <TimelinePathSegment>[];
+  final trips = <TimelineMemoryTrip>[];
+  final notes = <TimelineMemoryNote>[];
+  final frequent = <TimelineFrequentPlace>[];
+  final affinities = <TimelineModeAffinity>[];
+  final positions = <TimelineRawPosition>[];
+  final sensors = <TimelineSensorActivity>[];
+
+  GoogleTimelineDocument build() {
+    return GoogleTimelineDocument(
+      visits: visits,
+      activities: activities,
+      paths: paths,
+      trips: trips,
+      notes: notes.where((n) => n.text.isNotEmpty).toList(),
+      frequentPlaces: frequent,
+      affinities: affinities,
+      positions: positions,
+      sensorActivities: sensors,
+    );
   }
 }

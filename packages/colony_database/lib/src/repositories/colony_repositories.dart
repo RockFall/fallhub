@@ -1,7 +1,9 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:colony_domain/colony_domain.dart';
 import 'package:drift/drift.dart';
+import 'package:path/path.dart' as p;
 import 'package:uuid/uuid.dart';
 
 import '../colony_database.dart'
@@ -565,6 +567,12 @@ class RestoreRepository {
   }
 
   Future<void> _wipeAll() async {
+    await GoogleTimelineRepository(
+      _db,
+      UuidIdGenerator.v7(() => const Uuid().v4()),
+      _clock,
+      _events,
+    ).deletePayloadFiles();
     await _db.delete(_db.capturedNotifications).go();
     await _db.delete(_db.googleTimelinePlaceLabels).go();
     await _db.delete(_db.googleTimelineImports).go();
@@ -662,9 +670,12 @@ class RestoreRepository {
     }
     final timelineImport = snapshot.googleTimelineImport;
     if (timelineImport != null) {
-      await _db
-          .into(_db.googleTimelineImports)
-          .insert(ColonyMappers.fromGoogleTimelineImport(timelineImport));
+      await GoogleTimelineRepository(
+        _db,
+        UuidIdGenerator.v7(() => const Uuid().v4()),
+        _clock,
+        _events,
+      ).putImport(timelineImport);
     }
     for (final label in snapshot.googleTimelinePlaceLabels) {
       await _db.into(_db.googleTimelinePlaceLabels).insert(
@@ -6103,15 +6114,16 @@ class FlashcardRepository {
 
   Future<FlashcardJsonImportResult> importJson({
     required EntityId profileId,
-    required String source,
+    String? source,
+    FlashcardJsonDocument? document,
   }) async {
-    final document = FlashcardJsonCodec.parse(source);
+    final parsed = document ?? FlashcardJsonCodec.parse(source ?? '');
     final areas = await listAreas(profileId);
     final placements = await listPlacements(profileId);
     final decks = await listDecks(profileId);
     final cards = await listCards(profileId);
     final plan = FlashcardJsonImportPolicy.plan(
-      document: document,
+      document: parsed,
       areas: areas,
       placements: placements,
       decks: decks,
@@ -6273,10 +6285,8 @@ class GoogleTimelineRepository {
     return (_db.select(_db.googleTimelineImports)
           ..where((t) => t.profileId.equals(profileId.value)))
         .watch()
-        .map(
-          (rows) => rows.isEmpty
-              ? null
-              : ColonyMappers.toGoogleTimelineImport(rows.first),
+        .asyncMap(
+          (rows) async => rows.isEmpty ? null : _hydrate(rows.first),
         );
   }
 
@@ -6285,7 +6295,7 @@ class GoogleTimelineRepository {
           ..where((t) => t.profileId.equals(profileId.value))
           ..limit(1))
         .getSingleOrNull();
-    return row == null ? null : ColonyMappers.toGoogleTimelineImport(row);
+    return row == null ? null : _hydrate(row);
   }
 
   Stream<List<TimelinePlaceLabel>> watchLabels(EntityId profileId) {
@@ -6302,44 +6312,200 @@ class GoogleTimelineRepository {
     return rows.map(ColonyMappers.toTimelinePlaceLabel).toList();
   }
 
+  /// Writes [import] using a sidecar file when the DB has a documents directory,
+  /// so Android never SELECTs a multi-megabyte TEXT column.
+  Future<void> putImport(GoogleTimelineImport import) async {
+    final payloadJson = await _encodePayload(import);
+    await _db.into(_db.googleTimelineImports).insert(
+          GoogleTimelineImportsCompanion.insert(
+            id: import.id.value,
+            profileId: import.profileId.value,
+            fileName: import.fileName,
+            importedAt: import.importedAt.millisecondsSinceEpoch,
+            payloadJson: payloadJson,
+          ),
+        );
+  }
+
   /// Replaces any previous Timeline payload for the profile. Place labels stay.
+  ///
+  /// Pass either [document] (tests / in-memory) or [compactJsonPath] produced
+  /// by the streaming parser so the UI never jsonEncodes a huge graph.
   Future<GoogleTimelineImport> replaceImport({
     required EntityId profileId,
     required String fileName,
-    required GoogleTimelineDocument document,
+    GoogleTimelineDocument? document,
+    String? compactJsonPath,
+    int visitCount = 0,
+    int activityCount = 0,
+    int tripCount = 0,
   }) async {
+    if (document == null && compactJsonPath == null) {
+      throw ArgumentError('document or compactJsonPath is required');
+    }
     final now = _clock();
-    final existing = await getForProfile(profileId);
+    final existingRow = await (_db.select(_db.googleTimelineImports)
+          ..where((t) => t.profileId.equals(profileId.value))
+          ..limit(1))
+        .getSingleOrNull();
     final import = GoogleTimelineImport(
-      id: existing?.id ?? EntityId(_ids.newId()),
+      id: existingRow == null
+          ? EntityId(_ids.newId())
+          : EntityId(existingRow.id),
       profileId: profileId,
       fileName: fileName,
       importedAt: now,
-      document: document,
+      document: document ?? const GoogleTimelineDocument(),
     );
     await _db.transaction(() async {
       await (_db.delete(_db.googleTimelineImports)
             ..where((t) => t.profileId.equals(profileId.value)))
           .go();
-      await _db
-          .into(_db.googleTimelineImports)
-          .insert(ColonyMappers.fromGoogleTimelineImport(import));
+      await _deletePayloadFile(profileId);
+      if (compactJsonPath != null) {
+        await _putCompactFile(import, compactJsonPath);
+      } else {
+        await putImport(import);
+      }
       await _events.record(
         aggregateType: AggregateType.googleTimeline,
         aggregateId: import.id,
         eventType: EventType.googleTimelineImported,
         payload: {
           'file_name': fileName,
-          'visits': document.visits.length,
-          'activities': document.activities.length,
-          'trips': document.trips.length,
-          'overwrote': existing != null,
+          'visits': document?.visits.length ?? visitCount,
+          'activities': document?.activities.length ?? activityCount,
+          'trips': document?.trips.length ?? tripCount,
+          'overwrote': existingRow != null,
         },
         sourceType: SourceType.import,
       );
     });
+    if (compactJsonPath != null) {
+      return _hydrate(
+        (await (_db.select(_db.googleTimelineImports)
+                  ..where((t) => t.id.equals(import.id.value))
+                  ..limit(1))
+                .getSingle()),
+      );
+    }
     return import;
   }
+
+  Future<void> _putCompactFile(
+    GoogleTimelineImport import,
+    String compactJsonPath,
+  ) async {
+    final src = File(compactJsonPath);
+    final dir = _db.dataDirectory;
+    if (dir == null) {
+      final json = await src.readAsString();
+      await _db.into(_db.googleTimelineImports).insert(
+            GoogleTimelineImportsCompanion.insert(
+              id: import.id.value,
+              profileId: import.profileId.value,
+              fileName: import.fileName,
+              importedAt: import.importedAt.millisecondsSinceEpoch,
+              payloadJson: json,
+            ),
+          );
+      return;
+    }
+    final dest = File(p.join(dir, _payloadFileName(import.profileId)));
+    await src.copy(dest.path);
+    await _db.into(_db.googleTimelineImports).insert(
+          GoogleTimelineImportsCompanion.insert(
+            id: import.id.value,
+            profileId: import.profileId.value,
+            fileName: import.fileName,
+            importedAt: import.importedAt.millisecondsSinceEpoch,
+            payloadJson: jsonEncode({
+              ColonyMappers.googleTimelineExternalFileKey:
+                  _payloadFileName(import.profileId),
+            }),
+          ),
+        );
+  }
+
+  Future<void> deletePayloadFiles() async {
+    final dirPath = _db.dataDirectory;
+    if (dirPath == null) return;
+    final dir = Directory(dirPath);
+    if (!dir.existsSync()) return;
+    await for (final entity in dir.list()) {
+      if (entity is File &&
+          p.basename(entity.path).startsWith('google_timeline_') &&
+          entity.path.endsWith('.json')) {
+        try {
+          await entity.delete();
+        } on FileSystemException {
+          // Best-effort cleanup during restore wipe.
+        }
+      }
+    }
+  }
+
+  Future<GoogleTimelineImport> _hydrate(GoogleTimelineImportRow row) async {
+    final decoded = jsonDecode(row.payloadJson);
+    if (decoded is Map &&
+        decoded[ColonyMappers.googleTimelineExternalFileKey] is String) {
+      final name =
+          decoded[ColonyMappers.googleTimelineExternalFileKey] as String;
+      final dir = _db.dataDirectory;
+      if (dir != null) {
+        final file = File(p.join(dir, name));
+        if (file.existsSync()) {
+          final payload = jsonDecode(await file.readAsString());
+          if (payload is Map) {
+            return GoogleTimelineImport(
+              id: EntityId(row.id),
+              profileId: EntityId(row.profileId),
+              fileName: row.fileName,
+              importedAt: DateTime.fromMillisecondsSinceEpoch(
+                row.importedAt,
+                isUtc: true,
+              ),
+              document: GoogleTimelineDocument.fromJson(
+                payload is Map<String, dynamic>
+                    ? payload
+                    : Map<String, dynamic>.from(payload),
+              ),
+            );
+          }
+        }
+      }
+    }
+    return ColonyMappers.toGoogleTimelineImport(row);
+  }
+
+  Future<String> _encodePayload(GoogleTimelineImport import) async {
+    final json = jsonEncode(import.document.toJson());
+    if (_db.dataDirectory == null) return json;
+    await _writePayloadJson(import.profileId, json);
+    return jsonEncode({
+      ColonyMappers.googleTimelineExternalFileKey:
+          _payloadFileName(import.profileId),
+    });
+  }
+
+  Future<void> _writePayloadJson(EntityId profileId, String json) async {
+    final dir = _db.dataDirectory;
+    if (dir == null) return;
+    final file = File(p.join(dir, _payloadFileName(profileId)));
+    await file.writeAsString(json, flush: true);
+  }
+
+  Future<void> _deletePayloadFile(EntityId profileId) async {
+    final dir = _db.dataDirectory;
+    if (dir == null) return;
+    final file = File(p.join(dir, _payloadFileName(profileId)));
+    if (file.existsSync()) {
+      await file.delete();
+    }
+  }
+
+  String _payloadFileName(EntityId profileId) =>
+      'google_timeline_${profileId.value}.json';
 
   Future<TimelinePlaceLabel> upsertLabel({
     required EntityId profileId,

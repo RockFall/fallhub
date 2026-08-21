@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'dart:typed_data';
+
 import 'package:colony_domain/colony_domain.dart';
 import 'package:test/test.dart';
 
@@ -199,12 +202,77 @@ Aqui está o lote:
     expect(filled.contains('ainda não há categorias'), isFalse);
   });
 
+  test('parseSource skips a large unknown blob without copying it', () {
+    final buf = StringBuffer('{"notes":"');
+    buf.write('x' * 140000);
+    buf.write('","cards":[{"front":"ODD","back":"domínio","deck":"AV"}]}');
+    final bytes = Uint8List.fromList(utf8.encode(buf.toString()));
+    expect(bytes.length, greaterThan(65536 * 2));
+    final source = _CountingSource(bytes);
+    final doc = FlashcardJsonCodec.parseSource(source);
+    expect(doc.cards, hasLength(1));
+    expect(doc.cards.single.front, 'ODD');
+    expect(source.maxRead, lessThanOrEqualTo(65536));
+  });
+
+  test('parseSource reads decks[] one card at a time', () {
+    const json = '''
+{
+  "decks": [{
+    "title": "Harmonia",
+    "areaPath": ["Artes", "Música"],
+    "cards": [
+      {"front": "ii-V-I", "back": "cadência"}
+    ]
+  }]
+}
+''';
+    final doc = FlashcardJsonCodec.parse(json);
+    expect(doc.cards, hasLength(1));
+    expect(doc.cards.single.deckTitle, 'Harmonia');
+    expect(doc.cards.single.areaPath, ['Artes', 'Música']);
+  });
+
+  test('round-trips compact document JSON', () {
+    final doc = FlashcardJsonCodec.parse(
+      '{"cards":[{"front":"A","back":"B","deck":"D","kind":"basic"}]}',
+    );
+    final again = FlashcardJsonDocument.fromJson(doc.toJson());
+    expect(again.cards.single.front, 'A');
+    expect(again.cards.single.deckTitle, 'D');
+  });
+
   test('catalog childNamed walks the suggested map', () {
     final arts = KnowledgeAreaCatalog.childNamed(null, 'Artes');
     expect(arts?.key, 'arts');
-    expect(
-      KnowledgeAreaCatalog.childNamed(arts, 'Música')?.key,
-      'arts.music',
-    );
+    expect(KnowledgeAreaCatalog.childNamed(arts, 'Música')?.key, 'arts.music');
   });
+}
+
+class _CountingSource implements TimelineByteSource {
+  _CountingSource(this._bytes);
+
+  final Uint8List _bytes;
+  final reads = <int>[];
+
+  int get maxRead {
+    var m = 0;
+    for (final n in reads) {
+      if (n > m) m = n;
+    }
+    return m;
+  }
+
+  @override
+  int get length => _bytes.length;
+
+  @override
+  Uint8List read(int offset, int length) {
+    reads.add(length);
+    if (length <= 0 || offset >= _bytes.length) return Uint8List(0);
+    final end = offset + length > _bytes.length
+        ? _bytes.length
+        : offset + length;
+    return Uint8List.sublistView(_bytes, offset, end);
+  }
 }

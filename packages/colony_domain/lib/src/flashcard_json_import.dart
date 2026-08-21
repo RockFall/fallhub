@@ -6,6 +6,7 @@ import 'id_generator.dart';
 import 'knowledge_area.dart';
 import 'knowledge_area_catalog.dart';
 import 'knowledge_area_placement.dart';
+import 'timeline_byte_source.dart';
 
 class FlashcardJsonException implements Exception {
   FlashcardJsonException(this.message);
@@ -41,6 +42,20 @@ class FlashcardJsonCard {
   final FlashcardScheduleMode scheduleMode;
   final int priority;
   final bool bidirectional;
+
+  Map<String, dynamic> toJson() => <String, dynamic>{
+    'front': front,
+    'back': back,
+    'kind': kind.name,
+    'deck': deckTitle,
+    'areaPath': areaPath,
+    'alsoIn': alsoIn,
+    if (extra != null) 'extra': extra,
+    'tags': tags,
+    'schedule': scheduleMode.name,
+    'priority': priority,
+    'bidirectional': bidirectional,
+  };
 }
 
 class FlashcardJsonDocument {
@@ -48,6 +63,15 @@ class FlashcardJsonDocument {
 
   final int version;
   final List<FlashcardJsonCard> cards;
+
+  Map<String, dynamic> toJson() => <String, dynamic>{
+    'version': version,
+    'cards': [for (final card in cards) card.toJson()],
+  };
+
+  factory FlashcardJsonDocument.fromJson(Map<String, dynamic> json) {
+    return FlashcardJsonCodec.documentFromJson(json);
+  }
 }
 
 enum FlashcardJsonCardActionKind { create, skip, overwrite }
@@ -117,9 +141,8 @@ class FlashcardJsonImportPlan {
   final List<FlashcardJsonPlacementStep> placements;
   final List<FlashcardJsonCardStep> cards;
 
-  int get createCount => cards
-      .where((c) => c.action == FlashcardJsonCardActionKind.create)
-      .length;
+  int get createCount =>
+      cards.where((c) => c.action == FlashcardJsonCardActionKind.create).length;
   int get skipCount =>
       cards.where((c) => c.action == FlashcardJsonCardActionKind.skip).length;
   int get overwriteCount => cards
@@ -149,65 +172,43 @@ abstract final class FlashcardJsonCodec {
   static const defaultDeckTitle = 'Importação';
 
   static FlashcardJsonDocument parse(String source) {
-    final raw = jsonDecode(_extractJson(source));
-    if (raw is List) {
-      return FlashcardJsonDocument(
-        cards: [
-          for (final item in raw) _parseCard(item, fallbackDeck: defaultDeckTitle),
-        ],
-      );
+    final extracted = _extractJson(source);
+    return parseSource(Uint8ListTimelineByteSource(utf8.encode(extracted)));
+  }
+
+  /// Streaming parse. Walks `cards[]` / `decks[].cards[]` one object at a time
+  /// so a large dump is not `jsonDecode`d as a single tree. Unknown keys
+  /// (including huge blobs) are skipped with a sliding window.
+  static FlashcardJsonDocument parseSource(TimelineByteSource source) {
+    if (source.length == 0) {
+      throw FlashcardJsonException('JSON vazio.');
     }
-    if (raw is! Map) {
+    final cursor = TimelineByteCursor(source);
+    _seekJsonStart(cursor);
+    final acc = _FlashcardParseAcc();
+    final first = cursor.peek();
+    if (first == 0x5B) {
+      _readCardArray(
+        cursor,
+        acc,
+        fallbackDeck: defaultDeckTitle,
+        fallbackPath: const [],
+      );
+    } else if (first == 0x7B) {
+      _readRootObject(cursor, acc);
+    } else {
       throw FlashcardJsonException('O JSON deve ser um objeto ou uma lista.');
     }
-    final map = _asStringKeyMap(raw);
-    final version = map['version'] is num ? (map['version'] as num).toInt() : 1;
-    final cards = <FlashcardJsonCard>[];
-    final defaultDeck = _readString(map['deck']) ??
-        _readString(map['deckTitle']) ??
-        defaultDeckTitle;
-    final defaultPath = parsePath(map['areaPath']);
-
-    final decksRaw = map['decks'];
-    if (decksRaw is List) {
-      for (final item in decksRaw) {
-        if (item is! Map) continue;
-        final deck = _asStringKeyMap(item);
-        final title = _readString(deck['title']) ??
-            _readString(deck['name']) ??
-            defaultDeck;
-        final deckPath = parsePath(deck['areaPath']);
-        final nested = deck['cards'];
-        if (nested is! List) continue;
-        for (final card in nested) {
-          cards.add(
-            _parseCard(
-              card,
-              fallbackDeck: title,
-              fallbackPath: deckPath.isEmpty ? defaultPath : deckPath,
-            ),
-          );
-        }
-      }
-    }
-
-    final cardsRaw = map['cards'];
-    if (cardsRaw is List) {
-      for (final item in cardsRaw) {
-        cards.add(
-          _parseCard(
-            item,
-            fallbackDeck: defaultDeck,
-            fallbackPath: defaultPath,
-          ),
-        );
-      }
-    }
-
-    if (cards.isEmpty) {
+    if (acc.cards.isEmpty) {
       throw FlashcardJsonException('Nenhum cartão encontrado no JSON.');
     }
-    return FlashcardJsonDocument(version: version, cards: cards);
+    return FlashcardJsonDocument(version: acc.version, cards: acc.cards);
+  }
+
+  static FlashcardJsonDocument documentFromJson(Map<String, dynamic> json) {
+    return parseSource(
+      Uint8ListTimelineByteSource(utf8.encode(jsonEncode(json))),
+    );
   }
 
   static List<String> parsePath(Object? raw) {
@@ -243,7 +244,8 @@ abstract final class FlashcardJsonCodec {
     }
     final map = _asStringKeyMap(raw);
     final front = _readString(map['front']) ?? _readString(map['frente']) ?? '';
-    final back = _readString(map['back']) ??
+    final back =
+        _readString(map['back']) ??
         _readString(map['verso']) ??
         _readString(map['answer']) ??
         '';
@@ -256,13 +258,13 @@ abstract final class FlashcardJsonCodec {
         back.trim().isEmpty) {
       throw FlashcardJsonException('Cartão "$front" sem verso (back).');
     }
-    if (kind == FlashcardKind.cloze &&
-        ClozeRenderer.indicesIn(front).isEmpty) {
+    if (kind == FlashcardKind.cloze && ClozeRenderer.indicesIn(front).isEmpty) {
       throw FlashcardJsonException(
         'Cartão cloze precisa de {{c1::texto}} na frente.',
       );
     }
-    final deck = _readString(map['deck']) ??
+    final deck =
+        _readString(map['deck']) ??
         _readString(map['deckTitle']) ??
         fallbackDeck;
     final path = parsePath(map['areaPath']);
@@ -295,7 +297,8 @@ abstract final class FlashcardJsonCodec {
       tags: tags,
       scheduleMode: parseSchedule(map['schedule'] ?? map['scheduleMode']),
       priority: parsePriority(map['priority'] ?? map['prioridade']),
-      bidirectional: map['bidirectional'] == true ||
+      bidirectional:
+          map['bidirectional'] == true ||
           map['inverso'] == true ||
           kind == FlashcardKind.reverse,
     );
@@ -311,8 +314,7 @@ abstract final class FlashcardJsonCodec {
       'free_recall' ||
       'recordacao' ||
       'recordação' ||
-      'recordação livre' =>
-        FlashcardKind.freeRecall,
+      'recordação livre' => FlashcardKind.freeRecall,
       'exercise' || 'exercicio' || 'exercício' => FlashcardKind.exercise,
       'repertoire' || 'repertorio' || 'repertório' => FlashcardKind.repertoire,
       _ => throw FlashcardJsonException('Tipo de cartão desconhecido: $raw'),
@@ -322,10 +324,13 @@ abstract final class FlashcardJsonCodec {
   static FlashcardScheduleMode parseSchedule(Object? raw) {
     final value = raw?.toString().trim().toLowerCase() ?? '';
     return switch (value) {
-      '' || 'scheduled' || 'programado' || 'srs' =>
-        FlashcardScheduleMode.scheduled,
-      'unscheduled' || 'guardado' || 'saved' =>
-        FlashcardScheduleMode.unscheduled,
+      '' ||
+      'scheduled' ||
+      'programado' ||
+      'srs' => FlashcardScheduleMode.scheduled,
+      'unscheduled' ||
+      'guardado' ||
+      'saved' => FlashcardScheduleMode.unscheduled,
       _ => throw FlashcardJsonException('Agenda desconhecida: $raw'),
     };
   }
@@ -338,12 +343,234 @@ abstract final class FlashcardJsonCodec {
     return FlashcardPolicy.normalizePriority(parsed);
   }
 
+  static void _seekJsonStart(TimelineByteCursor cursor) {
+    cursor.skipBom();
+    cursor.skipWs();
+    if (cursor.peek() == 0x7B || cursor.peek() == 0x5B) return;
+    final afterBom = cursor.pos;
+    while (!cursor.isEof) {
+      if (cursor.peek() == 0x60) {
+        final start = cursor.pos;
+        if (cursor.next() == 0x60 &&
+            cursor.next() == 0x60 &&
+            cursor.next() == 0x60) {
+          cursor.skipWs();
+          // Optional language tag (json, JSON, …).
+          if (cursor.peek() != 0x7B && cursor.peek() != 0x5B) {
+            while (!cursor.isEof &&
+                cursor.peek() != 0x0A &&
+                cursor.peek() != 0x0D &&
+                !_isWs(cursor.peek()) &&
+                cursor.peek() != 0x7B &&
+                cursor.peek() != 0x5B) {
+              cursor.next();
+            }
+            cursor.skipWs();
+          }
+          if (cursor.peek() == 0x7B || cursor.peek() == 0x5B) return;
+        }
+        cursor.pos = start + 1;
+        continue;
+      }
+      cursor.next();
+    }
+    cursor.pos = afterBom;
+    while (!cursor.isEof && cursor.peek() != 0x7B && cursor.peek() != 0x5B) {
+      cursor.next();
+    }
+    if (cursor.peek() != 0x7B && cursor.peek() != 0x5B) {
+      throw FlashcardJsonException('Não encontrei um objeto ou lista JSON.');
+    }
+  }
+
+  static bool _isWs(int code) =>
+      code == 0x20 || code == 0x09 || code == 0x0A || code == 0x0D;
+
+  static void _readRootObject(
+    TimelineByteCursor cursor,
+    _FlashcardParseAcc acc,
+  ) {
+    cursor.expectByte(0x7B);
+    cursor.skipWs();
+    while (!cursor.isEof && cursor.peek() != 0x7D) {
+      final key = cursor.readString();
+      cursor.skipWs();
+      cursor.expectByte(0x3A);
+      cursor.skipWs();
+      switch (key) {
+        case 'version':
+          final raw = _decodeCurrent(cursor);
+          if (raw is num) acc.version = raw.toInt();
+        case 'deck':
+        case 'deckTitle':
+          acc.defaultDeck =
+              _readString(_decodeCurrent(cursor)) ?? acc.defaultDeck;
+        case 'areaPath':
+          acc.defaultPath = parsePath(_decodeCurrent(cursor));
+        case 'cards':
+          if (cursor.peek() == 0x5B) {
+            _readCardArray(
+              cursor,
+              acc,
+              fallbackDeck: acc.defaultDeck,
+              fallbackPath: acc.defaultPath,
+              applyDefaultsLate: true,
+            );
+          } else {
+            cursor.skipValue();
+          }
+        case 'decks':
+          if (cursor.peek() == 0x5B) {
+            _readDeckArray(cursor, acc);
+          } else {
+            cursor.skipValue();
+          }
+        default:
+          cursor.skipValue();
+      }
+      cursor.skipWs();
+      if (cursor.peek() == 0x2C) {
+        cursor.next();
+        cursor.skipWs();
+      }
+    }
+    if (cursor.peek() != 0x7D) {
+      throw FlashcardJsonException('JSON truncado.');
+    }
+    cursor.next();
+    acc.flushPending();
+  }
+
+  static void _readDeckArray(
+    TimelineByteCursor cursor,
+    _FlashcardParseAcc acc,
+  ) {
+    cursor.expectByte(0x5B);
+    cursor.skipWs();
+    while (!cursor.isEof && cursor.peek() != 0x5D) {
+      if (cursor.peek() == 0x7B) {
+        _readDeckObject(cursor, acc);
+      } else {
+        cursor.skipValue();
+      }
+      cursor.skipWs();
+      if (cursor.peek() == 0x2C) {
+        cursor.next();
+        cursor.skipWs();
+      }
+    }
+    if (cursor.peek() != 0x5D) {
+      throw FlashcardJsonException('JSON truncado: array sem fecho');
+    }
+    cursor.next();
+  }
+
+  static void _readDeckObject(
+    TimelineByteCursor cursor,
+    _FlashcardParseAcc acc,
+  ) {
+    cursor.expectByte(0x7B);
+    cursor.skipWs();
+    String? title;
+    var path = const <String>[];
+    final pending = <Map<String, dynamic>>[];
+    while (!cursor.isEof && cursor.peek() != 0x7D) {
+      final key = cursor.readString();
+      cursor.skipWs();
+      cursor.expectByte(0x3A);
+      cursor.skipWs();
+      switch (key) {
+        case 'title':
+        case 'name':
+          title = _readString(_decodeCurrent(cursor)) ?? title;
+        case 'areaPath':
+          path = parsePath(_decodeCurrent(cursor));
+        case 'cards':
+          if (cursor.peek() == 0x5B) {
+            _readObjectArray(cursor, pending.add);
+          } else {
+            cursor.skipValue();
+          }
+        default:
+          cursor.skipValue();
+      }
+      cursor.skipWs();
+      if (cursor.peek() == 0x2C) {
+        cursor.next();
+        cursor.skipWs();
+      }
+    }
+    if (cursor.peek() != 0x7D) {
+      throw FlashcardJsonException('JSON truncado.');
+    }
+    cursor.next();
+    acc.pendingDecks.add((title: title, path: path, cards: pending));
+  }
+
+  static void _readCardArray(
+    TimelineByteCursor cursor,
+    _FlashcardParseAcc acc, {
+    required String fallbackDeck,
+    required List<String> fallbackPath,
+    bool applyDefaultsLate = false,
+  }) {
+    final pending = <Map<String, dynamic>>[];
+    _readObjectArray(cursor, pending.add);
+    if (applyDefaultsLate) {
+      acc.pendingRootCards.addAll(pending);
+      return;
+    }
+    for (final map in pending) {
+      acc.cards.add(
+        _parseCard(map, fallbackDeck: fallbackDeck, fallbackPath: fallbackPath),
+      );
+    }
+  }
+
+  static void _readObjectArray(
+    TimelineByteCursor cursor,
+    void Function(Map<String, dynamic> map) onObject,
+  ) {
+    cursor.expectByte(0x5B);
+    cursor.skipWs();
+    while (!cursor.isEof && cursor.peek() != 0x5D) {
+      if (cursor.peek() == 0x7B) {
+        final raw = _decodeCurrent(cursor);
+        if (raw is! Map) {
+          throw FlashcardJsonException('Cada cartão deve ser um objeto JSON.');
+        }
+        onObject(_asStringKeyMap(raw));
+      } else {
+        cursor.skipValue();
+      }
+      cursor.skipWs();
+      if (cursor.peek() == 0x2C) {
+        cursor.next();
+        cursor.skipWs();
+      }
+    }
+    if (cursor.peek() != 0x5D) {
+      throw FlashcardJsonException('JSON truncado: array sem fecho');
+    }
+    cursor.next();
+  }
+
+  static Object? _decodeCurrent(TimelineByteCursor cursor) {
+    cursor.skipWs();
+    final start = cursor.pos;
+    cursor.skipValue();
+    return jsonDecode(utf8.decode(cursor.slice(start, cursor.pos)));
+  }
+
   static String _extractJson(String source) {
     var text = source.trim();
     if (text.isEmpty) {
       throw FlashcardJsonException('JSON vazio.');
     }
-    final fence = RegExp(r'```(?:json)?\s*([\s\S]*?)\s*```', caseSensitive: false);
+    final fence = RegExp(
+      r'```(?:json)?\s*([\s\S]*?)\s*```',
+      caseSensitive: false,
+    );
     final fenced = fence.firstMatch(text);
     if (fenced != null) {
       text = fenced.group(1)!.trim();
@@ -356,21 +583,60 @@ abstract final class FlashcardJsonCodec {
     final start = obj < 0
         ? arr
         : arr < 0
-            ? obj
-            : (obj < arr ? obj : arr);
+        ? obj
+        : (obj < arr ? obj : arr);
     return text.substring(start);
   }
 
   static Map<String, dynamic> _asStringKeyMap(Map raw) {
-    return {
-      for (final entry in raw.entries) entry.key.toString(): entry.value,
-    };
+    return {for (final entry in raw.entries) entry.key.toString(): entry.value};
   }
 
   static String? _readString(Object? value) {
     if (value == null) return null;
     final text = value.toString();
     return text.trim().isEmpty ? null : text;
+  }
+}
+
+class _FlashcardParseAcc {
+  var version = 1;
+  var defaultDeck = FlashcardJsonCodec.defaultDeckTitle;
+  var defaultPath = const <String>[];
+  final cards = <FlashcardJsonCard>[];
+  final pendingRootCards = <Map<String, dynamic>>[];
+  final pendingDecks =
+      <
+        ({String? title, List<String> path, List<Map<String, dynamic>> cards})
+      >[];
+
+  void flushPending() {
+    for (final deck in pendingDecks) {
+      final title = (deck.title == null || deck.title!.trim().isEmpty)
+          ? defaultDeck
+          : deck.title!;
+      final path = deck.path.isEmpty ? defaultPath : deck.path;
+      for (final map in deck.cards) {
+        cards.add(
+          FlashcardJsonCodec._parseCard(
+            map,
+            fallbackDeck: title,
+            fallbackPath: path,
+          ),
+        );
+      }
+    }
+    for (final map in pendingRootCards) {
+      cards.add(
+        FlashcardJsonCodec._parseCard(
+          map,
+          fallbackDeck: defaultDeck,
+          fallbackPath: defaultPath,
+        ),
+      );
+    }
+    pendingDecks.clear();
+    pendingRootCards.clear();
   }
 }
 
@@ -527,8 +793,8 @@ abstract final class FlashcardJsonImportPolicy {
   }
 
   static String pathKey(List<String> path) => [
-        for (final part in path) FlashcardJsonCodec.normalizeText(part),
-      ].join('\u0001');
+    for (final part in path) FlashcardJsonCodec.normalizeText(part),
+  ].join('\u0001');
 }
 
 abstract final class FlashcardJsonPromptBuilder {
@@ -545,13 +811,13 @@ abstract final class FlashcardJsonPromptBuilder {
       ..writeln(
         'Responda APENAS com JSON válido (sem markdown, sem comentário).',
       )
-      ..writeln(
-        'O app importa o JSON, cria prateleiras/baralhos que faltarem,',
-      )
+      ..writeln('O app importa o JSON, cria prateleiras/baralhos que faltarem,')
       ..writeln(
         'ignora cartões idênticos e substitui o verso se a pergunta já existir',
       )
-      ..writeln('no mesmo baralho com resposta diferente. O SRS não é resetado no overwrite.')
+      ..writeln(
+        'no mesmo baralho com resposta diferente. O SRS não é resetado no overwrite.',
+      )
       ..writeln()
       ..writeln('SCHEMA')
       ..writeln('{')
@@ -559,21 +825,17 @@ abstract final class FlashcardJsonPromptBuilder {
       ..writeln('  "cards": [')
       ..writeln('    {')
       ..writeln('      "front": "pergunta ou prompt (obrigatório)",')
-      ..writeln('      "back": "resposta (obrigatório, salvo cloze/recordação livre)",')
+      ..writeln(
+        '      "back": "resposta (obrigatório, salvo cloze/recordação livre)",',
+      )
       ..writeln(
         '      "kind": "basic|reverse|cloze|freeRecall|exercise|repertoire",',
       )
       ..writeln('      "deck": "nome do baralho (reutiliza se já existir)",')
-      ..writeln(
-        '      "areaPath": ["Raiz", "Filho", "Folha"],',
-      )
-      ..writeln(
-        '      "alsoIn": [["Outra raiz", "Outra folha"]],',
-      )
+      ..writeln('      "areaPath": ["Raiz", "Filho", "Folha"],')
+      ..writeln('      "alsoIn": [["Outra raiz", "Outra folha"]],')
       ..writeln('      "extra": "nota opcional no verso",')
-      ..writeln(
-        '      "tags": ["Jazz", "Música / Harmonia"],',
-      )
+      ..writeln('      "tags": ["Jazz", "Música / Harmonia"],')
       ..writeln('      "schedule": "scheduled|unscheduled",')
       ..writeln('      "priority": 5,')
       ..writeln('      "bidirectional": false')
@@ -610,9 +872,7 @@ abstract final class FlashcardJsonPromptBuilder {
       ..writeln(
         '- schedule: scheduled = entra na fila SM-2; unscheduled = só prática pontual.',
       )
-      ..writeln(
-        '- priority: 1 (mais alta) a 5 (mais baixa). Omitir = 5.',
-      )
+      ..writeln('- priority: 1 (mais alta) a 5 (mais baixa). Omitir = 5.')
       ..writeln(
         '- bidirectional: true cria o cartão invertido (frente↔verso) com SRS separado.',
       )
@@ -644,10 +904,7 @@ abstract final class FlashcardJsonPromptBuilder {
         );
         final alias = extras.isEmpty
             ? ''
-            : '  (também em: ${[
-                for (final parent in extras)
-                  KnowledgeAreaPolicy.pathLabel(areaId: parent.id, areas: areas),
-              ].join('; ')})';
+            : '  (também em: ${[for (final parent in extras) KnowledgeAreaPolicy.pathLabel(areaId: parent.id, areas: areas)].join('; ')})';
         buffer.writeln('$indent- ${node.area.title}$alias');
         for (final child in node.children) {
           walk(child, '$indent  ');
@@ -707,7 +964,9 @@ abstract final class FlashcardJsonPromptBuilder {
       ..writeln('REGRAS FINAIS')
       ..writeln('- Não invente campos extra.')
       ..writeln('- Não copie layout de outros apps de flashcard.')
-      ..writeln('- Uma ideia por cartão; frente curta o bastante para estudar no telemóvel.')
+      ..writeln(
+        '- Uma ideia por cartão; frente curta o bastante para estudar no telemóvel.',
+      )
       ..writeln('- JSON único, UTF-8.');
     return buffer.toString();
   }

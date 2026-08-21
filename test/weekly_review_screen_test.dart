@@ -79,7 +79,7 @@ void main() {
       profileId: profile.id,
 
       weekStartDate: weekStartDateFor(
-        DateTime.now(),
+        DateTime.now().toUtc(),
         weekStartsOnMonday: true,
       ),
 
@@ -153,7 +153,7 @@ void main() {
 
       profile.id,
 
-      weekStartDateFor(DateTime.now(), weekStartsOnMonday: true),
+      weekStartDateFor(DateTime.now().toUtc(), weekStartsOnMonday: true),
 
     );
 
