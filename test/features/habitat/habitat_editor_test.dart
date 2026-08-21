@@ -80,7 +80,12 @@ void main() {
     test('labels and assets cover all kinds', () {
       for (final kind in HabitatPropKinds.all) {
         expect(HabitatPropCatalog.label(kind), isNotEmpty);
-        expect(HabitatPropCatalog.assetPath(kind), contains('.png'));
+        final path = HabitatPropCatalog.assetPath(kind);
+        expect(
+          path == HabitatPropCatalog.proceduralAsset || path.contains('.png'),
+          isTrue,
+          reason: '$kind → $path',
+        );
       }
     });
 
