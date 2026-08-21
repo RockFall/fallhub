@@ -81,6 +81,11 @@ void main() {
     expect(find.text(AppStrings.travelTitle), findsOneWidget);
     expect(find.text(AppStrings.settings), findsOneWidget);
 
+    tester.view.physicalSize = const Size(390, 844);
+    await tester.pump();
+    expect(tester.takeException(), isNull);
+    expect(find.text(AppStrings.homeMiniAppsTitle), findsOneWidget);
+
     await _flushDisposeTimers(tester);
   });
 }
