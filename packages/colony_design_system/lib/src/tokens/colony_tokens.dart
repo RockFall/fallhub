@@ -90,6 +90,38 @@ abstract final class ColonyRadii {
   static const sm = 1.0;
   static const md = 2.0;
   static const lg = 2.0;
+
+  /// Soft launcher tiles (home mini-apps). Not used by RimWorld-style chrome.
+  static const tile = 16.0;
+  static const soft = 14.0;
+}
+
+/// Saturated fills for the home mini-app launcher (original palette).
+abstract final class ColonyMiniAppColors {
+  static const habitat = Color(0xFF2AA8A4);
+  static const pawn = Color(0xFFC4A35A);
+  static const work = Color(0xFF8B8F3A);
+  static const quests = Color(0xFFE07A3D);
+  static const flashcards = Color(0xFF2BB7C4);
+  static const research = Color(0xFF7B5EA7);
+  static const finance = Color(0xFFD4A017);
+  static const health = Color(0xFFD45B6A);
+  static const inventory = Color(0xFFA67C52);
+  static const travel = Color(0xFF4A90C8);
+  static const home = Color(0xFFC47A5A);
+  static const zones = Color(0xFF3D9AA8);
+  static const people = Color(0xFF5BA86A);
+  static const organizations = Color(0xFF5A7A9A);
+  static const commitments = Color(0xFF6BA56A);
+  static const inbox = Color(0xFFE07050);
+  static const chronicle = Color(0xFF5A6BB8);
+  static const projects = Color(0xFF3D7A8C);
+  static const decisions = Color(0xFFA8884A);
+  static const schedule = Color(0xFF5B7FBF);
+  static const sync = Color(0xFF4A8B9A);
+  static const integrations = Color(0xFF8A5A8A);
+  static const settings = Color(0xFF5A6A78);
+  static const more = Color(0xFF4A5560);
 }
 
 abstract final class ColonySizes {

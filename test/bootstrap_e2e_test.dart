@@ -140,7 +140,9 @@ void main() {
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 500));
 
-    expect(find.textContaining('Hoje · Colônia E2E'), findsOneWidget);
+    expect(find.textContaining('Colônia E2E'), findsOneWidget);
+    expect(find.text(AppStrings.homeMiniAppsTitle), findsOneWidget);
+    expect(find.text(AppStrings.habitatTitle), findsWidgets);
 
     router.go('/resources/finance');
     await tester.pump();

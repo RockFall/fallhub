@@ -257,6 +257,48 @@ abstract final class AppStrings {
   static const pawnName = 'Seu nome';
   static const startColony = 'Iniciar colônia';
   static const sectorsTitle = 'Setores ativos';
+  static const homeGreetingMorning = 'Bom dia';
+  static const homeGreetingAfternoon = 'Boa tarde';
+  static const homeGreetingEvening = 'Boa noite';
+  static String homeGreeting(DateTime localNow, String displayName) {
+    final hour = localNow.hour;
+    final hello = hour < 12
+        ? homeGreetingMorning
+        : hour < 18
+            ? homeGreetingAfternoon
+            : homeGreetingEvening;
+    return '$hello, $displayName';
+  }
+
+  static const homeSearchHint = 'Buscar programas e comandos';
+  static const homeMiniAppsTitle = 'Programas';
+  static const homeMiniAppsMore = 'Mais';
+  static const homeMiniAppsLess = 'Menos';
+  static const homeQuickCheckIn = 'Check-in';
+  static const homeQuickStudy = 'Estudar';
+  static const homeQuickInbox = 'Inbox';
+  static const homeQuickHabitat = 'Habitat';
+  static const homeNowTitle = 'Agora';
+  static const homeNext24hTitle = 'Próximas 24 horas';
+  static const homeNext24hEmpty = 'Nada na agenda nas próximas 24 horas.';
+  static const homeStateTitle = 'Estado da colônia';
+  static const homeStateCapacity = 'Capacidade';
+  static const homeStateCommitments = 'Compromissos';
+  static const homeStateFinance = 'Finanças';
+  static const homeStateHealth = 'Saúde';
+  static const homeStateLearning = 'Aprendizado';
+  static const homeStateMind = 'Carga mental';
+  static const homeStateUnknown = 'Dados incompletos';
+  static const homeStateStable = 'Estável';
+  static const homeStateAttention = 'Atenção';
+  static const homeStateProgress = 'Em progresso';
+  static const homeStateUnderControl = 'Sob controle';
+  static const homeStateLedgerLocal = 'Ledger local';
+  static const homeWeeklyDigestCta = 'Ver resumo da semana';
+  static const homeInboxEmpty = 'Nenhum item pendente na inbox.';
+  static const homeNextAppointment = 'Próximo lembrete';
+  static const homeNoAppointment = 'Nenhum lembrete de consulta à frente.';
+  static const homeOpenPawn = 'Abrir perfil';
   static const today = 'Hoje';
   static const nextActions = 'Próximas ações';
   static const alerts = 'Alertas';
