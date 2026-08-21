@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'dart:typed_data';
+
 import 'package:colony_domain/colony_domain.dart';
 import 'package:test/test.dart';
 
@@ -273,4 +276,102 @@ void main() {
     expect(doc.visits.single.semanticType, isNull);
     expect(doc.visits.single.location, isNotNull);
   });
+
+  test('skips a large rawSignals blob without copying it', () {
+    final buf = StringBuffer('{"rawSignals":[');
+    const ping =
+        '{"position":{"LatLng":"1.0°, 2.0°","timestamp":"2026-01-01T00:00:00Z"}}';
+    const count = 8000;
+    for (var i = 0; i < count; i++) {
+      if (i > 0) buf.write(',');
+      buf.write(ping);
+    }
+    buf.write(
+      '],"semanticSegments":[{'
+      '"startTime":"2026-08-20T08:00:00.000Z",'
+      '"endTime":"2026-08-20T09:00:00.000Z",'
+      '"visit":{"topCandidate":{"placeId":"ChIJ_STREAM",'
+      '"placeLocation":{"latLng":"-19.91°, -43.93°"}}}}]}',
+    );
+    final bytes = Uint8List.fromList(utf8.encode(buf.toString()));
+    expect(bytes.length, greaterThan(65536 * 2));
+
+    final source = _CountingSource(bytes);
+    final doc = GoogleTimelineCodec.parseSource(source);
+
+    expect(doc.visits, hasLength(1));
+    expect(doc.visits.single.placeId, 'ChIJ_STREAM');
+    expect(doc.positions, isEmpty);
+    expect(source.maxRead, lessThanOrEqualTo(source.windowHint));
+  });
+
+  test('parses visits when rawSignals comes first', () {
+    const json = '''
+{"rawSignals":[{"position":{"LatLng":"1.0°, 2.0°","timestamp":"2026-01-01T00:00:00Z"}}],
+ "semanticSegments":[{
+   "startTime":"2026-08-20T08:00:00.000Z",
+   "endTime":"2026-08-20T09:00:00.000Z",
+   "visit":{"topCandidate":{"placeId":"ChIJ_ORDER"}}
+ }]}
+''';
+    final doc = GoogleTimelineCodec.parse(json);
+    expect(doc.visits.single.placeId, 'ChIJ_ORDER');
+    expect(doc.positions, isEmpty);
+  });
+
+  test(
+    'downsamples a dense timelinePath without decoding the segment as one object',
+    () {
+      final buf = StringBuffer(
+        '{"semanticSegments":[{"startTime":"2026-08-20T08:00:00.000Z",'
+        '"endTime":"2026-08-20T10:00:00.000Z","timelinePath":[',
+      );
+      for (var i = 0; i < 200; i++) {
+        if (i > 0) buf.write(',');
+        buf.write(
+          '{"point":"31.2300000°, 121.4700000°","durationMinutesOffsetFromStartTime":$i}',
+        );
+      }
+      buf.write(']}]}');
+      final doc = GoogleTimelineCodec.parse(buf.toString());
+      expect(doc.paths, hasLength(1));
+      expect(doc.paths.single.points.length, lessThanOrEqualTo(16));
+      expect(doc.paths.single.points.first.time, DateTime.utc(2026, 8, 20, 8));
+      expect(
+        doc.paths.single.points.last.time,
+        DateTime.utc(2026, 8, 20, 8).add(const Duration(minutes: 199)),
+      );
+    },
+  );
+}
+
+class _CountingSource implements TimelineByteSource {
+  _CountingSource(this._bytes);
+
+  final Uint8List _bytes;
+  final reads = <int>[];
+
+  /// Matches [TimelineByteCursor] default window.
+  int get windowHint => 65536;
+
+  int get maxRead {
+    var m = 0;
+    for (final n in reads) {
+      if (n > m) m = n;
+    }
+    return m;
+  }
+
+  @override
+  int get length => _bytes.length;
+
+  @override
+  Uint8List read(int offset, int length) {
+    reads.add(length);
+    if (length <= 0 || offset >= _bytes.length) return Uint8List(0);
+    final end = offset + length > _bytes.length
+        ? _bytes.length
+        : offset + length;
+    return Uint8List.sublistView(_bytes, offset, end);
+  }
 }

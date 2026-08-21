@@ -10,17 +10,28 @@ class TimelineController extends AsyncNotifier<void> {
 
   Future<GoogleTimelineImport?> replaceImport({
     required String fileName,
-    required GoogleTimelineDocument document,
+    GoogleTimelineDocument? document,
+    String? compactJsonPath,
+    int visitCount = 0,
+    int activityCount = 0,
+    int tripCount = 0,
   }) async {
     GoogleTimelineImport? created;
     state = const AsyncLoading();
     state = await AsyncValue.guard(() async {
       final profile = await ref.read(repositoriesProvider).profiles.getActive();
       if (profile == null) throw StateError('Perfil não configurado');
-      created = await ref.read(repositoriesProvider).googleTimeline.replaceImport(
+      created = await ref
+          .read(repositoriesProvider)
+          .googleTimeline
+          .replaceImport(
             profileId: profile.id,
             fileName: fileName,
             document: document,
+            compactJsonPath: compactJsonPath,
+            visitCount: visitCount,
+            activityCount: activityCount,
+            tripCount: tripCount,
           );
     });
     if (state.hasError) return null;
@@ -33,10 +44,10 @@ class TimelineController extends AsyncNotifier<void> {
     state = await AsyncValue.guard(() async {
       final profile = await ref.read(repositoriesProvider).profiles.getActive();
       if (profile == null) throw StateError('Perfil não configurado');
-      await ref.read(repositoriesProvider).googleTimeline.upsertLabel(
-            profileId: profile.id,
-            label: label,
-          );
+      await ref
+          .read(repositoriesProvider)
+          .googleTimeline
+          .upsertLabel(profileId: profile.id, label: label);
     });
     if (state.hasError) return false;
     ref.invalidate(timelinePlaceLabelsProvider);

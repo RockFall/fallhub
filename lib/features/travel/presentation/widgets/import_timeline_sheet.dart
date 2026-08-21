@@ -1,8 +1,6 @@
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:colony_design_system/colony_design_system.dart';
-import 'package:colony_domain/colony_domain.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -33,8 +31,13 @@ class ImportTimelineSheet extends ConsumerStatefulWidget {
 class _ImportTimelineSheetState extends ConsumerState<ImportTimelineSheet> {
   String? _error;
   String? _fileName;
-  GoogleTimelineDocument? _preview;
+  String? _compactPath;
+  int _visits = 0;
+  int _activities = 0;
+  int _trips = 0;
+  int _places = 0;
   bool _busy = false;
+  bool get _hasPreview => _compactPath != null;
 
   Future<void> _openHelp() async {
     final uri = Uri.parse(AppStrings.timelineHelpUrl);
@@ -42,9 +45,6 @@ class _ImportTimelineSheetState extends ConsumerState<ImportTimelineSheet> {
   }
 
   String _errorMessage(Object e) {
-    if (e is TimelineImportTooLarge) {
-      return AppStrings.timelineFileTooLargeBytes(e.megaBytes);
-    }
     return '${AppStrings.timelineParseError} ($e)';
   }
 
@@ -69,15 +69,6 @@ class _ImportTimelineSheetState extends ConsumerState<ImportTimelineSheet> {
         return;
       }
       if (file.bytes != null && file.bytes!.isNotEmpty) {
-        if (file.bytes!.length > timelineImportMaxBytes) {
-          setState(() {
-            _busy = false;
-            _error = AppStrings.timelineFileTooLargeBytes(
-              (file.bytes!.length / (1024 * 1024)).ceil(),
-            );
-          });
-          return;
-        }
         await _parseSource(utf8.decode(file.bytes!), file.name);
         return;
       }
@@ -130,24 +121,13 @@ class _ImportTimelineSheetState extends ConsumerState<ImportTimelineSheet> {
 
   Future<void> _parsePath(String path, String fileName) async {
     try {
-      final length = await File(path).length();
-      if (length > timelineImportMaxBytes) {
-        if (!mounted) return;
-        setState(() {
-          _busy = false;
-          _error = AppStrings.timelineFileTooLargeBytes(
-            (length / (1024 * 1024)).ceil(),
-          );
-        });
-        return;
-      }
-      final json = await compute(parseGoogleTimelineFile, path);
-      _acceptPreview(json, fileName);
+      final result = await compute(parseGoogleTimelineFile, path);
+      _acceptPreview(result, fileName);
     } catch (e) {
       if (!mounted) return;
       setState(() {
         _busy = false;
-        _preview = null;
+        _compactPath = null;
         _error = _errorMessage(e);
       });
     }
@@ -155,22 +135,26 @@ class _ImportTimelineSheetState extends ConsumerState<ImportTimelineSheet> {
 
   Future<void> _parseSource(String source, String fileName) async {
     try {
-      final json = await compute(parseGoogleTimelineSource, source);
-      _acceptPreview(json, fileName);
+      final result = await compute(parseGoogleTimelineSource, source);
+      _acceptPreview(result, fileName);
     } catch (e) {
       if (!mounted) return;
       setState(() {
         _busy = false;
-        _preview = null;
+        _compactPath = null;
         _error = _errorMessage(e);
       });
     }
   }
 
-  void _acceptPreview(Map<String, dynamic> json, String fileName) {
+  void _acceptPreview(Map<String, dynamic> result, String fileName) {
     if (!mounted) return;
     setState(() {
-      _preview = GoogleTimelineDocument.fromJson(json);
+      _compactPath = result['compactPath'] as String?;
+      _visits = result['visits'] as int? ?? 0;
+      _activities = result['activities'] as int? ?? 0;
+      _trips = result['trips'] as int? ?? 0;
+      _places = result['places'] as int? ?? 0;
       _fileName = fileName;
       _busy = false;
       _error = null;
@@ -178,9 +162,9 @@ class _ImportTimelineSheetState extends ConsumerState<ImportTimelineSheet> {
   }
 
   Future<void> _confirm() async {
-    final doc = _preview;
+    final path = _compactPath;
     final name = _fileName;
-    if (doc == null || name == null) return;
+    if (path == null || name == null) return;
     final existing = ref.read(googleTimelineImportProvider).asData?.value;
     if (existing != null) {
       final ok = await showDialog<bool>(
@@ -208,7 +192,13 @@ class _ImportTimelineSheetState extends ConsumerState<ImportTimelineSheet> {
     setState(() => _busy = true);
     final imported = await ref
         .read(timelineControllerProvider.notifier)
-        .replaceImport(fileName: name, document: doc);
+        .replaceImport(
+          fileName: name,
+          compactJsonPath: path,
+          visitCount: _visits,
+          activityCount: _activities,
+          tripCount: _trips,
+        );
     if (!mounted) return;
     setState(() => _busy = false);
     if (imported == null) {
@@ -224,7 +214,7 @@ class _ImportTimelineSheetState extends ConsumerState<ImportTimelineSheet> {
   @override
   Widget build(BuildContext context) {
     final bottom = MediaQuery.viewInsetsOf(context).bottom;
-    final preview = _preview;
+    final preview = _hasPreview;
     return DraggableScrollableSheet(
       expand: false,
       initialChildSize: 0.88,
@@ -306,7 +296,7 @@ class _ImportTimelineSheetState extends ConsumerState<ImportTimelineSheet> {
                   ),
                 ),
               ],
-              if (preview != null) ...[
+              if (preview) ...[
                 const SizedBox(height: ColonySpacing.lg),
                 ColonyPanel(
                   title: AppStrings.timelinePreviewTitle,
@@ -318,14 +308,10 @@ class _ImportTimelineSheetState extends ConsumerState<ImportTimelineSheet> {
                       const SizedBox(height: ColonySpacing.sm),
                       Text(
                         AppStrings.timelinePreviewCounts(
-                          visits: preview.visits.length,
-                          activities: preview.activities.length,
-                          trips: preview.trips.length,
-                          places: preview.visits
-                              .map((v) => v.placeId)
-                              .whereType<String>()
-                              .toSet()
-                              .length,
+                          visits: _visits,
+                          activities: _activities,
+                          trips: _trips,
+                          places: _places,
                         ),
                       ),
                       const SizedBox(height: ColonySpacing.md),

@@ -216,6 +216,21 @@ Política de minimização: importar só o intervalo escolhido (ou só candidato
 4. Confirmar → `Trip.create` + evento `tripCreated` (ou evento de import dedicado). Sem Places API.
 5. Empty/loading/erro; strings L10N; disclaimer: dados inferidos pelo Google, não reservas, não diagnóstico de deslocamento.
 
+### 7. Parse em streaming — sem teto de tamanho
+
+O dump on-device real tem dezenas a centenas de MB, quase todos em `rawSignals` (GPS / wifi). Recusar o ficheiro acima de N MB não é solução: o utilizador exporta o histórico que tem.
+
+O codec trata o JSON como cursor de bytes (`TimelineByteSource` + janela 64 KB):
+
+| Região | O que faz |
+| --- | --- |
+| `semanticSegments[]` | Um objeto de cada vez; chaves andadas à mão. `visit` / `activity` / `timelineMemory` são `jsonDecode` de um campo pequeno; `timelinePath` é ponto a ponto e downsampled. |
+| `rawSignals` | `skipValue()` — avança a janela sem copiar o array. GPS/MACs nunca entram na heap. |
+| `userLocationProfile` | Decode do objeto (pequeno). |
+| Persistência | Documento compacto (visitas / deslocamentos / viagens) em ficheiro sidecar ao lado da DB; o SQLite só guarda um ponteiro. |
+
+A isolate de import recebe **só o path** do dump. A UI nunca faz `readAsString` do export. Não há `timelineImportMaxBytes`.
+
 ### Fora de escopo
 
 - OAuth Google, Takeout automático, leitura de `odlh-storage.db`, scraping.

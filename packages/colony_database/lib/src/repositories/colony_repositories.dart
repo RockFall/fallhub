@@ -6327,11 +6327,21 @@ class GoogleTimelineRepository {
   }
 
   /// Replaces any previous Timeline payload for the profile. Place labels stay.
+  ///
+  /// Pass either [document] (tests / in-memory) or [compactJsonPath] produced
+  /// by the streaming parser so the UI never jsonEncodes a huge graph.
   Future<GoogleTimelineImport> replaceImport({
     required EntityId profileId,
     required String fileName,
-    required GoogleTimelineDocument document,
+    GoogleTimelineDocument? document,
+    String? compactJsonPath,
+    int visitCount = 0,
+    int activityCount = 0,
+    int tripCount = 0,
   }) async {
+    if (document == null && compactJsonPath == null) {
+      throw ArgumentError('document or compactJsonPath is required');
+    }
     final now = _clock();
     final existingRow = await (_db.select(_db.googleTimelineImports)
           ..where((t) => t.profileId.equals(profileId.value))
@@ -6344,29 +6354,76 @@ class GoogleTimelineRepository {
       profileId: profileId,
       fileName: fileName,
       importedAt: now,
-      document: document,
+      document: document ?? const GoogleTimelineDocument(),
     );
     await _db.transaction(() async {
       await (_db.delete(_db.googleTimelineImports)
             ..where((t) => t.profileId.equals(profileId.value)))
           .go();
       await _deletePayloadFile(profileId);
-      await putImport(import);
+      if (compactJsonPath != null) {
+        await _putCompactFile(import, compactJsonPath);
+      } else {
+        await putImport(import);
+      }
       await _events.record(
         aggregateType: AggregateType.googleTimeline,
         aggregateId: import.id,
         eventType: EventType.googleTimelineImported,
         payload: {
           'file_name': fileName,
-          'visits': document.visits.length,
-          'activities': document.activities.length,
-          'trips': document.trips.length,
+          'visits': document?.visits.length ?? visitCount,
+          'activities': document?.activities.length ?? activityCount,
+          'trips': document?.trips.length ?? tripCount,
           'overwrote': existingRow != null,
         },
         sourceType: SourceType.import,
       );
     });
+    if (compactJsonPath != null) {
+      return _hydrate(
+        (await (_db.select(_db.googleTimelineImports)
+                  ..where((t) => t.id.equals(import.id.value))
+                  ..limit(1))
+                .getSingle()),
+      );
+    }
     return import;
+  }
+
+  Future<void> _putCompactFile(
+    GoogleTimelineImport import,
+    String compactJsonPath,
+  ) async {
+    final src = File(compactJsonPath);
+    final dir = _db.dataDirectory;
+    if (dir == null) {
+      final json = await src.readAsString();
+      await _db.into(_db.googleTimelineImports).insert(
+            GoogleTimelineImportsCompanion.insert(
+              id: import.id.value,
+              profileId: import.profileId.value,
+              fileName: import.fileName,
+              importedAt: import.importedAt.millisecondsSinceEpoch,
+              payloadJson: json,
+            ),
+          );
+      return;
+    }
+    final dest = File(p.join(dir, _payloadFileName(import.profileId)));
+    await src.copy(dest.path);
+    await _db.into(_db.googleTimelineImports).insert(
+          GoogleTimelineImportsCompanion.insert(
+            id: import.id.value,
+            profileId: import.profileId.value,
+            fileName: import.fileName,
+            importedAt: import.importedAt.millisecondsSinceEpoch,
+            payloadJson: jsonEncode({
+              ColonyMappers.googleTimelineExternalFileKey:
+                  _payloadFileName(import.profileId),
+            }),
+          ),
+        );
   }
 
   Future<void> deletePayloadFiles() async {

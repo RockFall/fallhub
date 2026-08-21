@@ -1,38 +1,71 @@
+import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:colony_domain/colony_domain.dart';
 
-/// Real on-device Timeline dumps often exceed 50 MB (mostly `rawSignals`).
-/// Above this we refuse rather than let the OS kill the app.
-const timelineImportMaxBytes = 150 * 1024 * 1024;
+class RandomAccessTimelineByteSource implements TimelineByteSource {
+  RandomAccessTimelineByteSource(this._file) : length = _file.lengthSync();
 
-class TimelineImportTooLarge implements Exception {
-  TimelineImportTooLarge(this.bytes);
-  final int bytes;
-
-  int get megaBytes => (bytes / (1024 * 1024)).ceil();
+  final RandomAccessFile _file;
 
   @override
-  String toString() => 'Timeline JSON too large ($megaBytes MB)';
+  final int length;
+
+  @override
+  Uint8List read(int offset, int length) {
+    if (length <= 0 || offset >= this.length) return Uint8List(0);
+    final take = offset + length > this.length ? this.length - offset : length;
+    _file.setPositionSync(offset);
+    final buf = Uint8List(take);
+    final n = _file.readIntoSync(buf);
+    if (n == take) return buf;
+    return Uint8List.sublistView(buf, 0, n);
+  }
 }
 
-/// Isolate entry: file path → normalized JSON maps (no Equatable / records).
+/// Isolate entry: path of the on-device Timeline dump → compact JSON on disk
+/// plus counts. The UI isolate never sees the raw bytes. No file-size cap —
+/// `rawSignals` is skipped with a sliding window over the file.
 Map<String, dynamic> parseGoogleTimelineFile(String path) {
-  final file = File(path);
-  final length = file.lengthSync();
-  if (length > timelineImportMaxBytes) {
-    throw TimelineImportTooLarge(length);
+  final raf = File(path).openSync();
+  try {
+    final doc = GoogleTimelineCodec.parseSource(
+      RandomAccessTimelineByteSource(raf),
+    );
+    final compact = File(
+      '${Directory.systemTemp.path}/colony_timeline_${DateTime.now().microsecondsSinceEpoch}.json',
+    );
+    compact.writeAsStringSync(jsonEncode(doc.toJson()));
+    return <String, dynamic>{
+      'compactPath': compact.path,
+      'visits': doc.visits.length,
+      'activities': doc.activities.length,
+      'trips': doc.trips.length,
+      'places': doc.visits
+          .map((v) => v.placeId)
+          .whereType<String>()
+          .toSet()
+          .length,
+    };
+  } finally {
+    raf.closeSync();
   }
-  final source = GoogleTimelineCodec.stripRawSignals(file.readAsStringSync());
-  return GoogleTimelineCodec.parseToJson(source);
 }
 
-/// Isolate entry for pasted JSON.
+/// Isolate entry for pasted JSON (written to a temp file, then streamed).
 Map<String, dynamic> parseGoogleTimelineSource(String source) {
-  if (source.length > timelineImportMaxBytes) {
-    throw TimelineImportTooLarge(source.length);
-  }
-  return GoogleTimelineCodec.parseToJson(
-    GoogleTimelineCodec.stripRawSignals(source),
+  final raw = File(
+    '${Directory.systemTemp.path}/colony_timeline_paste_${DateTime.now().microsecondsSinceEpoch}.json',
   );
+  raw.writeAsStringSync(source);
+  try {
+    return parseGoogleTimelineFile(raw.path);
+  } finally {
+    try {
+      raw.deleteSync();
+    } on FileSystemException {
+      // Compact output lives in a different file.
+    }
+  }
 }

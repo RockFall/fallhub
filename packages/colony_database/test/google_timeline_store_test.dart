@@ -109,4 +109,58 @@ void main() {
     expect(stored[ColonyMappers.googleTimelineExternalFileKey], isNull);
     expect((stored['visits'] as List), hasLength(1));
   });
+
+  test('replaceImport from compact JSON path copies the sidecar', () async {
+    final dir = Directory.systemTemp.createTempSync('colony-tl-compact-');
+    addTearDown(() async {
+      if (dir.existsSync()) await dir.delete(recursive: true);
+    });
+
+    final db = ColonyDatabase(NativeDatabase.memory(), dataDirectory: dir.path);
+    addTearDown(db.close);
+    final repos = ColonyRepositories.create(
+      db,
+      idGenerator: FixedIdGenerator(['profile-1', 'tl-1', 'event-1']),
+      clock: () => DateTime.utc(2026, 8, 21, 12),
+    );
+    final profile = await repos.profiles.create(
+      colonyName: 'Test',
+      displayName: 'Caio',
+      timezone: 'UTC',
+      locale: 'pt_BR',
+      baseCurrency: 'BRL',
+    );
+
+    final compact = File(p.join(dir.path, 'incoming.json'));
+    compact.writeAsStringSync(
+      jsonEncode(
+        GoogleTimelineDocument(
+          visits: [
+            TimelineVisit(
+              startAt: DateTime.utc(2026, 8, 3, 9),
+              endAt: DateTime.utc(2026, 8, 3, 10),
+              placeId: 'ChIJ_COMPACT',
+            ),
+          ],
+        ).toJson(),
+      ),
+    );
+
+    final imported = await repos.googleTimeline.replaceImport(
+      profileId: profile.id,
+      fileName: 'Timeline.json',
+      compactJsonPath: compact.path,
+      visitCount: 1,
+    );
+    expect(imported.document.visits.single.placeId, 'ChIJ_COMPACT');
+
+    final row = await db
+        .customSelect('SELECT payload_json FROM google_timeline_imports')
+        .getSingle();
+    final stored = jsonDecode(row.read<String>('payload_json')) as Map;
+    expect(
+      stored[ColonyMappers.googleTimelineExternalFileKey],
+      'google_timeline_${profile.id.value}.json',
+    );
+  });
 }
