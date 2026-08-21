@@ -246,6 +246,10 @@ abstract final class AppStrings {
   static const emptyTimeline = 'Nenhum evento registrado ainda.';
   static const loading = 'Carregando…';
   static const errorGeneric = 'Algo deu errado. Tente novamente.';
+  static const bootErrorTitle = 'Dados locais';
+  static const bootErrorBody =
+      'Não foi possível ler o banco local. Se isto continuar, reinstale o APK ou apague os dados do app.';
+  static const bootRetry = 'Tentar novamente';
   static const onboardingTitle = 'Criar colônia';
   static const onboardingSubtitle =
       'Configure sua base pessoal em menos de cinco minutos.';

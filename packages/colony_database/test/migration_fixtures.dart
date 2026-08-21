@@ -1188,6 +1188,12 @@ void _createPhase39Tables(Database db) {
   ''');
 }
 
+void seedFlashcardTagTables(Database db) => _createPhase37Tables(db);
+
+void seedCapturedNotificationTable(Database db) => _createPhase38Tables(db);
+
+void seedGoogleTimelineTables(Database db) => _createPhase39Tables(db);
+
 void seedFlashcardV35(
   Database db, {
   String profileId = 'profile-1',

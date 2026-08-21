@@ -22,6 +22,7 @@ import '../../features/settings/presentation/settings_screen.dart';
 import '../../features/tasks/presentation/task_inspect_screen.dart';
 import '../../features/work/presentation/schedule_screen.dart';
 import '../../features/work/presentation/work_screen.dart';
+import '../bootstrap/boot_screen.dart';
 import '../../features/projects/presentation/project_detail_screen.dart';
 import '../../features/projects/presentation/project_list_screen.dart';
 import '../../features/quests/presentation/quest_board_screen.dart';
@@ -56,15 +57,21 @@ final routerProvider = Provider<GoRouter>((ref) {
   ref.onDispose(refresh.dispose);
 
   final router = GoRouter(
-    initialLocation: '/colony',
+    initialLocation: '/boot',
     refreshListenable: refresh,
     redirect: (context, state) {
       final prefsAsync = ref.read(preferencesProvider);
       final profileAsync = ref.read(profileProvider);
-      // While providers reload, keep the current route. Treating loading as
-      // "not onboarded" remounted this screen and bounced Iniciar colônia.
+      final location = state.matchedLocation;
+      final onBoot = location == '/boot';
+      final onBootError = location == '/boot-error';
+      final onOnboarding = location == '/onboarding';
+
       if (prefsAsync.isLoading || profileAsync.isLoading) {
-        return null;
+        return onBoot ? null : '/boot';
+      }
+      if (prefsAsync.hasError || profileAsync.hasError) {
+        return onBootError ? null : '/boot-error';
       }
       final onboardingDone = prefsAsync.maybeWhen(
         data: (p) => p.onboardingCompleted,
@@ -74,14 +81,21 @@ final routerProvider = Provider<GoRouter>((ref) {
         data: (p) => p != null,
         orElse: () => false,
       );
-      final onOnboarding = state.matchedLocation == '/onboarding';
       if (!onboardingDone || !profileReady) {
         return onOnboarding ? null : '/onboarding';
       }
-      if (onOnboarding) return '/colony';
+      if (onOnboarding || onBoot || onBootError) return '/colony';
       return null;
     },
     routes: [
+      GoRoute(
+        path: '/boot',
+        builder: (context, state) => const BootScreen(),
+      ),
+      GoRoute(
+        path: '/boot-error',
+        builder: (context, state) => const BootErrorScreen(),
+      ),
       GoRoute(
         path: '/onboarding',
         builder: (context, state) => const OnboardingScreen(),

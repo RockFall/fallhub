@@ -16,16 +16,54 @@ Future<void> main() async {
     return;
   }
 
-  final database = await ColonyDatabase.open();
+  try {
+    final database = await ColonyDatabase.open();
+    runApp(
+      ProviderScope(
+        overrides: [
+          databaseProvider.overrideWithValue(database),
+        ],
+        child: const ColonyApp(),
+      ),
+    );
+  } catch (error) {
+    runApp(_DatabaseOpenFailedApp(error: error));
+  }
+}
 
-  runApp(
-    ProviderScope(
-      overrides: [
-        databaseProvider.overrideWithValue(database),
-      ],
-      child: const ColonyApp(),
-    ),
-  );
+/// Falha ao abrir/migrar o SQLite antes do ProviderScope.
+class _DatabaseOpenFailedApp extends StatelessWidget {
+  const _DatabaseOpenFailedApp({required this.error});
+
+  final Object error;
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: AppStrings.appName,
+      theme: ColonyTheme.dark(),
+      home: Scaffold(
+        body: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(ColonySpacing.xl),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  AppStrings.bootErrorTitle,
+                  style: Theme.of(context).textTheme.headlineMedium,
+                ),
+                const SizedBox(height: ColonySpacing.lg),
+                const Text(AppStrings.bootErrorBody),
+                const SizedBox(height: ColonySpacing.md),
+                SelectableText('$error'),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 }
 
 /// Web não suporta SQLite nativo (Drift + dart:ffi). Use Android ou emulador.

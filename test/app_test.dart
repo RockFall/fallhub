@@ -43,6 +43,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('CRIAR COLÔNIA'), findsOneWidget);
+    expect(find.text(AppStrings.colony), findsNothing);
     await _drainTimers(tester);
   });
 

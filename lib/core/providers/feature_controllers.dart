@@ -82,37 +82,47 @@ class OnboardingController extends AsyncNotifier<void> {
   }) async {
     state = const AsyncLoading();
     state = await AsyncValue.guard(() async {
-      final repos = ref.read(repositoriesProvider);
-      var profile = await repos.profiles.getActive();
-      if (profile == null) {
-        profile = await repos.profiles.create(
-          colonyName: colonyName.trim(),
-          displayName: displayName.trim(),
-          timezone: DateTime.now().timeZoneName,
-          locale: 'pt_BR',
-          baseCurrency: 'BRL',
-        );
-        await repos.events.record(
-          aggregateType: AggregateType.profile,
-          aggregateId: profile.id,
-          eventType: EventType.profileCreated,
-          payload: {
-            'colony_name': profile.colonyName,
-            'display_name': profile.displayName,
-          },
-        );
-      }
+      final db = ref.read(databaseProvider);
+      await db.transaction(() async {
+        final repos = ref.read(repositoriesProvider);
+        var profile = await repos.profiles.getActive();
+        if (profile == null) {
+          profile = await repos.profiles.create(
+            colonyName: colonyName.trim(),
+            displayName: displayName.trim(),
+            timezone: _safeTimeZoneName(),
+            locale: 'pt_BR',
+            baseCurrency: 'BRL',
+          );
+          await repos.events.record(
+            aggregateType: AggregateType.profile,
+            aggregateId: profile.id,
+            eventType: EventType.profileCreated,
+            payload: {
+              'colony_name': profile.colonyName,
+              'display_name': profile.displayName,
+            },
+          );
+        }
 
-      final prefs = AppPreferences.defaults().copyWith(
-        sectorsEnabled: sectors,
-        onboardingCompleted: true,
-      );
-      await repos.preferences.save(prefs);
-      await repos.needs.seedDefaults(profile.id);
+        final prefs = AppPreferences.defaults().copyWith(
+          sectorsEnabled: sectors,
+          onboardingCompleted: true,
+        );
+        await repos.preferences.save(prefs);
+        await repos.needs.seedDefaults(profile.id);
+      });
     });
     ref.invalidate(profileProvider);
     ref.invalidate(preferencesProvider);
-    if (state.hasError) return;
+    if (state.hasError) {
+      ref.read(loggerProvider).warning(
+            'Onboarding failed: ${state.error}',
+            state.error,
+            state.stackTrace,
+          );
+      return;
+    }
     await ref.read(profileProvider.future);
     await ref.read(preferencesProvider.future);
   }
@@ -198,3 +208,13 @@ class RestoreController extends AsyncNotifier<void> {
 
 final restoreControllerProvider =
     AsyncNotifierProvider<RestoreController, void>(RestoreController.new);
+
+String _safeTimeZoneName() {
+  try {
+    final name = DateTime.now().timeZoneName.trim();
+    if (name.isEmpty || name.length > 64) return 'UTC';
+    return name;
+  } catch (_) {
+    return 'UTC';
+  }
+}

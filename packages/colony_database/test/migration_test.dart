@@ -928,6 +928,33 @@ void main() {
       expect(listed, hasLength(1));
     });
 
+    test('v36 with leftover feature-branch tables still migrates to v39',
+        () async {
+      final db = await openMigratedFrom(
+        36,
+        seed: (sqlite) {
+          seedProfile(sqlite);
+          seedFlashcardTagTables(sqlite);
+          seedCapturedNotificationTable(sqlite);
+          seedGoogleTimelineTables(sqlite);
+        },
+      );
+      addTearDown(() async {
+        await db.close();
+      });
+
+      final repos = ColonyRepositories.create(
+        db,
+        idGenerator: FixedIdGenerator(
+          List.generate(20, (i) => 'collide-$i'),
+        ),
+        clock: () => DateTime.utc(2026, 8, 20, 12),
+      );
+      final profile = (await repos.profiles.getActive())!;
+      await repos.needs.seedDefaults(profile.id);
+      expect(profile.id.value, isNotEmpty);
+    });
+
     test('v36 to v39 adds google timeline import tables', () async {
       final db = await openMigratedFrom(
         36,

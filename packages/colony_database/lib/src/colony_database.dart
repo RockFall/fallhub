@@ -212,30 +212,109 @@ class ColonyDatabase extends _$ColonyDatabase {
             await m.createTable(flashcardReviewLogs);
           }
           if (from >= 34 && from < 35) {
-            await m.addColumn(flashcards, flashcards.scheduleMode);
-            await m.addColumn(flashcardReviewLogs, flashcardReviewLogs.reviewKind);
+            await _addColumnIfAbsent(
+              m,
+              'flashcards',
+              'schedule_mode',
+              () => m.addColumn(flashcards, flashcards.scheduleMode),
+            );
+            await _addColumnIfAbsent(
+              m,
+              'flashcard_review_logs',
+              'review_kind',
+              () => m.addColumn(
+                flashcardReviewLogs,
+                flashcardReviewLogs.reviewKind,
+              ),
+            );
           }
           if (from < 35) {
             await m.createTable(knowledgeAreaPlacements);
             await m.createTable(researchKnowledgeLinks);
           }
           if (from >= 34 && from < 36) {
-            await m.addColumn(flashcards, flashcards.priority);
+            await _addColumnIfAbsent(
+              m,
+              'flashcards',
+              'priority',
+              () => m.addColumn(flashcards, flashcards.priority),
+            );
           }
-          if (from < 37) {
-            await m.createTable(flashcardTags);
-            await m.createTable(flashcardTagLinks);
+          final missingTags = !await _tableExists(m, 'flashcard_tags');
+          await _createTableIfAbsent(
+            m,
+            'flashcard_tags',
+            () => m.createTable(flashcardTags),
+          );
+          await _createTableIfAbsent(
+            m,
+            'flashcard_tag_links',
+            () => m.createTable(flashcardTagLinks),
+          );
+          await _createTableIfAbsent(
+            m,
+            'captured_notifications',
+            () => m.createTable(capturedNotifications),
+          );
+          await _createTableIfAbsent(
+            m,
+            'google_timeline_imports',
+            () => m.createTable(googleTimelineImports),
+          );
+          await _createTableIfAbsent(
+            m,
+            'google_timeline_place_labels',
+            () => m.createTable(googleTimelinePlaceLabels),
+          );
+          await _addColumnIfAbsent(
+            m,
+            'preferences',
+            'use24_hour_format',
+            () => m.addColumn(preferences, preferences.use24HourFormat),
+          );
+          if ((from < 37 || missingTags) &&
+              await _columnExists(m, 'flashcards', 'tags_json')) {
             await _backfillFlashcardTags(m);
-          }
-          if (from < 38) {
-            await m.createTable(capturedNotifications);
-          }
-          if (from < 39) {
-            await m.createTable(googleTimelineImports);
-            await m.createTable(googleTimelinePlaceLabels);
           }
         },
       );
+
+  static Future<bool> _tableExists(Migrator m, String name) async {
+    final rows = await m.database.customSelect(
+      "SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = '$name'",
+    ).get();
+    return rows.isNotEmpty;
+  }
+
+  static Future<bool> _columnExists(
+    Migrator m,
+    String table,
+    String column,
+  ) async {
+    if (!await _tableExists(m, table)) return false;
+    final rows =
+        await m.database.customSelect('PRAGMA table_info($table)').get();
+    return rows.any((row) => row.read<String>('name') == column);
+  }
+
+  static Future<void> _createTableIfAbsent(
+    Migrator m,
+    String name,
+    Future<void> Function() create,
+  ) async {
+    if (await _tableExists(m, name)) return;
+    await create();
+  }
+
+  static Future<void> _addColumnIfAbsent(
+    Migrator m,
+    String table,
+    String column,
+    Future<void> Function() add,
+  ) async {
+    if (await _columnExists(m, table, column)) return;
+    await add();
+  }
 
   static Future<void> _backfillFlashcardTags(Migrator m) async {
     final rows = await m.database.customSelect('''
@@ -345,7 +424,11 @@ class ColonyDatabase extends _$ColonyDatabase {
   static Future<ColonyDatabase> open({String? fileName}) async {
     final dir = await getApplicationDocumentsDirectory();
     final file = File(p.join(dir.path, fileName ?? 'colony.db'));
-    return ColonyDatabase(NativeDatabase(file));
+    final db = ColonyDatabase(NativeDatabase(file));
+    // Force isolate + migrations before the first frame. Otherwise the UI
+    // mounts the main shell while SQLite is still upgrading.
+    await db.customSelect('SELECT 1').get();
+    return db;
   }
 
   static ColonyDatabase inMemory() {

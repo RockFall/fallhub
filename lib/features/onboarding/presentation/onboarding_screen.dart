@@ -114,6 +114,11 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                             color: Theme.of(context).colorScheme.error,
                           ),
                     ),
+                    const SizedBox(height: ColonySpacing.sm),
+                    SelectableText(
+                      '${state.error}',
+                      style: Theme.of(context).textTheme.bodySmall,
+                    ),
                     const SizedBox(height: ColonySpacing.md),
                   ],
                   FilledButton(
