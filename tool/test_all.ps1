@@ -28,6 +28,12 @@ if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
 Clear-NativeAssetsWindows
 
+Write-Host "==> flutter test packages/colony_design_system"
+flutter test packages/colony_design_system
+if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+Clear-NativeAssetsWindows
+
 Write-Host "==> flutter test packages/colony_domain"
 flutter test packages/colony_domain
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }

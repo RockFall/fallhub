@@ -78,7 +78,10 @@ void main() {
 
       profileId: profile.id,
 
-      weekStartDate: DateTime.utc(2026, 8, 3),
+      weekStartDate: weekStartDateFor(
+        DateTime.now(),
+        weekStartsOnMonday: true,
+      ),
 
       facts: 'Conteúdo existente',
 
@@ -150,7 +153,7 @@ void main() {
 
       profile.id,
 
-      DateTime.utc(2026, 8, 3),
+      weekStartDateFor(DateTime.now(), weekStartsOnMonday: true),
 
     );
 

@@ -10,6 +10,9 @@ flutter analyze --no-fatal-infos --no-fatal-warnings --no-fatal-infos --no-fatal
 echo "==> flutter test (app)"
 flutter test
 
+echo "==> flutter test packages/colony_design_system"
+flutter test packages/colony_design_system
+
 echo "==> flutter test packages/colony_domain"
 flutter test packages/colony_domain
 
