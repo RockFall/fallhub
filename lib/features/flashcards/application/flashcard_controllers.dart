@@ -289,7 +289,10 @@ class FlashcardController extends AsyncNotifier<void> {
   }
 
   FlashcardJsonImportPlan previewJson(String source) {
-    final document = FlashcardJsonCodec.parse(source);
+    return previewDocument(FlashcardJsonCodec.parse(source));
+  }
+
+  FlashcardJsonImportPlan previewDocument(FlashcardJsonDocument document) {
     return FlashcardJsonImportPolicy.plan(
       document: document,
       areas: ref.read(knowledgeAreasProvider).asData?.value ?? const [],
@@ -300,12 +303,18 @@ class FlashcardController extends AsyncNotifier<void> {
   }
 
   Future<FlashcardJsonImportResult?> importJson(String source) {
+    return importDocument(FlashcardJsonCodec.parse(source));
+  }
+
+  Future<FlashcardJsonImportResult?> importDocument(
+    FlashcardJsonDocument document,
+  ) {
     return _run(() async {
       final profile = await ref.read(profileProvider.future);
       if (profile == null) throw StateError('Perfil não configurado');
       return ref.read(repositoriesProvider).flashcards.importJson(
             profileId: profile.id,
-            source: source,
+            document: document,
           );
     });
   }

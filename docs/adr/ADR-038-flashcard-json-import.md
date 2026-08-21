@@ -13,6 +13,7 @@ O utilizador gera cartões com uma IA externa e precisa de os carregar no mapa l
 3. **Dedup** — na mesma baralho (título, case-insensitive): mesma frente normalizada + mesmo `kind` + mesmo verso → **ignorar**; frente igual e verso diferente → **overwrite** (SRS intacto).
 4. **Prompt copiável** — texto gerado a partir das áreas/baralhos atuais + schema. Muda quando o mapa muda. A IA não corre no dispositivo.
 5. **Sem bump de schema.** Evento `flashcardJsonImported`.
+6. **Ficheiro grande** — o picker lê só o path; a isolate anda o JSON com o mesmo cursor de bytes da Timeline (ADR-042 §7). `cards[]` / `decks[].cards[]` um objeto de cada vez; chaves desconhecidas são saltadas sem `jsonDecode` do dump inteiro. A UI não mete o ficheiro no `TextField`. Colar JSON pequeno continua no campo de texto.
 
 ## Fora de escopo
 Import Anki `.apkg`, imagens, LLM remoto, sync.

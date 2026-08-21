@@ -6114,15 +6114,16 @@ class FlashcardRepository {
 
   Future<FlashcardJsonImportResult> importJson({
     required EntityId profileId,
-    required String source,
+    String? source,
+    FlashcardJsonDocument? document,
   }) async {
-    final document = FlashcardJsonCodec.parse(source);
+    final parsed = document ?? FlashcardJsonCodec.parse(source ?? '');
     final areas = await listAreas(profileId);
     final placements = await listPlacements(profileId);
     final decks = await listDecks(profileId);
     final cards = await listCards(profileId);
     final plan = FlashcardJsonImportPolicy.plan(
-      document: document,
+      document: parsed,
       areas: areas,
       placements: placements,
       decks: decks,

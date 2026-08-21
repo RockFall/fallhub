@@ -854,7 +854,7 @@ abstract final class AppStrings {
   static const flashcardsRemaining = 'Restam nesta fila';
   static const flashcardsImportJson = 'Importar JSON';
   static const flashcardsImportJsonHint =
-      'Copie o prompt para uma IA, cole o JSON gerado e carregue os cartões no mapa.';
+      'Copie o prompt para uma IA, cole o JSON ou escolha um ficheiro. O parse é em streaming — não há teto de tamanho.';
   static const flashcardsImportPromptTitle = 'Prompt para a IA';
   static const flashcardsImportCopyPrompt = 'Copiar prompt';
   static const flashcardsImportCopied = 'Prompt copiado.';

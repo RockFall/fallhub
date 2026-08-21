@@ -3,12 +3,14 @@ import 'dart:convert';
 import 'package:colony_design_system/colony_design_system.dart';
 import 'package:colony_domain/colony_domain.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../app/localization/app_strings.dart';
 import '../../application/flashcard_controllers.dart';
+import '../../application/flashcard_import_parse.dart';
 import '../../application/flashcard_providers.dart';
 
 class ImportFlashcardsJsonSheet extends ConsumerWidget {
@@ -53,6 +55,9 @@ class _ImportFlashcardsJsonPanelState
     extends ConsumerState<ImportFlashcardsJsonPanel> {
   final _json = TextEditingController();
   String? _error;
+  String? _fileName;
+  FlashcardJsonDocument? _document;
+  bool _parsing = false;
 
   @override
   void dispose() {
@@ -69,33 +74,85 @@ class _ImportFlashcardsJsonPanelState
   }
 
   Future<void> _pickFile() async {
-    final result = await FilePicker.platform.pickFiles(
-      type: FileType.custom,
-      allowedExtensions: const ['json', 'txt'],
-      withData: true,
-    );
-    if (result == null || result.files.isEmpty) return;
-    final bytes = result.files.first.bytes;
-    if (bytes == null) {
-      setState(() => _error = AppStrings.flashcardsImportEmpty);
-      return;
-    }
     setState(() {
-      _json.text = utf8.decode(bytes);
+      _error = null;
+      _parsing = true;
+    });
+    try {
+      final result = await FilePicker.platform.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: const ['json', 'txt'],
+        withData: false,
+      );
+      if (result == null || result.files.isEmpty) {
+        if (mounted) setState(() => _parsing = false);
+        return;
+      }
+      final file = result.files.first;
+      if (!kIsWeb && file.path != null && file.path!.isNotEmpty) {
+        await _acceptParsed(
+          await compute(parseFlashcardJsonFile, file.path!),
+          file.name,
+        );
+        return;
+      }
+      if (file.bytes != null && file.bytes!.isNotEmpty) {
+        await _acceptParsed(
+          await compute(parseFlashcardJsonSource, utf8.decode(file.bytes!)),
+          file.name,
+        );
+        return;
+      }
+      setState(() {
+        _parsing = false;
+        _error = AppStrings.flashcardsImportEmpty;
+      });
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _parsing = false;
+        _document = null;
+        _error = '${AppStrings.flashcardsImportInvalid}: $e';
+      });
+    }
+  }
+
+  Future<void> _acceptParsed(
+    Map<dynamic, dynamic> json,
+    String fileName,
+  ) async {
+    final document = FlashcardJsonDocument.fromJson(
+      Map<String, dynamic>.from(json),
+    );
+    if (!mounted) return;
+    setState(() {
+      _document = document;
+      _fileName = fileName;
+      _json.clear();
+      _parsing = false;
       _error = null;
     });
     await _previewAndConfirm();
   }
 
   FlashcardJsonImportPlan? _planOrError() {
-    final source = _json.text.trim();
-    if (source.isEmpty) {
-      setState(() => _error = AppStrings.flashcardsImportEmpty);
-      return null;
-    }
     try {
-      final plan =
-          ref.read(flashcardControllerProvider.notifier).previewJson(source);
+      final document = _document;
+      final FlashcardJsonImportPlan plan;
+      if (document != null) {
+        plan = ref
+            .read(flashcardControllerProvider.notifier)
+            .previewDocument(document);
+      } else {
+        final source = _json.text.trim();
+        if (source.isEmpty) {
+          setState(() => _error = AppStrings.flashcardsImportEmpty);
+          return null;
+        }
+        plan = ref
+            .read(flashcardControllerProvider.notifier)
+            .previewJson(source);
+      }
       setState(() => _error = null);
       return plan;
     } on FlashcardJsonException catch (e) {
@@ -176,15 +233,20 @@ class _ImportFlashcardsJsonPanelState
   }
 
   Future<void> _apply() async {
+    final document = _document;
     final source = _json.text.trim();
-    if (source.isEmpty) {
+    if (document == null && source.isEmpty) {
       setState(() => _error = AppStrings.flashcardsImportEmpty);
       return;
     }
     try {
-      final result = await ref
-          .read(flashcardControllerProvider.notifier)
-          .importJson(source);
+      final result = document != null
+          ? await ref
+                .read(flashcardControllerProvider.notifier)
+                .importDocument(document)
+          : await ref
+                .read(flashcardControllerProvider.notifier)
+                .importJson(source);
       if (!mounted || result == null) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -195,7 +257,11 @@ class _ImportFlashcardsJsonPanelState
         ),
       );
       _json.clear();
-      setState(() => _error = null);
+      setState(() {
+        _error = null;
+        _document = null;
+        _fileName = null;
+      });
       if (widget.popOnSuccess && Navigator.of(context).canPop()) {
         Navigator.of(context).pop();
       }
@@ -219,7 +285,7 @@ class _ImportFlashcardsJsonPanelState
   @override
   Widget build(BuildContext context) {
     final prompt = ref.watch(flashcardJsonPromptProvider);
-    final busy = ref.watch(flashcardControllerProvider).isLoading;
+    final busy = _parsing || ref.watch(flashcardControllerProvider).isLoading;
     final areasAsync = ref.watch(knowledgeAreasProvider);
     final decksAsync = ref.watch(flashcardDecksProvider);
 
@@ -233,16 +299,16 @@ class _ImportFlashcardsJsonPanelState
         children: [
           Text(
             AppStrings.flashcardsImportJsonHint,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: ColonyColors.textMuted,
-                ),
+            style: Theme.of(
+              context,
+            ).textTheme.bodyMedium?.copyWith(color: ColonyColors.textMuted),
           ),
           const SizedBox(height: ColonySpacing.sm),
           Text(
             AppStrings.flashcardsImportPromptLive,
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: ColonyColors.accentCyan,
-                ),
+            style: Theme.of(
+              context,
+            ).textTheme.bodySmall?.copyWith(color: ColonyColors.accentCyan),
           ),
           const SizedBox(height: ColonySpacing.md),
           Row(
@@ -293,12 +359,19 @@ class _ImportFlashcardsJsonPanelState
             controller: _json,
             enabled: !busy,
             maxLines: 6,
-            decoration: const InputDecoration(
+            decoration: InputDecoration(
               labelText: AppStrings.flashcardsImportPaste,
               hintText: AppStrings.flashcardsImportPasteHint,
+              helperText: _fileName,
             ),
             onChanged: (_) {
-              if (_error != null) setState(() => _error = null);
+              if (_error != null || _document != null) {
+                setState(() {
+                  _error = null;
+                  _document = null;
+                  _fileName = null;
+                });
+              }
             },
           ),
           if (_error != null) ...[
@@ -306,8 +379,8 @@ class _ImportFlashcardsJsonPanelState
             Text(
               _error!,
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: Theme.of(context).colorScheme.error,
-                  ),
+                color: Theme.of(context).colorScheme.error,
+              ),
             ),
           ],
           const SizedBox(height: ColonySpacing.md),
