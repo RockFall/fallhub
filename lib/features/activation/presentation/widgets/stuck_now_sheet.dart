@@ -16,6 +16,7 @@ class StuckNowSheet extends ConsumerWidget {
     return showModalBottomSheet<void>(
       context: context,
       showDragHandle: true,
+      isScrollControlled: true,
       builder: (_) => const StuckNowSheet(),
     );
   }
@@ -28,7 +29,12 @@ class StuckNowSheet extends ConsumerWidget {
       hasUpcomingFocus: schedule?.hasUpcomingFocus ?? false,
     );
     return Padding(
-      padding: const EdgeInsets.all(ColonySpacing.lg),
+      padding: const EdgeInsets.fromLTRB(
+        ColonySpacing.lg,
+        ColonySpacing.sm,
+        ColonySpacing.lg,
+        ColonySpacing.xl,
+      ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -46,8 +52,14 @@ class StuckNowSheet extends ConsumerWidget {
           for (final choice in choices.take(2))
             Padding(
               padding: const EdgeInsets.only(bottom: ColonySpacing.sm),
-              child: FilledButton(
-                onPressed: () async {
+              child: ColonyJourneyCard(
+                assetPath:
+                    ActivationVisualCatalog.forType(choice.protocolType).artAsset,
+                title: choice.label,
+                subtitle: ActivationVisualCatalog.forType(choice.protocolType)
+                    .journeyLabel,
+                height: 108,
+                onTap: () async {
                   final episode = await ref
                       .read(activationControllerProvider.notifier)
                       .startPreferred(type: choice.protocolType);
@@ -57,7 +69,6 @@ class StuckNowSheet extends ConsumerWidget {
                     context.go('/activation/episodes/${episode.id.value}');
                   }
                 },
-                child: Text(choice.label),
               ),
             ),
         ],

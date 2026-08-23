@@ -125,12 +125,36 @@ class ActivationRepository {
       await saveBundle(bundle);
       created += 1;
     }
-    if (created > 0) {
-      await _ensureDefaultShield(profileId);
-      await _ensureDefaultExperiment(profileId);
-      await _ensureDefaultScene(profileId);
-    }
+    await _ensureDefaultWaypoints(profileId);
+    await _ensureDefaultShield(profileId);
+    await _ensureDefaultExperiment(profileId);
+    await _ensureDefaultScene(profileId);
     return created;
+  }
+
+  Future<void> _ensureDefaultWaypoints(EntityId profileId) async {
+    final existing = await listWaypoints(profileId);
+    final keys = <String>{
+      for (final waypoint in existing)
+        if (waypoint.settings['seed_key'] is String)
+          waypoint.settings['seed_key']! as String,
+    };
+    final now = _clock();
+    for (final spec in ActivationWaypointSeeds.catalog) {
+      if (keys.contains(spec.key)) continue;
+      await upsertWaypoint(
+        ActivationWaypoint(
+          id: _newId(),
+          profileId: profileId,
+          name: spec.name,
+          waypointType: spec.waypointType,
+          token: spec.token,
+          settings: spec.settings(),
+          createdAt: now,
+          updatedAt: now,
+        ),
+      );
+    }
   }
 
   Future<void> _ensureDefaultShield(EntityId profileId) async {

@@ -33,6 +33,37 @@ class ActivationController extends AsyncNotifier<void> {
     return started;
   }
 
+  Future<ActivationEpisode?> startForTask({
+    required EntityId taskId,
+    ActivationCapacityMode capacity = ActivationCapacityMode.standard,
+  }) async {
+    final profile = await ref.read(profileProvider.future);
+    if (profile == null) return null;
+    final orch = ref.read(activationOrchestratorProvider);
+    final open = await orch.restoreOpen(profile.id);
+    if (open != null) return open;
+    state = const AsyncLoading();
+    ActivationEpisode? started;
+    state = await AsyncValue.guard(() async {
+      final bundle = await orch.pickProtocol(
+        profileId: profile.id,
+        capacity: capacity,
+        preferredType: ActivationProtocolType.workStart,
+      );
+      if (bundle == null) {
+        throw StateError('Nenhuma rota disponível');
+      }
+      started = await orch.start(
+        profileId: profile.id,
+        bundle: bundle,
+        capacity: capacity,
+        linkedTaskId: taskId,
+        firstActionDeepLink: '/tasks/${taskId.value}',
+      );
+    });
+    return started;
+  }
+
   Future<ActivationEpisode?> startPreferred({
     required ActivationProtocolType type,
     ActivationCapacityMode capacity = ActivationCapacityMode.standard,

@@ -482,6 +482,22 @@ class _ActivationTab extends ConsumerWidget {
     return ListView(
       padding: const EdgeInsets.all(ColonySpacing.lg),
       children: [
+        ColonyHeroBanner(
+          assetPath: ActivationArtAssets.hero,
+          height: 140,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                AppStrings.activationPawnTab,
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
+              const Spacer(),
+              Text(AppStrings.activationHeroCaption),
+            ],
+          ),
+        ),
+        const SizedBox(height: ColonySpacing.sm),
         Text(AppStrings.activationDisclaimer),
         const SizedBox(height: ColonySpacing.sm),
         Text(AppStrings.activationNoMoralScore),
@@ -499,11 +515,18 @@ class _ActivationTab extends ConsumerWidget {
           data: (items) => Column(
             children: [
               for (final protocol in items.take(6))
-                ListTile(
-                  title: Text(protocol.name),
-                  subtitle: Text(protocol.originState.label),
-                  onTap: () => context.go(
-                    '/activation/protocols/${protocol.id.value}',
+                Padding(
+                  padding: const EdgeInsets.only(bottom: ColonySpacing.sm),
+                  child: ColonyJourneyCard(
+                    assetPath:
+                        ActivationVisualCatalog.artForProtocol(protocol),
+                    title: protocol.name,
+                    subtitle: ActivationVisualCatalog.forProtocol(protocol)
+                        .journeyLabel,
+                    height: 104,
+                    onTap: () => context.go(
+                      '/activation/protocols/${protocol.id.value}',
+                    ),
                   ),
                 ),
             ],

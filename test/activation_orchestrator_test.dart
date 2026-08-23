@@ -83,4 +83,31 @@ void main() {
       isTrue,
     );
   });
+
+  test('start binds first meaningful action to a task deep link', () async {
+    final profile = await repos.profiles.create(
+      colonyName: 'Colônia',
+      displayName: 'Caio',
+      timezone: 'UTC',
+      locale: 'pt_BR',
+      baseCurrency: 'BRL',
+    );
+    await orchestrator.ensureSeeded(profile.id);
+    final bundle = (await orchestrator.pickProtocol(
+      profileId: profile.id,
+      capacity: ActivationCapacityMode.standard,
+      preferredType: ActivationProtocolType.workStart,
+    ))!;
+    final episode = await orchestrator.start(
+      profileId: profile.id,
+      bundle: bundle,
+      linkedTaskId: const EntityId('task-canonical'),
+      firstActionDeepLink: '/tasks/task-canonical',
+    );
+    expect(episode.linkedTaskId, const EntityId('task-canonical'));
+    final snapshot = await orchestrator.loadSnapshot(episode.id);
+    final first = snapshot.runs.firstWhere((r) => r.isFirstMeaningfulAction);
+    expect(first.deepLink, '/tasks/task-canonical');
+    expect(first.opensTaskId, const EntityId('task-canonical'));
+  });
 }

@@ -44,9 +44,20 @@ class _EnvironmentScreenState extends ConsumerState<EnvironmentScreen> {
       padding: const EdgeInsets.all(ColonySpacing.lg),
       child: ListView(
         children: [
-          Text(
-            AppStrings.activationEnvironment,
-            style: Theme.of(context).textTheme.headlineMedium,
+          ColonyHeroBanner(
+            assetPath: ActivationArtAssets.night,
+            height: 140,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  AppStrings.activationEnvironment,
+                  style: Theme.of(context).textTheme.headlineMedium,
+                ),
+                const Spacer(),
+                Text(AppStrings.activationRescueHint),
+              ],
+            ),
           ),
           const SizedBox(height: ColonySpacing.md),
           Text(

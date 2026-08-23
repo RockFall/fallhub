@@ -8,6 +8,7 @@ import '../../../app/localization/app_strings.dart';
 import '../application/activation_controllers.dart';
 import '../application/activation_orchestrator.dart';
 import '../application/activation_providers.dart';
+import 'widgets/activation_art.dart';
 
 class MobilizationScreen extends ConsumerWidget {
   const MobilizationScreen({
@@ -69,6 +70,14 @@ class _StartRouteBodyState extends ConsumerState<_StartRouteBody> {
     context.go('/activation/episodes/${episode.id.value}');
   }
 
+  Future<void> _start(ActivationProtocol protocol) async {
+    final episode = await ref
+        .read(activationControllerProvider.notifier)
+        .startProtocol(protocolId: protocol.id, capacity: _capacity);
+    if (!mounted || episode == null) return;
+    context.go('/activation/episodes/${episode.id.value}');
+  }
+
   @override
   Widget build(BuildContext context) {
     final protocols = ref.watch(activationProtocolsProvider);
@@ -81,8 +90,8 @@ class _StartRouteBodyState extends ConsumerState<_StartRouteBody> {
             AppStrings.activationStartMorning,
             style: Theme.of(context).textTheme.headlineMedium,
           ),
-          const SizedBox(height: ColonySpacing.md),
-          Text(AppStrings.activationCapacity),
+          const SizedBox(height: ColonySpacing.sm),
+          Text(AppStrings.activationPickCapacity),
           const SizedBox(height: ColonySpacing.sm),
           Wrap(
             spacing: ColonySpacing.sm,
@@ -107,21 +116,24 @@ class _StartRouteBodyState extends ConsumerState<_StartRouteBody> {
                 return ListView(
                   children: [
                     for (final protocol in items)
-                      ListTile(
-                        title: Text(protocol.name),
-                        subtitle: Text(protocol.description ?? ''),
-                        onTap: () async {
-                          final episode = await ref
-                              .read(activationControllerProvider.notifier)
-                              .startProtocol(
-                                protocolId: protocol.id,
-                                capacity: _capacity,
-                              );
-                          if (!context.mounted || episode == null) return;
-                          context.go(
-                            '/activation/episodes/${episode.id.value}',
-                          );
-                        },
+                      Padding(
+                        padding: const EdgeInsets.only(
+                          bottom: ColonySpacing.sm,
+                        ),
+                        child: ColonyJourneyCard(
+                          assetPath: ActivationVisualCatalog.artForProtocol(
+                            protocol,
+                          ),
+                          eyebrow: AppStrings.activationProtocolTypeLabel(
+                            protocol.protocolType,
+                          ),
+                          title: protocol.name,
+                          subtitle:
+                              ActivationVisualCatalog.forProtocol(protocol)
+                                  .journeyLabel,
+                          height: 120,
+                          onTap: () => _start(protocol),
+                        ),
                       ),
                   ],
                 );
@@ -146,6 +158,15 @@ class _DraftModeBody extends ConsumerWidget {
     final controller = ref.read(activationControllerProvider.notifier);
     final released = episode.status == ActivationEpisodeStatus.released ||
         episode.status == ActivationEpisodeStatus.convertedToRecovery;
+    final spec = ActivationVisualResolver.specFor(snapshot.bundle?.protocol);
+    final station = ActivationVisualResolver.currentStation(
+      spec: spec,
+      current: current,
+      runs: snapshot.runs,
+    );
+    final confirmed = snapshot.runs
+        .where((run) => run.status == ActivationCommandRunStatus.confirmed)
+        .length;
 
     return Padding(
       padding: const EdgeInsets.all(ColonySpacing.lg),
@@ -168,40 +189,100 @@ class _DraftModeBody extends ConsumerWidget {
             ],
           ),
           Text(
-            AppStrings.activationStatus(episode.status),
+            '${AppStrings.activationStatus(episode.status)} · '
+            '${AppStrings.activationStepLabel(confirmed, snapshot.runs.length)}',
             style: Theme.of(context).textTheme.bodySmall,
           ),
-          const SizedBox(height: ColonySpacing.xl),
+          const SizedBox(height: ColonySpacing.sm),
+          ColonyRouteRibbon(
+            labels: [
+              for (final stationSpec in spec.stations) stationSpec.label,
+            ],
+            currentIndex: station,
+          ),
+          const SizedBox(height: ColonySpacing.md),
           Expanded(
-            child: Center(
-              child: released
-                  ? Text(
-                      episode.targetState.label,
-                      textAlign: TextAlign.center,
-                      style: Theme.of(context).textTheme.headlineMedium,
-                    )
-                  : Semantics(
-                      header: true,
-                      liveRegion: true,
-                      child: Text(
-                        current?.instructionRendered ??
-                            AppStrings.activationOperational,
-                        textAlign: TextAlign.center,
-                        style: Theme.of(context).textTheme.displaySmall,
+            child: AnimatedSwitcher(
+              duration: ColonyDurations.slow,
+              child: ClipRRect(
+                key: ValueKey(current?.id.value ?? episode.status.name),
+                borderRadius: BorderRadius.circular(ColonyRadii.soft),
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    ActivationArtFrame(assetPath: spec.artAsset),
+                    const DecoratedBox(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [
+                            Color(0x66080C10),
+                            Color(0xF2080C10),
+                          ],
+                        ),
                       ),
                     ),
+                    Padding(
+                      padding: const EdgeInsets.all(ColonySpacing.xl),
+                      child: Center(
+                        child: released
+                            ? Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    AppStrings.activationReleasedTitle,
+                                    textAlign: TextAlign.center,
+                                    style:
+                                        Theme.of(context).textTheme.titleMedium,
+                                  ),
+                                  const SizedBox(height: ColonySpacing.md),
+                                  Text(
+                                    episode.targetState.label,
+                                    textAlign: TextAlign.center,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .headlineMedium,
+                                  ),
+                                ],
+                              )
+                            : Semantics(
+                                header: true,
+                                liveRegion: true,
+                                child: Text(
+                                  current?.instructionRendered ??
+                                      AppStrings.activationOperational,
+                                  textAlign: TextAlign.center,
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .displaySmall
+                                      ?.copyWith(height: 1.25),
+                                ),
+                              ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
           ),
           if (snapshot.proofs.isNotEmpty)
-            Text(
-              '${AppStrings.activationProofSource}: ${snapshot.proofs.last.source}',
-              textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.bodySmall,
+            Padding(
+              padding: const EdgeInsets.only(top: ColonySpacing.sm),
+              child: Text(
+                '${AppStrings.activationProofSource}: ${snapshot.proofs.last.source}',
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.bodySmall,
+              ),
             ),
           if (current?.deepLink != null && current!.deepLink!.isNotEmpty)
             TextButton(
               onPressed: () => context.go(current.deepLink!),
-              child: const Text(AppStrings.activationOpenFirstAction),
+              child: Text(
+                current.opensTaskId != null
+                    ? AppStrings.activationOpenTask
+                    : AppStrings.activationOpenFirstAction,
+              ),
             ),
           ExpansionTile(
             title: const Text(AppStrings.activationRouteCollapsed),
@@ -209,6 +290,16 @@ class _DraftModeBody extends ConsumerWidget {
               for (final run in snapshot.runs)
                 ListTile(
                   dense: true,
+                  leading: Icon(
+                    run.status == ActivationCommandRunStatus.confirmed
+                        ? Icons.check_circle
+                        : run.status == ActivationCommandRunStatus.presented
+                            ? Icons.radio_button_checked
+                            : Icons.radio_button_unchecked,
+                    color: run.status == ActivationCommandRunStatus.confirmed
+                        ? ColonyMiniAppColors.activation
+                        : ColonyColors.textMuted,
+                  ),
                   title: Text(run.instructionRendered),
                   subtitle: Text(run.status.name),
                 ),

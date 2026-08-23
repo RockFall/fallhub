@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../app/localization/app_strings.dart';
 import '../../../core/providers/app_providers.dart';
+import '../../activation/application/activation_controllers.dart';
 
 class InboxScreen extends ConsumerWidget {
   const InboxScreen({super.key});
@@ -19,6 +20,27 @@ class InboxScreen extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Text(AppStrings.inbox, style: Theme.of(context).textTheme.headlineMedium),
+          const SizedBox(height: ColonySpacing.sm),
+          inbox.maybeWhen(
+            data: (tasks) {
+              if (tasks.isEmpty) return const SizedBox.shrink();
+              return Align(
+                alignment: Alignment.centerLeft,
+                child: TextButton.icon(
+                  onPressed: () async {
+                    final episode = await ref
+                        .read(activationControllerProvider.notifier)
+                        .startForTask(taskId: tasks.first.id);
+                    if (!context.mounted || episode == null) return;
+                    context.go('/activation/episodes/${episode.id.value}');
+                  },
+                  icon: const Icon(Icons.directions_walk_outlined),
+                  label: const Text(AppStrings.activationMobilizeTask),
+                ),
+              );
+            },
+            orElse: () => const SizedBox.shrink(),
+          ),
           const SizedBox(height: ColonySpacing.lg),
           Expanded(
             child: inbox.when(

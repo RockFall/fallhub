@@ -53,6 +53,7 @@ final openActivationEpisodeProvider =
 
 final activationWaypointsProvider =
     StreamProvider<List<ActivationWaypoint>>((ref) async* {
+  await ref.watch(activationSeedProvider.future);
   final profile = await ref.watch(profileProvider.future);
   if (profile == null) {
     yield const [];

@@ -49,6 +49,8 @@ class ActivationOrchestrator {
     ActivationCapacityMode capacity = ActivationCapacityMode.standard,
     ActivationTriggerType triggerType = ActivationTriggerType.userRequested,
     InertiaHypothesis? hypothesis,
+    EntityId? linkedTaskId,
+    String? firstActionDeepLink,
   }) async {
     final open = await repository.getOpenEpisode(profileId);
     if (open != null) {
@@ -60,15 +62,32 @@ class ActivationOrchestrator {
         throw StateError('Orçamento diário de intervenção atingido');
       }
     }
+    List<ActivationCommandTemplate> bindFirstAction(
+      List<ActivationCommandTemplate> templates,
+    ) {
+      if (linkedTaskId == null && firstActionDeepLink == null) {
+        return templates;
+      }
+      return [
+        for (final template in templates)
+          template.isFirstMeaningfulAction
+              ? template.copyWith(
+                  opensTaskId: linkedTaskId ?? template.opensTaskId,
+                  deepLink: firstActionDeepLink ?? template.deepLink,
+                )
+              : template,
+      ];
+    }
+
     final fallback = bundle.version.fallbackProtocolId == null
         ? const <ActivationCommandTemplate>[]
         : (await repository.getBundle(bundle.version.fallbackProtocolId!))
                 ?.commands ??
             const <ActivationCommandTemplate>[];
     final compiled = compiler.compile(
-      templates: bundle.orderedCommands,
+      templates: bindFirstAction(bundle.orderedCommands),
       capacity: capacity,
-      fallbackMinimal: fallback,
+      fallbackMinimal: bindFirstAction(fallback),
     );
     if (compiled.isEmpty) {
       throw StateError('Protocolo sem comandos concretos');
@@ -80,6 +99,7 @@ class ActivationOrchestrator {
       compiled: compiled,
       triggerType: triggerType,
       hypothesis: hypothesis,
+      linkedTaskId: linkedTaskId,
     );
     final running = (await repository.listExperiments(profileId))
         .where((e) => e.status == ActivationExperimentStatus.running)

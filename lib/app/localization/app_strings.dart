@@ -2263,6 +2263,38 @@ abstract final class AppStrings {
   static const activationHypothesis = 'Hipótese';
   static const activationFrom = 'De';
   static const activationTo = 'Para';
+  static const activationHeroCaption =
+      'Do chão à primeira ação. Uma ordem, um lugar, sem nota moral.';
+  static const activationJourneys = 'Percursos';
+  static const activationRouteMap = 'Mapa da casa';
+  static const activationMorningRoutes = 'Manhã';
+  static const activationDayRoutes = 'Dia';
+  static const activationEveningRoutes = 'Tarde e rua';
+  static const activationNightRoutes = 'Noite';
+  static const activationMobilizeTask = 'Mobilizar esta tarefa';
+  static const activationCurrentStation = 'Estação atual';
+  static const activationReleasedTitle = 'Terreno atravessado.';
+  static const activationStepOf = 'Passo';
+  static const activationSuggestedNow = 'Sugestão para agora';
+  static const activationWaypointMap = 'Âncoras no espaço';
+  static const activationReliability = 'Confiabilidade';
+  static const activationContinueJourney = 'Continuar o percurso';
+  static const activationPickCapacity = 'Como está a capacidade agora?';
+  static const activationOpenTask = 'Abrir a tarefa ligada';
+  static const activationChainTrigger = 'Trigger';
+  static const activationChainRelease = 'Liberação';
+  static const activationSeeRoute = 'Ver rota';
+
+  static String activationDaypartLabel(ActivationDaypart daypart) =>
+      switch (daypart) {
+        ActivationDaypart.morning => activationMorningRoutes,
+        ActivationDaypart.day => activationDayRoutes,
+        ActivationDaypart.evening => activationEveningRoutes,
+        ActivationDaypart.night => activationNightRoutes,
+      };
+
+  static String activationStepLabel(int current, int total) =>
+      '$activationStepOf ${current + 1} · $total';
 
   static String activationStatus(ActivationEpisodeStatus status) =>
       switch (status) {

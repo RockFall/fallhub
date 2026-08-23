@@ -1,9 +1,12 @@
 import 'package:colony_design_system/colony_design_system.dart';
+import 'package:colony_domain/colony_domain.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../app/localization/app_strings.dart';
 import '../application/activation_providers.dart';
+import 'widgets/activation_art.dart';
 
 class EpisodeInspectScreen extends ConsumerWidget {
   const EpisodeInspectScreen({super.key, required this.episodeId});
@@ -21,16 +24,38 @@ class EpisodeInspectScreen extends ConsumerWidget {
           return Center(child: Text(AppStrings.activationEmpty));
         }
         final episode = data.episode;
+        final spec = ActivationVisualResolver.specFor(data.bundle?.protocol);
+        final station = ActivationVisualResolver.currentStation(
+          spec: spec,
+          current: data.current,
+          runs: data.runs,
+        );
         return Padding(
           padding: const EdgeInsets.all(ColonySpacing.lg),
           child: ListView(
             children: [
-              Text(
-                AppStrings.activationStatus(episode.status),
-                style: Theme.of(context).textTheme.headlineMedium,
+              ColonyHeroBanner(
+                assetPath: spec.artAsset,
+                height: 160,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      AppStrings.activationStatus(episode.status),
+                      style: Theme.of(context).textTheme.headlineMedium,
+                    ),
+                    const Spacer(),
+                    Text(spec.journeyLabel),
+                  ],
+                ),
               ),
               const SizedBox(height: ColonySpacing.sm),
               Text(AppStrings.activationNoMoralScore),
+              const SizedBox(height: ColonySpacing.md),
+              ColonyRouteRibbon(
+                labels: [for (final item in spec.stations) item.label],
+                currentIndex: station,
+              ),
               const SizedBox(height: ColonySpacing.md),
               Text('${AppStrings.activationSignal}: ${episode.triggerType.name}'),
               if (episode.hypothesisType != null)
@@ -42,6 +67,14 @@ class EpisodeInspectScreen extends ConsumerWidget {
               ),
               Text('${AppStrings.activationFrom}: ${episode.initialState.label}'),
               Text('${AppStrings.activationTo}: ${episode.targetState.label}'),
+              if (episode.linkedTaskId != null) ...[
+                const SizedBox(height: ColonySpacing.sm),
+                TextButton(
+                  onPressed: () =>
+                      context.go('/tasks/${episode.linkedTaskId!.value}'),
+                  child: const Text(AppStrings.activationOpenTask),
+                ),
+              ],
               const SizedBox(height: ColonySpacing.lg),
               Text(
                 AppStrings.activationProofSource,
@@ -61,6 +94,14 @@ class EpisodeInspectScreen extends ConsumerWidget {
               ),
               for (final run in data.runs)
                 ListTile(
+                  leading: Icon(
+                    run.status == ActivationCommandRunStatus.confirmed
+                        ? Icons.check_circle
+                        : Icons.radio_button_unchecked,
+                    color: run.status == ActivationCommandRunStatus.confirmed
+                        ? ColonyMiniAppColors.activation
+                        : ColonyColors.textMuted,
+                  ),
                   title: Text(run.instructionRendered),
                   subtitle: Text(run.status.name),
                 ),

@@ -1,4 +1,5 @@
 import 'package:colony_design_system/colony_design_system.dart';
+import 'package:colony_domain/colony_domain.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -39,19 +40,18 @@ class ProtocolListScreen extends ConsumerWidget {
                   itemCount: items.length,
                   itemBuilder: (context, index) {
                     final protocol = items[index];
-                    return Card(
-                      child: ListTile(
-                        title: Text(protocol.name),
-                        subtitle: Text(
-                          [
-                            AppStrings.activationProtocolTypeLabel(
-                              protocol.protocolType,
-                            ),
-                            protocol.originState.label,
-                            '→',
-                            protocol.targetState.label,
-                          ].join(' · '),
+                    final spec = ActivationVisualCatalog.forProtocol(protocol);
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: ColonySpacing.sm),
+                      child: ColonyJourneyCard(
+                        assetPath: spec.artAsset,
+                        eyebrow: AppStrings.activationProtocolTypeLabel(
+                          protocol.protocolType,
                         ),
+                        title: protocol.name,
+                        subtitle:
+                            '${spec.journeyLabel} · ${protocol.originState.label} → ${protocol.targetState.label}',
+                        height: 128,
                         onTap: () => context.go(
                           '/activation/protocols/${protocol.id.value}',
                         ),

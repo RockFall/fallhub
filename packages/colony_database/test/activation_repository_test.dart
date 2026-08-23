@@ -39,6 +39,12 @@ void main() {
     expect(seeded, greaterThan(0));
 
     final protocols = await repos.activation.listProtocols(created.id);
+    final waypoints = await repos.activation.listWaypoints(created.id);
+    expect(waypoints.length, ActivationWaypointSeeds.catalog.length);
+    expect(
+      waypoints.map((w) => w.settings['seed_key']),
+      contains('bathroom_dock'),
+    );
     final morning = protocols.firstWhere(
       (p) => p.seedKey == 'morning_launch_standard',
     );

@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import '../../../app/localization/app_strings.dart';
 import '../../../core/providers/app_providers.dart';
 import '../../../core/providers/feature_controllers.dart';
+import '../../activation/application/activation_controllers.dart';
 
 class TaskInspectScreen extends ConsumerWidget {
   const TaskInspectScreen({super.key, required this.taskId});
@@ -52,6 +53,18 @@ class TaskInspectScreen extends ConsumerWidget {
                 Wrap(
                   spacing: ColonySpacing.sm,
                   children: [
+                    FilledButton.tonal(
+                      onPressed: () async {
+                        final episode = await ref
+                            .read(activationControllerProvider.notifier)
+                            .startForTask(taskId: task.id);
+                        if (!context.mounted || episode == null) return;
+                        context.go(
+                          '/activation/episodes/${episode.id.value}',
+                        );
+                      },
+                      child: const Text(AppStrings.activationMobilizeTask),
+                    ),
                     FilledButton(
                       onPressed: () => ref
                           .read(taskActionsControllerProvider.notifier)

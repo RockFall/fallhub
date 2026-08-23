@@ -28,7 +28,7 @@ void main() {
     final repos = ColonyRepositories.create(
       db,
       idGenerator: FixedIdGenerator([
-        for (var i = 1; i <= 300; i++) 'act-ui-$i',
+        for (var i = 1; i <= 400; i++) 'act-ui-$i',
       ]),
       clock: () => DateTime.utc(2026, 8, 23, 12),
     );
@@ -59,6 +59,8 @@ void main() {
 
     expect(find.text(AppStrings.activationTitle), findsWidgets);
     expect(find.text(AppStrings.activationStuckNow), findsOneWidget);
+    expect(find.text(AppStrings.activationHeroCaption), findsOneWidget);
+    expect(find.text(AppStrings.activationJourneys), findsOneWidget);
     expect(find.text(AppStrings.activationNoMoralScore), findsWidgets);
     expect(find.textContaining('dias seguidos'), findsNothing);
     expect(find.textContaining('score moral'), findsNothing);

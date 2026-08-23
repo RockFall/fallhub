@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../app/localization/app_strings.dart';
 import '../application/activation_controllers.dart';
 import '../application/activation_providers.dart';
+import 'widgets/waypoint_route_map.dart';
 
 class WaypointEditorScreen extends ConsumerStatefulWidget {
   const WaypointEditorScreen({super.key, this.initialToken});
@@ -55,8 +56,21 @@ class _WaypointEditorScreenState extends ConsumerState<WaypointEditorScreen> {
           ),
           const SizedBox(height: ColonySpacing.sm),
           Text(
-            AppStrings.activationWaypointEmpty,
+            AppStrings.activationWaypointMap,
             style: Theme.of(context).textTheme.bodySmall,
+          ),
+          const SizedBox(height: ColonySpacing.md),
+          waypoints.maybeWhen(
+            data: (items) => WaypointRouteMap(
+              waypoints: items,
+              onSelect: (waypoint) {
+                if (waypoint.token == null) return;
+                ref
+                    .read(activationControllerProvider.notifier)
+                    .reachWaypoint(waypoint.token!);
+              },
+            ),
+            orElse: () => const SizedBox(height: 8),
           ),
           const SizedBox(height: ColonySpacing.md),
           TextField(
@@ -99,12 +113,14 @@ class _WaypointEditorScreenState extends ConsumerState<WaypointEditorScreen> {
                   children: [
                     for (final waypoint in items)
                       ListTile(
+                        leading: const Icon(Icons.place_outlined),
                         title: Text(waypoint.name),
                         subtitle: Text(
                           [
                             waypoint.waypointType.name,
                             if (waypoint.reliabilityScore != null)
-                              'confiabilidade ${(waypoint.reliabilityScore! * 100).round()}%',
+                              '${AppStrings.activationReliability} '
+                                  '${(waypoint.reliabilityScore! * 100).round()}%',
                           ].join(' · '),
                         ),
                         trailing: IconButton(

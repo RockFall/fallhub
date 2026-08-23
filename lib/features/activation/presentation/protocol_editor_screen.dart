@@ -50,19 +50,41 @@ class _ProtocolEditorScreenState extends ConsumerState<ProtocolEditorScreen> {
     if (bundle == null) {
       return Center(child: Text(_error ?? AppStrings.activationEmpty));
     }
+    final spec = ActivationVisualCatalog.forProtocol(bundle.protocol);
     return Padding(
       padding: const EdgeInsets.all(ColonySpacing.lg),
       child: ListView(
         children: [
-          Text(
-            bundle.protocol.name,
-            style: Theme.of(context).textTheme.headlineMedium,
+          ColonyHeroBanner(
+            assetPath: spec.artAsset,
+            height: 150,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  bundle.protocol.name,
+                  style: Theme.of(context).textTheme.headlineMedium,
+                ),
+                const Spacer(),
+                Text(spec.journeyLabel),
+              ],
+            ),
           ),
           const SizedBox(height: ColonySpacing.sm),
           Text(bundle.protocol.description ?? ''),
           Text(
             'v${bundle.protocol.activeVersion} · '
             '${bundle.protocol.maturity.name}',
+          ),
+          const SizedBox(height: ColonySpacing.md),
+          ColonyRouteRibbon(
+            labels: [
+              AppStrings.activationChainTrigger,
+              for (final command in bundle.orderedCommands)
+                command.actionVerb,
+              AppStrings.activationChainRelease,
+            ],
+            currentIndex: 1,
           ),
           const SizedBox(height: ColonySpacing.md),
           SwitchListTile(
