@@ -99,6 +99,14 @@ abstract final class ColonyMiniApps {
       pinned: true,
     ),
     ColonyMiniApp(
+      id: 'music_atlas',
+      label: AppStrings.musicAtlasTitle,
+      route: '/research/music-atlas',
+      icon: Icons.album_outlined,
+      color: ColonyMiniAppColors.musicAtlas,
+      pinned: true,
+    ),
+    ColonyMiniApp(
       id: 'finance',
       label: AppStrings.financeLedgerTitle,
       route: '/resources/finance',

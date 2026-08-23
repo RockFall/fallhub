@@ -1,6 +1,7 @@
 import 'package:colony_design_system/colony_design_system.dart';
 import 'package:colony_domain/colony_domain.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../../app/localization/app_strings.dart';
 
@@ -44,10 +45,15 @@ class WorkPriorityGrid extends StatelessWidget {
               children: [
                 Expanded(
                   flex: 3,
-                  child: Text(
-                    AppStrings.workTypeLabel(priority.workType),
-                    style: Theme.of(context).textTheme.bodyMedium,
-                    overflow: TextOverflow.ellipsis,
+                  child: InkWell(
+                    onTap: priority.workType == WorkType.music
+                        ? () => context.go('/research/music-atlas')
+                        : null,
+                    child: Text(
+                      AppStrings.workTypeLabel(priority.workType),
+                      style: Theme.of(context).textTheme.bodyMedium,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ),
                 ),
                 Expanded(

@@ -49,6 +49,15 @@ final calendarIcsConsentProvider = Provider<IntegrationConsent?>((ref) {
   return null;
 });
 
+final spotifyConsentProvider = Provider<IntegrationConsent?>((ref) {
+  final consents = ref.watch(integrationConsentsProvider).asData?.value;
+  if (consents == null) return null;
+  for (final c in consents) {
+    if (c.kind == IntegrationKind.spotify) return c;
+  }
+  return null;
+});
+
 final notificationListenerConsentProvider = Provider<IntegrationConsent?>((ref) {
   final consents = ref.watch(integrationConsentsProvider).asData?.value;
   if (consents == null) return null;

@@ -258,6 +258,15 @@ class _HabitatScreenState extends ConsumerState<HabitatScreen> {
             },
           ),
         );
+        if (prop.kind == HabitatPropKinds.instrument) {
+          items.add(
+            ColonyFloatMenuItem(
+              label: AppStrings.musicAtlasFromHabitat,
+              icon: Icons.album_outlined,
+              onSelected: () => context.go('/research/music-atlas'),
+            ),
+          );
+        }
       case HabitatCellSelection():
       case null:
         if (_game.draftedPawn != null &&

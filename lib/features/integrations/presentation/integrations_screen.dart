@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../app/localization/app_strings.dart';
+import '../../music_atlas/presentation/widgets/spotify_integration_panel.dart';
 import '../application/integrations_controllers.dart';
 import '../application/integrations_providers.dart';
 
@@ -363,6 +364,8 @@ class _IntegrationsScreenState extends ConsumerState<IntegrationsScreen>
               );
             },
           ),
+          const SizedBox(height: ColonySpacing.lg),
+          const SpotifyIntegrationPanel(),
           const SizedBox(height: ColonySpacing.lg),
           ColonyPanel(
             title: AppStrings.integrationsCalendarIcs,

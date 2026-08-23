@@ -3,14 +3,17 @@
 
 **Documento:** Feature Specification + UX Specification + Domain Model + AI Implementation Guide  
 **Produto pai:** `Life Colony OS`  
-**Módulo pai:** `Pesquisa`, com integrações profundas em `Pawn`, `Skills`, `Biblioteca`, `Crônica`, `Missões`, `Agenda`, `Relações`, `Viagens` e `Storyteller`  
+**Módulo pai:** `Pesquisa`, com integrações profundas em `Flashcards`, `Integrações`, `Habitat`, `Home`, `Pawn`, `Skills`, `Biblioteca`, `Crônica`, `Missões`, `Agenda`, `Relações`, `Viagens` e `Storyteller`  
 **Nome funcional:** `Atlas Musical`  
 **Codinome interno:** `Music Frontier`  
-**Status:** Especificação v1.0  
-**Data de referência:** 6 de agosto de 2026  
+**Status:** Especificação v1.1 — revisão de encaixe no app real  
+**Data de referência:** 23 de agosto de 2026  
+**Origem v1.0:** 6 de agosto de 2026  
 **Plataforma:** Flutter — Android, iOS e desktop; experiência plenamente utilizável offline  
-**Escopo desta versão:** descoberta, escuta, contextualização, comparação, memória, prática e planejamento de explorações musicais  
-**Fora de escopo:** streaming próprio, download não autorizado de áudio, reprodução integral de conteúdo protegido, substituição de serviços de música e “nota objetiva” sobre gosto musical  
+**Escopo desta versão:** descoberta, escuta, contextualização, comparação, memória, prática, planejamento de explorações, importação JSON com prompt para IA externa, conector Spotify opt-in e pontes com Pesquisa/Flashcards  
+**Fora de escopo:** streaming próprio, download não autorizado de áudio, reprodução integral de conteúdo protegido, substituição de Spotify/Apple Music, LLM remoto obrigatório e “nota objetiva” sobre gosto musical  
+
+**Delta v1.1 (23 ago 2026):** a v1.0 descrevia o continente cartográfico. Esta revisão **encaixa** o módulo no app que já existe (home de mini-programas, Pesquisa, Flashcards+SRS+import JSON, Integrações ICS, Habitat, Storyteller `rules_v1`) e **puxa para cedo** duas fatias que estavam implícitas ou tardias: prompt copiável + JSON (canal A) e conector Spotify opt-in. Capítulos novos: §2.4, §36.5–36.6, §45.5–45.7, §46.2, §75–§80. Roadmap M0–M13 na §67. O ensaio cartográfico das §3–§34 permanece; não foi reescrito por cosmética.
 
 ---
 
@@ -91,6 +94,12 @@
 - [72. Prompt de execução para a IA](#72-prompt-de-execução-para-a-ia)
 - [73. Resultado esperado](#73-resultado-esperado)
 - [74. Referências técnicas](#74-referências-técnicas)
+- [75. Spotify — conector local-first](#75-spotify--conector-local-first)
+- [76. Importação JSON com prompt para IA](#76-importação-json-com-prompt-para-ia)
+- [77. Flashcards, tags e mapa de conhecimento](#77-flashcards-tags-e-mapa-de-conhecimento)
+- [78. Superfície no app atual](#78-superfície-no-app-atual)
+- [79. Contrato JSON v1 do Atlas](#79-contrato-json-v1-do-atlas)
+- [80. Critérios de aceite das fatias novas](#80-critérios-de-aceite-das-fatias-novas)
 
 ---
 
@@ -109,7 +118,7 @@ A IA desenvolvedora deve interpretar a funcionalidade como um **sistema de carto
 - uma coleção de recomendações geradas sem contexto;
 - uma tentativa de representar toda a história da música como uma hierarquia única e incontroversa.
 
-A implementação deve começar pelo núcleo local, manual e explicável. Integrações externas, enriquecimento automático e IA entram depois que as entidades, fluxos e testes locais estiverem maduros.
+A implementação deve começar pelo núcleo local, manual e explicável. **Importação JSON com prompt copiável** (padrão já enviado em Flashcards, ADR-038) entra cedo: a IA corre *fora* do app. **Spotify** entra como adapter opt-in assim que o núcleo gravar encontros e nós — não espera a Fase 11. LLM remoto *dentro* do app permanece defer (ADR-033).
 
 ## 0.1 Regras absolutas
 
@@ -234,6 +243,39 @@ O Atlas é a representação espacial e histórica de dados que já pertencem ao
 - comprar um disco pode ligar `Transaction`, `InventoryItem` e `KnowledgeSource`;
 - viajar a uma cidade pode revelar cenas e locais relacionados;
 - o Storyteller usa esses dados para sugerir reflexões, não para gerar um segundo sistema paralelo.
+
+## 2.4 Mapa do app real (agosto 2026)
+
+O Atlas não pode ser especificado como se o produto ainda fosse só o PRD. O repositório já tem superfícies que o módulo deve *usar*, não reinventar:
+
+| Superfície existente | Como o Atlas entra |
+|---|---|
+| Home launcher (mini-programas) | tile `Música` / `Atlas` + atalho “O que estou ouvindo” |
+| Menu Mais e command palette | destinos `/research/music-atlas`, captura, import JSON, Spotify |
+| `/research` + detalhe de nó | ponte N:N `ResearchKnowledgeLink` + evidência de escuta/prática |
+| `/flashcards` + SRS (ADR-036/037/038/039) | baralhos `repertoire` / teoria; import JSON pode criar cartões |
+| `/settings/integrations` (ADR-032, ICS stub) | toggle Spotify + MusicBrainz + import JSON; mesmo consentimento |
+| Storyteller `rules_v1` (ADR-033) | bullets de expedição/encontros; sem LLM |
+| Habitat / piano (spec living pawn) | objeto abre prática, repertório ou Atlas — sem autoplay |
+| Agenda (`/work/schedule`) | blocos `escuta`, `prática`, `show`; deep link para sessão |
+| Pessoas / compromissos | recomendador, aula, show combinado |
+| Viagens / zonas / casa | cena, festival, disco na estante |
+| Ledger | gasto de disco/show/aula com proveniência, sem “ROI cultural” |
+| Export/restore | entidades musicais no snapshot; **tokens Spotify nunca entram** |
+| Parse streaming (ADR-042 / ADR-038 §6) | dumps JSON/Spotify grandes: path + isolate, sem teto, sem colar MB no TextField |
+
+Rotas canónicas (além das da §2.1):
+
+```text
+/research/music-atlas
+/research/music-atlas/import
+/research/music-atlas/import?source=json
+/research/music-atlas/import?source=spotify
+/settings/integrations
+/flashcards?area=musica
+/flashcards/study?deckId=…
+/quests?tag=music-expedition
+```
 
 ---
 
@@ -1958,6 +2000,10 @@ CreativeInfluence:
 
 O app deve diferenciar influência declarada de semelhança inferida.
 
+## 32.5 Flashcards de repertório — ver §77
+
+`FlashcardKind.repertoire` já existe no app. O Atlas **propõe** cartões a partir de uma peça, de uma sessão de prática ou de um laboratório de comparação; o utilizador confirma. O SRS continua em `/flashcards`. Não se cria um cartão por cada álbum ouvido.
+
 ---
 
 # 33. Conceitos musicais e escuta ativa
@@ -2152,6 +2198,32 @@ O usuário pode criar perguntas independentes:
 
 Perguntas se conectam a expedições e notas.
 
+## 36.5 Pesquisa como está no app (não um clone)
+
+A árvore de pesquisa já existe (`/research`, sessões, evidência, WIP, links quest↔research). O Atlas **não** cria uma segunda árvore.
+
+Contrato:
+
+| Atlas | Pesquisa |
+|---|---|
+| `MusicNode` (obra, artista, território, conceito) | opcionalmente ligado a `ResearchNode` |
+| Encontro / sessão de escuta | `LearningSession` + `ResearchEvidence` quando o usuário **afirma** evidência |
+| Expedição curta | fica no Atlas |
+| Expedição longa com propósito | pode promover a `Quest` ligada a um ou mais nós |
+| “Cartografado” | **não** marca o ResearchNode como demonstrado |
+
+Um álbum ouvido não demonstra o nó “Reconhecer linguagem modal”. Demonstrar exige rubrica + evidência (comparar duas obras, explicar, tocar um trecho, cartão SRS estável — à escolha do usuário).
+
+`ResearchKnowledgeLink.kind`:
+
+- `primary` — o nó de pesquisa *é* este território/conceito;
+- `related` — contexto;
+- `practice` — baralho ou repertório que treina o nó.
+
+## 36.6 Flashcards — ver §77
+
+Ponte obrigatória com ADR-036/037/038/039. Resumo: Atlas gera *candidatos* a cartão; o usuário confirma; SRS vive em `/flashcards`. Detalhe normativo na §77.
+
 ---
 
 # 37. Integração com Missões, Agenda e Foco
@@ -2185,6 +2257,8 @@ Tipos:
 - revisão de mapa.
 
 Eventos podem abrir diretamente no modo correspondente.
+
+`WorkType.music` já existe na grelha. Um `ScheduleBlock` com este tipo deep-linka para o Atlas, para a sessão de escuta ou para `/flashcards?area=musica` — não para um quarto calendário.
 
 ## 37.3 Focus Session
 
@@ -2277,6 +2351,8 @@ O Storyteller musical observa padrões e oferece intervenções raras.
 - `Revisita oportuna`;
 - `Pergunta sem resposta`;
 - `Marco da expedição`;
+- `Gravado sem encontro` (sinal Spotify / inbox);
+- `Prática à espera` (cartões de Música vencidos);
 - `Contraste útil`;
 - `Memória musical`;
 - `Obra para o momento`;
@@ -2308,11 +2384,22 @@ Desde então, você cartografou duas correntes que podem mudar essa escuta.
 - feedback ajusta frequência;
 - nenhuma inferência emocional invasiva.
 
+Até existir LLM no app (ADR-033), as cartas musicais são **templates `rules_v1`** no `NarrativeDigest` já enviado — não um segundo Storyteller. Inputs: expedições activas, encontros recentes, inbox Spotify, cartões vencidos na área Música, blocos `WorkType.music`. Evidências são ids clicáveis.
+
 ---
 
 # 41. Assistente de IA musical
 
-## 41.1 Funções permitidas
+Há **dois** canais. Confundi-los reproduz o erro que o app já evitou em Flashcards.
+
+| Canal | Onde corre | Quando entra |
+|---|---|---|
+| **A. Prompt copiável + JSON** | IA *externa* (ChatGPT, Claude, etc.) | Fatia cedo — §76 e §79 |
+| **B. LLM remoto dentro do app** | opt-in, defer ADR-033 | Só depois do núcleo + import + Spotify |
+
+O canal A **não** é “IA do Colony”. É o mesmo padrão de `flashcardsImportPromptLive`: o mapa atual vira um prompt; a pessoa cola o JSON; o app valida, pré-visualiza e aplica.
+
+## 41.1 Funções permitidas (canal B, futuro)
 
 - sugerir escopo;
 - montar expedição;
@@ -2648,6 +2735,36 @@ concert_reflection
 
 Toda descoberta relevante gera evento, mas reproduções brutas não precisam gerar eventos individuais na Crônica.
 
+## 45.5 KnowledgeArea, tags e Flashcard
+
+O mapa de conhecimento (ADR-036/037/039) já tem o ramo canónico `arts.music` (`Artes / Música`), com filhos `Teoria musical` e `Tropicalismo` (este último também em `História / Brasil`). O Atlas **não** cria um segundo mapa.
+
+| Entidade existente | Papel no Atlas |
+|---|---|
+| `KnowledgeArea` (`arts.music*`, `arts.harmony`, `arts.piano`) | prateleira; `areaPath` do import JSON |
+| `Flashcard` / `FlashcardDeck` | prática; kinds `repertoire`, `cloze`, `basic` |
+| `FlashcardTag` | classificação cruzada (`Jazz`, `Música / Harmonia`) |
+| `ResearchKnowledgeLink` | `primary` / `related` / `practice` entre nó de pesquisa e área |
+| `Flashcard.researchNodeId` / `FlashcardDeck.researchNodeId` | foco primário do baralho, se houver |
+
+Candidatos a cartão gerados pelo Atlas são *rascunhos*. Só entram no SRS depois de confirmação (mesmo ritual do import de flashcards).
+
+## 45.6 IntegrationConsent
+
+`IntegrationKind` hoje tem `calendarIcs` e `notificationListener`. O Atlas acrescenta kinds, sem novo ecrã de permissões:
+
+- `spotify` — OAuth PKCE; tokens em secure storage;
+- `musicbrainz` — User-Agent + cache; sem conta;
+- `musicJsonImport` — consentimento de aplicar um documento (opcional; o picker já é explícito).
+
+Revogar Spotify **não** apaga nós, encontros nem expedições já gravados. Apaga tokens, cursors e cache bruto do provider.
+
+## 45.7 WorkType.music e Habitat
+
+`WorkType.music` já existe na grelha de trabalho. Blocos de agenda e sessões de foco com este tipo deep-linkam para o Atlas, para uma sessão de escuta ou para `/flashcards?area=musica`.
+
+O Habitat (spec living pawn) pode ter um objecto piano/estante: inspecionar abre prática, repertório ou Atlas. **Sem autoplay.** Sem SDK de reprodução.
+
 ---
 
 # 46. Schema relacional inicial
@@ -2925,7 +3042,64 @@ Criar FTS para:
 - cues;
 - títulos de expedição.
 
-## 46.2 Migração
+## 46.2 Tabelas de importação e Spotify
+
+Acrescentar na mesma família de migrations (ou na imediata a seguir ao núcleo):
+
+```sql
+CREATE TABLE music_import_runs (
+  id TEXT PRIMARY KEY,
+  profile_id TEXT NOT NULL REFERENCES profiles(id),
+  source_kind TEXT NOT NULL, -- json | spotify_library | spotify_recent
+                             -- | spotify_playlist | listenbrainz | csv
+  status TEXT NOT NULL,      -- preview | applied | rolled_back | failed
+  document_version INTEGER,
+  item_count INTEGER NOT NULL DEFAULT 0,
+  created_count INTEGER NOT NULL DEFAULT 0,
+  skipped_count INTEGER NOT NULL DEFAULT 0,
+  conflict_count INTEGER NOT NULL DEFAULT 0,
+  provenance_json TEXT NOT NULL,
+  report_json TEXT,
+  created_at INTEGER NOT NULL,
+  applied_at INTEGER,
+  rolled_back_at INTEGER
+);
+
+CREATE TABLE music_import_staging (
+  id TEXT PRIMARY KEY,
+  run_id TEXT NOT NULL REFERENCES music_import_runs(id),
+  raw_json TEXT NOT NULL,
+  normalized_title TEXT,
+  normalized_artist TEXT,
+  external_provider TEXT,
+  external_id TEXT,
+  proposed_node_id TEXT,
+  resolution TEXT NOT NULL, -- create | link | skip | conflict
+  user_decision TEXT,
+  created_at INTEGER NOT NULL
+);
+CREATE INDEX idx_music_staging_run ON music_import_staging(run_id);
+
+CREATE TABLE music_spotify_sync_state (
+  profile_id TEXT PRIMARY KEY REFERENCES profiles(id),
+  consent_id TEXT NOT NULL,
+  granted_scopes_json TEXT NOT NULL,
+  library_cursor TEXT,
+  recent_cursor TEXT,
+  last_library_at INTEGER,
+  last_recent_at INTEGER,
+  last_playlist_at INTEGER,
+  capability_probe_json TEXT NOT NULL,
+  last_error TEXT,
+  updated_at INTEGER NOT NULL
+);
+
+-- Tokens NUNCA nesta tabela nem no export. Secure storage apenas.
+```
+
+Identidades Spotify reutilizam `music_external_identities` com `provider='spotify'` (`album`, `artist`, `track`, `playlist`, `show`). ISRC, MusicBrainz ID e Spotify ID convivem no mesmo nó.
+
+## 46.3 Migração
 
 A primeira migration do Atlas deve:
 
@@ -2970,6 +3144,17 @@ MusicAffinitySignalRejected
 MusicMapScopeCreated
 MusicProjectionSaved
 MusicArtifactCreated
+MusicAtlasJsonImported
+MusicAtlasJsonRolledBack
+FlashcardCandidateProposed
+FlashcardCandidateAccepted
+SpotifyLinked
+SpotifyRevoked
+SpotifyLibraryPulled
+SpotifyRecentStaged
+SpotifyPlaylistDrafted
+SpotifyNowPlayingCaptured
+SpotifyCapabilityDegraded
 ```
 
 Payloads devem conter somente IDs e mudanças necessárias, não blobs completos.
@@ -3387,13 +3572,11 @@ Exige developer token e autorização adequada.
 
 ## 53.4 Spotify
 
-Uso opcional e não essencial:
+Uso opcional e **não** requisito do produto. A especificação normativa do conector está na **§75**.
 
-- metadata disponível;
-- biblioteca/playlist conforme permissões e regras vigentes;
-- links externos.
+Resumo: OAuth PKCE no dispositivo, scopes incrementais, importar biblioteca/recents/playlists como *sinais* (não conhecimento), “abrir no Spotify”, captura do que está tocando, reconciliação MusicBrainz. Tokens **fora** do export. Development Mode 2026: capacidades consultadas em runtime.
 
-A API e o Development Mode sofreram mudanças relevantes em 2026; o adapter deve consultar capacidades dinamicamente e nunca ser requisito do produto.
+Sem SDK de playback no MVP. Sem substituir o cliente Spotify. Sem baixar áudio.
 
 ## 53.5 Discogs
 
@@ -3531,6 +3714,10 @@ Foram encontrados 18.402 listens.
 - candidatos a estado “visitado”;
 - obras para confirmação;
 - ruído/autoplay detectável.
+
+## 55.4 Importação JSON com prompt — ver §76 e §79
+
+Mesmo ritual dos flashcards (ADR-038): copiar prompt vivo → IA externa → colar ou escolher ficheiro → preview → aplicar. Parse em streaming. Sem teto. Sem LLM no dispositivo.
 
 ---
 
@@ -3967,6 +4154,35 @@ Seeds são sugestões editáveis baseadas em interesses já declarados. Nunca as
 7. liga fotos e transações;
 8. território geográfico ganha encontro.
 
+## 64.7 Importação JSON com prompt
+
+1. abre `/research/music-atlas/import?source=json` (ou o sheet a partir do Atlas);
+2. copia o prompt vivo (territórios, nós, áreas `Artes / Música`, baralhos, tags);
+3. cola num LLM externo com um pedido (“cartografa o tropicalismo a partir do que já tenho”);
+4. recebe JSON; cola o texto **ou** escolhe um ficheiro;
+5. o parser em streaming produz um plano (criar / ligar / saltar / conflito);
+6. o utilizador confirma;
+7. nós, claims e encontros entram com `source_type=imported_json`;
+8. cartões embutidos opcionais passam pelo mesmo plano de `FlashcardJsonImportPolicy`;
+9. nenhum nó fica “cartografado” só porque veio no JSON.
+
+## 64.8 Constelação Spotify
+
+1. em `/settings/integrations`, activa Spotify e concede `user-library-read`;
+2. pull-to-refresh importa álbuns gravados como *contacto* (não “conhecido”);
+3. a projecção “Constelação Spotify” mostra gravados ∩ cartografados, gravados sem encontro, e cartografados sem Spotify;
+4. o utilizador escolhe três álbuns gravados sem encontro e cria uma expedição curta;
+5. “Abrir no Spotify” lança `spotify:` / `open.spotify.com`;
+6. revogar o consentimento apaga tokens e cursors; os nós locais permanecem.
+
+## 64.9 Da escuta ao cartão
+
+1. termina uma sessão de escuta atenta ou um laboratório de comparação;
+2. o Atlas sugere 1–5 candidatos (ano, crédito, conceito ouvido, peça de repertório);
+3. o utilizador aceita dois; recusa o resto;
+4. os cartões nascem em `/flashcards` com `areaPath` `Artes / Música / …` e tag opcional;
+5. o nó de pesquisa ligado recebe `ResearchKnowledgeLink.practice` se o utilizador afirmar a ponte.
+
 ---
 
 # 65. Critérios de aceitação
@@ -4048,6 +4264,8 @@ Seeds são sugestões editáveis baseadas em interesses já declarados. Nunca as
 - vault;
 - sem telemetry de gosto por default.
 
+Critérios das fatias novas (JSON, Spotify, Flashcards, superfície) estão na **§80**.
+
 ---
 
 # 66. Estratégia de testes
@@ -4062,7 +4280,11 @@ Seeds são sugestões editáveis baseadas em interesses já declarados. Nunca as
 - dedup;
 - import;
 - relation claims;
-- permission policy.
+- permission policy;
+- `MusicAtlasJsonCodec` / prompt builder;
+- dedup por ID externo e título+artista;
+- mapeamento Spotify → Encounter(contact);
+- capability probe (scope em falta ≠ crash).
 
 ## 66.2 Property tests
 
@@ -4103,7 +4325,9 @@ Seeds são sugestões editáveis baseadas em interesses já declarados. Nunca as
 - import -> resolve -> rollback;
 - repertoire -> evidence -> skill;
 - trip -> scene -> event;
-- sync conflict.
+- sync conflict;
+- JSON apply -> flashcards plan -> research link;
+- Spotify library pull -> constellation overlay -> revoke tokens.
 
 ## 66.6 Factuality tests for AI
 
@@ -4121,29 +4345,42 @@ A IA deve recusar certeza indevida.
 
 # 67. Roadmap de implementação
 
+A ordem abaixo **substitui** a tentação de fazer mapa-grafo + LLM + Spotify ao mesmo tempo. O app já tem inbox, import JSON, pesquisa, flashcards e `/settings/integrations`: o Atlas **enche** esses canos antes de inventar UI nova. JSON com prompt e o conector Spotify **não** esperam a Fase 10/11 do spec mestre.
+
 ## Fase M0 — Fundação
 
-- tabelas;
-- models;
-- repositories;
+- tabelas do núcleo (`music_nodes`, estados, encontros);
+- models e repositories;
 - feature flag;
 - FTS;
 - domain events;
-- testes.
+- testes de migration.
 
 ## Fase M1 — Núcleo manual
 
-- criar nós;
+- criar nós locais;
 - estado pessoal;
 - encontros;
 - notas;
-- lista;
-- inspect;
+- lista + inspect;
 - Crônica.
 
-Produto útil sem mapa complexo.
+Produto útil sem mapa complexo e **sem rede**.
 
-## Fase M2 — Atlas básico
+## Fase M2 — Importação JSON + prompt para IA
+
+Entra **antes** do grafo. Replica o ritual já enviado em Flashcards (ADR-038):
+
+- `MusicAtlasJsonCodec` + `MusicAtlasJsonPromptBuilder`;
+- sheet em `/research/music-atlas/import?source=json`;
+- parse streaming (ADR-038 §6 / ADR-042);
+- preview → apply → relatório;
+- cartões embutidos delegam a `FlashcardJsonImportPolicy`;
+- evento `musicAtlasJsonImported`.
+
+Ver §76, §79 e §80.1.
+
+## Fase M3 — Atlas básico
 
 - scope;
 - graph;
@@ -4153,24 +4390,28 @@ Produto útil sem mapa complexo.
 - list fallback;
 - saved projection.
 
-## Fase M3 — Expedições
+## Fase M4 — Expedições e superfície no app
 
-- planner;
-- stops;
-- camp;
-- listening mode;
-- cues;
-- completion.
+- planner, stops, camp, listening mode;
+- tile na home (ADR-044);
+- command palette e menu Mais;
+- `WorkType.music` / blocos de agenda;
+- digest `rules_v1` (expedição activa, gravados sem encontro).
 
-## Fase M4 — Conhecimento e comparação
+Ver §78.
 
-- dimensões;
-- evidence;
+## Fase M5 — Conhecimento, flashcards e pesquisa
+
+- dimensões e evidence;
 - comparison lab;
-- concepts;
-- repertoire links.
+- conceitos;
+- repertório → candidatos `FlashcardKind.repertoire`;
+- `ResearchKnowledgeLink` (`primary` / `related` / `practice`);
+- prateleiras `arts.music*`.
 
-## Fase M5 — River View e cenas
+Ver §36.5, §77 e §80.3.
+
+## Fase M6 — River View e cenas
 
 - temporal model;
 - relation claims;
@@ -4178,23 +4419,37 @@ Produto útil sem mapa complexo.
 - scene profile;
 - geographic links.
 
-## Fase M6 — Importação pública
+## Fase M7 — Metadata pública
 
 - MusicBrainz;
-- Cover Art;
+- Cover Art Archive;
 - identity resolution;
 - import staging;
-- metadata conflicts.
+- conflitos de metadata.
 
-## Fase M7 — Histórico de escuta
+## Fase M8 — Spotify (conector local-first)
 
-- ListenBrainz;
-- outros imports;
-- aggregation;
-- candidate confirmation;
-- Personal Constellation.
+**Não espera** Apple Music, Discogs nem LLM. Assim que M1+M2 gravarem encontros:
 
-## Fase M8 — Recomendação local
+- `IntegrationKind.spotify` em `/settings/integrations`;
+- OAuth PKCE no dispositivo;
+- scopes incrementais;
+- biblioteca / recents / playlists / currently-playing;
+- Constelação Spotify;
+- “abrir no Spotify”;
+- tokens fora do export;
+- capability probe (Development Mode / quotas 2026).
+
+Ver §75 e §80.2. ListenBrainz pode chegar na mesma fase ou logo a seguir, com o mesmo pipeline de staging.
+
+## Fase M9 — Histórico de escuta e constelação pessoal
+
+- agregação de listens (Spotify recents + ListenBrainz + CSV);
+- confirmação de candidatos;
+- Personal Constellation;
+- nenhum listen marca “cartografado”.
+
+## Fase M10 — Recomendação local
 
 - frontier algorithm;
 - bridges;
@@ -4202,24 +4457,18 @@ Produto útil sem mapa complexo.
 - feedback;
 - diversity controls.
 
-## Fase M9 — IA
-
-- route drafts;
-- summary;
-- cues;
-- RAG;
-- source validation;
-- structured outputs.
-
-## Fase M10 — Integrações de serviços
+## Fase M11 — Outros serviços
 
 - Apple Music;
-- Spotify conforme capacidades;
 - Discogs;
 - Wikidata;
 - adapters adicionais.
 
-## Fase M11 — Maturidade
+## Fase M12 — LLM *dentro* do app (defer)
+
+Canal B da §41. ADR-033. Só depois do núcleo, do JSON e do Spotify. Structured outputs + confirmação. Não substitui o prompt copiável.
+
+## Fase M13 — Maturidade
 
 - performance grande;
 - accessibility audit;
@@ -4332,6 +4581,33 @@ Produto útil sem mapa complexo.
 - feedback;
 - bias report.
 
+## Epic M — JSON import + prompt
+
+- codec + prompt builder vivo;
+- sheet clone dos flashcards;
+- streaming parse;
+- plan/apply/rollback;
+- flashcards embutidos;
+- testes de dedup.
+
+## Epic N — Spotify connector
+
+- IntegrationKind + consent UI;
+- PKCE + secure storage;
+- capability probe;
+- library / recent / playlist / now-playing adapters;
+- Constelação overlay;
+- revoke sem apagar nós;
+- deep links `spotify:`.
+
+## Epic O — Pontes Pesquisa / Flashcards / Home
+
+- ResearchKnowledgeLink;
+- candidatos a cartão;
+- tile e quick action;
+- digest rules_v1;
+- Habitat piano sem autoplay.
+
 ---
 
 # 69. Definition of Done
@@ -4382,7 +4658,19 @@ A feature completa só está madura quando:
 9. `ADR-MUSIC-009`: recommendation weights;
 10. `ADR-MUSIC-010`: IA remota e factuality;
 11. `ADR-MUSIC-011`: vault de gravações próprias;
-12. `ADR-MUSIC-012`: sync de metadata pública.
+12. `ADR-MUSIC-012`: sync de metadata pública;
+13. `ADR-MUSIC-013`: Spotify local-first (PKCE, scopes incrementais, tokens fora do export, listens ≠ conhecimento, capability probe);
+14. `ADR-MUSIC-014`: importação JSON do Atlas com prompt para IA externa (clone ADR-038; parse streaming; cartões embutidos delegam ao codec de flashcards).
+
+ADRs de produto já existentes que o Atlas **deve citar e não duplicar**:
+
+- ADR-017 / 019 / 021 / 022 — grafo de pesquisa, evidência, canvas, links quest↔research;
+- ADR-032 — integrações opt-in;
+- ADR-033 — Storyteller `rules_v1`; LLM remoto defer;
+- ADR-036 / 037 / 038 / 039 — flashcards, mapa de áreas, import JSON, tags;
+- ADR-042 — parse streaming de dumps;
+- ADR-044 — home de mini-programas;
+- ADR-005 / 015 — local-first e export/restore.
 
 ---
 
@@ -4481,7 +4769,7 @@ Fase 5A — Atlas Musical
 - integração com repertório e Crônica.
 ```
 
-Metadata externa entra em Fase 10; IA musical em Fase 11.
+Metadata externa entra em Fase 10 do spec mestre **excepto** JSON (Fase 1 do app, já existe o padrão) e Spotify (Fase 10 do mestre, Fase M8 deste anexo — pode avançar assim que o núcleo gravar encontros). IA *dentro* do app permanece Fase 11 / ADR-033. O prompt copiável não é Fase 11.
 
 ## 71.10 Seção 60 — telas
 
@@ -4507,6 +4795,22 @@ Adicionar:
 Álbuns e obras podem ser ligados ao Atlas Musical sem duplicação de KnowledgeSource.
 ```
 
+## 71.13 Home (ADR-044)
+
+Não editar o spec mestre só por isto. No anexo: tile `Música` / `Atlas` no catálogo de mini-programas; atalho “O que estou ouvindo”; digest abaixo da grelha pode citar expedição activa e flashcards de `Artes / Música`.
+
+## 71.14 Flashcards
+
+Nenhuma alteração normativa no spec mestre. O Atlas consome ADR-036/037/038/039: candidatos, `areaPath`, tags, `repertoire`. Import JSON do Atlas *pode* embutir o mesmo schema de cartões.
+
+## 71.15 Integrações
+
+Acrescentar `IntegrationKind.spotify` (e opcionalmente `musicbrainz`) à lista de `/settings/integrations`. Mesmo padrão ICS: opt-in, revogável, proveniência, app útil sem a integração.
+
+## 71.16 Catálogo de conhecimento
+
+O ramo `arts.music` já existe. Novas folhas (jazz, piano popular, produção, etc.) só se o utilizador as semear ou o import JSON as criar. Não despejar 50 áreas vazias.
+
 ---
 
 # 72. Prompt de execução para a IA
@@ -4516,40 +4820,55 @@ Você está implementando o módulo Atlas Musical do Life Colony OS.
 
 Antes de escrever código:
 1. leia LIFE_COLONY_OS_SPEC.md;
-2. leia LIFE_COLONY_OS_MUSIC_ATLAS_SPEC.md;
-3. identifique a vertical slice atual;
-4. escreva plano e ADRs necessários;
-5. não implemente integrações antes do núcleo local.
+2. leia LIFE_COLONY_OS_MUSIC_ATLAS_SPEC.md (v1.1, sobretudo §0, §2.4, §36.5,
+   §41, §75–§80);
+3. leia ADR-005, 015, 017, 032, 033, 036, 037, 038, 039, 042, 044;
+4. identifique a vertical slice actual (M0→M1→M2→…; não salte para o grafo
+   nem para LLM in-app);
+5. escreva plano e ADRs MUSIC-00x em falta;
+6. não implemente Spotify antes de o núcleo gravar encontros e o JSON apply
+   funcionar; não implemente LLM remoto.
 
 Regras:
 - MusicNode não substitui ResearchNode;
-- listen importado não equivale a conhecimento;
+- listen / álbum gravado no Spotify não equivale a conhecimento;
 - relações históricas são claims com provenance;
 - nenhuma pontuação representa conhecimento musical global;
 - cobertura exige scope explícito;
 - toda recomendação precisa de explicação;
 - o usuário pode corrigir inferências;
 - offline é obrigatório;
-- IA remota é opt-in;
-- não armazenar áudio ou letras protegidas indevidamente;
-- não copiar RimWorld.
+- IA *dentro* do app é defer (ADR-033); o prompt copiável é a fatia cedo;
+- tokens Spotify nunca entram no export;
+- não armazenar áudio ou letras protegidas;
+- não copiar RimWorld;
+- strings em lib/app/localization/; widgets não acedem ao banco.
 
-Ordem recomendada da primeira slice:
-1. migration de music_nodes, personal_music_node_states e music_encounters;
-2. domain models e value objects;
-3. repositories Drift;
-4. RecordMusicEncounter;
-5. Node Inspect básico;
-6. quick capture;
-7. DomainEvent e Crônica;
-8. testes unitários, widget e integração;
-9. demo seed;
-10. documentação.
+Ordem de implementação (não inverter):
+1. M0/M1 — migration music_nodes, personal_music_node_states, music_encounters;
+   domain; repositories; RecordMusicEncounter; inspect; capture; Crônica;
+2. M2 — MusicAtlasJsonCodec + PromptBuilder + sheet (clone flashcards);
+   streaming parse; preview/apply; testes de dedup;
+3. M4 superfície — tile home, palette, WorkType.music, digest rules_v1;
+4. M5 — candidatos a flashcard + ResearchKnowledgeLink;
+5. M8 — IntegrationKind.spotify, PKCE, library/recent/playlist/now-playing,
+   Constelação, revoke;
+6. mapa-grafo, River View, recomendação local, outros providers, LLM in-app
+   só depois.
 
-Critério final:
-o usuário deve conseguir criar um álbum/artista/gênero local, registrar um encontro,
-atribuir ressonância, escrever uma nota, ver o estado pessoal e encontrar o evento
-na Crônica sem internet e sem conta.
+Primeira slice (critério de saída):
+o usuário cria um álbum/artista/gênero local, registra um encontro, atribui
+ressonância, escreve uma nota, vê o estado pessoal e encontra o evento na
+Crônica — sem internet e sem conta.
+
+Segunda slice:
+copia o prompt vivo, cola um JSON (ou escolhe ficheiro), pré-visualiza e
+aplica nós/claims sem marcar nada como cartografado. Cartões embutidos
+passam pelo FlashcardJsonImportPolicy.
+
+Terceira slice (quando M1+M2 existirem):
+liga Spotify opt-in, puxa a biblioteca, vê a Constelação, abre um álbum no
+cliente Spotify, revoga tokens sem perder os nós locais.
 ```
 
 ---
@@ -4602,6 +4921,743 @@ Fontes técnicas para adapters e decisões de integração. Verificar novamente 
 - Discogs API: <https://www.discogs.com/developers>
 - Wikidata Query Service: <https://www.wikidata.org/wiki/Wikidata:SPARQL_query_service>
 - Cover Art Archive: <https://coverartarchive.org/>
+- Spotify Authorization (PKCE): <https://developer.spotify.com/documentation/web-api/tutorials/code-pkce-flow>
+- Spotify scopes: <https://developer.spotify.com/documentation/web-api/concepts/scopes>
+- Flashcards no repo: `packages/colony_domain/lib/src/flashcard_json_import.dart`, ADR-038
+- Integrações no repo: `lib/features/integrations/`, ADR-032
+- Home mini-programas: `lib/features/colony/presentation/colony_mini_apps.dart`, ADR-044
+
+---
+
+# 75. Spotify — conector local-first
+
+Spotify é o sítio onde muita gente *já* guarda discos, playlists e o que está a tocar. O Atlas não compete com isso. Usa o Spotify como **sensor e atalho**: o que a pessoa já marcou ou ouviu vira sinal no mapa; o que ela quer ouvir de novo abre o cliente Spotify.
+
+O app continua útil com Spotify desligado. Sem conta Colony. Sem sync remoto obrigatório.
+
+## 75.1 Porque é interessante (e não só um import)
+
+Um dump de biblioteca sem contexto é uma lista. O conector ganha sentido quando responde perguntas que o cliente Spotify não faz:
+
+| Pergunta | Superfície no Atlas |
+|---|---|
+| O que eu gravei e ainda nunca encontrei de propósito? | Inbox “gravado sem encontro” |
+| O que eu já cartografei e o Spotify ainda não tem? | Constelação, lado local-only |
+| Esta playlist conta uma história? | “Transformar em expedição” |
+| O que está a tocar agora merece um encontro? | Captura na home / Habitat |
+| Que artistas eu sigo cuja névoa ainda está fechada? | Candidatos de território |
+| Qual o próximo passo a partir *deste* disco gravado? | Ponte / expedição curta |
+
+Isto não é um clone de Wrapped, nem um ranking de minutos. Minutos de reprodução são um sinal fraco de conhecimento (regra §0.1.5).
+
+## 75.2 Consentimento e ecrã
+
+Vive em `/settings/integrations`, no mesmo padrão ICS (ADR-032):
+
+1. cartão **Spotify** com disclaimer: “Lê a tua biblioteca e o histórico recente. Não toca música no Colony. Não marca discos como conhecidos.”;
+2. toggle → `IntegrationConsent(kind: spotify)`;
+3. botão **Ligar conta** dispara OAuth PKCE no dispositivo;
+4. scopes **incrementais** — cada família de dados pede o seu scope quando o utilizador toca nessa acção;
+5. estado visível: ligado / scopes concedidos / última sincronização / último erro / **Revogar**.
+
+Revogar:
+
+- apaga tokens, refresh, PKCE verifiers, cursors e `music_spotify_sync_state`;
+- **não** apaga `MusicNode`, encontros, expedições, claims nem flashcards já criados;
+- o overlay “Constelação Spotify” passa a vazio com empty state honesto.
+
+## 75.3 OAuth PKCE
+
+- Authorization Code com PKCE no dispositivo. Sem client secret no binário.
+- Redirect: app scheme (`colony://integrations/spotify/callback`) ou o padrão da plataforma.
+- Tokens em **secure storage** (Keychain / EncryptedSharedPreferences / equivalente desktop). Nunca Drift, nunca `shared_preferences` em claro, **nunca export JSON** (ADR-015).
+- Refresh silencioso enquanto o consentimento estiver activo. Falha de refresh → cartão de erro + “Ligar de novo”, sem crash.
+- Sem conta Colony no meio. Sem proxy obrigatório. Se um redirect HTTPS for necessário para o registo da app Spotify, o servidor só troca o código; **não** guarda o histórico musical.
+
+Documentar no ADR-MUSIC-013 o `client_id`, o redirect e o procedimento de Development Mode (utilizadores de teste).
+
+## 75.4 Scopes incrementais
+
+Pedir o mínimo. Cada linha é uma capacidade, não um pack.
+
+| Scope | Capacidade | O que o Atlas faz |
+|---|---|---|
+| `user-library-read` | Álbuns/faixas gravados | Nós + Encounter(`contact`) + inbox |
+| `user-read-recently-played` | Recentes (~50) | Staging de *listen*; não é encontro atento |
+| `playlist-read-private` + `playlist-read-collaborative` | Playlists | Draft de expedição; não auto-aplica |
+| `user-read-currently-playing` e/ou `user-read-playback-state` | O que está a tocar | Captura de um toque |
+| `user-follow-read` | Artistas seguidos | Candidatos de névoa |
+| `user-library-read` (shows) | Podcasts, se útil | Só se o nó `show` existir no domínio |
+
+Fora do MVP, e só com segundo consentimento explícito:
+
+- `playlist-modify-private` — gravar uma expedição como playlist **comentada** (título + descrição com a pergunta da expedição). Nunca silencioso.
+
+**Não dependemos**, como requisito, de endpoints que a Spotify já restringiu ou pode restringir (Recommendations, Audio Features). Se um probe de capacidade os encontrar, podem ser sinal *opcional* no laboratório de comparação. Se não existirem, o produto não degrada.
+
+## 75.5 Capability probe (2026)
+
+Apps Spotify começam em Development Mode, com quota e lista de testers. Quotas, scopes e endpoints mudam.
+
+Na ligação e no pull:
+
+1. ler scopes realmente concedidos;
+2. chamar um endpoint barato da família que o utilizador pediu;
+3. gravar `capability_probe_json` (scope, HTTP status, `retry-after`, data);
+4. UI: “Biblioteca indisponível nesta app / nesta conta” ≠ crash ≠ empty fingido.
+
+Testes unitários cobrem 401, 403, 429 e body vazio. Nunca assumir Extended Quota.
+
+## 75.6 Mapeamento de dados
+
+Tudo passa pelo pipeline da §55 (staging → resolver → preview → confirm), excepto a captura de “agora a tocar”, que pode criar um encontro *rápido* com undo.
+
+### Biblioteca gravada (`saved albums`)
+
+Cada álbum:
+
+- `KnowledgeSource(type=album)` se ainda não existir;
+- `MusicNode` (release group / release, conforme resolução);
+- `music_external_identities(provider='spotify', entity_type='album')`;
+- Encounter do tipo **`contact`** (a pessoa marcou; não afirmou escuta atenta);
+- `source_type=spotify_library`;
+- **não** sobe `discovery_state` para visitado/cartografado.
+
+Faixas gravadas isoladas ligam-se ao release group quando o resolver tiver confiança; senão ficam nó `recording` local.
+
+### Recently played
+
+- entram em `music_import_staging` como listens;
+- agregação: contagem, primeira/última reprodução, burst vs. disperso;
+- o utilizador **confirma** candidatos a Encounter(`listen`) ou ignora;
+- autoplay / repetição curta aparece no relatório como ruído possível;
+- nenhum listen sozinho marca “conhecido”.
+
+### Playlists
+
+Por playlist, um cartão:
+
+```text
+«Madrugada de piano» · 41 faixas · 12 já no Atlas · 29 só no Spotify
+[Abrir no Spotify]  [Pré-visualizar nós]  [Transformar em expedição]
+```
+
+“Transformar em expedição” cria um **draft** (`MusicExpedition`) com:
+
+- `question` editável (obrigatória antes de activar);
+- uma parada por faixa/álbum resolvido, `is_optional=true` por defeito;
+- `reason` inicial = posição na playlist + nome da playlist;
+- `provenance` = Spotify playlist id + snapshot.
+
+O utilizador corta, reordena e escreve a pergunta. Uma playlist não é uma expedição até confirmação.
+
+### Currently playing
+
+Da home, do Habitat, do command palette ou do Atlas:
+
+1. lê o playback actual (se o scope existir e houver algo a tocar);
+2. resolve álbum/artista/faixa;
+3. sheet de captura rápida (nota, ressonância, atenção) — mesmo fluxo da §9;
+4. “Abrir no Spotify” permanece disponível se a API falhar.
+
+Sem playback no Colony. Sem waveform. Sem letra.
+
+### Artistas seguidos
+
+- nós `artist` com Encounter(`contact`) se ainda não existirem;
+- se o território do artista estiver no scope e sem encontros de obra, o artista entra na névoa como **portal avistado**, não como território cartografado.
+
+## 75.7 Constelação Spotify
+
+Projecção derivada (cacheável como as outras):
+
+```text
+gravados ∩ com encontro atento     → “já trabalho isto”
+gravados ∩ só contact              → inbox
+cartografados ∩ sem id Spotify     → “só no Colony”
+seguidos ∩ território sem obras    → portais
+playlists → drafts de expedição
+```
+
+Lista acessível obrigatória. Canvas opcional. Sem percentagem “do Spotify” ou “de toda a música”.
+
+Acção primária da inbox: **Encontrar** (criar encontro) ou **Expedição curta com N itens**.
+
+## 75.8 Abrir no Spotify
+
+Todo `MusicNode` com identidade Spotify mostra:
+
+- `spotify:album:{id}` / `spotify:artist:{id}` / `spotify:track:{id}` / `spotify:playlist:{id}`;
+- fallback `https://open.spotify.com/…`.
+
+Se o cliente não estiver instalado, o fallback HTTPS chega. Não embutir Web Playback SDK no MVP.
+
+## 75.9 Partilha de entrada (Android / desktop)
+
+O Colony pode declarar-se destino de partilha para `text/plain` e URIs `open.spotify.com` / `spotify:`.
+
+Fluxo: recebe URI → resolve → sheet de captura ou “adicionar à inbox”. Mesmo domínio que a captura manual. Sem criar conta. Sem rede para *gravar* o encontro (a resolução do catálogo, se online, é enriquecimento).
+
+## 75.10 Reconciliação
+
+Ordem de sinais (não fundir em silêncio — §54):
+
+1. Spotify ID já ligado;
+2. ISRC → MusicBrainz recording → release group;
+3. UPC/EAN se existir;
+4. título+artista normalizados + ano;
+5. conflito → ecrã da §54.2.
+
+MusicBrainz continua a ser o identificador *canónico* público quando existir. Spotify é um alias.
+
+## 75.11 Sync
+
+- Pull-to-refresh no Atlas, na Constelação e em Integrações.
+- Sem background agressivo. Sem work periódico que acorde a rede de hora a hora.
+- Incremental: cursors / `after` / `limit` conforme o endpoint.
+- Respeitar `429` / `Retry-After`.
+- Offline: a última Constelação cacheada continua legível; pull falha com empty/error honesto.
+
+## 75.12 Privacidade e export
+
+No snapshot de export (ADR-015):
+
+- entram nós, identidades (ids públicos), encontros, expedições, runs de import **sem** tokens;
+- **não** entram access/refresh tokens, PKCE verifiers, cookies, nem o blob bruto de `/me` para além do necessário já normalizado.
+
+Telemetry de gosto: off por defeito. Nada é enviado a um servidor Colony.
+
+## 75.13 Fora de escopo (explícito)
+
+- SDK de playback / áudio no processo Colony;
+- download ou cache de áudio;
+- lyrics;
+- social graph Spotify (amigos, activity feed);
+- “Daily Mix” como fonte de verdade;
+- escrever na biblioteca (`user-library-modify`) no MVP;
+- substituir o cliente Spotify;
+- exigir Spotify para usar o Atlas.
+
+## 75.14 Eventos
+
+```text
+SpotifyLinked
+SpotifyRevoked
+SpotifyLibraryPulled
+SpotifyRecentStaged
+SpotifyPlaylistDrafted
+SpotifyNowPlayingCaptured
+SpotifyCapabilityDegraded
+```
+
+---
+
+# 76. Importação JSON com prompt para IA
+
+Canal A da §41. Cópia consciente do ritual de flashcards (`ImportFlashcardsJsonSheet`, ADR-038), aplicado ao Atlas.
+
+A IA corre **fora** do app. O Colony gera um prompt que descreve o mapa *actual*, o utilizador cola esse prompt num modelo à escolha, cola de volta (ou escolhe) um JSON, e o app valida.
+
+## 76.1 Ritual
+
+```text
+Copiar prompt vivo
+    → colar num LLM externo (com um pedido em linguagem natural)
+    → receber JSON
+    → colar no campo  ou  escolher ficheiro
+    → Pré-visualizar
+    → confirmar o plano
+    → aplicar transação
+    → relatório + undo
+```
+
+Strings no mesmo espírito de `flashcardsImportPromptLive`: o texto **muda** quando territórios, nós, áreas, baralhos ou tags mudam.
+
+## 76.2 Onde vive
+
+- rota `/research/music-atlas/import?source=json`;
+- sheet a partir do Atlas, do inspect de território, e do command palette;
+- atalho em `/settings/integrations` (“Importar Atlas via JSON”) — não exige `IntegrationKind` se o picker já for explícito.
+
+Não meter dumps no `TextField`. Ficheiro: o picker devolve **path**; uma isolate percorre o JSON com `TimelineByteCursor` (ADR-038 §6 / ADR-042). Colar JSON pequeno continua no campo.
+
+Sem teto de tamanho. Sem `jsonDecode` da árvore inteira.
+
+## 76.3 Intenções do prompt
+
+O prompt builder gera um **núcleo** (papel + schema + estado actual) e o utilizador acrescenta o pedido. Intenções suportadas no texto de ajuda:
+
+| Intenção | O que o JSON costuma trazer |
+|---|---|
+| Cartografar um território | nós + claims + scope |
+| Montar uma expedição | `expeditions[]` com pergunta e paradas |
+| Reconciliar uma lista de discos | nós + external ids + encounters `contact` |
+| Gerar prática | `cards[]` no schema de flashcards |
+| Ligar a pesquisa | `researchLinks[]` (ids ou títulos de nós existentes) |
+| Comparar obras | `comparisons[]` (rascunhos, exigem confirmação) |
+
+O prompt **proíbe** o modelo de:
+
+- afirmar influência sem `provenance` ou `uncertainty`;
+- marcar `discovery_state` acima de `contact` / `sighted`;
+- inventar letras ou biografias;
+- emitir percentagens de “cobertura da música”;
+- criar cartões para todos os álbuns.
+
+## 76.4 Conteúdo do prompt vivo
+
+Gerado por `MusicAtlasJsonPromptBuilder.build(...)`, no mesmo estilo de `FlashcardJsonPromptBuilder`:
+
+1. papel: “formatas um documento do Atlas Musical do Life Colony OS; responde **apenas** JSON”;
+2. schema da §79;
+3. regras de dedup e de estados;
+4. **territórios / scopes** actuais (título + id curto);
+5. **nós** actuais compactos (tipo, nome, ids externos se houver) — teto razoável + “há N mais; não os dupliques pelo nome”;
+6. **claims** já aceites (from → type → to);
+7. **áreas de conhecimento** (floresta ADR-037, sobretudo `Artes / Música`) e baralhos;
+8. **tags** (ADR-039);
+9. **nós de pesquisa** ligados (`ResearchKnowledgeLink`) e títulos;
+10. prateleiras canónicas `arts.music*`, `arts.harmony`, `arts.piano`;
+11. liberdade de criar ramos novos, preferindo grafia existente.
+
+Se o mapa estiver vazio, o prompt diz-no e pede uma árvore mínima (um território + alguns nós + uma pergunta de expedição).
+
+## 76.5 Plano de importação
+
+Espelho de `FlashcardJsonImportPlan`:
+
+```text
+MusicAtlasJsonImportPlan
+  nodes:       create | link | skip | conflict
+  claims:      create | skip | conflict
+  encounters:  create | skip          (nunca sobe estado sozinho)
+  expeditions: create draft
+  repertoire:  create | link
+  cards:       delega a FlashcardJsonImportPolicy
+  researchLinks: create se o ResearchNode existir ou for criado com confirmação
+```
+
+Dedup de nós, por ordem:
+
+1. `externalIds[]` (spotify / musicbrainz / wikidata / isrc);
+2. `localId` se o documento o citar e existir;
+3. `normalized(title) + normalized(artist/credit) + nodeType`;
+4. conflito (mesmo título, artista diferente / tipo diferente) → o utilizador escolhe.
+
+Claims: o mesmo par `from + to + relationType` com provenance diferente **acrescenta fonte**, não duplica a aresta.
+
+## 76.6 Apply
+
+Uma transação:
+
+1. criar/ligar nós e identidades;
+2. criar claims com `status=proposed` ou `accepted` conforme o documento — `accepted` só se `acceptedByUser=true` no JSON **e** o utilizador não desmarcou no preview;
+3. encontros com `source_type=imported_json`;
+4. expedições em draft;
+5. repertório;
+6. cartões via política já existente;
+7. `music_import_runs` + relatório;
+8. evento `MusicAtlasJsonImported`;
+9. undo (reverter o run).
+
+Nenhum apply marca `cartographed` / `demonstrated`.
+
+## 76.7 Proveniência
+
+```yaml
+Provenance:
+  source_type: imported_json
+  parser_version: music_atlas_json_v1
+  run_id: uuid
+  imported_at: iso
+  prompt_fingerprint: hash do prompt vivo (não o pedido do utilizador)
+```
+
+O pedido em linguagem natural que a pessoa escreveu no LLM **não** é obrigatório no JSON. Se vier em `meta.userRequest`, guarda-se no run (privacidade: faz parte do export local; não telemetria).
+
+---
+
+# 77. Flashcards, tags e mapa de conhecimento
+
+O Atlas é cartografia. Flashcards são prática. Pesquisa é intenção + evidência. Os três encontram-se; nenhum absorve os outros.
+
+## 77.1 Contrato
+
+| Sistema | Pergunta que responde | O Atlas não pode |
+|---|---|---|
+| Atlas | O que já avistei, visitei, comparei? | obrigar um cartão por álbum |
+| Flashcards + SRS | O que consigo *recuperar* amanhã? | substituir o mapa |
+| KnowledgeArea | Em que prateleira isto vive? | virar árvore de géneros musicais única |
+| ResearchNode | Que objectivo estou a demonstrar? | ser marcado demonstrado por um listen |
+
+ADR-036: conhecimento sem cartão é válido. Baralho sem área é válido. Área sem baralho é válida.
+
+## 77.2 Onde o Atlas gera candidatos
+
+Depois de acções com fricção consciente — nunca no import em massa, nunca no pull Spotify:
+
+- sessão de escuta atenta concluída;
+- laboratório de comparação com nota salva;
+- peça adicionada ao repertório;
+- claim histórico aceite pelo utilizador (“quero lembrar a data / a relação”);
+- inspect de um conceito (`MusicConcept`) com “praticar isto”.
+
+Cada candidato é um rascunho:
+
+```yaml
+FlashcardCandidate:
+  origin: listening_session | comparison | repertoire | claim | concept
+  origin_id: uuid
+  suggested_kind: basic | cloze | freeRecall | exercise | repertoire
+  front: ...
+  back: ...
+  deckTitle: ...
+  areaPath: [Artes, Música, ...]
+  tags: [Jazz, ...]
+  researchNodeId?: ...
+  accepted: false
+```
+
+UI: sheet “Sugerir prática” com checkboxes. Recusar é o default honesto. Aceitar chama o mesmo apply que o import de flashcards.
+
+## 77.3 Kinds e exemplos
+
+- `basic` — “Em que ano saiu *Kind of Blue*?” / “1959”;
+- `cloze` — “O jazz {{c1::modal}} desloca o foco do ii–V–I para {{c2::escalas e centros}}.”;
+- `repertoire` — frente: trecho ou forma a tocar; verso: referência (gravação, tonalidade, notas de prática);
+- `exercise` — “Canta o baixo dos primeiros 8 compassos de X e grava”;
+- `freeRecall` — “O que mudou no teu ouvido entre as duas escutas de Y?”.
+
+Bidireccional só quando faz sentido (obra ↔ ano, tema ↔ compositor). Não inverter prosa de opinião.
+
+## 77.4 Prateleiras e tags
+
+Preferir caminhos existentes:
+
+```text
+Artes / Música
+Artes / Música / Teoria musical
+Artes / Música / Tropicalismo     (também em Humanidades / História / Brasil)
+Artes / Harmonia
+Artes / Piano
+```
+
+O import e os candidatos podem criar folhas novas (`Artes / Música / Jazz modal`). Tags hierárquicas (ADR-039) cruzam o mapa: `Jazz / Piano`, `Cena / Recife`, `Prática / ii–V–I`.
+
+Estudar `?area=musica` ou `?tagId=` usa as filas já implementadas. O Atlas só deep-linka.
+
+## 77.5 Pesquisa
+
+`ResearchKnowledgeLink.kind`:
+
+- `primary` — o nó de pesquisa *é* este território ou conceito;
+- `related` — contexto (um álbum que ilustra o nó);
+- `practice` — baralho ou área que treina o nó.
+
+Uma expedição longa pode promover-se a `Quest` com link quest↔research (ADR-022). Sessões de escuta podem virar `LearningSession` + `ResearchEvidence` **quando o utilizador afirma** a evidência (tipos da §45.3). Ouvir não demonstra.
+
+WIP e canvas de pesquisa (ADR-021) não são o mapa do Atlas. O Atlas pode *abrir* o nó de pesquisa ligado; não desenha uma segunda árvore.
+
+## 77.6 Habitat e agenda
+
+- Objecto piano/estante no Habitat → “Praticar repertório” / “Abrir Atlas” / “Fila de flashcards de Música”. Sem autoplay.
+- `WorkType.music` e blocos `escuta` / `prática` → deep link para a sessão ou para `/flashcards/study?deckId=`.
+- Digest da home: se houver cartões vencidos na área Música **e** uma expedição activa, um bullet `rules_v1` pode citar ambos, com ids de evidência, sem culpa.
+
+---
+
+# 78. Superfície no app atual
+
+O Atlas não é um segundo aplicativo. Encaixa nas superfícies que já existem em agosto de 2026.
+
+## 78.1 Home (ADR-044)
+
+Catálogo `ColonyMiniApps`:
+
+- tile **Música** / **Atlas** → `/research/music-atlas` (pinned opcional);
+- quick action **O que estou ouvindo** → captura Spotify ou captura manual;
+- o digest abaixo da grelha pode incluir, via `NarrativeDigest` `rules_v1`:
+  - expedição activa (“Parada 2 de 5: …”);
+  - N gravados Spotify sem encontro;
+  - cartões de Música vencidos;
+  - próximo bloco `WorkType.music` na agenda.
+
+Sem widget de player. Sem capa a autoplay.
+
+## 78.2 Command palette e menu Mais
+
+Destinos:
+
+```text
+Atlas Musical
+Capturar encontro
+Importar Atlas (JSON)
+Ligar / abrir Spotify
+Flashcards · Música
+Pesquisa · nós ligados
+```
+
+## 78.3 Pesquisa
+
+`/research` lista nós com link ao Atlas. O detalhe de um `ResearchNode` mostra:
+
+- territórios/obras ligados;
+- evidências de escuta/prática;
+- baralhos `practice`;
+- “Abrir no Atlas”.
+
+O canvas de pesquisa não mistura `MusicNode` como se fossem o mesmo tipo.
+
+## 78.4 Flashcards
+
+Hub já existente. Filtros `area=musica` e tags. O Atlas não reimplementa SRS, pace (ADR-040) nem prioridade (ADR-041).
+
+## 78.5 Integrações
+
+`/settings/integrations` ganha o cartão Spotify (e, se M7 estiver ligado, MusicBrainz como “resolver público, sem conta”). Import JSON do Atlas pode aparecer como acção secundária no mesmo ecrã.
+
+## 78.6 Crônica, inbox, missões, pessoas, viagens, ledger
+
+Já especificados nas §35–§39. Reforço de encaixe:
+
+- inbox: captura de URI Spotify partilhado; “gravado sem encontro”;
+- missões: expedição longa → `Quest` com tag `music-expedition`;
+- pessoas: `Person` como recomendador; compromisso “aula / show”;
+- viagens: cena e festival no trip;
+- ledger: `Transaction` com proveniência, sem ROI cultural;
+- export: entidades musicais no snapshot; tokens fora.
+
+## 78.7 Feature flag e empty states
+
+Flag `musicAtlas`. Off: o tile pode esconder-se ou abrir um empty “em breve”. On e sem nós: empty que oferece (1) criar um disco à mão, (2) copiar o prompt JSON, (3) ligar Spotify — nesta ordem, porque (1) e (2) funcionam offline.
+
+---
+
+# 79. Contrato JSON v1 do Atlas
+
+Documento raiz. Aceita objecto ou, por tolerância, uma lista só de nós. Aceita cerca ````json`. Parser streaming: percorre `nodes[]`, `claims[]`, `encounters[]`, `expeditions[]`, `cards[]` / `decks[].cards[]` um objecto de cada vez.
+
+```json
+{
+  "version": 1,
+  "kind": "music_atlas",
+  "meta": {
+    "title": "Tropicalismo — recorte",
+    "userRequest": "opcional; o que a pessoa pediu ao LLM",
+    "generatedBy": "external_llm"
+  },
+  "territories": [
+    {
+      "key": "tropicalismo",
+      "title": "Tropicalismo",
+      "scopeStatement": "Recorte pessoal da canção popular brasileira 1967–1972.",
+      "timeRange": { "from": "1967", "to": "1972" }
+    }
+  ],
+  "nodes": [
+    {
+      "key": "panis",
+      "nodeType": "release_group",
+      "title": "Tropicália ou Panis et Circencis",
+      "sortTitle": "Tropicalia ou Panis et Circencis",
+      "artists": ["Caetano Veloso", "Gilberto Gil"],
+      "year": 1968,
+      "territoryKeys": ["tropicalismo"],
+      "externalIds": [
+        { "provider": "musicbrainz", "entityType": "release-group", "id": "…" },
+        { "provider": "spotify", "entityType": "album", "id": "…" }
+      ],
+      "summary": "Marco colectivo. Não é biografia.",
+      "discoveryState": "sighted",
+      "notes": "opcional; vira AtomicNote se o utilizador confirmar"
+    }
+  ],
+  "claims": [
+    {
+      "fromKey": "panis",
+      "toKey": "alegria",
+      "relationType": "shares_scene",
+      "validFrom": "1967",
+      "validTo": "1969",
+      "description": "Mesmo ciclo de intervenção cultural.",
+      "confidence": 0.6,
+      "uncertainties": ["A cena não é um género único."],
+      "sources": [{ "title": "…", "url": "https://…" }],
+      "acceptedByUser": false
+    }
+  ],
+  "encounters": [
+    {
+      "nodeKey": "panis",
+      "encounterType": "contact",
+      "occurredAt": "2026-08-01",
+      "note": "Sinalizado por um amigo.",
+      "resonance": 3
+    }
+  ],
+  "expeditions": [
+    {
+      "title": "Ouvir o disco colectivo com a pergunta certa",
+      "question": "O que neste disco é canção e o que é intervenção?",
+      "territoryKey": "tropicalismo",
+      "stops": [
+        {
+          "nodeKey": "panis",
+          "role": "camp",
+          "reason": "Ponto de entrada colectivo.",
+          "cues": ["arranjo", "ironia", "citação"],
+          "optional": false
+        }
+      ]
+    }
+  ],
+  "repertoire": [
+    {
+      "nodeKey": "panis",
+      "title": "Linda",
+      "instrument": "piano",
+      "practiceLine": "tirar de ouvido"
+    }
+  ],
+  "researchLinks": [
+    {
+      "nodeKey": "tropicalismo-conceito",
+      "researchTitle": "Contextualizar o Tropicalismo em 10 sessões",
+      "kind": "primary",
+      "areaPath": ["Artes", "Música", "Tropicalismo"]
+    }
+  ],
+  "comparisons": [
+    {
+      "nodeKeys": ["panis", "alegria"],
+      "dimensions": ["ironia", "orquestração"],
+      "observation": "rascunho; exige confirmação"
+    }
+  ],
+  "cards": [
+    {
+      "front": "Em que ano saiu Tropicália ou Panis et Circencis?",
+      "back": "1968",
+      "kind": "basic",
+      "deck": "Tropicalismo",
+      "areaPath": ["Artes", "Música", "Tropicalismo"],
+      "tags": ["Brasil / 1968"],
+      "schedule": "scheduled",
+      "priority": 4
+    }
+  ]
+}
+```
+
+## 79.1 Campos e defaults
+
+- `version` — inteiro; v1 é o único aceite nesta spec. Versão desconhecida → erro claro, sem apply parcial silencioso.
+- `kind` — `music_atlas`. Se ausente e existirem `nodes` / `territories`, o codec aceita. Se o documento for só `cards[]` (schema de flashcards), **não** é um import do Atlas: o sheet deve oferecer “abrir em Flashcards”.
+- `nodeType` — `artist` | `work` | `recording` | `release_group` | `release` | `territory` | `scene` | `concept` | `label` | `place` | `show`.
+- `discoveryState` no JSON só pode ser `unknown` | `sighted` | `contact`. Qualquer outro valor é **clamp** para `sighted` e entra no relatório.
+- `confidence` em claims: 0–1; ausente = null, não 1.
+- `cards[]` / `decks[]` — **idênticos** a `FlashcardJsonCard` (ADR-038). Reutilizar o codec. Não inventar um segundo schema de cartões.
+- `areaPath` aceita string `"Artes / Música / Jazz"` ou array, como nos flashcards.
+- Chaves (`key`) são locais ao documento. O apply resolve para `EntityId`.
+
+## 79.2 O que o parser ignora
+
+- chaves desconhecidas (janela deslizante, ADR-038 §6);
+- blobs enormes (`lyrics`, `audio`, capas em base64) — saltar, reportar;
+- HTML;
+- percentagens de cobertura global.
+
+## 79.3 Exemplo mínimo válido
+
+```json
+{
+  "version": 1,
+  "kind": "music_atlas",
+  "nodes": [
+    {
+      "key": "kind-of-blue",
+      "nodeType": "release_group",
+      "title": "Kind of Blue",
+      "artists": ["Miles Davis"],
+      "year": 1959
+    }
+  ]
+}
+```
+
+Aplica um nó. Estado pessoal: `sighted` se o utilizador confirmar o plano. Sem claims, sem cartões, sem Spotify.
+
+## 79.4 Testes do codec
+
+Espelhar `flashcard_json_import_test.dart`:
+
+- JSON puro, cerca markdown, array na raiz (só nós);
+- `areaPath` string vs array;
+- clamp de `discoveryState`;
+- dedup por Spotify ID e por título+artista;
+- claim duplicado acrescenta fonte;
+- `cards[]` delega e não reseta SRS no overwrite;
+- ficheiro grande: `parseSource` sem carregar o dump na UI;
+- documento só com `cards` → erro de kind ou redirect.
+
+---
+
+# 80. Critérios de aceite das fatias novas
+
+Complementam a §65. Uma fatia só fecha com empty/loading/error/offline, strings localizadas e testes no `test_all`.
+
+## 80.1 JSON + prompt (M2)
+
+1. Com o mapa vazio, o prompt diz que não há categorias/nós e pede um recorte mínimo.
+2. Depois de criar um território, o prompt **muda** e lista esse título.
+3. Colar o exemplo mínimo da §79.3 produz um plano com 1 `create` e 0 cartografados.
+4. Reimportar o mesmo documento produz só `skip`.
+5. Um JSON com `discoveryState: "cartographed"` é clampado e o relatório mostra o clamp.
+6. Escolher um ficheiro grande não coloca o conteúdo no `TextField`; a isolate devolve plano ou erro.
+7. Apply é transacional; undo reverte o `music_import_run`.
+8. `cards[]` válidos passam por `FlashcardJsonImportPolicy` (dedup/overwrite sem resetar SRS).
+9. Offline: o ritual funciona por completo (o LLM externo é que precisa de rede — o app não).
+10. Tokens / rede Spotify não são requisitos.
+
+## 80.2 Spotify (M8)
+
+1. App útil com o toggle off.
+2. Ligar pede PKCE; cancelar não deixa consent “ligado” a meio.
+3. Com `user-library-read`, pull cria nós + Encounter(`contact`) apenas.
+4. Nenhum saved album nasce `cartographed`.
+5. Constelação mostra as três partições (gravado∩atento, gravado sem encontro, local-only) ou empty honesto.
+6. Playlist → draft de expedição com pergunta obrigatória antes de activar.
+7. “O que estou ouvindo” com scope e playback activo abre a captura; sem playback, empty claro.
+8. “Abrir no Spotify” lança deep link ou HTTPS.
+9. Revogar apaga tokens e cursors; nós locais permanecem; export **não** contém tokens (teste de snapshot).
+10. 401/403/429 não crasham; capability probe grava o motivo.
+11. Sem SDK de playback no processo.
+12. Development Mode: utilizador fora da allowlist vê erro de quota, não um mapa vazio fingido.
+
+## 80.3 Flashcards e pesquisa (M5)
+
+1. Sessão de escuta / comparação / repertório oferece candidatos; nenhum é criado sem checkbox.
+2. Aceitar dois candidatos cria cartões em `/flashcards` com `areaPath` sob `Artes / Música` (ou folha criada).
+3. Recusar fecha o sheet sem side-effects.
+4. `ResearchKnowledgeLink.practice` só nasce se o utilizador afirmar a ponte.
+5. Um listen importado **não** cria evidência de research nem cartão.
+6. Deep link `/flashcards?area=musica` abre a fila existente.
+7. Habitat piano não inicia áudio.
+
+## 80.4 Superfície (M4)
+
+1. Tile Música na home abre o Atlas (ou empty da flag).
+2. Command palette encontra Capturar, Import JSON e Atlas.
+3. `WorkType.music` na agenda abre sessão ou Atlas.
+4. Digest `rules_v1` pode citar expedição / inbox Spotify / cartões vencidos com evidência; sem LLM; sem culpa.
+5. Feature flag off não parte o routing do resto do app.
+
+## 80.5 Privacidade transversal
+
+1. Export após JSON + Spotify contém entidades musicais e **zero** secrets.
+2. Delete de perfil / wipe remove tokens.
+3. Sem telemetry de gosto por defeito.
+4. Nenhuma percentagem “de toda a música” ou “do Spotify” na UI.
 
 ---
 

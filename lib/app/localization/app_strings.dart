@@ -365,6 +365,7 @@ abstract final class AppStrings {
         'health_appointment_activity' => 'Consultas',
         'finance_activity' => 'Finanças',
         'research_activity' => 'Pesquisa',
+        'music_atlas_activity' => 'Atlas',
         'inventory_activity' => 'Inventário',
         'review_wins' => 'Vitórias',
         'review_problems' => 'Problemas',
@@ -420,6 +421,8 @@ abstract final class AppStrings {
         '${count ?? 0} movimento${count == 1 ? '' : 's'} no ledger/orçamento.',
       'research_activity' =>
         '${count ?? 0} movimento${count == 1 ? '' : 's'} em pesquisa.',
+      'music_atlas_activity' =>
+        '${count ?? 0} movimento${count == 1 ? '' : 's'} no Atlas musical.',
       'inventory_activity' =>
         '${count ?? 0} movimento${count == 1 ? '' : 's'} no inventário.',
       'review_wins' => 'Vitórias anotadas na revisão semanal.',
@@ -688,6 +691,121 @@ abstract final class AppStrings {
 
   static const newResearchNode = 'Novo nó';
   static const flashcardsTitle = 'Flashcards';
+  static const musicAtlasTitle = 'Atlas musical';
+  static const musicAtlasSubtitle =
+      'Cartografia pessoal — ouvir não é conhecer.';
+  static const musicAtlasEmpty =
+      'Ainda não há nós. Cria um disco à mão, importa JSON ou liga o Spotify.';
+  static const musicAtlasCreateNode = 'Novo nó';
+  static const musicAtlasCapture = 'Registar encontro';
+  static const musicAtlasImportJson = 'Importar JSON';
+  static const musicAtlasOpenSpotify = 'Abrir no Spotify';
+  static const musicAtlasNowPlaying = 'O que estou ouvindo';
+  static const musicAtlasConstellation = 'Constelação Spotify';
+  static const musicAtlasSavedInbox = 'Gravado sem encontro atento';
+  static const musicAtlasLocalOnly = 'Só no Colony';
+  static const musicAtlasAttentiveSaved = 'Já trabalho isto';
+  static const musicAtlasCopyPrompt = 'Copiar prompt';
+  static const musicAtlasPromptCopied = 'Prompt copiado.';
+  static const musicAtlasPromptLive =
+      'Este texto muda quando o mapa, as áreas e os baralhos mudam.';
+  static const musicAtlasPasteJson = 'Colar JSON';
+  static const musicAtlasPickFile = 'Escolher ficheiro';
+  static const musicAtlasPreview = 'Pré-visualizar';
+  static const musicAtlasApply = 'Importar agora';
+  static const musicAtlasImportDone = 'Importação do Atlas concluída.';
+  static const musicAtlasInvalidJson = 'JSON inválido';
+  static const musicAtlasTitleField = 'Título';
+  static const musicAtlasTypeField = 'Tipo';
+  static const musicAtlasYearField = 'Ano';
+  static const musicAtlasNoteField = 'Nota';
+  static const musicAtlasResonance = 'Ressonância';
+  static const musicAtlasEncounterType = 'Tipo de encontro';
+  static const musicAtlasState = 'Estado pessoal';
+  static const musicAtlasQuestion = 'Pergunta da expedição';
+  static const musicAtlasDraftExpedition = 'Nova expedição';
+  static const musicAtlasStartExpedition = 'Activar expedição';
+  static const musicAtlasCompleteExpedition = 'Concluir';
+  static const musicAtlasSuggestCards = 'Sugerir prática';
+  static const musicAtlasAcceptCards = 'Criar cartões escolhidos';
+  static const musicAtlasNoCandidates = 'Nenhum candidato — escuta casual não gera cartões.';
+  static const musicAtlasSpotifyTitle = 'Spotify';
+  static const musicAtlasSpotifyDisclaimer =
+      'Lê a tua biblioteca e o histórico recente. Não toca música no Colony. Não marca discos como conhecidos.';
+  static const musicAtlasSpotifyClientId = 'Client ID (público)';
+  static const musicAtlasSpotifyConnect = 'Ligar conta';
+  static const musicAtlasSpotifyPasteCode = 'Colar URI de retorno ou código';
+  static const musicAtlasSpotifyPull = 'Actualizar biblioteca';
+  static const musicAtlasSpotifyRevoke = 'Revogar';
+  static const musicAtlasSpotifyNeedConsent = 'Activa o opt-in do Spotify primeiro.';
+  static const musicAtlasSpotifyNeedClient =
+      'Indica o Client ID da app Spotify (Development Mode).';
+  static const musicAtlasSpotifyNeedConnect =
+      'Liga a conta Spotify primeiro.';
+  static const musicAtlasOffline = 'Offline — o núcleo local continua disponível.';
+  static const musicAtlasImportEmpty =
+      'Cola o JSON ou escolhe um ficheiro. O picker não deita o dump no campo.';
+  static const musicAtlasImportNothingToDo = 'Nada novo para importar.';
+  static const musicAtlasPasteHint =
+      '{ "version": 1, "kind": "music_atlas", "nodes": [] }';
+  static const musicAtlasExpeditions = 'Expedições';
+  static const musicAtlasEncountersTitle = 'Encontros';
+  static const musicAtlasRelationsTitle = 'Relações';
+  static const musicAtlasFromHabitat = 'Abrir Atlas musical';
+  static const musicAtlasPlaylists = 'Playlists Spotify';
+  static const musicAtlasDraftPlaylist = 'Expedição a partir da playlist';
+  static const musicAtlasFlashcardsHelp =
+      'Só escuta atenta, comparação, prática ou ao vivo sugerem cartões. Nada é criado sem o teu ok.';
+  static const musicAtlasPromptTitle = 'Prompt para a IA (fora do app)';
+
+  static String musicAtlasImportPlanSummary({
+    required int create,
+    required int link,
+    required int skip,
+    required int conflict,
+  }) {
+    return '$create novos · $link ligados · $skip iguais · $conflict conflitos';
+  }
+
+  static String musicAtlasDiscoveryLabel(MusicDiscoveryState state) =>
+      switch (state) {
+        MusicDiscoveryState.unmapped => 'Não mapeado',
+        MusicDiscoveryState.rumor => 'Rumor / contacto',
+        MusicDiscoveryState.sighted => 'Avistado',
+        MusicDiscoveryState.sampled => 'Amostrado',
+        MusicDiscoveryState.visited => 'Visitado',
+        MusicDiscoveryState.cartographed => 'Cartografado',
+        MusicDiscoveryState.connected => 'Conectado',
+        MusicDiscoveryState.internalized => 'Internalizado',
+        MusicDiscoveryState.living => 'Vivo',
+        MusicDiscoveryState.dormant => 'Adormecido',
+        MusicDiscoveryState.archived => 'Arquivado',
+      };
+
+  static String musicAtlasNodeTypeLabel(MusicNodeType type) => switch (type) {
+        MusicNodeType.artist => 'Artista',
+        MusicNodeType.work => 'Obra',
+        MusicNodeType.recording => 'Gravação',
+        MusicNodeType.releaseGroup => 'Álbum',
+        MusicNodeType.release => 'Edição',
+        MusicNodeType.territory => 'Território',
+        MusicNodeType.scene => 'Cena',
+        MusicNodeType.concept => 'Conceito',
+        MusicNodeType.label => 'Selo',
+        MusicNodeType.place => 'Lugar',
+        MusicNodeType.show => 'Show',
+      };
+
+  static String musicAtlasEncounterLabel(MusicEncounterType type) =>
+      switch (type) {
+        MusicEncounterType.contact => 'Contacto',
+        MusicEncounterType.listen => 'Escuta',
+        MusicEncounterType.attentiveListen => 'Escuta atenta',
+        MusicEncounterType.comparison => 'Comparação',
+        MusicEncounterType.practice => 'Prática',
+        MusicEncounterType.live => 'Ao vivo',
+        MusicEncounterType.importListen => 'Listen importado',
+      };
   static const flashcardsSubtitle =
       'Mapa de conhecimento e repetição espaçada — local, sem conta.';
   static const flashcardsStudyNow = 'Estudar (espaçado)';

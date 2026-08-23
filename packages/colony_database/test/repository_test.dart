@@ -244,7 +244,7 @@ void main() {
     await repos.needs.seedDefaults(profile.id);
 
     final json = await repos.export.exportJson();
-    expect(json, contains('"version": 34'));
+    expect(json, contains('"version": 35'));
     expect(json, contains('Viagem internacional'));
     expect(json, contains('"quests"'));
     expect(json, contains('"work_priorities"'));
@@ -337,7 +337,7 @@ void main() {
     expect(pauseStatusEvents.first.payload['pause_reason'], 'Aguardando visto');
 
     final json = await repos.export.exportJson();
-    expect(json, contains('"version": 34'));
+    expect(json, contains('"version": 35'));
     expect(json, contains('"projects"'));
     expect(json, contains('"quest_project_links"'));
     expect(json, contains('Viagem 2026'));
@@ -436,7 +436,7 @@ void main() {
     expect(events.any((e) => e.eventType == EventType.decisionUpdated), isTrue);
 
     final json = await repos.export.exportJson();
-    expect(json, contains('"version": 34'));
+    expect(json, contains('"version": 35'));
     expect(json, contains('"decision_records"'));
     expect(json, contains('"quest_decision_links"'));
     expect(json, contains('Aceitar oferta'));
@@ -714,7 +714,7 @@ void main() {
     await repos.research.updateStatus(advanced, ResearchNodeStatus.inResearch);
 
     final json = await repos.export.exportJson();
-    expect(json, contains('"version": 34'));
+    expect(json, contains('"version": 35'));
     expect(json, contains('"research_nodes"'));
     expect(json, contains('"learning_sessions"'));
     expect(json, contains('"research_evidence"'));
@@ -933,7 +933,7 @@ void main() {
     expect(linked.single.name, 'Mochila');
 
     final snapshot = await repos.export.buildSnapshot();
-    expect(snapshot.version, 34);
+    expect(snapshot.version, 35);
     expect(snapshot.tripInventoryLinks, hasLength(1));
 
     await repos.trips.unlinkInventoryItem(
@@ -968,7 +968,7 @@ void main() {
     expect(linked.single.title, 'Lisboa');
 
     final snapshot = await repos.export.buildSnapshot();
-    expect(snapshot.version, 34);
+    expect(snapshot.version, 35);
     expect(snapshot.zoneTripLinks, hasLength(1));
 
     await repos.contextZones.unlinkTrip(zoneId: zone.id, tripId: trip.id);
@@ -1007,7 +1007,7 @@ void main() {
     expect(linked, hasLength(1));
 
     final snapshot = await repos.export.buildSnapshot();
-    expect(snapshot.version, 34);
+    expect(snapshot.version, 35);
     expect(snapshot.questInventoryLinks, hasLength(1));
 
     await repos.inventory.unlinkQuest(
@@ -1056,7 +1056,7 @@ void main() {
     expect(memberships.first.id, org.id);
 
     final snapshot = await repos.export.buildSnapshot();
-    expect(snapshot.version, 34);
+    expect(snapshot.version, 35);
     expect(snapshot.personOrganizationLinks, hasLength(1));
     expect(snapshot.personOrganizationLinks.first.role, 'colega');
 

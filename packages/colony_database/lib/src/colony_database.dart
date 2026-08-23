@@ -71,6 +71,15 @@ part 'colony_database.g.dart';
   CapturedNotifications,
   GoogleTimelineImports,
   GoogleTimelinePlaceLabels,
+  MusicNodes,
+  MusicExternalIdentities,
+  PersonalMusicNodeStates,
+  MusicEncounters,
+  MusicRelationClaims,
+  MusicExpeditions,
+  MusicExpeditionStops,
+  MusicImportRuns,
+  MusicSpotifySyncStates,
 ])
 class ColonyDatabase extends _$ColonyDatabase {
   ColonyDatabase(super.e, {this.dataDirectory});
@@ -79,7 +88,7 @@ class ColonyDatabase extends _$ColonyDatabase {
   final String? dataDirectory;
 
   @override
-  int get schemaVersion => 39;
+  int get schemaVersion => 40;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -279,6 +288,51 @@ class ColonyDatabase extends _$ColonyDatabase {
               await _columnExists(m, 'flashcards', 'tags_json')) {
             await _backfillFlashcardTags(m);
           }
+          await _createTableIfAbsent(
+            m,
+            'music_nodes',
+            () => m.createTable(musicNodes),
+          );
+          await _createTableIfAbsent(
+            m,
+            'music_external_identities',
+            () => m.createTable(musicExternalIdentities),
+          );
+          await _createTableIfAbsent(
+            m,
+            'personal_music_node_states',
+            () => m.createTable(personalMusicNodeStates),
+          );
+          await _createTableIfAbsent(
+            m,
+            'music_encounters',
+            () => m.createTable(musicEncounters),
+          );
+          await _createTableIfAbsent(
+            m,
+            'music_relation_claims',
+            () => m.createTable(musicRelationClaims),
+          );
+          await _createTableIfAbsent(
+            m,
+            'music_expeditions',
+            () => m.createTable(musicExpeditions),
+          );
+          await _createTableIfAbsent(
+            m,
+            'music_expedition_stops',
+            () => m.createTable(musicExpeditionStops),
+          );
+          await _createTableIfAbsent(
+            m,
+            'music_import_runs',
+            () => m.createTable(musicImportRuns),
+          );
+          await _createTableIfAbsent(
+            m,
+            'music_spotify_sync_state',
+            () => m.createTable(musicSpotifySyncStates),
+          );
         },
       );
 
@@ -2303,6 +2357,360 @@ class ColonyMappers {
       category: label.category.name,
       customName: Value(label.customName),
       updatedAt: updatedAt.millisecondsSinceEpoch,
+    );
+  }
+
+  static DateTime _utcMs(int ms) =>
+      DateTime.fromMillisecondsSinceEpoch(ms, isUtc: true);
+
+  static DateTime? _utcMsOrNull(int? ms) =>
+      ms == null ? null : DateTime.fromMillisecondsSinceEpoch(ms, isUtc: true);
+
+  static domain.MusicNode toMusicNode(MusicNodeRow row) {
+    return domain.MusicNode(
+      id: domain.EntityId(row.id),
+      nodeType: domain.MusicNodeType.values.byName(row.nodeType),
+      canonicalName: row.canonicalName,
+      sortName: row.sortName,
+      description: row.description,
+      beginYear: row.beginYear,
+      endYear: row.endYear,
+      metadataQuality: row.metadataQuality,
+      provenanceJson: row.provenanceJson,
+      createdAt: _utcMs(row.createdAt),
+      updatedAt: _utcMs(row.updatedAt),
+      deletedAt: _utcMsOrNull(row.deletedAt),
+      version: row.version,
+    );
+  }
+
+  static MusicNodesCompanion fromMusicNode(domain.MusicNode node) {
+    return MusicNodesCompanion.insert(
+      id: node.id.value,
+      nodeType: node.nodeType.name,
+      canonicalName: node.canonicalName,
+      sortName: node.sortName,
+      description: Value(node.description),
+      beginYear: Value(node.beginYear),
+      endYear: Value(node.endYear),
+      metadataQuality: Value(node.metadataQuality),
+      provenanceJson: Value(node.provenanceJson),
+      createdAt: node.createdAt.millisecondsSinceEpoch,
+      updatedAt: node.updatedAt.millisecondsSinceEpoch,
+      deletedAt: Value(node.deletedAt?.millisecondsSinceEpoch),
+      version: Value(node.version),
+    );
+  }
+
+  static domain.MusicExternalIdentity toMusicExternalIdentity(
+    MusicExternalIdentityRow row,
+  ) {
+    return domain.MusicExternalIdentity(
+      id: domain.EntityId(row.id),
+      nodeId: domain.EntityId(row.nodeId),
+      provider: row.provider,
+      entityType: row.entityType,
+      externalId: row.externalId,
+      externalUrl: row.externalUrl,
+      confidence: row.confidence,
+      reviewedByUser: row.reviewedByUser,
+      metadataJson: row.metadataJson,
+      createdAt: _utcMs(row.createdAt),
+      updatedAt: _utcMs(row.updatedAt),
+    );
+  }
+
+  static MusicExternalIdentitiesCompanion fromMusicExternalIdentity(
+    domain.MusicExternalIdentity identity,
+  ) {
+    return MusicExternalIdentitiesCompanion.insert(
+      id: identity.id.value,
+      nodeId: identity.nodeId.value,
+      provider: identity.provider,
+      entityType: identity.entityType,
+      externalId: identity.externalId,
+      externalUrl: Value(identity.externalUrl),
+      confidence: Value(identity.confidence),
+      reviewedByUser: Value(identity.reviewedByUser),
+      metadataJson: Value(identity.metadataJson),
+      createdAt: identity.createdAt.millisecondsSinceEpoch,
+      updatedAt: identity.updatedAt.millisecondsSinceEpoch,
+    );
+  }
+
+  static domain.PersonalMusicNodeState toPersonalMusicNodeState(
+    PersonalMusicNodeStateRow row,
+  ) {
+    return domain.PersonalMusicNodeState(
+      profileId: domain.EntityId(row.profileId),
+      nodeId: domain.EntityId(row.nodeId),
+      discoveryState: domain.MusicDiscoveryState.values.byName(
+        row.discoveryState,
+      ),
+      resonance: row.resonance,
+      firstEncounterAt: _utcMsOrNull(row.firstEncounterAt),
+      lastEncounterAt: _utcMsOrNull(row.lastEncounterAt),
+      encounterCount: row.encounterCount,
+      personalSummary: row.personalSummary,
+      nextAction: row.nextAction,
+      createdAt: _utcMs(row.createdAt),
+      updatedAt: _utcMs(row.updatedAt),
+      version: row.version,
+    );
+  }
+
+  static PersonalMusicNodeStatesCompanion fromPersonalMusicNodeState(
+    domain.PersonalMusicNodeState state,
+  ) {
+    return PersonalMusicNodeStatesCompanion.insert(
+      profileId: state.profileId.value,
+      nodeId: state.nodeId.value,
+      discoveryState: state.discoveryState.name,
+      resonance: Value(state.resonance),
+      firstEncounterAt: Value(state.firstEncounterAt?.millisecondsSinceEpoch),
+      lastEncounterAt: Value(state.lastEncounterAt?.millisecondsSinceEpoch),
+      encounterCount: Value(state.encounterCount),
+      personalSummary: Value(state.personalSummary),
+      nextAction: Value(state.nextAction),
+      createdAt: state.createdAt.millisecondsSinceEpoch,
+      updatedAt: state.updatedAt.millisecondsSinceEpoch,
+      version: Value(state.version),
+    );
+  }
+
+  static domain.MusicEncounter toMusicEncounter(MusicEncounterRow row) {
+    return domain.MusicEncounter(
+      id: domain.EntityId(row.id),
+      profileId: domain.EntityId(row.profileId),
+      nodeId: domain.EntityId(row.nodeId),
+      encounterType: domain.MusicEncounterType.values.byName(row.encounterType),
+      occurredAt: _utcMs(row.occurredAt),
+      durationSeconds: row.durationSeconds,
+      attentionQuality: row.attentionQuality,
+      resonance: row.resonance,
+      note: row.note,
+      sourceType: domain.SourceType.values.byName(row.sourceType),
+      provenanceJson: row.provenanceJson,
+      createdAt: _utcMs(row.createdAt),
+      updatedAt: _utcMs(row.updatedAt),
+      deletedAt: _utcMsOrNull(row.deletedAt),
+    );
+  }
+
+  static MusicEncountersCompanion fromMusicEncounter(
+    domain.MusicEncounter encounter,
+  ) {
+    return MusicEncountersCompanion.insert(
+      id: encounter.id.value,
+      profileId: encounter.profileId.value,
+      nodeId: encounter.nodeId.value,
+      encounterType: encounter.encounterType.name,
+      occurredAt: encounter.occurredAt.millisecondsSinceEpoch,
+      durationSeconds: Value(encounter.durationSeconds),
+      attentionQuality: Value(encounter.attentionQuality),
+      resonance: Value(encounter.resonance),
+      note: Value(encounter.note),
+      sourceType: encounter.sourceType.name,
+      provenanceJson: Value(encounter.provenanceJson),
+      createdAt: encounter.createdAt.millisecondsSinceEpoch,
+      updatedAt: encounter.updatedAt.millisecondsSinceEpoch,
+      deletedAt: Value(encounter.deletedAt?.millisecondsSinceEpoch),
+    );
+  }
+
+  static domain.MusicRelationClaim toMusicRelationClaim(
+    MusicRelationClaimRow row,
+  ) {
+    return domain.MusicRelationClaim(
+      id: domain.EntityId(row.id),
+      fromNodeId: domain.EntityId(row.fromNodeId),
+      toNodeId: domain.EntityId(row.toNodeId),
+      relationType: domain.MusicRelationType.values.byName(row.relationType),
+      description: row.description,
+      status: domain.MusicClaimStatus.values.byName(row.status),
+      confidence: row.confidence,
+      validFrom: row.validFrom,
+      validTo: row.validTo,
+      provenanceJson: row.provenanceJson,
+      createdAt: _utcMs(row.createdAt),
+      updatedAt: _utcMs(row.updatedAt),
+      deletedAt: _utcMsOrNull(row.deletedAt),
+    );
+  }
+
+  static MusicRelationClaimsCompanion fromMusicRelationClaim(
+    domain.MusicRelationClaim claim,
+  ) {
+    return MusicRelationClaimsCompanion.insert(
+      id: claim.id.value,
+      fromNodeId: claim.fromNodeId.value,
+      toNodeId: claim.toNodeId.value,
+      relationType: claim.relationType.name,
+      description: Value(claim.description),
+      status: claim.status.name,
+      confidence: Value(claim.confidence),
+      validFrom: Value(claim.validFrom),
+      validTo: Value(claim.validTo),
+      provenanceJson: Value(claim.provenanceJson),
+      createdAt: claim.createdAt.millisecondsSinceEpoch,
+      updatedAt: claim.updatedAt.millisecondsSinceEpoch,
+      deletedAt: Value(claim.deletedAt?.millisecondsSinceEpoch),
+    );
+  }
+
+  static domain.MusicExpedition toMusicExpedition(MusicExpeditionRow row) {
+    return domain.MusicExpedition(
+      id: domain.EntityId(row.id),
+      profileId: domain.EntityId(row.profileId),
+      title: row.title,
+      question: row.question,
+      status: domain.MusicExpeditionStatus.values.byName(row.status),
+      purpose: row.purpose,
+      questId: row.questId == null ? null : domain.EntityId(row.questId!),
+      startedAt: _utcMsOrNull(row.startedAt),
+      completedAt: _utcMsOrNull(row.completedAt),
+      abandonedAt: _utcMsOrNull(row.abandonedAt),
+      abandonmentReason: row.abandonmentReason,
+      createdAt: _utcMs(row.createdAt),
+      updatedAt: _utcMs(row.updatedAt),
+      deletedAt: _utcMsOrNull(row.deletedAt),
+      version: row.version,
+    );
+  }
+
+  static MusicExpeditionsCompanion fromMusicExpedition(
+    domain.MusicExpedition expedition,
+  ) {
+    return MusicExpeditionsCompanion.insert(
+      id: expedition.id.value,
+      profileId: expedition.profileId.value,
+      title: expedition.title,
+      question: expedition.question,
+      status: expedition.status.name,
+      purpose: Value(expedition.purpose),
+      questId: Value(expedition.questId?.value),
+      startedAt: Value(expedition.startedAt?.millisecondsSinceEpoch),
+      completedAt: Value(expedition.completedAt?.millisecondsSinceEpoch),
+      abandonedAt: Value(expedition.abandonedAt?.millisecondsSinceEpoch),
+      abandonmentReason: Value(expedition.abandonmentReason),
+      createdAt: expedition.createdAt.millisecondsSinceEpoch,
+      updatedAt: expedition.updatedAt.millisecondsSinceEpoch,
+      deletedAt: Value(expedition.deletedAt?.millisecondsSinceEpoch),
+      version: Value(expedition.version),
+    );
+  }
+
+  static domain.MusicExpeditionStop toMusicExpeditionStop(
+    MusicExpeditionStopRow row,
+  ) {
+    final decoded = jsonDecode(row.cuesJson);
+    final cues = decoded is List
+        ? [for (final item in decoded) item.toString()]
+        : const <String>[];
+    return domain.MusicExpeditionStop(
+      id: domain.EntityId(row.id),
+      expeditionId: domain.EntityId(row.expeditionId),
+      nodeId: domain.EntityId(row.nodeId),
+      displayOrder: row.displayOrder,
+      role: domain.MusicExpeditionStopRole.values.byName(row.role),
+      reason: row.reason,
+      cues: cues,
+      isOptional: row.isOptional,
+      completedAt: _utcMsOrNull(row.completedAt),
+    );
+  }
+
+  static MusicExpeditionStopsCompanion fromMusicExpeditionStop(
+    domain.MusicExpeditionStop stop,
+  ) {
+    return MusicExpeditionStopsCompanion.insert(
+      id: stop.id.value,
+      expeditionId: stop.expeditionId.value,
+      nodeId: stop.nodeId.value,
+      displayOrder: stop.displayOrder,
+      role: stop.role.name,
+      reason: Value(stop.reason),
+      cuesJson: Value(jsonEncode(stop.cues)),
+      isOptional: Value(stop.isOptional),
+      completedAt: Value(stop.completedAt?.millisecondsSinceEpoch),
+    );
+  }
+
+  static domain.MusicImportRun toMusicImportRun(MusicImportRunRow row) {
+    return domain.MusicImportRun(
+      id: domain.EntityId(row.id),
+      profileId: domain.EntityId(row.profileId),
+      sourceKind: domain.MusicImportSourceKind.values.byName(row.sourceKind),
+      status: domain.MusicImportRunStatus.values.byName(row.status),
+      documentVersion: row.documentVersion,
+      itemCount: row.itemCount,
+      createdCount: row.createdCount,
+      skippedCount: row.skippedCount,
+      conflictCount: row.conflictCount,
+      provenanceJson: row.provenanceJson,
+      reportJson: row.reportJson,
+      createdAt: _utcMs(row.createdAt),
+      appliedAt: _utcMsOrNull(row.appliedAt),
+      rolledBackAt: _utcMsOrNull(row.rolledBackAt),
+    );
+  }
+
+  static MusicImportRunsCompanion fromMusicImportRun(domain.MusicImportRun run) {
+    return MusicImportRunsCompanion.insert(
+      id: run.id.value,
+      profileId: run.profileId.value,
+      sourceKind: run.sourceKind.name,
+      status: run.status.name,
+      documentVersion: Value(run.documentVersion),
+      itemCount: Value(run.itemCount),
+      createdCount: Value(run.createdCount),
+      skippedCount: Value(run.skippedCount),
+      conflictCount: Value(run.conflictCount),
+      provenanceJson: Value(run.provenanceJson),
+      reportJson: Value(run.reportJson),
+      createdAt: run.createdAt.millisecondsSinceEpoch,
+      appliedAt: Value(run.appliedAt?.millisecondsSinceEpoch),
+      rolledBackAt: Value(run.rolledBackAt?.millisecondsSinceEpoch),
+    );
+  }
+
+  static domain.MusicSpotifySyncState toMusicSpotifySyncState(
+    MusicSpotifySyncStateRow row,
+  ) {
+    final decoded = jsonDecode(row.grantedScopesJson);
+    final scopes = decoded is List
+        ? [for (final item in decoded) item.toString()]
+        : const <String>[];
+    return domain.MusicSpotifySyncState(
+      profileId: domain.EntityId(row.profileId),
+      consentId: domain.EntityId(row.consentId),
+      grantedScopes: scopes,
+      libraryCursor: row.libraryCursor,
+      recentCursor: row.recentCursor,
+      lastLibraryAt: _utcMsOrNull(row.lastLibraryAt),
+      lastRecentAt: _utcMsOrNull(row.lastRecentAt),
+      lastPlaylistAt: _utcMsOrNull(row.lastPlaylistAt),
+      capabilityProbeJson: row.capabilityProbeJson,
+      lastError: row.lastError,
+      updatedAt: _utcMs(row.updatedAt),
+    );
+  }
+
+  static MusicSpotifySyncStatesCompanion fromMusicSpotifySyncState(
+    domain.MusicSpotifySyncState state,
+  ) {
+    return MusicSpotifySyncStatesCompanion.insert(
+      profileId: state.profileId.value,
+      consentId: state.consentId.value,
+      grantedScopesJson: Value(jsonEncode(state.grantedScopes)),
+      libraryCursor: Value(state.libraryCursor),
+      recentCursor: Value(state.recentCursor),
+      lastLibraryAt: Value(state.lastLibraryAt?.millisecondsSinceEpoch),
+      lastRecentAt: Value(state.lastRecentAt?.millisecondsSinceEpoch),
+      lastPlaylistAt: Value(state.lastPlaylistAt?.millisecondsSinceEpoch),
+      capabilityProbeJson: Value(state.capabilityProbeJson),
+      lastError: Value(state.lastError),
+      updatedAt: state.updatedAt.millisecondsSinceEpoch,
     );
   }
 }

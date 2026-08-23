@@ -255,6 +255,27 @@ abstract final class NarrativeDigestRules {
       );
     }
 
+    final musicEvents = inWindow
+        .where(
+          (e) =>
+              e.eventType == EventType.musicEncounterRecorded ||
+              e.eventType == EventType.musicExpeditionStarted ||
+              e.eventType == EventType.musicExpeditionCompleted ||
+              e.eventType == EventType.musicAtlasJsonImported ||
+              e.eventType == EventType.spotifyLibraryPulled ||
+              e.eventType == EventType.spotifyNowPlayingCaptured,
+        )
+        .toList();
+    if (musicEvents.isNotEmpty) {
+      bullets.add(
+        NarrativeDigestBullet(
+          templateId: 'music_atlas_activity',
+          params: {'count': musicEvents.length},
+          evidenceEventIds: musicEvents.take(3).map((e) => e.id).toList(),
+        ),
+      );
+    }
+
     final inventoryEvents = inWindow
         .where(
           (e) =>
@@ -330,6 +351,7 @@ abstract final class NarrativeDigestRules {
         'quest_activity' => 70,
         'finance_activity' => 65,
         'research_activity' => 60,
+        'music_atlas_activity' => 58,
         'commitment_activity' => 55,
         'trip_activity' => 50,
         'task_activity' => 45,

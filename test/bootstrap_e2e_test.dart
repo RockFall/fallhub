@@ -18,12 +18,15 @@ import 'package:fallhub/features/relations/presentation/organizations_screen.dar
 import 'package:fallhub/features/relations/presentation/commitments_screen.dart';
 import 'package:fallhub/features/flashcards/presentation/flashcards_hub_screen.dart';
 import 'package:fallhub/features/research/presentation/research_list_screen.dart';
+import 'package:fallhub/features/music_atlas/presentation/music_atlas_hub_screen.dart';
 import 'package:fallhub/features/travel/presentation/travel_screen.dart';
 import 'package:fallhub/features/home/presentation/home_maintenance_screen.dart';
 import 'package:fallhub/features/zones/presentation/zones_screen.dart';
 import 'package:fallhub/features/integrations/application/integrations_providers.dart';
 import 'package:fallhub/features/integrations/application/notification_capture_platform.dart';
 import 'package:fallhub/features/integrations/presentation/integrations_screen.dart';
+import 'package:fallhub/features/music_atlas/application/spotify_runtime.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 Future<void> _flushDisposeTimers(WidgetTester tester) async {
   await tester.pumpWidget(const SizedBox.shrink());
@@ -33,8 +36,12 @@ Future<void> _flushDisposeTimers(WidgetTester tester) async {
 }
 
 void main() {
+  setUp(() {
+    SharedPreferences.setMockInitialValues({});
+  });
+
   testWidgets(
-      'bootstrap: DB + routing opens colony, finance, health, inventory, travel, home, zones, people, organizations, commitments, integrations, research, quests, flashcards',
+      'bootstrap: DB + routing opens colony, finance, health, inventory, travel, home, zones, people, organizations, commitments, integrations, research, quests, flashcards, music atlas',
       (tester) async {
     tester.view.physicalSize = const Size(1100, 1600);
     tester.view.devicePixelRatio = 1.0;
@@ -120,6 +127,10 @@ void main() {
           path: '/flashcards',
           builder: (_, __) => const Scaffold(body: FlashcardsHubScreen()),
         ),
+        GoRoute(
+          path: '/research/music-atlas',
+          builder: (_, __) => const Scaffold(body: MusicAtlasHubScreen()),
+        ),
       ],
     );
 
@@ -130,6 +141,8 @@ void main() {
           notificationCapturePlatformProvider.overrideWithValue(
             FakeNotificationCapturePlatform(android: false),
           ),
+          spotifyCatalogPortProvider.overrideWithValue(FakeSpotifyCatalog()),
+          spotifyTokenStoreProvider.overrideWithValue(MemorySpotifyTokenStore()),
         ],
         child: MaterialApp.router(
           theme: ColonyTheme.dark(),
@@ -227,6 +240,12 @@ void main() {
     await tester.pump(const Duration(milliseconds: 500));
     expect(find.text(AppStrings.flashcardsEmpty), findsOneWidget);
     expect(find.text(AppStrings.flashcardsStudyNow), findsOneWidget);
+
+    router.go('/research/music-atlas');
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 500));
+    expect(find.text(AppStrings.musicAtlasTitle), findsWidgets);
+    expect(find.text(AppStrings.musicAtlasEmpty), findsOneWidget);
 
     await _flushDisposeTimers(tester);
     await db.close();
