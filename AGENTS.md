@@ -50,6 +50,7 @@ features/<name>/
 | 2 | Pawn, needs, check-in, daily review | concluído |
 | 3 | Work grid, schedule | concluído |
 | 4 | Quests, projects, decisions, weekly review | concluído |
+| 4A | Motor de Ignição (protocolos, Morning Launch, waypoints, Crônica) | concluído |
 | 5 | Research tree MVP | concluído (Iters 15–18; links quest↔research Iter 24; flashcards+SRS ADR-036) |
 | 6 | Finance ledger manual (§23) | MVP avançado+ (CSV apply Iter 107; plan→apply) |
 | 7 | Health local (§45) | MVP+ (appointments Iter 111; DB v35 / export v31) |

@@ -14,6 +14,7 @@ import '../../../pawn/presentation/widgets/check_in_sheet.dart';
 import '../../../quests/application/quest_providers.dart';
 import '../../../storyteller/presentation/narrative_digest_sheet.dart';
 import '../../../work/application/work_providers.dart';
+import '../../../activation/presentation/widgets/agora_readiness_card.dart';
 
 class ColonyHomeDigest extends ConsumerWidget {
   const ColonyHomeDigest({super.key});
@@ -24,6 +25,8 @@ class ColonyHomeDigest extends ConsumerWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         const _NowCard(),
+        const SizedBox(height: ColonySpacing.lg),
+        const AgoraReadinessCard(),
         const SizedBox(height: ColonySpacing.lg),
         const _StudyStrip(),
         const SizedBox(height: ColonySpacing.lg),

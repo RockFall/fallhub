@@ -366,6 +366,7 @@ abstract final class AppStrings {
         'finance_activity' => 'Finanças',
         'research_activity' => 'Pesquisa',
         'music_atlas_activity' => 'Atlas',
+        'activation_activity' => 'Mobilização',
         'inventory_activity' => 'Inventário',
         'review_wins' => 'Vitórias',
         'review_problems' => 'Problemas',
@@ -423,6 +424,8 @@ abstract final class AppStrings {
         '${count ?? 0} movimento${count == 1 ? '' : 's'} em pesquisa.',
       'music_atlas_activity' =>
         '${count ?? 0} movimento${count == 1 ? '' : 's'} no Atlas musical.',
+      'activation_activity' =>
+        '${count ?? 0} episódio${count == 1 ? '' : 's'} de mobilização.',
       'inventory_activity' =>
         '${count ?? 0} movimento${count == 1 ? '' : 's'} no inventário.',
       'review_wins' => 'Vitórias anotadas na revisão semanal.',
@@ -2162,8 +2165,140 @@ abstract final class AppStrings {
       'research_knowledge_links' => 'Pontes pesquisa↔conhecimento',
       'google_timeline_import' => 'Timeline importada',
       'google_timeline_place_labels' => 'Rótulos de lugares',
+      'activation_protocols' => 'Rotas de ignição',
+      'activation_episodes' => 'Episódios de mobilização',
+      'activation_waypoints' => 'Waypoints',
       _ => key,
     };
     return '$label: $count';
   }
+
+  static const activationTitle = 'Mobilização';
+  static const activationSubtitle =
+      'Uma ordem por vez. Sem streak, sem nota de disciplina.';
+  static const activationDisclaimer =
+      'Ajuda a atravessar a próxima transição. Não diagnostica, não pune e não exige sensores.';
+  static const activationEmpty =
+      'Nenhuma rota ainda. As rotas padrão entram no primeiro uso.';
+  static const activationStuckNow = 'Estou travado agora';
+  static const activationStartMorning = 'Iniciar ignição da manhã';
+  static const activationStartFirstAction = 'Iniciar primeira ação';
+  static const activationMobilize = 'Mobilizar';
+  static const activationConfirm = 'Confirmar';
+  static const activationSkip = 'Pular';
+  static const activationAdapt = 'Adaptar';
+  static const activationPause = 'Pausar';
+  static const activationResume = 'Continuar';
+  static const activationAbort = 'Encerrar';
+  static const activationRecover = 'Ir para recuperação';
+  static const activationFalsePositive = 'Não estava travado';
+  static const activationAlreadyDone = 'Já concluí';
+  static const activationEscape = 'Sair com segurança';
+  static const activationEscapeHint =
+      'Sem justificativa. Comunicações essenciais nunca são bloqueadas.';
+  static const activationProtocols = 'Rotas';
+  static const activationWaypoints = 'Waypoints';
+  static const activationShield = 'Escudo de fricção';
+  static const activationEpisodes = 'Episódios';
+  static const activationExperiments = 'Experimentos';
+  static const activationDraftTitle = 'Modo mobilização';
+  static const activationNextMove = 'Próximo movimento';
+  static const activationRouteCollapsed = 'Rota';
+  static const activationRestoringTitle = 'Rota em andamento encontrada.';
+  static const activationOperational = 'Operacional';
+  static const activationInRoute = 'Em rota';
+  static const activationRecovery = 'Recuperação';
+  static const activationAvailable = 'Mobilização disponível';
+  static const activationResting = 'Estou descansando';
+  static const activationCapacity = 'Capacidade';
+  static const activationCapacityStandard = 'Padrão';
+  static const activationCapacityLow = 'Baixa capacidade';
+  static const activationCapacityEmergency = 'Mínimo de emergência';
+  static const activationCapacityHigh = 'Alta energia';
+  static const activationShieldPolicyOnly =
+      'Neste dispositivo o escudo é política local: descreve a fricção e a allowlist. Não bloqueia outros apps e não usa Accessibility Service.';
+  static const activationShieldAllowlist =
+      'Allowlist essencial: emergência, autenticação, mapas, recursos médicos.';
+  static const activationWaypointEmpty =
+      'Nenhum waypoint. Um QR ou token avança a rota sem formulário.';
+  static const activationWaypointNew = 'Novo waypoint';
+  static const activationWaypointToken = 'Token / QR';
+  static const activationWaypointName = 'Nome';
+  static const activationInsightDisclaimer =
+      'Padrões associativos. O sistema não demonstrou causa.';
+  static const activationNoMoralScore =
+      'Não há streak nem score de disciplina.';
+  static const activationSensorsOptional =
+      'Sensores são opcionais. Sem eles, a confirmação manual basta.';
+  static const activationPawnTab = 'Mobilização';
+  static const activationChronicDomain = 'Mobilização';
+  static const pawnTabActivation = 'Mobilização';
+  static const activationEnvironment = 'Ambiente e resgate';
+  static const activationDetectionLetter =
+      'Janela compatível com uma rota curta. Sem obrigação.';
+  static const activationDetectionBlocked =
+      'Descanso planejado. Nenhuma proposta automática.';
+  static const activationOpenFirstAction = 'Abrir primeira ação';
+  static const activationEnabled = 'Rota ligada';
+  static const activationTriggerRelease = 'Trigger → comandos → liberação';
+  static const activationFirstMeaningful = 'primeira ação significativa';
+  static const activationAddCommand = 'Adicionar ordem concreta';
+  static const activationSaveVersion = 'Publicar nova versão';
+  static const activationNoExperiments = 'Nenhum experimento em curso.';
+  static const activationAnalyze = 'Analisar associações';
+  static const activationRescue = 'Resgate social';
+  static const activationRescueHint =
+      'O app não envia mensagens. O contrato fica local e exige confirmação.';
+  static const activationRescueContact = 'Rótulo do contato';
+  static const activationRescueMessage = 'Modelo da mensagem';
+  static const activationRescueArm = 'Armar contrato local';
+  static const activationRescueRequest = 'Registrar intenção (sem enviar)';
+  static const activationHaDryRun = 'Simular cena local';
+  static const activationCapabilityTitle = 'Capacidade deste dispositivo';
+  static const activationWatchDeferred =
+      'Relógio e Health Connect ficam adiados. O núcleo funciona sem eles.';
+  static const activationProofSource = 'Evidência';
+  static const activationCommands = 'Comandos';
+  static const activationSignal = 'Sinal';
+  static const activationHypothesis = 'Hipótese';
+  static const activationFrom = 'De';
+  static const activationTo = 'Para';
+
+  static String activationStatus(ActivationEpisodeStatus status) =>
+      switch (status) {
+        ActivationEpisodeStatus.proposed => 'Proposto',
+        ActivationEpisodeStatus.active => 'Ativo',
+        ActivationEpisodeStatus.mobilizing => 'Em rota',
+        ActivationEpisodeStatus.adapted => 'Adaptado',
+        ActivationEpisodeStatus.released => 'Liberado',
+        ActivationEpisodeStatus.paused => 'Pausado',
+        ActivationEpisodeStatus.aborted => 'Encerrado',
+        ActivationEpisodeStatus.convertedToRecovery => 'Recuperação',
+        ActivationEpisodeStatus.falsePositive => 'Corrigido',
+        ActivationEpisodeStatus.expired => 'Expirado',
+        ActivationEpisodeStatus.dismissed => 'Dispensado',
+      };
+
+  static String activationCapacityLabel(ActivationCapacityMode mode) =>
+      switch (mode) {
+        ActivationCapacityMode.standard => activationCapacityStandard,
+        ActivationCapacityMode.lowCapacity => activationCapacityLow,
+        ActivationCapacityMode.emergencyMinimum => activationCapacityEmergency,
+        ActivationCapacityMode.highEnergy => activationCapacityHigh,
+      };
+
+  static String activationProtocolTypeLabel(ActivationProtocolType type) =>
+      switch (type) {
+        ActivationProtocolType.wakeUp => 'Manhã',
+        ActivationProtocolType.hygiene => 'Higiene',
+        ActivationProtocolType.workStart => 'Trabalho',
+        ActivationProtocolType.studyStart => 'Estudo',
+        ActivationProtocolType.exerciseStart => 'Movimento',
+        ActivationProtocolType.departure => 'Saída',
+        ActivationProtocolType.sleepPreparation => 'Noite',
+        ActivationProtocolType.antiScroll => 'Anti-scroll',
+        ActivationProtocolType.houseReset => 'Reset',
+        ActivationProtocolType.creativeStart => 'Criativo',
+        ActivationProtocolType.custom => 'Personalizado',
+      };
 }

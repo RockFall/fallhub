@@ -8,6 +8,7 @@ import 'package:uuid/uuid.dart';
 
 import '../colony_database.dart'
     hide DomainEvent, NeedDefinition, NeedReading, CheckIn, MoodFactor, DailyReview, WeeklyReview, WorkPriority, Bill, ScheduleBlock, Quest, Project, QuestProject, DecisionRecord, QuestDecision, ResearchNode, ResearchPrerequisite;
+import 'activation_repository.dart';
 import 'music_atlas_repository.dart';
 
 class ProfileRepository {
@@ -365,6 +366,7 @@ class ExportRepository {
     this._flashcards,
     this._googleTimeline,
     this._musicAtlas,
+    this._activation,
     this._clock,
   );
 
@@ -396,6 +398,7 @@ class ExportRepository {
   final FlashcardRepository _flashcards;
   final GoogleTimelineRepository _googleTimeline;
   final MusicAtlasRepository _musicAtlas;
+  final ActivationRepository _activation;
   final DateTime Function() _clock;
 
   Future<ExportSnapshot> buildSnapshot() async {
@@ -477,10 +480,11 @@ class ExportRepository {
         ...await _musicAtlas.listStops(expedition.id),
     ];
     final musicImportRuns = await _musicAtlas.listImportRuns(profile.id);
+    final activation = await _activation.exportBundle(profile.id);
 
     return ExportSnapshot(
       exportedAt: _clock(),
-      version: 35,
+      version: 36,
       profile: profile,
       preferences: prefs,
       tasks: tasks,
@@ -545,6 +549,7 @@ class ExportRepository {
       musicExpeditions: musicExpeditions,
       musicExpeditionStops: musicExpeditionStops,
       musicImportRuns: musicImportRuns,
+      activation: activation,
     );
   }
 
@@ -595,6 +600,12 @@ class RestoreRepository {
       _clock,
       _events,
     ).deletePayloadFiles();
+    await ActivationRepository(
+      _db,
+      UuidIdGenerator.v7(() => const Uuid().v4()),
+      _clock,
+      _events,
+    ).wipeAll();
     await _db.delete(_db.capturedNotifications).go();
     await _db.delete(_db.googleTimelinePlaceLabels).go();
     await _db.delete(_db.googleTimelineImports).go();
@@ -960,6 +971,12 @@ class RestoreRepository {
     for (final priority in snapshot.workPriorities) {
       await _db.into(_db.workPriorities).insert(ColonyMappers.fromWorkPriority(priority));
     }
+    await ActivationRepository(
+      _db,
+      UuidIdGenerator.v7(() => const Uuid().v4()),
+      _clock,
+      _events,
+    ).restoreBundle(snapshot.activation);
   }
 }
 
@@ -6635,6 +6652,7 @@ class ColonyRepositories {
     required this.flashcards,
     required this.googleTimeline,
     required this.musicAtlas,
+    required this.activation,
     required this.sync,
     required this.export,
     required this.restore,
@@ -6669,6 +6687,7 @@ class ColonyRepositories {
   final FlashcardRepository flashcards;
   final GoogleTimelineRepository googleTimeline;
   final MusicAtlasRepository musicAtlas;
+  final ActivationRepository activation;
   final SyncRepository sync;
   final ExportRepository export;
   final RestoreRepository restore;
@@ -6718,6 +6737,7 @@ class ColonyRepositories {
       flashcards: flashcardsRepo,
       research: research,
     );
+    final activationRepo = ActivationRepository(database, ids, now, events);
     final dailyReviews = DailyReviewRepository(database, ids, now, events);
     final weeklyReviews = WeeklyReviewRepository(database, ids, now, events);
     final restore = RestoreRepository(database, events, now);
@@ -6751,6 +6771,7 @@ class ColonyRepositories {
       flashcards: flashcardsRepo,
       googleTimeline: googleTimelineRepo,
       musicAtlas: musicAtlasRepo,
+      activation: activationRepo,
       sync: syncRepo,
       export: ExportRepository(
         profiles,
@@ -6781,6 +6802,7 @@ class ColonyRepositories {
         flashcardsRepo,
         googleTimelineRepo,
         musicAtlasRepo,
+        activationRepo,
         now,
       ),
       restore: restore,

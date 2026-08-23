@@ -123,6 +123,7 @@ abstract final class ColonyMiniAppColors {
   static const integrations = Color(0xFF8A5A8A);
   static const settings = Color(0xFF5A6A78);
   static const more = Color(0xFF4A5560);
+  static const activation = Color(0xFF3D8B7A);
 }
 
 abstract final class ColonySizes {

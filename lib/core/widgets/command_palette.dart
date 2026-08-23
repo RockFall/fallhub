@@ -25,6 +25,13 @@ class _CommandPaletteState extends ConsumerState<CommandPalette> {
   final _focus = FocusNode();
 
   final _commands = const [
+    _PaletteCommand(AppStrings.activationStuckNow, '/activation/start', Icons.bolt_outlined),
+    _PaletteCommand(AppStrings.activationStartMorning, '/activation/start', Icons.wb_sunny_outlined),
+    _PaletteCommand(AppStrings.activationStartFirstAction, '/activation/start', Icons.play_arrow_outlined),
+    _PaletteCommand(AppStrings.activationTitle, '/activation', Icons.directions_walk_outlined),
+    _PaletteCommand(AppStrings.activationProtocols, '/activation/protocols', Icons.route_outlined),
+    _PaletteCommand(AppStrings.activationWaypoints, '/activation/waypoints', Icons.place_outlined),
+    _PaletteCommand(AppStrings.activationShield, '/activation/shield', Icons.shield_outlined),
     _PaletteCommand('Revisão semanal', '/pawn/review/weekly', Icons.date_range_outlined),
     _PaletteCommand('Ir para Colônia', '/colony', Icons.home_work_outlined),
     _PaletteCommand('Habitat', '/colony/habitat', Icons.cottage_outlined),

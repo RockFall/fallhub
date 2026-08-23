@@ -6,6 +6,8 @@ import 'package:go_router/go_router.dart';
 
 import '../../../app/localization/app_strings.dart';
 import '../../../core/providers/app_providers.dart';
+import '../../activation/application/activation_providers.dart';
+import '../../activation/presentation/widgets/stuck_now_sheet.dart';
 import '../application/pawn_controllers.dart';
 import '../application/pawn_providers.dart';
 import 'widgets/check_in_sheet.dart';
@@ -25,7 +27,7 @@ class _PawnScreenState extends ConsumerState<PawnScreen>
   @override
   void initState() {
     super.initState();
-    _tabs = TabController(length: 3, vsync: this);
+    _tabs = TabController(length: 4, vsync: this);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(pawnBootstrapProvider.notifier).ensureSeeded();
     });
@@ -78,6 +80,7 @@ class _PawnScreenState extends ConsumerState<PawnScreen>
                 Tab(text: AppStrings.pawnTabSummary),
                 Tab(text: AppStrings.pawnTabNeeds),
                 Tab(text: AppStrings.pawnTabMind),
+                Tab(text: AppStrings.pawnTabActivation),
               ],
             ),
             Expanded(
@@ -89,6 +92,7 @@ class _PawnScreenState extends ConsumerState<PawnScreen>
                     NeedReadingSheet.show(context, snapshot: snapshot);
                   }),
                   _MindTab(checkIn: checkIn),
+                  const _ActivationTab(),
                 ],
               ),
             ),
@@ -464,6 +468,67 @@ class _MindTabState extends ConsumerState<_MindTab> {
           ],
         ],
       ),
+    );
+  }
+}
+
+class _ActivationTab extends ConsumerWidget {
+  const _ActivationTab();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final episodes = ref.watch(activationEpisodesProvider);
+    final protocols = ref.watch(activationProtocolsProvider);
+    return ListView(
+      padding: const EdgeInsets.all(ColonySpacing.lg),
+      children: [
+        Text(AppStrings.activationDisclaimer),
+        const SizedBox(height: ColonySpacing.sm),
+        Text(AppStrings.activationNoMoralScore),
+        const SizedBox(height: ColonySpacing.md),
+        FilledButton(
+          onPressed: () => StuckNowSheet.show(context),
+          child: const Text(AppStrings.activationStuckNow),
+        ),
+        const SizedBox(height: ColonySpacing.lg),
+        Text(AppStrings.activationProtocols,
+            style: Theme.of(context).textTheme.titleMedium),
+        protocols.when(
+          loading: () => const LinearProgressIndicator(),
+          error: (_, _) => Text(AppStrings.errorGeneric),
+          data: (items) => Column(
+            children: [
+              for (final protocol in items.take(6))
+                ListTile(
+                  title: Text(protocol.name),
+                  subtitle: Text(protocol.originState.label),
+                  onTap: () => context.go(
+                    '/activation/protocols/${protocol.id.value}',
+                  ),
+                ),
+            ],
+          ),
+        ),
+        const SizedBox(height: ColonySpacing.md),
+        Text(AppStrings.activationEpisodes,
+            style: Theme.of(context).textTheme.titleMedium),
+        episodes.when(
+          loading: () => const SizedBox.shrink(),
+          error: (_, _) => const SizedBox.shrink(),
+          data: (items) => Column(
+            children: [
+              for (final episode in items.take(5))
+                ListTile(
+                  title: Text(AppStrings.activationStatus(episode.status)),
+                  subtitle: Text(episode.targetState.label),
+                  onTap: () => context.go(
+                    '/activation/episodes/${episode.id.value}?inspect=1',
+                  ),
+                ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }
