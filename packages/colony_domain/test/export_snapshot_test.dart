@@ -1135,14 +1135,22 @@ void main() {
     expect(snapshot.googleTimelinePlaceLabels, isEmpty);
   });
 
-  test('rejects unsupported version 35', () {
+  test('parses export version 35 with empty music atlas collections', () {
     final json = Map<String, dynamic>.from(baseJson)..['version'] = 35;
+    final snapshot = ExportSnapshot.fromJson(json);
+    expect(snapshot.version, 35);
+    expect(snapshot.musicNodes, isEmpty);
+    expect(snapshot.musicEncounters, isEmpty);
+  });
+
+  test('rejects unsupported version 36', () {
+    final json = Map<String, dynamic>.from(baseJson)..['version'] = 36;
 
     expect(
       () => ExportSnapshot.fromJson(json),
       throwsA(
         predicate<ExportSnapshotException>(
-          (e) => e.message.contains('35'),
+          (e) => e.message.contains('36'),
         ),
       ),
     );
