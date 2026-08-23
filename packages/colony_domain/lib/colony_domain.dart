@@ -56,6 +56,7 @@ export 'src/inventory_item.dart';
 export 'src/person.dart';
 export 'src/person_interaction.dart';
 export 'src/person_organization.dart';
+export 'src/friendship.dart';
 export 'src/trip.dart';
 export 'src/organization.dart';
 export 'src/home_maintenance.dart';

@@ -29,6 +29,7 @@ import 'person.dart';
 import 'category_budget.dart';
 import 'person_interaction.dart';
 import 'person_organization.dart';
+import 'friendship.dart';
 import 'commitment.dart';
 import 'context_zone.dart';
 import 'zone_trip.dart';
@@ -129,6 +130,9 @@ class ExportSnapshot extends Equatable {
     this.musicExpeditions = const [],
     this.musicExpeditionStops = const [],
     this.musicImportRuns = const [],
+    this.friendships = const [],
+    this.friendshipCircles = const [],
+    this.friendshipCircleMemberships = const [],
   });
 
   final DateTime exportedAt;
@@ -197,6 +201,9 @@ class ExportSnapshot extends Equatable {
   final List<MusicExpedition> musicExpeditions;
   final List<MusicExpeditionStop> musicExpeditionStops;
   final List<MusicImportRun> musicImportRuns;
+  final List<Friendship> friendships;
+  final List<FriendshipCircle> friendshipCircles;
+  final List<FriendshipCircleMembership> friendshipCircleMemberships;
 
   Map<String, int> get entityCounts => {
         'tasks': tasks.length,
@@ -254,6 +261,9 @@ class ExportSnapshot extends Equatable {
         'music_expeditions': musicExpeditions.length,
         'music_expedition_stops': musicExpeditionStops.length,
         'music_import_runs': musicImportRuns.length,
+        'friendships': friendships.length,
+        'friendship_circles': friendshipCircles.length,
+        'friendship_circle_memberships': friendshipCircleMemberships.length,
       };
 
   static ExportSnapshot fromJsonString(String source) {
@@ -272,7 +282,7 @@ class ExportSnapshot extends Equatable {
 
   static ExportSnapshot fromJson(Map<String, dynamic> json) {
     final version = _requireInt(json, 'version');
-    if (version < 1 || version > 35) {
+    if (version < 1 || version > 36) {
       throw ExportSnapshotException('Versão de export não suportada: $version');
     }
 
@@ -535,6 +545,18 @@ class ExportSnapshot extends Equatable {
           : const [],
       musicImportRuns: version >= 35
           ? _parseList(json['music_import_runs'], _parseMusicImportRun(profileId))
+          : const [],
+      friendships: version >= 36
+          ? _parseList(json['friendships'], _parseFriendship(profileId))
+          : const [],
+      friendshipCircles: version >= 36
+          ? _parseList(json['friendship_circles'], _parseFriendshipCircle(profileId))
+          : const [],
+      friendshipCircleMemberships: version >= 36
+          ? _parseList(
+              json['friendship_circle_memberships'],
+              _parseFriendshipCircleMembership,
+            )
           : const [],
     );
   }
@@ -1012,6 +1034,63 @@ class ExportSnapshot extends Equatable {
         createdAt: _parseDateTime(_requireString(json, 'created_at')),
       );
     };
+  }
+
+  static Friendship Function(Map<String, dynamic>) _parseFriendship(
+    EntityId profileId,
+  ) {
+    return (json) {
+      return Friendship(
+        id: EntityId(_requireString(json, 'id')),
+        profileId: profileId,
+        personId: EntityId(_requireString(json, 'person_id')),
+        kind: FriendshipKind.values.byName(_requireString(json, 'kind')),
+        cadence:
+            FriendshipCadence.values.byName(_requireString(json, 'cadence')),
+        howWeMet: json['how_we_met'] as String?,
+        startedAt: json['started_at'] == null
+            ? null
+            : _parseDateTime(json['started_at'] as String),
+        notes: json['notes'] as String?,
+        archivedAt: json['archived_at'] == null
+            ? null
+            : _parseDateTime(json['archived_at'] as String),
+        createdAt: _parseDateTime(_requireString(json, 'created_at')),
+        updatedAt: _parseDateTime(_requireString(json, 'updated_at')),
+      );
+    };
+  }
+
+  static FriendshipCircle Function(Map<String, dynamic>) _parseFriendshipCircle(
+    EntityId profileId,
+  ) {
+    return (json) {
+      final cadenceRaw = json['default_cadence'] as String?;
+      return FriendshipCircle(
+        id: EntityId(_requireString(json, 'id')),
+        profileId: profileId,
+        name: _requireString(json, 'name'),
+        notes: json['notes'] as String?,
+        defaultCadence: cadenceRaw == null
+            ? null
+            : FriendshipCadence.values.byName(cadenceRaw),
+        archivedAt: json['archived_at'] == null
+            ? null
+            : _parseDateTime(json['archived_at'] as String),
+        createdAt: _parseDateTime(_requireString(json, 'created_at')),
+        updatedAt: _parseDateTime(_requireString(json, 'updated_at')),
+      );
+    };
+  }
+
+  static FriendshipCircleMembership _parseFriendshipCircleMembership(
+    Map<String, dynamic> json,
+  ) {
+    return FriendshipCircleMembership(
+      personId: EntityId(_requireString(json, 'person_id')),
+      circleId: EntityId(_requireString(json, 'circle_id')),
+      linkedAt: _parseDateTime(_requireString(json, 'linked_at')),
+    );
   }
 
   static Trip Function(Map<String, dynamic>) _parseTrip(EntityId profileId) {
@@ -1882,6 +1961,14 @@ class ExportSnapshot extends Equatable {
             musicExpeditionStops.map(_musicExpeditionStopJson).toList(),
         'music_import_runs': musicImportRuns.map(_musicImportRunJson).toList(),
       },
+      if (version >= 36) ...{
+        'friendships': friendships.map(_friendshipJson).toList(),
+        'friendship_circles':
+            friendshipCircles.map(_friendshipCircleJson).toList(),
+        'friendship_circle_memberships': friendshipCircleMemberships
+            .map(_friendshipCircleMembershipJson)
+            .toList(),
+      },
     };
   }
 
@@ -2242,6 +2329,42 @@ class ExportSnapshot extends Equatable {
         'occurred_at': interaction.occurredAt.toUtc().toIso8601String(),
         if (interaction.note != null) 'note': interaction.note,
         'created_at': interaction.createdAt.toUtc().toIso8601String(),
+      };
+
+  static Map<String, Object?> _friendshipJson(Friendship friendship) => {
+        'id': friendship.id.value,
+        'person_id': friendship.personId.value,
+        'kind': friendship.kind.name,
+        'cadence': friendship.cadence.name,
+        if (friendship.howWeMet != null) 'how_we_met': friendship.howWeMet,
+        if (friendship.startedAt != null)
+          'started_at': friendship.startedAt!.toUtc().toIso8601String(),
+        if (friendship.notes != null) 'notes': friendship.notes,
+        if (friendship.archivedAt != null)
+          'archived_at': friendship.archivedAt!.toUtc().toIso8601String(),
+        'created_at': friendship.createdAt.toUtc().toIso8601String(),
+        'updated_at': friendship.updatedAt.toUtc().toIso8601String(),
+      };
+
+  static Map<String, Object?> _friendshipCircleJson(FriendshipCircle circle) => {
+        'id': circle.id.value,
+        'name': circle.name,
+        if (circle.notes != null) 'notes': circle.notes,
+        if (circle.defaultCadence != null)
+          'default_cadence': circle.defaultCadence!.name,
+        if (circle.archivedAt != null)
+          'archived_at': circle.archivedAt!.toUtc().toIso8601String(),
+        'created_at': circle.createdAt.toUtc().toIso8601String(),
+        'updated_at': circle.updatedAt.toUtc().toIso8601String(),
+      };
+
+  static Map<String, Object?> _friendshipCircleMembershipJson(
+    FriendshipCircleMembership link,
+  ) =>
+      {
+        'person_id': link.personId.value,
+        'circle_id': link.circleId.value,
+        'linked_at': link.linkedAt.toUtc().toIso8601String(),
       };
 
   static Map<String, Object?> _tripJson(Trip trip) => {
@@ -2724,5 +2847,8 @@ class ExportSnapshot extends Equatable {
         musicExpeditions,
         musicExpeditionStops,
         musicImportRuns,
+        friendships,
+        friendshipCircles,
+        friendshipCircleMemberships,
       ];
 }

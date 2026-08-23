@@ -1422,6 +1422,109 @@ abstract final class AppStrings {
         InteractionKind.other => 'Outro',
       };
 
+  static const personBirthdayOptional = 'Aniversário (opcional)';
+  static const personSearchHint = 'Buscar pessoas';
+  static const personSortLabel = 'Ordenar';
+  static const personSortName = 'Nome';
+  static const personSortLastContact = 'Último contacto';
+  static const personNeverContacted = 'Ainda sem contacto';
+  static const personAddToFriendships = 'Adicionar às amizades';
+  static const personOpenFriendship = 'Ver amizade';
+  static const personAlsoFriendship = 'Também é uma amizade';
+  static const personInteractionsTitle = 'Histórico de interações';
+
+  static String lastContactLabel(int? days) {
+    if (days == null) return personNeverContacted;
+    if (days == 0) return 'Contacto hoje';
+    if (days == 1) return 'Último contacto há 1 dia';
+    return 'Último contacto há $days dias';
+  }
+
+  static const friendshipsTitle = 'Amizades';
+  static const friendshipsDisclaimer =
+      'Registro pessoal local. Tipo e cadência são seus; o app não calcula qualidade de amizade.';
+  static const friendshipsEmpty = 'Nenhuma amizade registrada.';
+  static const friendshipsEmptyHint =
+      'Promova uma pessoa a amizade para acompanhar encontros e círculos.';
+  static const friendshipNew = 'Nova amizade';
+  static const friendshipEdit = 'Editar amizade';
+  static const friendshipArchive = 'Arquivar amizade';
+  static const friendshipKind = 'Tipo de amizade';
+  static const friendshipCadence = 'Cadência de encontros';
+  static const friendshipHowWeMet = 'Como nos conhecemos (opcional)';
+  static const friendshipNotesOptional = 'Notas da amizade (opcional)';
+  static const friendshipLogEncounter = 'Registrar encontro';
+  static const friendshipLogEncounterMulti = 'Encontro com várias pessoas';
+  static const friendshipAttentionTitle = 'Atenção';
+  static const friendshipAttentionEmpty = 'Nenhuma cadência vencida.';
+  static const friendshipAllFilter = 'Todas';
+  static const friendshipOverdueFilter = 'Em atraso';
+  static const friendshipNeverMet = 'Ainda sem encontro';
+  static const friendshipNoCadence = 'Sem cadência — quando der';
+  static const friendshipTypicalIntervalUnknown = 'Sem intervalo típico ainda';
+  static const friendshipCirclesTitle = 'Círculos';
+  static const friendshipCircleNew = 'Novo círculo';
+  static const friendshipCircleName = 'Nome do círculo';
+  static const friendshipCircleNameRequired = 'Informe o nome do círculo';
+  static const friendshipCircleNotesOptional = 'Notas do círculo (opcional)';
+  static const friendshipCircleDefaultCadence = 'Cadência sugerida do círculo';
+  static const friendshipCircleNone = 'Sem círculo';
+  static const friendshipPickPerson = 'Pessoa';
+  static const friendshipPickPersonRequired = 'Escolha uma pessoa';
+  static const friendshipCreatePersonHint = 'Ou crie uma pessoa nova';
+  static const friendshipOccurredAt = 'Quando';
+  static const friendshipSelectPeople = 'Quem estava';
+
+  static String friendshipKindLabel(FriendshipKind kind) => switch (kind) {
+        FriendshipKind.innerCircle => 'Círculo interno',
+        FriendshipKind.close => 'Próxima',
+        FriendshipKind.regular => 'Regular',
+        FriendshipKind.casual => 'Casual',
+        FriendshipKind.acquaintance => 'Conhecida',
+        FriendshipKind.childhood => 'Infância',
+        FriendshipKind.familyFriend => 'Amiga da família',
+        FriendshipKind.colleagueSocial => 'Colega social',
+        FriendshipKind.neighbor => 'Vizinha',
+        FriendshipKind.online => 'Online',
+        FriendshipKind.seasonal => 'Sazonal',
+        FriendshipKind.dormant => 'Dormente',
+        FriendshipKind.unspecified => 'Por classificar',
+      };
+
+  static String friendshipCadenceLabel(FriendshipCadence cadence) =>
+      switch (cadence) {
+        FriendshipCadence.weekly => 'Semanal',
+        FriendshipCadence.fortnightly => 'Quinzenal',
+        FriendshipCadence.monthly => 'Mensal',
+        FriendshipCadence.quarterly => 'Trimestral',
+        FriendshipCadence.semiannual => 'Semestral',
+        FriendshipCadence.yearly => 'Anual',
+        FriendshipCadence.whenever => 'Quando der',
+      };
+
+  static String friendshipAttentionLabel(FriendshipAttention attention) =>
+      switch (attention) {
+        FriendshipAttention.overdue => 'Cadência em atraso',
+        FriendshipAttention.dueSoon => 'Encontro em breve',
+        FriendshipAttention.onTrack => 'Em dia',
+        FriendshipAttention.noCadence => 'Quando der',
+        FriendshipAttention.neverMet => 'Ainda sem encontro',
+      };
+
+  static String daysSinceEncounter(int? days) {
+    if (days == null) return friendshipNeverMet;
+    if (days == 0) return 'Encontro hoje';
+    if (days == 1) return 'Último encontro há 1 dia';
+    return 'Último encontro há $days dias';
+  }
+
+  static String encounterCountLabel(int count) => count == 1
+      ? '1 encontro registrado'
+      : '$count encontros registrados';
+
+  static String typicalIntervalLabel(int days) =>
+      'Intervalo típico: $days dias';
+
   // Inventory (Iteration 42)
   static const inventoryTitle = 'Inventário';
   static const inventoryHint =

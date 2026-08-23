@@ -26,6 +26,7 @@ void main() {
         'weekly-1',
         'event-4',
         'event-5',
+        for (var i = 0; i < 30; i++) 'export-spare-$i',
       ]),
       clock: () => DateTime.utc(2026, 8, 6, 14),
     );
@@ -194,7 +195,7 @@ void main() {
     );
 
     final before = await repos.export.buildSnapshot();
-    expect(before.version, 35);
+    expect(before.version, 36);
     expect(before.questPrerequisiteLinks, hasLength(1));
 
     await repos.restore.restore(before);
@@ -255,7 +256,7 @@ void main() {
     );
 
     final before = await repos.export.buildSnapshot();
-    expect(before.version, 35);
+    expect(before.version, 36);
     expect(before.checkIns, hasLength(1));
     expect(before.dailyReviews, hasLength(1));
     expect(before.moodFactors, hasLength(2));
@@ -308,7 +309,7 @@ void main() {
     );
 
     final before = await repos.export.buildSnapshot();
-    expect(before.version, 35);
+    expect(before.version, 36);
     expect(before.weeklyReviews, hasLength(1));
 
     await repos.restore.restore(before);
@@ -361,7 +362,7 @@ void main() {
     expect(accepted.acceptedAt, isNotNull);
 
     final before = await repos.export.buildSnapshot();
-    expect(before.version, 35);
+    expect(before.version, 36);
     expect(before.quests.single.acceptanceAssumptions, ['Premissa A']);
 
     await repos.restore.restore(before);
@@ -412,7 +413,7 @@ void main() {
     );
 
     final before = await repos.export.buildSnapshot();
-    expect(before.version, 35);
+    expect(before.version, 36);
     expect(before.researchNodes, hasLength(1));
 
     await repos.restore.restore(before);
@@ -472,7 +473,7 @@ void main() {
     );
 
     final before = await repos.export.buildSnapshot();
-    expect(before.version, 35);
+    expect(before.version, 36);
     expect(before.learningSessions, hasLength(1));
     expect(before.researchEvidence, hasLength(1));
 
@@ -488,7 +489,7 @@ void main() {
     await repos.restore.restore(snapshot);
 
     final after = await repos.export.buildSnapshot();
-    expect(after.version, 35);
+    expect(after.version, 36);
     expect(after.financialEntities, isEmpty);
     expect(after.financialAccounts, isEmpty);
     expect(after.transactions, isEmpty);
@@ -545,7 +546,7 @@ void main() {
     );
 
     final before = await repos.export.buildSnapshot();
-    expect(before.version, 35);
+    expect(before.version, 36);
     expect(before.financialEntities, hasLength(1));
     expect(before.financialAccounts, hasLength(1));
     expect(before.transactions, hasLength(1));
@@ -593,7 +594,7 @@ void main() {
     expect(conditions.single.status, HealthConditionStatus.monitoring);
 
     final after = await repos.export.buildSnapshot();
-    expect(after.version, 35);
+    expect(after.version, 36);
     expect(after.symptomEntries, isEmpty);
   });
 
@@ -934,7 +935,7 @@ void main() {
     );
 
     final before = await repos.export.buildSnapshot();
-    expect(before.version, 35);
+    expect(before.version, 36);
     expect(before.questResearchLinks, hasLength(1));
     expect(before.questResearchLinks.first.questId, quest.id);
     expect(before.questResearchLinks.first.researchNodeId, node.id);
@@ -971,7 +972,7 @@ void main() {
     );
 
     final before = await repos.export.buildSnapshot();
-    expect(before.version, 35);
+    expect(before.version, 36);
     expect(before.symptomEntries, hasLength(1));
 
     await repos.restore.restore(before);
@@ -1001,7 +1002,7 @@ void main() {
     );
 
     final before = await repos.export.buildSnapshot();
-    expect(before.version, 35);
+    expect(before.version, 36);
     expect(before.inventoryItems, hasLength(1));
 
     await repos.restore.restore(before);
@@ -1031,7 +1032,7 @@ void main() {
     );
 
     final before = await repos.export.buildSnapshot();
-    expect(before.version, 35);
+    expect(before.version, 36);
     expect(before.people, hasLength(1));
 
     await repos.restore.restore(before);
@@ -1061,7 +1062,7 @@ void main() {
     );
 
     final before = await repos.export.buildSnapshot();
-    expect(before.version, 35);
+    expect(before.version, 36);
     expect(before.categoryBudgets, hasLength(1));
 
     await repos.restore.restore(before);
@@ -1117,5 +1118,47 @@ void main() {
 
     final allProfiles = await db.select(db.profiles).get();
     expect(allProfiles, hasLength(1));
+  });
+
+  test('friendship export restore round-trip', () async {
+    final profile = await repos.profiles.create(
+      colonyName: 'Friends RT',
+      displayName: 'Caio',
+      timezone: 'UTC',
+      locale: 'pt_BR',
+      baseCurrency: 'BRL',
+    );
+    final person = await repos.people.create(
+      profileId: profile.id,
+      displayName: 'Ana',
+    );
+    await repos.friendships.create(
+      profileId: profile.id,
+      personId: person.id,
+      kind: FriendshipKind.regular,
+      cadence: FriendshipCadence.monthly,
+      howWeMet: 'trabalho',
+    );
+    final circle = await repos.friendships.createCircle(
+      profileId: profile.id,
+      name: 'Faculdade',
+    );
+    await repos.friendships.linkPersonToCircle(
+      personId: person.id,
+      circleId: circle.id,
+    );
+
+    final before = await repos.export.buildSnapshot();
+    expect(before.version, 36);
+    expect(before.friendships, hasLength(1));
+    expect(before.friendshipCircles, hasLength(1));
+    expect(before.friendshipCircleMemberships, hasLength(1));
+
+    await repos.restore.restore(before);
+
+    final after = await repos.export.buildSnapshot();
+    expect(after.friendships.single.howWeMet, 'trabalho');
+    expect(after.friendshipCircles.single.name, 'Faculdade');
+    expect(after.friendshipCircleMemberships, hasLength(1));
   });
 }

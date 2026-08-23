@@ -190,6 +190,14 @@ abstract final class ColonyMiniApps {
       assetPath: ColonyMiniAppAssets.people,
     ),
     ColonyMiniApp(
+      id: 'friendships',
+      label: AppStrings.friendshipsTitle,
+      route: '/relations/friendships',
+      icon: Icons.favorite_outline,
+      color: ColonyMiniAppColors.friendships,
+      assetPath: ColonyMiniAppAssets.people,
+    ),
+    ColonyMiniApp(
       id: 'organizations',
       label: AppStrings.organizationsTitle,
       route: '/relations/organizations',

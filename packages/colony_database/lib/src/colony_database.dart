@@ -80,6 +80,9 @@ part 'colony_database.g.dart';
   MusicExpeditionStops,
   MusicImportRuns,
   MusicSpotifySyncStates,
+  Friendships,
+  FriendshipCircles,
+  FriendshipCircleMemberships,
 ])
 class ColonyDatabase extends _$ColonyDatabase {
   ColonyDatabase(super.e, {this.dataDirectory});
@@ -88,7 +91,7 @@ class ColonyDatabase extends _$ColonyDatabase {
   final String? dataDirectory;
 
   @override
-  int get schemaVersion => 40;
+  int get schemaVersion => 41;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -332,6 +335,21 @@ class ColonyDatabase extends _$ColonyDatabase {
             m,
             'music_spotify_sync_state',
             () => m.createTable(musicSpotifySyncStates),
+          );
+          await _createTableIfAbsent(
+            m,
+            'friendships',
+            () => m.createTable(friendships),
+          );
+          await _createTableIfAbsent(
+            m,
+            'friendship_circles',
+            () => m.createTable(friendshipCircles),
+          );
+          await _createTableIfAbsent(
+            m,
+            'friendship_circle_memberships',
+            () => m.createTable(friendshipCircleMemberships),
           );
         },
       );
@@ -1572,6 +1590,94 @@ class ColonyMappers {
       occurredAt: interaction.occurredAt.millisecondsSinceEpoch,
       note: Value(interaction.note),
       createdAt: interaction.createdAt.millisecondsSinceEpoch,
+    );
+  }
+
+  static domain.Friendship toFriendship(FriendshipRow row) {
+    return domain.Friendship(
+      id: domain.EntityId(row.id),
+      profileId: domain.EntityId(row.profileId),
+      personId: domain.EntityId(row.personId),
+      kind: domain.FriendshipKind.values.byName(row.kind),
+      cadence: domain.FriendshipCadence.values.byName(row.cadence),
+      howWeMet: row.howWeMet,
+      startedAt: row.startedAt == null
+          ? null
+          : DateTime.fromMillisecondsSinceEpoch(row.startedAt!, isUtc: true),
+      notes: row.notes,
+      archivedAt: row.archivedAt == null
+          ? null
+          : DateTime.fromMillisecondsSinceEpoch(row.archivedAt!, isUtc: true),
+      createdAt: DateTime.fromMillisecondsSinceEpoch(row.createdAt, isUtc: true),
+      updatedAt: DateTime.fromMillisecondsSinceEpoch(row.updatedAt, isUtc: true),
+    );
+  }
+
+  static FriendshipsCompanion fromFriendship(domain.Friendship friendship) {
+    return FriendshipsCompanion.insert(
+      id: friendship.id.value,
+      profileId: friendship.profileId.value,
+      personId: friendship.personId.value,
+      kind: friendship.kind.name,
+      cadence: friendship.cadence.name,
+      howWeMet: Value(friendship.howWeMet),
+      startedAt: Value(friendship.startedAt?.millisecondsSinceEpoch),
+      notes: Value(friendship.notes),
+      archivedAt: Value(friendship.archivedAt?.millisecondsSinceEpoch),
+      createdAt: friendship.createdAt.millisecondsSinceEpoch,
+      updatedAt: friendship.updatedAt.millisecondsSinceEpoch,
+    );
+  }
+
+  static domain.FriendshipCircle toFriendshipCircle(FriendshipCircleRow row) {
+    return domain.FriendshipCircle(
+      id: domain.EntityId(row.id),
+      profileId: domain.EntityId(row.profileId),
+      name: row.name,
+      notes: row.notes,
+      defaultCadence: row.defaultCadence == null
+          ? null
+          : domain.FriendshipCadence.values.byName(row.defaultCadence!),
+      archivedAt: row.archivedAt == null
+          ? null
+          : DateTime.fromMillisecondsSinceEpoch(row.archivedAt!, isUtc: true),
+      createdAt: DateTime.fromMillisecondsSinceEpoch(row.createdAt, isUtc: true),
+      updatedAt: DateTime.fromMillisecondsSinceEpoch(row.updatedAt, isUtc: true),
+    );
+  }
+
+  static FriendshipCirclesCompanion fromFriendshipCircle(
+    domain.FriendshipCircle circle,
+  ) {
+    return FriendshipCirclesCompanion.insert(
+      id: circle.id.value,
+      profileId: circle.profileId.value,
+      name: circle.name,
+      notes: Value(circle.notes),
+      defaultCadence: Value(circle.defaultCadence?.name),
+      archivedAt: Value(circle.archivedAt?.millisecondsSinceEpoch),
+      createdAt: circle.createdAt.millisecondsSinceEpoch,
+      updatedAt: circle.updatedAt.millisecondsSinceEpoch,
+    );
+  }
+
+  static domain.FriendshipCircleMembership toFriendshipCircleMembership(
+    FriendshipCircleMembershipRow row,
+  ) {
+    return domain.FriendshipCircleMembership(
+      personId: domain.EntityId(row.personId),
+      circleId: domain.EntityId(row.circleId),
+      linkedAt: DateTime.fromMillisecondsSinceEpoch(row.linkedAt, isUtc: true),
+    );
+  }
+
+  static FriendshipCircleMembershipsCompanion fromFriendshipCircleMembership(
+    domain.FriendshipCircleMembership link,
+  ) {
+    return FriendshipCircleMembershipsCompanion.insert(
+      personId: link.personId.value,
+      circleId: link.circleId.value,
+      linkedAt: link.linkedAt.millisecondsSinceEpoch,
     );
   }
 

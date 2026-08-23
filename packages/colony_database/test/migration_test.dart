@@ -1857,5 +1857,53 @@ void main() {
       expect(await repos.musicAtlas.listNodes(), hasLength(1));
       expect(profile.id.value, isNotEmpty);
     });
+
+    test('v39 to v41 adds friendship tables', () async {
+      final db = await openMigratedFrom(
+        39,
+        seed: (sqlite) {
+          seedProfile(sqlite);
+        },
+      );
+      addTearDown(() async {
+        await db.close();
+      });
+
+      final repos = ColonyRepositories.create(
+        db,
+        idGenerator: FixedIdGenerator([
+          'person-1',
+          'event-1',
+          'friend-1',
+          'event-2',
+          'circle-1',
+          'event-3',
+        ]),
+        clock: () => DateTime.utc(2026, 8, 23, 12),
+      );
+      final profile = (await repos.profiles.getActive())!;
+      final person = await repos.people.create(
+        profileId: profile.id,
+        displayName: 'Ana',
+      );
+      final friendship = await repos.friendships.create(
+        profileId: profile.id,
+        personId: person.id,
+        kind: FriendshipKind.close,
+      );
+      final circle = await repos.friendships.createCircle(
+        profileId: profile.id,
+        name: 'RPG',
+      );
+      await repos.friendships.linkPersonToCircle(
+        personId: person.id,
+        circleId: circle.id,
+      );
+
+      expect(friendship.kind, FriendshipKind.close);
+      expect(await repos.friendships.listAll(profile.id), hasLength(1));
+      expect(await repos.friendships.listCircles(profile.id), hasLength(1));
+      expect(await repos.friendships.listMemberships(profile.id), hasLength(1));
+    });
   });
 }

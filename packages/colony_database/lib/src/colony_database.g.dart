@@ -40009,6 +40009,1484 @@ class MusicSpotifySyncStatesCompanion
   }
 }
 
+class $FriendshipsTable extends Friendships
+    with TableInfo<$FriendshipsTable, FriendshipRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $FriendshipsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _profileIdMeta = const VerificationMeta(
+    'profileId',
+  );
+  @override
+  late final GeneratedColumn<String> profileId = GeneratedColumn<String>(
+    'profile_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES profiles (id)',
+    ),
+  );
+  static const VerificationMeta _personIdMeta = const VerificationMeta(
+    'personId',
+  );
+  @override
+  late final GeneratedColumn<String> personId = GeneratedColumn<String>(
+    'person_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES people (id)',
+    ),
+  );
+  static const VerificationMeta _kindMeta = const VerificationMeta('kind');
+  @override
+  late final GeneratedColumn<String> kind = GeneratedColumn<String>(
+    'kind',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _cadenceMeta = const VerificationMeta(
+    'cadence',
+  );
+  @override
+  late final GeneratedColumn<String> cadence = GeneratedColumn<String>(
+    'cadence',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _howWeMetMeta = const VerificationMeta(
+    'howWeMet',
+  );
+  @override
+  late final GeneratedColumn<String> howWeMet = GeneratedColumn<String>(
+    'how_we_met',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _startedAtMeta = const VerificationMeta(
+    'startedAt',
+  );
+  @override
+  late final GeneratedColumn<int> startedAt = GeneratedColumn<int>(
+    'started_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _notesMeta = const VerificationMeta('notes');
+  @override
+  late final GeneratedColumn<String> notes = GeneratedColumn<String>(
+    'notes',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _archivedAtMeta = const VerificationMeta(
+    'archivedAt',
+  );
+  @override
+  late final GeneratedColumn<int> archivedAt = GeneratedColumn<int>(
+    'archived_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<int> createdAt = GeneratedColumn<int>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<int> updatedAt = GeneratedColumn<int>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    profileId,
+    personId,
+    kind,
+    cadence,
+    howWeMet,
+    startedAt,
+    notes,
+    archivedAt,
+    createdAt,
+    updatedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'friendships';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<FriendshipRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('profile_id')) {
+      context.handle(
+        _profileIdMeta,
+        profileId.isAcceptableOrUnknown(data['profile_id']!, _profileIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_profileIdMeta);
+    }
+    if (data.containsKey('person_id')) {
+      context.handle(
+        _personIdMeta,
+        personId.isAcceptableOrUnknown(data['person_id']!, _personIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_personIdMeta);
+    }
+    if (data.containsKey('kind')) {
+      context.handle(
+        _kindMeta,
+        kind.isAcceptableOrUnknown(data['kind']!, _kindMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_kindMeta);
+    }
+    if (data.containsKey('cadence')) {
+      context.handle(
+        _cadenceMeta,
+        cadence.isAcceptableOrUnknown(data['cadence']!, _cadenceMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_cadenceMeta);
+    }
+    if (data.containsKey('how_we_met')) {
+      context.handle(
+        _howWeMetMeta,
+        howWeMet.isAcceptableOrUnknown(data['how_we_met']!, _howWeMetMeta),
+      );
+    }
+    if (data.containsKey('started_at')) {
+      context.handle(
+        _startedAtMeta,
+        startedAt.isAcceptableOrUnknown(data['started_at']!, _startedAtMeta),
+      );
+    }
+    if (data.containsKey('notes')) {
+      context.handle(
+        _notesMeta,
+        notes.isAcceptableOrUnknown(data['notes']!, _notesMeta),
+      );
+    }
+    if (data.containsKey('archived_at')) {
+      context.handle(
+        _archivedAtMeta,
+        archivedAt.isAcceptableOrUnknown(data['archived_at']!, _archivedAtMeta),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  List<Set<GeneratedColumn>> get uniqueKeys => [
+    {personId},
+  ];
+  @override
+  FriendshipRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return FriendshipRow(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      profileId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}profile_id'],
+      )!,
+      personId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}person_id'],
+      )!,
+      kind: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}kind'],
+      )!,
+      cadence: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}cadence'],
+      )!,
+      howWeMet: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}how_we_met'],
+      ),
+      startedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}started_at'],
+      ),
+      notes: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}notes'],
+      ),
+      archivedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}archived_at'],
+      ),
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}updated_at'],
+      )!,
+    );
+  }
+
+  @override
+  $FriendshipsTable createAlias(String alias) {
+    return $FriendshipsTable(attachedDatabase, alias);
+  }
+}
+
+class FriendshipRow extends DataClass implements Insertable<FriendshipRow> {
+  final String id;
+  final String profileId;
+  final String personId;
+  final String kind;
+  final String cadence;
+  final String? howWeMet;
+  final int? startedAt;
+  final String? notes;
+  final int? archivedAt;
+  final int createdAt;
+  final int updatedAt;
+  const FriendshipRow({
+    required this.id,
+    required this.profileId,
+    required this.personId,
+    required this.kind,
+    required this.cadence,
+    this.howWeMet,
+    this.startedAt,
+    this.notes,
+    this.archivedAt,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['profile_id'] = Variable<String>(profileId);
+    map['person_id'] = Variable<String>(personId);
+    map['kind'] = Variable<String>(kind);
+    map['cadence'] = Variable<String>(cadence);
+    if (!nullToAbsent || howWeMet != null) {
+      map['how_we_met'] = Variable<String>(howWeMet);
+    }
+    if (!nullToAbsent || startedAt != null) {
+      map['started_at'] = Variable<int>(startedAt);
+    }
+    if (!nullToAbsent || notes != null) {
+      map['notes'] = Variable<String>(notes);
+    }
+    if (!nullToAbsent || archivedAt != null) {
+      map['archived_at'] = Variable<int>(archivedAt);
+    }
+    map['created_at'] = Variable<int>(createdAt);
+    map['updated_at'] = Variable<int>(updatedAt);
+    return map;
+  }
+
+  FriendshipsCompanion toCompanion(bool nullToAbsent) {
+    return FriendshipsCompanion(
+      id: Value(id),
+      profileId: Value(profileId),
+      personId: Value(personId),
+      kind: Value(kind),
+      cadence: Value(cadence),
+      howWeMet: howWeMet == null && nullToAbsent
+          ? const Value.absent()
+          : Value(howWeMet),
+      startedAt: startedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(startedAt),
+      notes: notes == null && nullToAbsent
+          ? const Value.absent()
+          : Value(notes),
+      archivedAt: archivedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(archivedAt),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+    );
+  }
+
+  factory FriendshipRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return FriendshipRow(
+      id: serializer.fromJson<String>(json['id']),
+      profileId: serializer.fromJson<String>(json['profileId']),
+      personId: serializer.fromJson<String>(json['personId']),
+      kind: serializer.fromJson<String>(json['kind']),
+      cadence: serializer.fromJson<String>(json['cadence']),
+      howWeMet: serializer.fromJson<String?>(json['howWeMet']),
+      startedAt: serializer.fromJson<int?>(json['startedAt']),
+      notes: serializer.fromJson<String?>(json['notes']),
+      archivedAt: serializer.fromJson<int?>(json['archivedAt']),
+      createdAt: serializer.fromJson<int>(json['createdAt']),
+      updatedAt: serializer.fromJson<int>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'profileId': serializer.toJson<String>(profileId),
+      'personId': serializer.toJson<String>(personId),
+      'kind': serializer.toJson<String>(kind),
+      'cadence': serializer.toJson<String>(cadence),
+      'howWeMet': serializer.toJson<String?>(howWeMet),
+      'startedAt': serializer.toJson<int?>(startedAt),
+      'notes': serializer.toJson<String?>(notes),
+      'archivedAt': serializer.toJson<int?>(archivedAt),
+      'createdAt': serializer.toJson<int>(createdAt),
+      'updatedAt': serializer.toJson<int>(updatedAt),
+    };
+  }
+
+  FriendshipRow copyWith({
+    String? id,
+    String? profileId,
+    String? personId,
+    String? kind,
+    String? cadence,
+    Value<String?> howWeMet = const Value.absent(),
+    Value<int?> startedAt = const Value.absent(),
+    Value<String?> notes = const Value.absent(),
+    Value<int?> archivedAt = const Value.absent(),
+    int? createdAt,
+    int? updatedAt,
+  }) => FriendshipRow(
+    id: id ?? this.id,
+    profileId: profileId ?? this.profileId,
+    personId: personId ?? this.personId,
+    kind: kind ?? this.kind,
+    cadence: cadence ?? this.cadence,
+    howWeMet: howWeMet.present ? howWeMet.value : this.howWeMet,
+    startedAt: startedAt.present ? startedAt.value : this.startedAt,
+    notes: notes.present ? notes.value : this.notes,
+    archivedAt: archivedAt.present ? archivedAt.value : this.archivedAt,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+  );
+  FriendshipRow copyWithCompanion(FriendshipsCompanion data) {
+    return FriendshipRow(
+      id: data.id.present ? data.id.value : this.id,
+      profileId: data.profileId.present ? data.profileId.value : this.profileId,
+      personId: data.personId.present ? data.personId.value : this.personId,
+      kind: data.kind.present ? data.kind.value : this.kind,
+      cadence: data.cadence.present ? data.cadence.value : this.cadence,
+      howWeMet: data.howWeMet.present ? data.howWeMet.value : this.howWeMet,
+      startedAt: data.startedAt.present ? data.startedAt.value : this.startedAt,
+      notes: data.notes.present ? data.notes.value : this.notes,
+      archivedAt: data.archivedAt.present
+          ? data.archivedAt.value
+          : this.archivedAt,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('FriendshipRow(')
+          ..write('id: $id, ')
+          ..write('profileId: $profileId, ')
+          ..write('personId: $personId, ')
+          ..write('kind: $kind, ')
+          ..write('cadence: $cadence, ')
+          ..write('howWeMet: $howWeMet, ')
+          ..write('startedAt: $startedAt, ')
+          ..write('notes: $notes, ')
+          ..write('archivedAt: $archivedAt, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    profileId,
+    personId,
+    kind,
+    cadence,
+    howWeMet,
+    startedAt,
+    notes,
+    archivedAt,
+    createdAt,
+    updatedAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is FriendshipRow &&
+          other.id == this.id &&
+          other.profileId == this.profileId &&
+          other.personId == this.personId &&
+          other.kind == this.kind &&
+          other.cadence == this.cadence &&
+          other.howWeMet == this.howWeMet &&
+          other.startedAt == this.startedAt &&
+          other.notes == this.notes &&
+          other.archivedAt == this.archivedAt &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt);
+}
+
+class FriendshipsCompanion extends UpdateCompanion<FriendshipRow> {
+  final Value<String> id;
+  final Value<String> profileId;
+  final Value<String> personId;
+  final Value<String> kind;
+  final Value<String> cadence;
+  final Value<String?> howWeMet;
+  final Value<int?> startedAt;
+  final Value<String?> notes;
+  final Value<int?> archivedAt;
+  final Value<int> createdAt;
+  final Value<int> updatedAt;
+  final Value<int> rowid;
+  const FriendshipsCompanion({
+    this.id = const Value.absent(),
+    this.profileId = const Value.absent(),
+    this.personId = const Value.absent(),
+    this.kind = const Value.absent(),
+    this.cadence = const Value.absent(),
+    this.howWeMet = const Value.absent(),
+    this.startedAt = const Value.absent(),
+    this.notes = const Value.absent(),
+    this.archivedAt = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  FriendshipsCompanion.insert({
+    required String id,
+    required String profileId,
+    required String personId,
+    required String kind,
+    required String cadence,
+    this.howWeMet = const Value.absent(),
+    this.startedAt = const Value.absent(),
+    this.notes = const Value.absent(),
+    this.archivedAt = const Value.absent(),
+    required int createdAt,
+    required int updatedAt,
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       profileId = Value(profileId),
+       personId = Value(personId),
+       kind = Value(kind),
+       cadence = Value(cadence),
+       createdAt = Value(createdAt),
+       updatedAt = Value(updatedAt);
+  static Insertable<FriendshipRow> custom({
+    Expression<String>? id,
+    Expression<String>? profileId,
+    Expression<String>? personId,
+    Expression<String>? kind,
+    Expression<String>? cadence,
+    Expression<String>? howWeMet,
+    Expression<int>? startedAt,
+    Expression<String>? notes,
+    Expression<int>? archivedAt,
+    Expression<int>? createdAt,
+    Expression<int>? updatedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (profileId != null) 'profile_id': profileId,
+      if (personId != null) 'person_id': personId,
+      if (kind != null) 'kind': kind,
+      if (cadence != null) 'cadence': cadence,
+      if (howWeMet != null) 'how_we_met': howWeMet,
+      if (startedAt != null) 'started_at': startedAt,
+      if (notes != null) 'notes': notes,
+      if (archivedAt != null) 'archived_at': archivedAt,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  FriendshipsCompanion copyWith({
+    Value<String>? id,
+    Value<String>? profileId,
+    Value<String>? personId,
+    Value<String>? kind,
+    Value<String>? cadence,
+    Value<String?>? howWeMet,
+    Value<int?>? startedAt,
+    Value<String?>? notes,
+    Value<int?>? archivedAt,
+    Value<int>? createdAt,
+    Value<int>? updatedAt,
+    Value<int>? rowid,
+  }) {
+    return FriendshipsCompanion(
+      id: id ?? this.id,
+      profileId: profileId ?? this.profileId,
+      personId: personId ?? this.personId,
+      kind: kind ?? this.kind,
+      cadence: cadence ?? this.cadence,
+      howWeMet: howWeMet ?? this.howWeMet,
+      startedAt: startedAt ?? this.startedAt,
+      notes: notes ?? this.notes,
+      archivedAt: archivedAt ?? this.archivedAt,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (profileId.present) {
+      map['profile_id'] = Variable<String>(profileId.value);
+    }
+    if (personId.present) {
+      map['person_id'] = Variable<String>(personId.value);
+    }
+    if (kind.present) {
+      map['kind'] = Variable<String>(kind.value);
+    }
+    if (cadence.present) {
+      map['cadence'] = Variable<String>(cadence.value);
+    }
+    if (howWeMet.present) {
+      map['how_we_met'] = Variable<String>(howWeMet.value);
+    }
+    if (startedAt.present) {
+      map['started_at'] = Variable<int>(startedAt.value);
+    }
+    if (notes.present) {
+      map['notes'] = Variable<String>(notes.value);
+    }
+    if (archivedAt.present) {
+      map['archived_at'] = Variable<int>(archivedAt.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<int>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<int>(updatedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('FriendshipsCompanion(')
+          ..write('id: $id, ')
+          ..write('profileId: $profileId, ')
+          ..write('personId: $personId, ')
+          ..write('kind: $kind, ')
+          ..write('cadence: $cadence, ')
+          ..write('howWeMet: $howWeMet, ')
+          ..write('startedAt: $startedAt, ')
+          ..write('notes: $notes, ')
+          ..write('archivedAt: $archivedAt, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $FriendshipCirclesTable extends FriendshipCircles
+    with TableInfo<$FriendshipCirclesTable, FriendshipCircleRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $FriendshipCirclesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _profileIdMeta = const VerificationMeta(
+    'profileId',
+  );
+  @override
+  late final GeneratedColumn<String> profileId = GeneratedColumn<String>(
+    'profile_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES profiles (id)',
+    ),
+  );
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+    'name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _notesMeta = const VerificationMeta('notes');
+  @override
+  late final GeneratedColumn<String> notes = GeneratedColumn<String>(
+    'notes',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _defaultCadenceMeta = const VerificationMeta(
+    'defaultCadence',
+  );
+  @override
+  late final GeneratedColumn<String> defaultCadence = GeneratedColumn<String>(
+    'default_cadence',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _archivedAtMeta = const VerificationMeta(
+    'archivedAt',
+  );
+  @override
+  late final GeneratedColumn<int> archivedAt = GeneratedColumn<int>(
+    'archived_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<int> createdAt = GeneratedColumn<int>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<int> updatedAt = GeneratedColumn<int>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    profileId,
+    name,
+    notes,
+    defaultCadence,
+    archivedAt,
+    createdAt,
+    updatedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'friendship_circles';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<FriendshipCircleRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('profile_id')) {
+      context.handle(
+        _profileIdMeta,
+        profileId.isAcceptableOrUnknown(data['profile_id']!, _profileIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_profileIdMeta);
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    if (data.containsKey('notes')) {
+      context.handle(
+        _notesMeta,
+        notes.isAcceptableOrUnknown(data['notes']!, _notesMeta),
+      );
+    }
+    if (data.containsKey('default_cadence')) {
+      context.handle(
+        _defaultCadenceMeta,
+        defaultCadence.isAcceptableOrUnknown(
+          data['default_cadence']!,
+          _defaultCadenceMeta,
+        ),
+      );
+    }
+    if (data.containsKey('archived_at')) {
+      context.handle(
+        _archivedAtMeta,
+        archivedAt.isAcceptableOrUnknown(data['archived_at']!, _archivedAtMeta),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  FriendshipCircleRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return FriendshipCircleRow(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      profileId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}profile_id'],
+      )!,
+      name: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      )!,
+      notes: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}notes'],
+      ),
+      defaultCadence: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}default_cadence'],
+      ),
+      archivedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}archived_at'],
+      ),
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}updated_at'],
+      )!,
+    );
+  }
+
+  @override
+  $FriendshipCirclesTable createAlias(String alias) {
+    return $FriendshipCirclesTable(attachedDatabase, alias);
+  }
+}
+
+class FriendshipCircleRow extends DataClass
+    implements Insertable<FriendshipCircleRow> {
+  final String id;
+  final String profileId;
+  final String name;
+  final String? notes;
+  final String? defaultCadence;
+  final int? archivedAt;
+  final int createdAt;
+  final int updatedAt;
+  const FriendshipCircleRow({
+    required this.id,
+    required this.profileId,
+    required this.name,
+    this.notes,
+    this.defaultCadence,
+    this.archivedAt,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['profile_id'] = Variable<String>(profileId);
+    map['name'] = Variable<String>(name);
+    if (!nullToAbsent || notes != null) {
+      map['notes'] = Variable<String>(notes);
+    }
+    if (!nullToAbsent || defaultCadence != null) {
+      map['default_cadence'] = Variable<String>(defaultCadence);
+    }
+    if (!nullToAbsent || archivedAt != null) {
+      map['archived_at'] = Variable<int>(archivedAt);
+    }
+    map['created_at'] = Variable<int>(createdAt);
+    map['updated_at'] = Variable<int>(updatedAt);
+    return map;
+  }
+
+  FriendshipCirclesCompanion toCompanion(bool nullToAbsent) {
+    return FriendshipCirclesCompanion(
+      id: Value(id),
+      profileId: Value(profileId),
+      name: Value(name),
+      notes: notes == null && nullToAbsent
+          ? const Value.absent()
+          : Value(notes),
+      defaultCadence: defaultCadence == null && nullToAbsent
+          ? const Value.absent()
+          : Value(defaultCadence),
+      archivedAt: archivedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(archivedAt),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+    );
+  }
+
+  factory FriendshipCircleRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return FriendshipCircleRow(
+      id: serializer.fromJson<String>(json['id']),
+      profileId: serializer.fromJson<String>(json['profileId']),
+      name: serializer.fromJson<String>(json['name']),
+      notes: serializer.fromJson<String?>(json['notes']),
+      defaultCadence: serializer.fromJson<String?>(json['defaultCadence']),
+      archivedAt: serializer.fromJson<int?>(json['archivedAt']),
+      createdAt: serializer.fromJson<int>(json['createdAt']),
+      updatedAt: serializer.fromJson<int>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'profileId': serializer.toJson<String>(profileId),
+      'name': serializer.toJson<String>(name),
+      'notes': serializer.toJson<String?>(notes),
+      'defaultCadence': serializer.toJson<String?>(defaultCadence),
+      'archivedAt': serializer.toJson<int?>(archivedAt),
+      'createdAt': serializer.toJson<int>(createdAt),
+      'updatedAt': serializer.toJson<int>(updatedAt),
+    };
+  }
+
+  FriendshipCircleRow copyWith({
+    String? id,
+    String? profileId,
+    String? name,
+    Value<String?> notes = const Value.absent(),
+    Value<String?> defaultCadence = const Value.absent(),
+    Value<int?> archivedAt = const Value.absent(),
+    int? createdAt,
+    int? updatedAt,
+  }) => FriendshipCircleRow(
+    id: id ?? this.id,
+    profileId: profileId ?? this.profileId,
+    name: name ?? this.name,
+    notes: notes.present ? notes.value : this.notes,
+    defaultCadence: defaultCadence.present
+        ? defaultCadence.value
+        : this.defaultCadence,
+    archivedAt: archivedAt.present ? archivedAt.value : this.archivedAt,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+  );
+  FriendshipCircleRow copyWithCompanion(FriendshipCirclesCompanion data) {
+    return FriendshipCircleRow(
+      id: data.id.present ? data.id.value : this.id,
+      profileId: data.profileId.present ? data.profileId.value : this.profileId,
+      name: data.name.present ? data.name.value : this.name,
+      notes: data.notes.present ? data.notes.value : this.notes,
+      defaultCadence: data.defaultCadence.present
+          ? data.defaultCadence.value
+          : this.defaultCadence,
+      archivedAt: data.archivedAt.present
+          ? data.archivedAt.value
+          : this.archivedAt,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('FriendshipCircleRow(')
+          ..write('id: $id, ')
+          ..write('profileId: $profileId, ')
+          ..write('name: $name, ')
+          ..write('notes: $notes, ')
+          ..write('defaultCadence: $defaultCadence, ')
+          ..write('archivedAt: $archivedAt, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    profileId,
+    name,
+    notes,
+    defaultCadence,
+    archivedAt,
+    createdAt,
+    updatedAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is FriendshipCircleRow &&
+          other.id == this.id &&
+          other.profileId == this.profileId &&
+          other.name == this.name &&
+          other.notes == this.notes &&
+          other.defaultCadence == this.defaultCadence &&
+          other.archivedAt == this.archivedAt &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt);
+}
+
+class FriendshipCirclesCompanion extends UpdateCompanion<FriendshipCircleRow> {
+  final Value<String> id;
+  final Value<String> profileId;
+  final Value<String> name;
+  final Value<String?> notes;
+  final Value<String?> defaultCadence;
+  final Value<int?> archivedAt;
+  final Value<int> createdAt;
+  final Value<int> updatedAt;
+  final Value<int> rowid;
+  const FriendshipCirclesCompanion({
+    this.id = const Value.absent(),
+    this.profileId = const Value.absent(),
+    this.name = const Value.absent(),
+    this.notes = const Value.absent(),
+    this.defaultCadence = const Value.absent(),
+    this.archivedAt = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  FriendshipCirclesCompanion.insert({
+    required String id,
+    required String profileId,
+    required String name,
+    this.notes = const Value.absent(),
+    this.defaultCadence = const Value.absent(),
+    this.archivedAt = const Value.absent(),
+    required int createdAt,
+    required int updatedAt,
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       profileId = Value(profileId),
+       name = Value(name),
+       createdAt = Value(createdAt),
+       updatedAt = Value(updatedAt);
+  static Insertable<FriendshipCircleRow> custom({
+    Expression<String>? id,
+    Expression<String>? profileId,
+    Expression<String>? name,
+    Expression<String>? notes,
+    Expression<String>? defaultCadence,
+    Expression<int>? archivedAt,
+    Expression<int>? createdAt,
+    Expression<int>? updatedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (profileId != null) 'profile_id': profileId,
+      if (name != null) 'name': name,
+      if (notes != null) 'notes': notes,
+      if (defaultCadence != null) 'default_cadence': defaultCadence,
+      if (archivedAt != null) 'archived_at': archivedAt,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  FriendshipCirclesCompanion copyWith({
+    Value<String>? id,
+    Value<String>? profileId,
+    Value<String>? name,
+    Value<String?>? notes,
+    Value<String?>? defaultCadence,
+    Value<int?>? archivedAt,
+    Value<int>? createdAt,
+    Value<int>? updatedAt,
+    Value<int>? rowid,
+  }) {
+    return FriendshipCirclesCompanion(
+      id: id ?? this.id,
+      profileId: profileId ?? this.profileId,
+      name: name ?? this.name,
+      notes: notes ?? this.notes,
+      defaultCadence: defaultCadence ?? this.defaultCadence,
+      archivedAt: archivedAt ?? this.archivedAt,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (profileId.present) {
+      map['profile_id'] = Variable<String>(profileId.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (notes.present) {
+      map['notes'] = Variable<String>(notes.value);
+    }
+    if (defaultCadence.present) {
+      map['default_cadence'] = Variable<String>(defaultCadence.value);
+    }
+    if (archivedAt.present) {
+      map['archived_at'] = Variable<int>(archivedAt.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<int>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<int>(updatedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('FriendshipCirclesCompanion(')
+          ..write('id: $id, ')
+          ..write('profileId: $profileId, ')
+          ..write('name: $name, ')
+          ..write('notes: $notes, ')
+          ..write('defaultCadence: $defaultCadence, ')
+          ..write('archivedAt: $archivedAt, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $FriendshipCircleMembershipsTable extends FriendshipCircleMemberships
+    with
+        TableInfo<
+          $FriendshipCircleMembershipsTable,
+          FriendshipCircleMembershipRow
+        > {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $FriendshipCircleMembershipsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _personIdMeta = const VerificationMeta(
+    'personId',
+  );
+  @override
+  late final GeneratedColumn<String> personId = GeneratedColumn<String>(
+    'person_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES people (id)',
+    ),
+  );
+  static const VerificationMeta _circleIdMeta = const VerificationMeta(
+    'circleId',
+  );
+  @override
+  late final GeneratedColumn<String> circleId = GeneratedColumn<String>(
+    'circle_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES friendship_circles (id)',
+    ),
+  );
+  static const VerificationMeta _linkedAtMeta = const VerificationMeta(
+    'linkedAt',
+  );
+  @override
+  late final GeneratedColumn<int> linkedAt = GeneratedColumn<int>(
+    'linked_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [personId, circleId, linkedAt];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'friendship_circle_memberships';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<FriendshipCircleMembershipRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('person_id')) {
+      context.handle(
+        _personIdMeta,
+        personId.isAcceptableOrUnknown(data['person_id']!, _personIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_personIdMeta);
+    }
+    if (data.containsKey('circle_id')) {
+      context.handle(
+        _circleIdMeta,
+        circleId.isAcceptableOrUnknown(data['circle_id']!, _circleIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_circleIdMeta);
+    }
+    if (data.containsKey('linked_at')) {
+      context.handle(
+        _linkedAtMeta,
+        linkedAt.isAcceptableOrUnknown(data['linked_at']!, _linkedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_linkedAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {personId, circleId};
+  @override
+  FriendshipCircleMembershipRow map(
+    Map<String, dynamic> data, {
+    String? tablePrefix,
+  }) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return FriendshipCircleMembershipRow(
+      personId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}person_id'],
+      )!,
+      circleId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}circle_id'],
+      )!,
+      linkedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}linked_at'],
+      )!,
+    );
+  }
+
+  @override
+  $FriendshipCircleMembershipsTable createAlias(String alias) {
+    return $FriendshipCircleMembershipsTable(attachedDatabase, alias);
+  }
+}
+
+class FriendshipCircleMembershipRow extends DataClass
+    implements Insertable<FriendshipCircleMembershipRow> {
+  final String personId;
+  final String circleId;
+  final int linkedAt;
+  const FriendshipCircleMembershipRow({
+    required this.personId,
+    required this.circleId,
+    required this.linkedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['person_id'] = Variable<String>(personId);
+    map['circle_id'] = Variable<String>(circleId);
+    map['linked_at'] = Variable<int>(linkedAt);
+    return map;
+  }
+
+  FriendshipCircleMembershipsCompanion toCompanion(bool nullToAbsent) {
+    return FriendshipCircleMembershipsCompanion(
+      personId: Value(personId),
+      circleId: Value(circleId),
+      linkedAt: Value(linkedAt),
+    );
+  }
+
+  factory FriendshipCircleMembershipRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return FriendshipCircleMembershipRow(
+      personId: serializer.fromJson<String>(json['personId']),
+      circleId: serializer.fromJson<String>(json['circleId']),
+      linkedAt: serializer.fromJson<int>(json['linkedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'personId': serializer.toJson<String>(personId),
+      'circleId': serializer.toJson<String>(circleId),
+      'linkedAt': serializer.toJson<int>(linkedAt),
+    };
+  }
+
+  FriendshipCircleMembershipRow copyWith({
+    String? personId,
+    String? circleId,
+    int? linkedAt,
+  }) => FriendshipCircleMembershipRow(
+    personId: personId ?? this.personId,
+    circleId: circleId ?? this.circleId,
+    linkedAt: linkedAt ?? this.linkedAt,
+  );
+  FriendshipCircleMembershipRow copyWithCompanion(
+    FriendshipCircleMembershipsCompanion data,
+  ) {
+    return FriendshipCircleMembershipRow(
+      personId: data.personId.present ? data.personId.value : this.personId,
+      circleId: data.circleId.present ? data.circleId.value : this.circleId,
+      linkedAt: data.linkedAt.present ? data.linkedAt.value : this.linkedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('FriendshipCircleMembershipRow(')
+          ..write('personId: $personId, ')
+          ..write('circleId: $circleId, ')
+          ..write('linkedAt: $linkedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(personId, circleId, linkedAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is FriendshipCircleMembershipRow &&
+          other.personId == this.personId &&
+          other.circleId == this.circleId &&
+          other.linkedAt == this.linkedAt);
+}
+
+class FriendshipCircleMembershipsCompanion
+    extends UpdateCompanion<FriendshipCircleMembershipRow> {
+  final Value<String> personId;
+  final Value<String> circleId;
+  final Value<int> linkedAt;
+  final Value<int> rowid;
+  const FriendshipCircleMembershipsCompanion({
+    this.personId = const Value.absent(),
+    this.circleId = const Value.absent(),
+    this.linkedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  FriendshipCircleMembershipsCompanion.insert({
+    required String personId,
+    required String circleId,
+    required int linkedAt,
+    this.rowid = const Value.absent(),
+  }) : personId = Value(personId),
+       circleId = Value(circleId),
+       linkedAt = Value(linkedAt);
+  static Insertable<FriendshipCircleMembershipRow> custom({
+    Expression<String>? personId,
+    Expression<String>? circleId,
+    Expression<int>? linkedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (personId != null) 'person_id': personId,
+      if (circleId != null) 'circle_id': circleId,
+      if (linkedAt != null) 'linked_at': linkedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  FriendshipCircleMembershipsCompanion copyWith({
+    Value<String>? personId,
+    Value<String>? circleId,
+    Value<int>? linkedAt,
+    Value<int>? rowid,
+  }) {
+    return FriendshipCircleMembershipsCompanion(
+      personId: personId ?? this.personId,
+      circleId: circleId ?? this.circleId,
+      linkedAt: linkedAt ?? this.linkedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (personId.present) {
+      map['person_id'] = Variable<String>(personId.value);
+    }
+    if (circleId.present) {
+      map['circle_id'] = Variable<String>(circleId.value);
+    }
+    if (linkedAt.present) {
+      map['linked_at'] = Variable<int>(linkedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('FriendshipCircleMembershipsCompanion(')
+          ..write('personId: $personId, ')
+          ..write('circleId: $circleId, ')
+          ..write('linkedAt: $linkedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$ColonyDatabase extends GeneratedDatabase {
   _$ColonyDatabase(QueryExecutor e) : super(e);
   $ColonyDatabaseManager get managers => $ColonyDatabaseManager(this);
@@ -40122,6 +41600,11 @@ abstract class _$ColonyDatabase extends GeneratedDatabase {
   );
   late final $MusicSpotifySyncStatesTable musicSpotifySyncStates =
       $MusicSpotifySyncStatesTable(this);
+  late final $FriendshipsTable friendships = $FriendshipsTable(this);
+  late final $FriendshipCirclesTable friendshipCircles =
+      $FriendshipCirclesTable(this);
+  late final $FriendshipCircleMembershipsTable friendshipCircleMemberships =
+      $FriendshipCircleMembershipsTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -40195,6 +41678,9 @@ abstract class _$ColonyDatabase extends GeneratedDatabase {
     musicExpeditionStops,
     musicImportRuns,
     musicSpotifySyncStates,
+    friendships,
+    friendshipCircles,
+    friendshipCircleMemberships,
   ];
 }
 
@@ -41206,6 +42692,48 @@ final class $$ProfilesTableReferences
 
     final cache = $_typedResult.readTableOrNull(
       _musicSpotifySyncStatesRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$FriendshipsTable, List<FriendshipRow>>
+  _friendshipsRefsTable(_$ColonyDatabase db) => MultiTypedResultKey.fromTable(
+    db.friendships,
+    aliasName: $_aliasNameGenerator(db.profiles.id, db.friendships.profileId),
+  );
+
+  $$FriendshipsTableProcessedTableManager get friendshipsRefs {
+    final manager = $$FriendshipsTableTableManager(
+      $_db,
+      $_db.friendships,
+    ).filter((f) => f.profileId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_friendshipsRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$FriendshipCirclesTable, List<FriendshipCircleRow>>
+  _friendshipCirclesRefsTable(_$ColonyDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.friendshipCircles,
+        aliasName: $_aliasNameGenerator(
+          db.profiles.id,
+          db.friendshipCircles.profileId,
+        ),
+      );
+
+  $$FriendshipCirclesTableProcessedTableManager get friendshipCirclesRefs {
+    final manager = $$FriendshipCirclesTableTableManager(
+      $_db,
+      $_db.friendshipCircles,
+    ).filter((f) => f.profileId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _friendshipCirclesRefsTable($_db),
     );
     return ProcessedTableManager(
       manager.$state.copyWith(prefetchedData: cache),
@@ -42352,6 +43880,56 @@ class $$ProfilesTableFilterComposer
                     $removeJoinBuilderFromRootComposer,
               ),
         );
+    return f(composer);
+  }
+
+  Expression<bool> friendshipsRefs(
+    Expression<bool> Function($$FriendshipsTableFilterComposer f) f,
+  ) {
+    final $$FriendshipsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.friendships,
+      getReferencedColumn: (t) => t.profileId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$FriendshipsTableFilterComposer(
+            $db: $db,
+            $table: $db.friendships,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> friendshipCirclesRefs(
+    Expression<bool> Function($$FriendshipCirclesTableFilterComposer f) f,
+  ) {
+    final $$FriendshipCirclesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.friendshipCircles,
+      getReferencedColumn: (t) => t.profileId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$FriendshipCirclesTableFilterComposer(
+            $db: $db,
+            $table: $db.friendshipCircles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
     return f(composer);
   }
 }
@@ -43551,6 +45129,57 @@ class $$ProfilesTableAnnotationComposer
         );
     return f(composer);
   }
+
+  Expression<T> friendshipsRefs<T extends Object>(
+    Expression<T> Function($$FriendshipsTableAnnotationComposer a) f,
+  ) {
+    final $$FriendshipsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.friendships,
+      getReferencedColumn: (t) => t.profileId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$FriendshipsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.friendships,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<T> friendshipCirclesRefs<T extends Object>(
+    Expression<T> Function($$FriendshipCirclesTableAnnotationComposer a) f,
+  ) {
+    final $$FriendshipCirclesTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.friendshipCircles,
+          getReferencedColumn: (t) => t.profileId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$FriendshipCirclesTableAnnotationComposer(
+                $db: $db,
+                $table: $db.friendshipCircles,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
 }
 
 class $$ProfilesTableTableManager
@@ -43610,6 +45239,8 @@ class $$ProfilesTableTableManager
             bool musicExpeditionsRefs,
             bool musicImportRunsRefs,
             bool musicSpotifySyncStatesRefs,
+            bool friendshipsRefs,
+            bool friendshipCirclesRefs,
           })
         > {
   $$ProfilesTableTableManager(_$ColonyDatabase db, $ProfilesTable table)
@@ -43728,6 +45359,8 @@ class $$ProfilesTableTableManager
                 musicExpeditionsRefs = false,
                 musicImportRunsRefs = false,
                 musicSpotifySyncStatesRefs = false,
+                friendshipsRefs = false,
+                friendshipCirclesRefs = false,
               }) {
                 return PrefetchHooks(
                   db: db,
@@ -43776,6 +45409,8 @@ class $$ProfilesTableTableManager
                     if (musicExpeditionsRefs) db.musicExpeditions,
                     if (musicImportRunsRefs) db.musicImportRuns,
                     if (musicSpotifySyncStatesRefs) db.musicSpotifySyncStates,
+                    if (friendshipsRefs) db.friendships,
+                    if (friendshipCirclesRefs) db.friendshipCircles,
                   ],
                   addJoins: null,
                   getPrefetchedDataCallback: (items) async {
@@ -44683,6 +46318,48 @@ class $$ProfilesTableTableManager
                               ),
                           typedResults: items,
                         ),
+                      if (friendshipsRefs)
+                        await $_getPrefetchedData<
+                          Profile,
+                          $ProfilesTable,
+                          FriendshipRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$ProfilesTableReferences
+                              ._friendshipsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$ProfilesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).friendshipsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.profileId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (friendshipCirclesRefs)
+                        await $_getPrefetchedData<
+                          Profile,
+                          $ProfilesTable,
+                          FriendshipCircleRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$ProfilesTableReferences
+                              ._friendshipCirclesRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$ProfilesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).friendshipCirclesRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.profileId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
                     ];
                   },
                 );
@@ -44747,6 +46424,8 @@ typedef $$ProfilesTableProcessedTableManager =
         bool musicExpeditionsRefs,
         bool musicImportRunsRefs,
         bool musicSpotifySyncStatesRefs,
+        bool friendshipsRefs,
+        bool friendshipCirclesRefs,
       })
     >;
 typedef $$DomainEventsTableCreateCompanionBuilder =
@@ -60186,6 +61865,52 @@ final class $$PeopleTableReferences
       manager.$state.copyWith(prefetchedData: cache),
     );
   }
+
+  static MultiTypedResultKey<$FriendshipsTable, List<FriendshipRow>>
+  _friendshipsRefsTable(_$ColonyDatabase db) => MultiTypedResultKey.fromTable(
+    db.friendships,
+    aliasName: $_aliasNameGenerator(db.people.id, db.friendships.personId),
+  );
+
+  $$FriendshipsTableProcessedTableManager get friendshipsRefs {
+    final manager = $$FriendshipsTableTableManager(
+      $_db,
+      $_db.friendships,
+    ).filter((f) => f.personId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_friendshipsRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<
+    $FriendshipCircleMembershipsTable,
+    List<FriendshipCircleMembershipRow>
+  >
+  _friendshipCircleMembershipsRefsTable(_$ColonyDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.friendshipCircleMemberships,
+        aliasName: $_aliasNameGenerator(
+          db.people.id,
+          db.friendshipCircleMemberships.personId,
+        ),
+      );
+
+  $$FriendshipCircleMembershipsTableProcessedTableManager
+  get friendshipCircleMembershipsRefs {
+    final manager = $$FriendshipCircleMembershipsTableTableManager(
+      $_db,
+      $_db.friendshipCircleMemberships,
+    ).filter((f) => f.personId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _friendshipCircleMembershipsRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
 }
 
 class $$PeopleTableFilterComposer
@@ -60347,6 +62072,60 @@ class $$PeopleTableFilterComposer
                 $removeJoinBuilderFromRootComposer,
           ),
     );
+    return f(composer);
+  }
+
+  Expression<bool> friendshipsRefs(
+    Expression<bool> Function($$FriendshipsTableFilterComposer f) f,
+  ) {
+    final $$FriendshipsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.friendships,
+      getReferencedColumn: (t) => t.personId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$FriendshipsTableFilterComposer(
+            $db: $db,
+            $table: $db.friendships,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> friendshipCircleMembershipsRefs(
+    Expression<bool> Function(
+      $$FriendshipCircleMembershipsTableFilterComposer f,
+    )
+    f,
+  ) {
+    final $$FriendshipCircleMembershipsTableFilterComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.friendshipCircleMemberships,
+          getReferencedColumn: (t) => t.personId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$FriendshipCircleMembershipsTableFilterComposer(
+                $db: $db,
+                $table: $db.friendshipCircleMemberships,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
     return f(composer);
   }
 }
@@ -60592,6 +62371,60 @@ class $$PeopleTableAnnotationComposer
     );
     return f(composer);
   }
+
+  Expression<T> friendshipsRefs<T extends Object>(
+    Expression<T> Function($$FriendshipsTableAnnotationComposer a) f,
+  ) {
+    final $$FriendshipsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.friendships,
+      getReferencedColumn: (t) => t.personId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$FriendshipsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.friendships,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<T> friendshipCircleMembershipsRefs<T extends Object>(
+    Expression<T> Function(
+      $$FriendshipCircleMembershipsTableAnnotationComposer a,
+    )
+    f,
+  ) {
+    final $$FriendshipCircleMembershipsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.friendshipCircleMemberships,
+          getReferencedColumn: (t) => t.personId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$FriendshipCircleMembershipsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.friendshipCircleMemberships,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
 }
 
 class $$PeopleTableTableManager
@@ -60612,6 +62445,8 @@ class $$PeopleTableTableManager
             bool personInteractionsRefs,
             bool personOrganizationsRefs,
             bool commitmentsRefs,
+            bool friendshipsRefs,
+            bool friendshipCircleMembershipsRefs,
           })
         > {
   $$PeopleTableTableManager(_$ColonyDatabase db, $PeopleTable table)
@@ -60697,6 +62532,8 @@ class $$PeopleTableTableManager
                 personInteractionsRefs = false,
                 personOrganizationsRefs = false,
                 commitmentsRefs = false,
+                friendshipsRefs = false,
+                friendshipCircleMembershipsRefs = false,
               }) {
                 return PrefetchHooks(
                   db: db,
@@ -60704,6 +62541,9 @@ class $$PeopleTableTableManager
                     if (personInteractionsRefs) db.personInteractions,
                     if (personOrganizationsRefs) db.personOrganizations,
                     if (commitmentsRefs) db.commitments,
+                    if (friendshipsRefs) db.friendships,
+                    if (friendshipCircleMembershipsRefs)
+                      db.friendshipCircleMemberships,
                   ],
                   addJoins:
                       <
@@ -60802,6 +62642,48 @@ class $$PeopleTableTableManager
                               ),
                           typedResults: items,
                         ),
+                      if (friendshipsRefs)
+                        await $_getPrefetchedData<
+                          PersonRow,
+                          $PeopleTable,
+                          FriendshipRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$PeopleTableReferences
+                              ._friendshipsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$PeopleTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).friendshipsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.personId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (friendshipCircleMembershipsRefs)
+                        await $_getPrefetchedData<
+                          PersonRow,
+                          $PeopleTable,
+                          FriendshipCircleMembershipRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$PeopleTableReferences
+                              ._friendshipCircleMembershipsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$PeopleTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).friendshipCircleMembershipsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.personId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
                     ];
                   },
                 );
@@ -60827,6 +62709,8 @@ typedef $$PeopleTableProcessedTableManager =
         bool personInteractionsRefs,
         bool personOrganizationsRefs,
         bool commitmentsRefs,
+        bool friendshipsRefs,
+        bool friendshipCircleMembershipsRefs,
       })
     >;
 typedef $$CategoryBudgetsTableCreateCompanionBuilder =
@@ -78790,6 +80674,1447 @@ typedef $$MusicSpotifySyncStatesTableProcessedTableManager =
       MusicSpotifySyncStateRow,
       PrefetchHooks Function({bool profileId})
     >;
+typedef $$FriendshipsTableCreateCompanionBuilder =
+    FriendshipsCompanion Function({
+      required String id,
+      required String profileId,
+      required String personId,
+      required String kind,
+      required String cadence,
+      Value<String?> howWeMet,
+      Value<int?> startedAt,
+      Value<String?> notes,
+      Value<int?> archivedAt,
+      required int createdAt,
+      required int updatedAt,
+      Value<int> rowid,
+    });
+typedef $$FriendshipsTableUpdateCompanionBuilder =
+    FriendshipsCompanion Function({
+      Value<String> id,
+      Value<String> profileId,
+      Value<String> personId,
+      Value<String> kind,
+      Value<String> cadence,
+      Value<String?> howWeMet,
+      Value<int?> startedAt,
+      Value<String?> notes,
+      Value<int?> archivedAt,
+      Value<int> createdAt,
+      Value<int> updatedAt,
+      Value<int> rowid,
+    });
+
+final class $$FriendshipsTableReferences
+    extends BaseReferences<_$ColonyDatabase, $FriendshipsTable, FriendshipRow> {
+  $$FriendshipsTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static $ProfilesTable _profileIdTable(_$ColonyDatabase db) =>
+      db.profiles.createAlias(
+        $_aliasNameGenerator(db.friendships.profileId, db.profiles.id),
+      );
+
+  $$ProfilesTableProcessedTableManager get profileId {
+    final $_column = $_itemColumn<String>('profile_id')!;
+
+    final manager = $$ProfilesTableTableManager(
+      $_db,
+      $_db.profiles,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_profileIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $PeopleTable _personIdTable(_$ColonyDatabase db) => db.people
+      .createAlias($_aliasNameGenerator(db.friendships.personId, db.people.id));
+
+  $$PeopleTableProcessedTableManager get personId {
+    final $_column = $_itemColumn<String>('person_id')!;
+
+    final manager = $$PeopleTableTableManager(
+      $_db,
+      $_db.people,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_personIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$FriendshipsTableFilterComposer
+    extends Composer<_$ColonyDatabase, $FriendshipsTable> {
+  $$FriendshipsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get kind => $composableBuilder(
+    column: $table.kind,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get cadence => $composableBuilder(
+    column: $table.cadence,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get howWeMet => $composableBuilder(
+    column: $table.howWeMet,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get startedAt => $composableBuilder(
+    column: $table.startedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get notes => $composableBuilder(
+    column: $table.notes,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get archivedAt => $composableBuilder(
+    column: $table.archivedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$ProfilesTableFilterComposer get profileId {
+    final $$ProfilesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.profileId,
+      referencedTable: $db.profiles,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProfilesTableFilterComposer(
+            $db: $db,
+            $table: $db.profiles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$PeopleTableFilterComposer get personId {
+    final $$PeopleTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.personId,
+      referencedTable: $db.people,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PeopleTableFilterComposer(
+            $db: $db,
+            $table: $db.people,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$FriendshipsTableOrderingComposer
+    extends Composer<_$ColonyDatabase, $FriendshipsTable> {
+  $$FriendshipsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get kind => $composableBuilder(
+    column: $table.kind,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get cadence => $composableBuilder(
+    column: $table.cadence,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get howWeMet => $composableBuilder(
+    column: $table.howWeMet,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get startedAt => $composableBuilder(
+    column: $table.startedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get notes => $composableBuilder(
+    column: $table.notes,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get archivedAt => $composableBuilder(
+    column: $table.archivedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$ProfilesTableOrderingComposer get profileId {
+    final $$ProfilesTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.profileId,
+      referencedTable: $db.profiles,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProfilesTableOrderingComposer(
+            $db: $db,
+            $table: $db.profiles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$PeopleTableOrderingComposer get personId {
+    final $$PeopleTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.personId,
+      referencedTable: $db.people,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PeopleTableOrderingComposer(
+            $db: $db,
+            $table: $db.people,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$FriendshipsTableAnnotationComposer
+    extends Composer<_$ColonyDatabase, $FriendshipsTable> {
+  $$FriendshipsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get kind =>
+      $composableBuilder(column: $table.kind, builder: (column) => column);
+
+  GeneratedColumn<String> get cadence =>
+      $composableBuilder(column: $table.cadence, builder: (column) => column);
+
+  GeneratedColumn<String> get howWeMet =>
+      $composableBuilder(column: $table.howWeMet, builder: (column) => column);
+
+  GeneratedColumn<int> get startedAt =>
+      $composableBuilder(column: $table.startedAt, builder: (column) => column);
+
+  GeneratedColumn<String> get notes =>
+      $composableBuilder(column: $table.notes, builder: (column) => column);
+
+  GeneratedColumn<int> get archivedAt => $composableBuilder(
+    column: $table.archivedAt,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<int> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  $$ProfilesTableAnnotationComposer get profileId {
+    final $$ProfilesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.profileId,
+      referencedTable: $db.profiles,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProfilesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.profiles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$PeopleTableAnnotationComposer get personId {
+    final $$PeopleTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.personId,
+      referencedTable: $db.people,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PeopleTableAnnotationComposer(
+            $db: $db,
+            $table: $db.people,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$FriendshipsTableTableManager
+    extends
+        RootTableManager<
+          _$ColonyDatabase,
+          $FriendshipsTable,
+          FriendshipRow,
+          $$FriendshipsTableFilterComposer,
+          $$FriendshipsTableOrderingComposer,
+          $$FriendshipsTableAnnotationComposer,
+          $$FriendshipsTableCreateCompanionBuilder,
+          $$FriendshipsTableUpdateCompanionBuilder,
+          (FriendshipRow, $$FriendshipsTableReferences),
+          FriendshipRow,
+          PrefetchHooks Function({bool profileId, bool personId})
+        > {
+  $$FriendshipsTableTableManager(_$ColonyDatabase db, $FriendshipsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$FriendshipsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$FriendshipsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$FriendshipsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> profileId = const Value.absent(),
+                Value<String> personId = const Value.absent(),
+                Value<String> kind = const Value.absent(),
+                Value<String> cadence = const Value.absent(),
+                Value<String?> howWeMet = const Value.absent(),
+                Value<int?> startedAt = const Value.absent(),
+                Value<String?> notes = const Value.absent(),
+                Value<int?> archivedAt = const Value.absent(),
+                Value<int> createdAt = const Value.absent(),
+                Value<int> updatedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => FriendshipsCompanion(
+                id: id,
+                profileId: profileId,
+                personId: personId,
+                kind: kind,
+                cadence: cadence,
+                howWeMet: howWeMet,
+                startedAt: startedAt,
+                notes: notes,
+                archivedAt: archivedAt,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String profileId,
+                required String personId,
+                required String kind,
+                required String cadence,
+                Value<String?> howWeMet = const Value.absent(),
+                Value<int?> startedAt = const Value.absent(),
+                Value<String?> notes = const Value.absent(),
+                Value<int?> archivedAt = const Value.absent(),
+                required int createdAt,
+                required int updatedAt,
+                Value<int> rowid = const Value.absent(),
+              }) => FriendshipsCompanion.insert(
+                id: id,
+                profileId: profileId,
+                personId: personId,
+                kind: kind,
+                cadence: cadence,
+                howWeMet: howWeMet,
+                startedAt: startedAt,
+                notes: notes,
+                archivedAt: archivedAt,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$FriendshipsTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({profileId = false, personId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (profileId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.profileId,
+                                referencedTable: $$FriendshipsTableReferences
+                                    ._profileIdTable(db),
+                                referencedColumn: $$FriendshipsTableReferences
+                                    ._profileIdTable(db)
+                                    .id,
+                              )
+                              as T;
+                    }
+                    if (personId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.personId,
+                                referencedTable: $$FriendshipsTableReferences
+                                    ._personIdTable(db),
+                                referencedColumn: $$FriendshipsTableReferences
+                                    ._personIdTable(db)
+                                    .id,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$FriendshipsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$ColonyDatabase,
+      $FriendshipsTable,
+      FriendshipRow,
+      $$FriendshipsTableFilterComposer,
+      $$FriendshipsTableOrderingComposer,
+      $$FriendshipsTableAnnotationComposer,
+      $$FriendshipsTableCreateCompanionBuilder,
+      $$FriendshipsTableUpdateCompanionBuilder,
+      (FriendshipRow, $$FriendshipsTableReferences),
+      FriendshipRow,
+      PrefetchHooks Function({bool profileId, bool personId})
+    >;
+typedef $$FriendshipCirclesTableCreateCompanionBuilder =
+    FriendshipCirclesCompanion Function({
+      required String id,
+      required String profileId,
+      required String name,
+      Value<String?> notes,
+      Value<String?> defaultCadence,
+      Value<int?> archivedAt,
+      required int createdAt,
+      required int updatedAt,
+      Value<int> rowid,
+    });
+typedef $$FriendshipCirclesTableUpdateCompanionBuilder =
+    FriendshipCirclesCompanion Function({
+      Value<String> id,
+      Value<String> profileId,
+      Value<String> name,
+      Value<String?> notes,
+      Value<String?> defaultCadence,
+      Value<int?> archivedAt,
+      Value<int> createdAt,
+      Value<int> updatedAt,
+      Value<int> rowid,
+    });
+
+final class $$FriendshipCirclesTableReferences
+    extends
+        BaseReferences<
+          _$ColonyDatabase,
+          $FriendshipCirclesTable,
+          FriendshipCircleRow
+        > {
+  $$FriendshipCirclesTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $ProfilesTable _profileIdTable(_$ColonyDatabase db) =>
+      db.profiles.createAlias(
+        $_aliasNameGenerator(db.friendshipCircles.profileId, db.profiles.id),
+      );
+
+  $$ProfilesTableProcessedTableManager get profileId {
+    final $_column = $_itemColumn<String>('profile_id')!;
+
+    final manager = $$ProfilesTableTableManager(
+      $_db,
+      $_db.profiles,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_profileIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static MultiTypedResultKey<
+    $FriendshipCircleMembershipsTable,
+    List<FriendshipCircleMembershipRow>
+  >
+  _friendshipCircleMembershipsRefsTable(_$ColonyDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.friendshipCircleMemberships,
+        aliasName: $_aliasNameGenerator(
+          db.friendshipCircles.id,
+          db.friendshipCircleMemberships.circleId,
+        ),
+      );
+
+  $$FriendshipCircleMembershipsTableProcessedTableManager
+  get friendshipCircleMembershipsRefs {
+    final manager = $$FriendshipCircleMembershipsTableTableManager(
+      $_db,
+      $_db.friendshipCircleMemberships,
+    ).filter((f) => f.circleId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _friendshipCircleMembershipsRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+}
+
+class $$FriendshipCirclesTableFilterComposer
+    extends Composer<_$ColonyDatabase, $FriendshipCirclesTable> {
+  $$FriendshipCirclesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get notes => $composableBuilder(
+    column: $table.notes,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get defaultCadence => $composableBuilder(
+    column: $table.defaultCadence,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get archivedAt => $composableBuilder(
+    column: $table.archivedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$ProfilesTableFilterComposer get profileId {
+    final $$ProfilesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.profileId,
+      referencedTable: $db.profiles,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProfilesTableFilterComposer(
+            $db: $db,
+            $table: $db.profiles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  Expression<bool> friendshipCircleMembershipsRefs(
+    Expression<bool> Function(
+      $$FriendshipCircleMembershipsTableFilterComposer f,
+    )
+    f,
+  ) {
+    final $$FriendshipCircleMembershipsTableFilterComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.friendshipCircleMemberships,
+          getReferencedColumn: (t) => t.circleId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$FriendshipCircleMembershipsTableFilterComposer(
+                $db: $db,
+                $table: $db.friendshipCircleMemberships,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+}
+
+class $$FriendshipCirclesTableOrderingComposer
+    extends Composer<_$ColonyDatabase, $FriendshipCirclesTable> {
+  $$FriendshipCirclesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get notes => $composableBuilder(
+    column: $table.notes,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get defaultCadence => $composableBuilder(
+    column: $table.defaultCadence,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get archivedAt => $composableBuilder(
+    column: $table.archivedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$ProfilesTableOrderingComposer get profileId {
+    final $$ProfilesTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.profileId,
+      referencedTable: $db.profiles,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProfilesTableOrderingComposer(
+            $db: $db,
+            $table: $db.profiles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$FriendshipCirclesTableAnnotationComposer
+    extends Composer<_$ColonyDatabase, $FriendshipCirclesTable> {
+  $$FriendshipCirclesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<String> get notes =>
+      $composableBuilder(column: $table.notes, builder: (column) => column);
+
+  GeneratedColumn<String> get defaultCadence => $composableBuilder(
+    column: $table.defaultCadence,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get archivedAt => $composableBuilder(
+    column: $table.archivedAt,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<int> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  $$ProfilesTableAnnotationComposer get profileId {
+    final $$ProfilesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.profileId,
+      referencedTable: $db.profiles,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProfilesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.profiles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  Expression<T> friendshipCircleMembershipsRefs<T extends Object>(
+    Expression<T> Function(
+      $$FriendshipCircleMembershipsTableAnnotationComposer a,
+    )
+    f,
+  ) {
+    final $$FriendshipCircleMembershipsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.friendshipCircleMemberships,
+          getReferencedColumn: (t) => t.circleId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$FriendshipCircleMembershipsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.friendshipCircleMemberships,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+}
+
+class $$FriendshipCirclesTableTableManager
+    extends
+        RootTableManager<
+          _$ColonyDatabase,
+          $FriendshipCirclesTable,
+          FriendshipCircleRow,
+          $$FriendshipCirclesTableFilterComposer,
+          $$FriendshipCirclesTableOrderingComposer,
+          $$FriendshipCirclesTableAnnotationComposer,
+          $$FriendshipCirclesTableCreateCompanionBuilder,
+          $$FriendshipCirclesTableUpdateCompanionBuilder,
+          (FriendshipCircleRow, $$FriendshipCirclesTableReferences),
+          FriendshipCircleRow,
+          PrefetchHooks Function({
+            bool profileId,
+            bool friendshipCircleMembershipsRefs,
+          })
+        > {
+  $$FriendshipCirclesTableTableManager(
+    _$ColonyDatabase db,
+    $FriendshipCirclesTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$FriendshipCirclesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$FriendshipCirclesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$FriendshipCirclesTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> profileId = const Value.absent(),
+                Value<String> name = const Value.absent(),
+                Value<String?> notes = const Value.absent(),
+                Value<String?> defaultCadence = const Value.absent(),
+                Value<int?> archivedAt = const Value.absent(),
+                Value<int> createdAt = const Value.absent(),
+                Value<int> updatedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => FriendshipCirclesCompanion(
+                id: id,
+                profileId: profileId,
+                name: name,
+                notes: notes,
+                defaultCadence: defaultCadence,
+                archivedAt: archivedAt,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String profileId,
+                required String name,
+                Value<String?> notes = const Value.absent(),
+                Value<String?> defaultCadence = const Value.absent(),
+                Value<int?> archivedAt = const Value.absent(),
+                required int createdAt,
+                required int updatedAt,
+                Value<int> rowid = const Value.absent(),
+              }) => FriendshipCirclesCompanion.insert(
+                id: id,
+                profileId: profileId,
+                name: name,
+                notes: notes,
+                defaultCadence: defaultCadence,
+                archivedAt: archivedAt,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$FriendshipCirclesTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback:
+              ({profileId = false, friendshipCircleMembershipsRefs = false}) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [
+                    if (friendshipCircleMembershipsRefs)
+                      db.friendshipCircleMemberships,
+                  ],
+                  addJoins:
+                      <
+                        T extends TableManagerState<
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic
+                        >
+                      >(state) {
+                        if (profileId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.profileId,
+                                    referencedTable:
+                                        $$FriendshipCirclesTableReferences
+                                            ._profileIdTable(db),
+                                    referencedColumn:
+                                        $$FriendshipCirclesTableReferences
+                                            ._profileIdTable(db)
+                                            .id,
+                                  )
+                                  as T;
+                        }
+
+                        return state;
+                      },
+                  getPrefetchedDataCallback: (items) async {
+                    return [
+                      if (friendshipCircleMembershipsRefs)
+                        await $_getPrefetchedData<
+                          FriendshipCircleRow,
+                          $FriendshipCirclesTable,
+                          FriendshipCircleMembershipRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$FriendshipCirclesTableReferences
+                              ._friendshipCircleMembershipsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$FriendshipCirclesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).friendshipCircleMembershipsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.circleId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                    ];
+                  },
+                );
+              },
+        ),
+      );
+}
+
+typedef $$FriendshipCirclesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$ColonyDatabase,
+      $FriendshipCirclesTable,
+      FriendshipCircleRow,
+      $$FriendshipCirclesTableFilterComposer,
+      $$FriendshipCirclesTableOrderingComposer,
+      $$FriendshipCirclesTableAnnotationComposer,
+      $$FriendshipCirclesTableCreateCompanionBuilder,
+      $$FriendshipCirclesTableUpdateCompanionBuilder,
+      (FriendshipCircleRow, $$FriendshipCirclesTableReferences),
+      FriendshipCircleRow,
+      PrefetchHooks Function({
+        bool profileId,
+        bool friendshipCircleMembershipsRefs,
+      })
+    >;
+typedef $$FriendshipCircleMembershipsTableCreateCompanionBuilder =
+    FriendshipCircleMembershipsCompanion Function({
+      required String personId,
+      required String circleId,
+      required int linkedAt,
+      Value<int> rowid,
+    });
+typedef $$FriendshipCircleMembershipsTableUpdateCompanionBuilder =
+    FriendshipCircleMembershipsCompanion Function({
+      Value<String> personId,
+      Value<String> circleId,
+      Value<int> linkedAt,
+      Value<int> rowid,
+    });
+
+final class $$FriendshipCircleMembershipsTableReferences
+    extends
+        BaseReferences<
+          _$ColonyDatabase,
+          $FriendshipCircleMembershipsTable,
+          FriendshipCircleMembershipRow
+        > {
+  $$FriendshipCircleMembershipsTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $PeopleTable _personIdTable(_$ColonyDatabase db) =>
+      db.people.createAlias(
+        $_aliasNameGenerator(
+          db.friendshipCircleMemberships.personId,
+          db.people.id,
+        ),
+      );
+
+  $$PeopleTableProcessedTableManager get personId {
+    final $_column = $_itemColumn<String>('person_id')!;
+
+    final manager = $$PeopleTableTableManager(
+      $_db,
+      $_db.people,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_personIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $FriendshipCirclesTable _circleIdTable(_$ColonyDatabase db) =>
+      db.friendshipCircles.createAlias(
+        $_aliasNameGenerator(
+          db.friendshipCircleMemberships.circleId,
+          db.friendshipCircles.id,
+        ),
+      );
+
+  $$FriendshipCirclesTableProcessedTableManager get circleId {
+    final $_column = $_itemColumn<String>('circle_id')!;
+
+    final manager = $$FriendshipCirclesTableTableManager(
+      $_db,
+      $_db.friendshipCircles,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_circleIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$FriendshipCircleMembershipsTableFilterComposer
+    extends Composer<_$ColonyDatabase, $FriendshipCircleMembershipsTable> {
+  $$FriendshipCircleMembershipsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get linkedAt => $composableBuilder(
+    column: $table.linkedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$PeopleTableFilterComposer get personId {
+    final $$PeopleTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.personId,
+      referencedTable: $db.people,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PeopleTableFilterComposer(
+            $db: $db,
+            $table: $db.people,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$FriendshipCirclesTableFilterComposer get circleId {
+    final $$FriendshipCirclesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.circleId,
+      referencedTable: $db.friendshipCircles,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$FriendshipCirclesTableFilterComposer(
+            $db: $db,
+            $table: $db.friendshipCircles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$FriendshipCircleMembershipsTableOrderingComposer
+    extends Composer<_$ColonyDatabase, $FriendshipCircleMembershipsTable> {
+  $$FriendshipCircleMembershipsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get linkedAt => $composableBuilder(
+    column: $table.linkedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$PeopleTableOrderingComposer get personId {
+    final $$PeopleTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.personId,
+      referencedTable: $db.people,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PeopleTableOrderingComposer(
+            $db: $db,
+            $table: $db.people,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$FriendshipCirclesTableOrderingComposer get circleId {
+    final $$FriendshipCirclesTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.circleId,
+      referencedTable: $db.friendshipCircles,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$FriendshipCirclesTableOrderingComposer(
+            $db: $db,
+            $table: $db.friendshipCircles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$FriendshipCircleMembershipsTableAnnotationComposer
+    extends Composer<_$ColonyDatabase, $FriendshipCircleMembershipsTable> {
+  $$FriendshipCircleMembershipsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get linkedAt =>
+      $composableBuilder(column: $table.linkedAt, builder: (column) => column);
+
+  $$PeopleTableAnnotationComposer get personId {
+    final $$PeopleTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.personId,
+      referencedTable: $db.people,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PeopleTableAnnotationComposer(
+            $db: $db,
+            $table: $db.people,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$FriendshipCirclesTableAnnotationComposer get circleId {
+    final $$FriendshipCirclesTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.circleId,
+          referencedTable: $db.friendshipCircles,
+          getReferencedColumn: (t) => t.id,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$FriendshipCirclesTableAnnotationComposer(
+                $db: $db,
+                $table: $db.friendshipCircles,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return composer;
+  }
+}
+
+class $$FriendshipCircleMembershipsTableTableManager
+    extends
+        RootTableManager<
+          _$ColonyDatabase,
+          $FriendshipCircleMembershipsTable,
+          FriendshipCircleMembershipRow,
+          $$FriendshipCircleMembershipsTableFilterComposer,
+          $$FriendshipCircleMembershipsTableOrderingComposer,
+          $$FriendshipCircleMembershipsTableAnnotationComposer,
+          $$FriendshipCircleMembershipsTableCreateCompanionBuilder,
+          $$FriendshipCircleMembershipsTableUpdateCompanionBuilder,
+          (
+            FriendshipCircleMembershipRow,
+            $$FriendshipCircleMembershipsTableReferences,
+          ),
+          FriendshipCircleMembershipRow,
+          PrefetchHooks Function({bool personId, bool circleId})
+        > {
+  $$FriendshipCircleMembershipsTableTableManager(
+    _$ColonyDatabase db,
+    $FriendshipCircleMembershipsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$FriendshipCircleMembershipsTableFilterComposer(
+                $db: db,
+                $table: table,
+              ),
+          createOrderingComposer: () =>
+              $$FriendshipCircleMembershipsTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$FriendshipCircleMembershipsTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> personId = const Value.absent(),
+                Value<String> circleId = const Value.absent(),
+                Value<int> linkedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => FriendshipCircleMembershipsCompanion(
+                personId: personId,
+                circleId: circleId,
+                linkedAt: linkedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String personId,
+                required String circleId,
+                required int linkedAt,
+                Value<int> rowid = const Value.absent(),
+              }) => FriendshipCircleMembershipsCompanion.insert(
+                personId: personId,
+                circleId: circleId,
+                linkedAt: linkedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$FriendshipCircleMembershipsTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({personId = false, circleId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (personId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.personId,
+                                referencedTable:
+                                    $$FriendshipCircleMembershipsTableReferences
+                                        ._personIdTable(db),
+                                referencedColumn:
+                                    $$FriendshipCircleMembershipsTableReferences
+                                        ._personIdTable(db)
+                                        .id,
+                              )
+                              as T;
+                    }
+                    if (circleId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.circleId,
+                                referencedTable:
+                                    $$FriendshipCircleMembershipsTableReferences
+                                        ._circleIdTable(db),
+                                referencedColumn:
+                                    $$FriendshipCircleMembershipsTableReferences
+                                        ._circleIdTable(db)
+                                        .id,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$FriendshipCircleMembershipsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$ColonyDatabase,
+      $FriendshipCircleMembershipsTable,
+      FriendshipCircleMembershipRow,
+      $$FriendshipCircleMembershipsTableFilterComposer,
+      $$FriendshipCircleMembershipsTableOrderingComposer,
+      $$FriendshipCircleMembershipsTableAnnotationComposer,
+      $$FriendshipCircleMembershipsTableCreateCompanionBuilder,
+      $$FriendshipCircleMembershipsTableUpdateCompanionBuilder,
+      (
+        FriendshipCircleMembershipRow,
+        $$FriendshipCircleMembershipsTableReferences,
+      ),
+      FriendshipCircleMembershipRow,
+      PrefetchHooks Function({bool personId, bool circleId})
+    >;
 
 class $ColonyDatabaseManager {
   final _$ColonyDatabase _db;
@@ -78950,5 +82275,15 @@ class $ColonyDatabaseManager {
       $$MusicSpotifySyncStatesTableTableManager(
         _db,
         _db.musicSpotifySyncStates,
+      );
+  $$FriendshipsTableTableManager get friendships =>
+      $$FriendshipsTableTableManager(_db, _db.friendships);
+  $$FriendshipCirclesTableTableManager get friendshipCircles =>
+      $$FriendshipCirclesTableTableManager(_db, _db.friendshipCircles);
+  $$FriendshipCircleMembershipsTableTableManager
+  get friendshipCircleMemberships =>
+      $$FriendshipCircleMembershipsTableTableManager(
+        _db,
+        _db.friendshipCircleMemberships,
       );
 }

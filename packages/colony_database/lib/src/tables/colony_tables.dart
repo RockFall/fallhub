@@ -1235,3 +1235,60 @@ class MusicSpotifySyncStates extends Table {
   @override
   Set<Column<Object>> get primaryKey => {profileId};
 }
+
+@DataClassName('FriendshipRow')
+class Friendships extends Table {
+  @override
+  String get tableName => 'friendships';
+
+  TextColumn get id => text()();
+  TextColumn get profileId => text().references(Profiles, #id)();
+  TextColumn get personId => text().references(People, #id)();
+  TextColumn get kind => text()();
+  TextColumn get cadence => text()();
+  TextColumn get howWeMet => text().nullable()();
+  IntColumn get startedAt => integer().nullable()();
+  TextColumn get notes => text().nullable()();
+  IntColumn get archivedAt => integer().nullable()();
+  IntColumn get createdAt => integer()();
+  IntColumn get updatedAt => integer()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+
+  @override
+  List<Set<Column<Object>>> get uniqueKeys => [
+        {personId},
+      ];
+}
+
+@DataClassName('FriendshipCircleRow')
+class FriendshipCircles extends Table {
+  @override
+  String get tableName => 'friendship_circles';
+
+  TextColumn get id => text()();
+  TextColumn get profileId => text().references(Profiles, #id)();
+  TextColumn get name => text()();
+  TextColumn get notes => text().nullable()();
+  TextColumn get defaultCadence => text().nullable()();
+  IntColumn get archivedAt => integer().nullable()();
+  IntColumn get createdAt => integer()();
+  IntColumn get updatedAt => integer()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+}
+
+@DataClassName('FriendshipCircleMembershipRow')
+class FriendshipCircleMemberships extends Table {
+  @override
+  String get tableName => 'friendship_circle_memberships';
+
+  TextColumn get personId => text().references(People, #id)();
+  TextColumn get circleId => text().references(FriendshipCircles, #id)();
+  IntColumn get linkedAt => integer()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {personId, circleId};
+}

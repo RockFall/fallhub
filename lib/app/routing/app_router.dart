@@ -44,6 +44,7 @@ import '../../features/finance/presentation/finance_ledger_screen.dart';
 import '../../features/health/presentation/health_screen.dart';
 import '../../features/inventory/presentation/inventory_screen.dart';
 import '../../features/relations/presentation/people_screen.dart';
+import '../../features/relations/presentation/friendships_screen.dart';
 import '../../features/relations/presentation/organizations_screen.dart';
 import '../../features/relations/presentation/commitments_screen.dart';
 import '../../features/travel/presentation/travel_screen.dart';
@@ -334,6 +335,10 @@ final routerProvider = Provider<GoRouter>((ref) {
             builder: (context, state) => const PeopleScreen(),
           ),
           GoRoute(
+            path: '/relations/friendships',
+            builder: (context, state) => const FriendshipsScreen(),
+          ),
+          GoRoute(
             path: '/relations/organizations',
             builder: (context, state) => const OrganizationsScreen(),
           ),
@@ -527,6 +532,11 @@ class _AppShellState extends ConsumerState<AppShell> {
           icon: Icons.people_outline,
           label: AppStrings.peopleTitle,
           onSelected: () => context.go('/relations/people'),
+        ),
+        ColonyFloatMenuItem(
+          icon: Icons.favorite_outline,
+          label: AppStrings.friendshipsTitle,
+          onSelected: () => context.go('/relations/friendships'),
         ),
         ColonyFloatMenuItem(
           icon: Icons.apartment_outlined,

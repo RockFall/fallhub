@@ -1,4 +1,5 @@
 import 'package:colony_design_system/colony_design_system.dart';
+import 'package:colony_domain/colony_domain.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -25,6 +26,9 @@ class _CreatePersonSheetState extends ConsumerState<CreatePersonSheet> {
   final _preferredController = TextEditingController();
   final _typesController = TextEditingController();
   final _notesController = TextEditingController();
+  DateTime? _birthday;
+  bool _alsoFriendship = false;
+  FriendshipKind _kind = FriendshipKind.unspecified;
   String? _nameError;
 
   @override
@@ -52,6 +56,17 @@ class _CreatePersonSheetState extends ConsumerState<CreatePersonSheet> {
         .toList();
   }
 
+  Future<void> _pickBirthday() async {
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: _birthday ?? DateTime(1990, 1, 1),
+      firstDate: DateTime(1900),
+      lastDate: DateTime.now(),
+    );
+    if (picked == null) return;
+    setState(() => _birthday = DateTime.utc(picked.year, picked.month, picked.day));
+  }
+
   Future<void> _save() async {
     if (!_validate()) return;
     final created = await ref.read(relationsControllerProvider.notifier).create(
@@ -63,6 +78,9 @@ class _CreatePersonSheetState extends ConsumerState<CreatePersonSheet> {
           notes: _notesController.text.trim().isEmpty
               ? null
               : _notesController.text.trim(),
+          birthday: _birthday,
+          alsoFriendship: _alsoFriendship,
+          friendshipKind: _kind,
         );
     if (!mounted || created == null) return;
     Navigator.pop(context);
@@ -112,6 +130,17 @@ class _CreatePersonSheetState extends ConsumerState<CreatePersonSheet> {
               ),
             ),
             const SizedBox(height: ColonySpacing.md),
+            ListTile(
+              contentPadding: EdgeInsets.zero,
+              title: Text(
+                _birthday == null
+                    ? AppStrings.personBirthdayOptional
+                    : '${AppStrings.personBirthdayOptional}: ${_birthday!.toIso8601String().split('T').first}',
+              ),
+              trailing: const Icon(Icons.cake_outlined),
+              onTap: _pickBirthday,
+            ),
+            const SizedBox(height: ColonySpacing.md),
             TextField(
               controller: _notesController,
               maxLines: 3,
@@ -119,6 +148,31 @@ class _CreatePersonSheetState extends ConsumerState<CreatePersonSheet> {
                 labelText: AppStrings.personNotesOptional,
               ),
             ),
+            SwitchListTile(
+              contentPadding: EdgeInsets.zero,
+              title: const Text(AppStrings.personAlsoFriendship),
+              value: _alsoFriendship,
+              onChanged: (value) => setState(() => _alsoFriendship = value),
+            ),
+            if (_alsoFriendship) ...[
+              DropdownButtonFormField<FriendshipKind>(
+                initialValue: _kind,
+                decoration: const InputDecoration(
+                  labelText: AppStrings.friendshipKind,
+                ),
+                items: FriendshipKind.values
+                    .map(
+                      (k) => DropdownMenuItem(
+                        value: k,
+                        child: Text(AppStrings.friendshipKindLabel(k)),
+                      ),
+                    )
+                    .toList(),
+                onChanged: (value) {
+                  if (value != null) setState(() => _kind = value);
+                },
+              ),
+            ],
             const SizedBox(height: ColonySpacing.lg),
             FilledButton(
               onPressed: _save,

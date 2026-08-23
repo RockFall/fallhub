@@ -46,6 +46,94 @@ final personMembershipsProvider =
       .watchMembershipsForPerson(EntityId(personId));
 });
 
+final allPersonInteractionsProvider =
+    StreamProvider<List<PersonInteraction>>((ref) async* {
+  final profile = await ref.watch(profileProvider.future);
+  if (profile == null) {
+    yield [];
+    return;
+  }
+  yield* ref.watch(repositoriesProvider).people.watchAllInteractions(profile.id);
+});
+
+final friendshipsProvider = StreamProvider<List<Friendship>>((ref) async* {
+  final profile = await ref.watch(profileProvider.future);
+  if (profile == null) {
+    yield [];
+    return;
+  }
+  yield* ref.watch(repositoriesProvider).friendships.watchAll(profile.id);
+});
+
+final friendshipCirclesProvider =
+    StreamProvider<List<FriendshipCircle>>((ref) async* {
+  final profile = await ref.watch(profileProvider.future);
+  if (profile == null) {
+    yield [];
+    return;
+  }
+  yield* ref.watch(repositoriesProvider).friendships.watchCircles(profile.id);
+});
+
+final friendshipMembershipsProvider =
+    StreamProvider<List<FriendshipCircleMembership>>((ref) async* {
+  final profile = await ref.watch(profileProvider.future);
+  if (profile == null) {
+    yield [];
+    return;
+  }
+  yield* ref
+      .watch(repositoriesProvider)
+      .friendships
+      .watchMemberships(profile.id);
+});
+
+final friendshipOverviewsProvider = Provider<AsyncValue<List<FriendshipOverview>>>(
+  (ref) {
+    final people = ref.watch(peopleProvider);
+    final friendships = ref.watch(friendshipsProvider);
+    final circles = ref.watch(friendshipCirclesProvider);
+    final memberships = ref.watch(friendshipMembershipsProvider);
+    final interactions = ref.watch(allPersonInteractionsProvider);
+    if (people.isLoading ||
+        friendships.isLoading ||
+        circles.isLoading ||
+        memberships.isLoading ||
+        interactions.isLoading) {
+      return const AsyncLoading();
+    }
+    final error = people.error ??
+        friendships.error ??
+        circles.error ??
+        memberships.error ??
+        interactions.error;
+    if (error != null) {
+      return AsyncError(error, StackTrace.current);
+    }
+    return AsyncData(
+      FriendshipOverview.assemble(
+        people: people.value ?? const [],
+        friendships: friendships.value ?? const [],
+        circles: circles.value ?? const [],
+        memberships: memberships.value ?? const [],
+        interactions: interactions.value ?? const [],
+        now: DateTime.now().toUtc(),
+      ),
+    );
+  },
+);
+
+final friendshipForPersonProvider =
+    Provider.family<Friendship?, EntityId>((ref, personId) {
+  final friendships = ref.watch(friendshipsProvider).valueOrNull ?? const [];
+  for (final friendship in friendships) {
+    if (friendship.personId == personId && !friendship.isArchived) {
+      return friendship;
+    }
+  }
+  return null;
+});
+
 final commitmentsProvider = StreamProvider<List<Commitment>>((ref) async* {
   final profile = await ref.watch(profileProvider.future);
   if (profile == null) {

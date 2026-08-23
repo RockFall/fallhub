@@ -13,6 +13,10 @@ class RelationsController extends AsyncNotifier<void> {
     String? preferredName,
     List<String> relationshipTypes = const [],
     String? notes,
+    DateTime? birthday,
+    bool alsoFriendship = false,
+    FriendshipKind friendshipKind = FriendshipKind.unspecified,
+    FriendshipCadence? friendshipCadence,
   }) async {
     state = const AsyncLoading();
     Person? created;
@@ -25,10 +29,20 @@ class RelationsController extends AsyncNotifier<void> {
             preferredName: preferredName,
             relationshipTypes: relationshipTypes,
             notes: notes,
+            birthday: birthday,
           );
+      if (alsoFriendship && created != null) {
+        await ref.read(repositoriesProvider).friendships.ensureForPerson(
+              profileId: profile.id,
+              personId: created!.id,
+              kind: friendshipKind,
+              cadence: friendshipCadence,
+            );
+      }
     });
     if (state.hasError) return null;
     ref.invalidate(peopleProvider);
+    ref.invalidate(friendshipsProvider);
     return created;
   }
 
@@ -76,7 +90,133 @@ class RelationsController extends AsyncNotifier<void> {
     if (state.hasError) return null;
     ref.invalidate(peopleProvider);
     ref.invalidate(personInteractionsProvider(person.id));
+    ref.invalidate(allPersonInteractionsProvider);
     return created;
+  }
+
+  Future<List<PersonInteraction>> logEncounter({
+    required List<Person> people,
+    required InteractionKind kind,
+    required DateTime occurredAt,
+    String? note,
+  }) async {
+    final created = <PersonInteraction>[];
+    for (final person in people) {
+      final ix = await logInteraction(
+        person: person,
+        kind: kind,
+        occurredAt: occurredAt,
+        note: note,
+      );
+      if (ix != null) created.add(ix);
+    }
+    return created;
+  }
+
+  Future<Friendship?> ensureFriendship({
+    required Person person,
+    FriendshipKind kind = FriendshipKind.unspecified,
+    FriendshipCadence? cadence,
+    String? howWeMet,
+    String? notes,
+    Iterable<EntityId> circleIds = const [],
+  }) async {
+    state = const AsyncLoading();
+    Friendship? created;
+    state = await AsyncValue.guard(() async {
+      final profile = await ref.read(repositoriesProvider).profiles.getActive();
+      if (profile == null) throw StateError('Perfil não configurado');
+      created = await ref.read(repositoriesProvider).friendships.ensureForPerson(
+            profileId: profile.id,
+            personId: person.id,
+            kind: kind,
+            cadence: cadence,
+            howWeMet: howWeMet,
+            notes: notes,
+          );
+      await ref.read(repositoriesProvider).friendships.replacePersonCircles(
+            personId: person.id,
+            circleIds: circleIds,
+          );
+    });
+    if (state.hasError) return null;
+    _invalidateFriendships();
+    return created;
+  }
+
+  Future<Friendship?> saveFriendship(
+    Friendship friendship, {
+    Iterable<EntityId>? circleIds,
+  }) async {
+    state = const AsyncLoading();
+    Friendship? updated;
+    state = await AsyncValue.guard(() async {
+      updated =
+          await ref.read(repositoriesProvider).friendships.save(friendship);
+      if (circleIds != null) {
+        await ref.read(repositoriesProvider).friendships.replacePersonCircles(
+              personId: friendship.personId,
+              circleIds: circleIds,
+            );
+      }
+    });
+    if (state.hasError) return null;
+    _invalidateFriendships();
+    return updated;
+  }
+
+  Future<Friendship?> archiveFriendship(Friendship friendship) async {
+    state = const AsyncLoading();
+    Friendship? archived;
+    state = await AsyncValue.guard(() async {
+      archived =
+          await ref.read(repositoriesProvider).friendships.archive(friendship);
+    });
+    if (state.hasError) return null;
+    _invalidateFriendships();
+    return archived;
+  }
+
+  Future<FriendshipCircle?> createCircle({
+    required String name,
+    String? notes,
+    FriendshipCadence? defaultCadence,
+  }) async {
+    state = const AsyncLoading();
+    FriendshipCircle? created;
+    state = await AsyncValue.guard(() async {
+      final profile = await ref.read(repositoriesProvider).profiles.getActive();
+      if (profile == null) throw StateError('Perfil não configurado');
+      created = await ref.read(repositoriesProvider).friendships.createCircle(
+            profileId: profile.id,
+            name: name,
+            notes: notes,
+            defaultCadence: defaultCadence,
+          );
+    });
+    if (state.hasError) return null;
+    ref.invalidate(friendshipCirclesProvider);
+    return created;
+  }
+
+  Future<FriendshipCircle?> archiveCircle(FriendshipCircle circle) async {
+    state = const AsyncLoading();
+    FriendshipCircle? archived;
+    state = await AsyncValue.guard(() async {
+      archived =
+          await ref.read(repositoriesProvider).friendships.archiveCircle(circle);
+    });
+    if (state.hasError) return null;
+    ref.invalidate(friendshipCirclesProvider);
+    ref.invalidate(friendshipMembershipsProvider);
+    return archived;
+  }
+
+  void _invalidateFriendships() {
+    ref.invalidate(friendshipsProvider);
+    ref.invalidate(friendshipCirclesProvider);
+    ref.invalidate(friendshipMembershipsProvider);
+    ref.invalidate(allPersonInteractionsProvider);
   }
 
   Future<Organization?> createOrganization({

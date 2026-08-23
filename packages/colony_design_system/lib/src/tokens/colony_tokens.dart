@@ -112,6 +112,7 @@ abstract final class ColonyMiniAppColors {
   static const home = Color(0xFFC47A5A);
   static const zones = Color(0xFF3D9AA8);
   static const people = Color(0xFF5BA86A);
+  static const friendships = Color(0xFFC4A35A);
   static const organizations = Color(0xFF5A7A9A);
   static const commitments = Color(0xFF6BA56A);
   static const inbox = Color(0xFFE07050);

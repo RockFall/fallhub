@@ -5,6 +5,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../app/localization/app_strings.dart';
 import '../../application/relations_controllers.dart';
+import '../../application/relations_providers.dart';
+import 'edit_friendship_sheet.dart';
 import 'membership_section.dart';
 
 class EditPersonSheet extends ConsumerStatefulWidget {
@@ -29,6 +31,7 @@ class _EditPersonSheetState extends ConsumerState<EditPersonSheet> {
   late final TextEditingController _preferredController;
   late final TextEditingController _typesController;
   late final TextEditingController _notesController;
+  DateTime? _birthday;
   String? _nameError;
 
   @override
@@ -40,6 +43,7 @@ class _EditPersonSheetState extends ConsumerState<EditPersonSheet> {
     _typesController =
         TextEditingController(text: p.relationshipTypes.join(', '));
     _notesController = TextEditingController(text: p.notes ?? '');
+    _birthday = p.birthday;
   }
 
   @override
@@ -67,6 +71,17 @@ class _EditPersonSheetState extends ConsumerState<EditPersonSheet> {
         .toList();
   }
 
+  Future<void> _pickBirthday() async {
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: _birthday ?? DateTime(1990, 1, 1),
+      firstDate: DateTime(1900),
+      lastDate: DateTime.now(),
+    );
+    if (picked == null) return;
+    setState(() => _birthday = DateTime.utc(picked.year, picked.month, picked.day));
+  }
+
   Future<void> _save() async {
     if (!_validate()) return;
     final preferred = _preferredController.text.trim();
@@ -78,6 +93,8 @@ class _EditPersonSheetState extends ConsumerState<EditPersonSheet> {
       relationshipTypes: _parseTypes(),
       notes: notes,
       clearNotes: notes.isEmpty,
+      birthday: _birthday,
+      clearBirthday: _birthday == null,
       updatedAt: DateTime.now().toUtc(),
     );
     final saved =
@@ -89,6 +106,9 @@ class _EditPersonSheetState extends ConsumerState<EditPersonSheet> {
   @override
   Widget build(BuildContext context) {
     final bottomInset = MediaQuery.viewInsetsOf(context).bottom;
+    final interactionsAsync =
+        ref.watch(personInteractionsProvider(widget.person.id));
+    final friendship = ref.watch(friendshipForPersonProvider(widget.person.id));
 
     return Padding(
       padding: EdgeInsets.fromLTRB(
@@ -130,6 +150,17 @@ class _EditPersonSheetState extends ConsumerState<EditPersonSheet> {
               ),
             ),
             const SizedBox(height: ColonySpacing.md),
+            ListTile(
+              contentPadding: EdgeInsets.zero,
+              title: Text(
+                _birthday == null
+                    ? AppStrings.personBirthdayOptional
+                    : '${AppStrings.personBirthdayOptional}: ${_birthday!.toIso8601String().split('T').first}',
+              ),
+              trailing: const Icon(Icons.cake_outlined),
+              onTap: _pickBirthday,
+            ),
+            const SizedBox(height: ColonySpacing.md),
             TextField(
               controller: _notesController,
               maxLines: 3,
@@ -138,6 +169,60 @@ class _EditPersonSheetState extends ConsumerState<EditPersonSheet> {
               ),
             ),
             PersonMembershipsSection(person: widget.person),
+            const SizedBox(height: ColonySpacing.md),
+            OutlinedButton.icon(
+              onPressed: () async {
+                if (friendship == null) {
+                  await ref
+                      .read(relationsControllerProvider.notifier)
+                      .ensureFriendship(person: widget.person);
+                }
+                if (!context.mounted) return;
+                final current = ref.read(
+                  friendshipForPersonProvider(widget.person.id),
+                );
+                if (current != null) {
+                  await EditFriendshipSheet.show(context, current);
+                }
+              },
+              icon: const Icon(Icons.favorite_outline),
+              label: Text(
+                friendship == null
+                    ? AppStrings.personAddToFriendships
+                    : AppStrings.personOpenFriendship,
+              ),
+            ),
+            const SizedBox(height: ColonySpacing.lg),
+            Text(
+              AppStrings.personInteractionsTitle,
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
+            const SizedBox(height: ColonySpacing.sm),
+            interactionsAsync.when(
+              loading: () => const LinearProgressIndicator(),
+              error: (_, __) => Text(AppStrings.errorGeneric),
+              data: (items) {
+                if (items.isEmpty) {
+                  return Text(AppStrings.personInteractionsEmpty);
+                }
+                return Column(
+                  children: [
+                    for (final ix in items.take(8))
+                      ListTile(
+                        contentPadding: EdgeInsets.zero,
+                        dense: true,
+                        title: Text(AppStrings.interactionKindLabel(ix.kind)),
+                        subtitle: Text(
+                          [
+                            ix.occurredAt.toIso8601String().split('T').first,
+                            if (ix.note != null) ix.note!,
+                          ].join(' · '),
+                        ),
+                      ),
+                  ],
+                );
+              },
+            ),
             const SizedBox(height: ColonySpacing.lg),
             FilledButton(
               onPressed: _save,

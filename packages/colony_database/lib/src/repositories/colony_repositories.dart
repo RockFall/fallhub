@@ -8,6 +8,7 @@ import 'package:uuid/uuid.dart';
 
 import '../colony_database.dart'
     hide DomainEvent, NeedDefinition, NeedReading, CheckIn, MoodFactor, DailyReview, WeeklyReview, WorkPriority, Bill, ScheduleBlock, Quest, Project, QuestProject, DecisionRecord, QuestDecision, ResearchNode, ResearchPrerequisite;
+import 'friendship_repository.dart';
 import 'music_atlas_repository.dart';
 
 class ProfileRepository {
@@ -349,6 +350,7 @@ class ExportRepository {
     this._health,
     this._inventory,
     this._people,
+    this._friendships,
     this._trips,
     this._organizations,
     this._homeMaintenance,
@@ -380,6 +382,7 @@ class ExportRepository {
   final HealthRepository _health;
   final InventoryRepository _inventory;
   final PersonRepository _people;
+  final FriendshipRepository _friendships;
   final TripRepository _trips;
   final OrganizationRepository _organizations;
   final HomeMaintenanceRepository _homeMaintenance;
@@ -437,6 +440,10 @@ class ExportRepository {
     final people = await _people.listAll(profile.id);
     final categoryBudgets = await _finance.listBudgets(profile.id);
     final personInteractions = await _people.listAllInteractions(profile.id);
+    final friendships = await _friendships.listAll(profile.id);
+    final friendshipCircles = await _friendships.listCircles(profile.id);
+    final friendshipCircleMemberships =
+        await _friendships.listMemberships(profile.id);
     final trips = await _trips.listAll(profile.id);
     final organizations = await _organizations.listAll(profile.id);
     final personOrganizationLinks =
@@ -480,7 +487,7 @@ class ExportRepository {
 
     return ExportSnapshot(
       exportedAt: _clock(),
-      version: 35,
+      version: 36,
       profile: profile,
       preferences: prefs,
       tasks: tasks,
@@ -545,6 +552,9 @@ class ExportRepository {
       musicExpeditions: musicExpeditions,
       musicExpeditionStops: musicExpeditionStops,
       musicImportRuns: musicImportRuns,
+      friendships: friendships,
+      friendshipCircles: friendshipCircles,
+      friendshipCircleMemberships: friendshipCircleMemberships,
     );
   }
 
@@ -630,6 +640,9 @@ class RestoreRepository {
     await _db.delete(_db.organizations).go();
     await _db.delete(_db.trips).go();
     await _db.delete(_db.personInteractions).go();
+    await _db.delete(_db.friendshipCircleMemberships).go();
+    await _db.delete(_db.friendships).go();
+    await _db.delete(_db.friendshipCircles).go();
     await _db.delete(_db.categoryBudgets).go();
     await _db.delete(_db.people).go();
     await _db.delete(_db.inventoryItems).go();
@@ -837,6 +850,21 @@ class RestoreRepository {
       await _db
           .into(_db.personInteractions)
           .insert(ColonyMappers.fromPersonInteraction(interaction));
+    }
+    for (final circle in snapshot.friendshipCircles) {
+      await _db
+          .into(_db.friendshipCircles)
+          .insert(ColonyMappers.fromFriendshipCircle(circle));
+    }
+    for (final friendship in snapshot.friendships) {
+      await _db
+          .into(_db.friendships)
+          .insert(ColonyMappers.fromFriendship(friendship));
+    }
+    for (final link in snapshot.friendshipCircleMemberships) {
+      await _db
+          .into(_db.friendshipCircleMemberships)
+          .insert(ColonyMappers.fromFriendshipCircleMembership(link));
     }
     for (final budget in snapshot.categoryBudgets) {
       await _db
@@ -3743,6 +3771,8 @@ class PersonRepository {
     String? preferredName,
     List<String> relationshipTypes = const [],
     String? notes,
+    DateTime? birthday,
+    DateTime? nextFollowUpAt,
   }) async {
     final now = _clock();
     final person = Person.create(
@@ -3752,6 +3782,8 @@ class PersonRepository {
       preferredName: preferredName,
       relationshipTypes: relationshipTypes,
       notes: notes,
+      birthday: birthday,
+      nextFollowUpAt: nextFollowUpAt,
       createdAt: now,
     );
 
@@ -3803,6 +3835,14 @@ class PersonRepository {
       sourceType: SourceType.manual,
     );
     return updated;
+  }
+
+  Stream<List<PersonInteraction>> watchAllInteractions(EntityId profileId) {
+    return (_db.select(_db.personInteractions)
+          ..where((t) => t.profileId.equals(profileId.value))
+          ..orderBy([(t) => OrderingTerm.desc(t.occurredAt)]))
+        .watch()
+        .map((rows) => rows.map(ColonyMappers.toPersonInteraction).toList());
   }
 
   Stream<List<PersonInteraction>> watchInteractionsForPerson(EntityId personId) {
@@ -6626,6 +6666,7 @@ class ColonyRepositories {
     required this.health,
     required this.inventory,
     required this.people,
+    required this.friendships,
     required this.trips,
     required this.organizations,
     required this.homeMaintenance,
@@ -6660,6 +6701,7 @@ class ColonyRepositories {
   final HealthRepository health;
   final InventoryRepository inventory;
   final PersonRepository people;
+  final FriendshipRepository friendships;
   final TripRepository trips;
   final OrganizationRepository organizations;
   final HomeMaintenanceRepository homeMaintenance;
@@ -6694,6 +6736,7 @@ class ColonyRepositories {
     final finance = FinanceRepository(database, ids, now, events);
     final health = HealthRepository(database, ids, now, events);
     final peopleRepo = PersonRepository(database, ids, now, events);
+    final friendshipsRepo = FriendshipRepository(database, ids, now, events);
     final syncRepo = SyncRepository(database, ids, now, events);
     final tasks = TaskRepository(database, ids, now, events, syncRepo);
     final quests = QuestRepository(database, ids, now, events, syncRepo);
@@ -6742,6 +6785,7 @@ class ColonyRepositories {
       health: health,
       inventory: inventory,
       people: peopleRepo,
+      friendships: friendshipsRepo,
       trips: tripsRepo,
       organizations: orgsRepo,
       homeMaintenance: homeRepo,
@@ -6765,6 +6809,7 @@ class ColonyRepositories {
         health,
         inventory,
         peopleRepo,
+        friendshipsRepo,
         tripsRepo,
         orgsRepo,
         homeRepo,

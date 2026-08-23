@@ -244,7 +244,7 @@ void main() {
     await repos.needs.seedDefaults(profile.id);
 
     final json = await repos.export.exportJson();
-    expect(json, contains('"version": 35'));
+    expect(json, contains('"version": 36'));
     expect(json, contains('Viagem internacional'));
     expect(json, contains('"quests"'));
     expect(json, contains('"work_priorities"'));
@@ -337,7 +337,7 @@ void main() {
     expect(pauseStatusEvents.first.payload['pause_reason'], 'Aguardando visto');
 
     final json = await repos.export.exportJson();
-    expect(json, contains('"version": 35'));
+    expect(json, contains('"version": 36'));
     expect(json, contains('"projects"'));
     expect(json, contains('"quest_project_links"'));
     expect(json, contains('Viagem 2026'));
@@ -436,7 +436,7 @@ void main() {
     expect(events.any((e) => e.eventType == EventType.decisionUpdated), isTrue);
 
     final json = await repos.export.exportJson();
-    expect(json, contains('"version": 35'));
+    expect(json, contains('"version": 36'));
     expect(json, contains('"decision_records"'));
     expect(json, contains('"quest_decision_links"'));
     expect(json, contains('Aceitar oferta'));
@@ -714,7 +714,7 @@ void main() {
     await repos.research.updateStatus(advanced, ResearchNodeStatus.inResearch);
 
     final json = await repos.export.exportJson();
-    expect(json, contains('"version": 35'));
+    expect(json, contains('"version": 36'));
     expect(json, contains('"research_nodes"'));
     expect(json, contains('"learning_sessions"'));
     expect(json, contains('"research_evidence"'));
@@ -933,7 +933,7 @@ void main() {
     expect(linked.single.name, 'Mochila');
 
     final snapshot = await repos.export.buildSnapshot();
-    expect(snapshot.version, 35);
+    expect(snapshot.version, 36);
     expect(snapshot.tripInventoryLinks, hasLength(1));
 
     await repos.trips.unlinkInventoryItem(
@@ -968,7 +968,7 @@ void main() {
     expect(linked.single.title, 'Lisboa');
 
     final snapshot = await repos.export.buildSnapshot();
-    expect(snapshot.version, 35);
+    expect(snapshot.version, 36);
     expect(snapshot.zoneTripLinks, hasLength(1));
 
     await repos.contextZones.unlinkTrip(zoneId: zone.id, tripId: trip.id);
@@ -1007,7 +1007,7 @@ void main() {
     expect(linked, hasLength(1));
 
     final snapshot = await repos.export.buildSnapshot();
-    expect(snapshot.version, 35);
+    expect(snapshot.version, 36);
     expect(snapshot.questInventoryLinks, hasLength(1));
 
     await repos.inventory.unlinkQuest(
@@ -1056,7 +1056,7 @@ void main() {
     expect(memberships.first.id, org.id);
 
     final snapshot = await repos.export.buildSnapshot();
-    expect(snapshot.version, 35);
+    expect(snapshot.version, 36);
     expect(snapshot.personOrganizationLinks, hasLength(1));
     expect(snapshot.personOrganizationLinks.first.role, 'colega');
 
@@ -1110,5 +1110,76 @@ void main() {
       events.any((e) => e.eventType == EventType.categoryBudgetUpdated),
       isTrue,
     );
+  });
+
+  test('friendship overlay, circle membership and rhythm export', () async {
+    final friendsDb = ColonyDatabase.inMemory();
+    addTearDown(friendsDb.close);
+    final friendsRepos = ColonyRepositories.create(
+      friendsDb,
+      idGenerator: FixedIdGenerator([
+        for (var i = 1; i <= 20; i++) 'friend-rt-$i',
+      ]),
+      clock: () => DateTime.utc(2026, 8, 23, 12),
+    );
+    final profile = await friendsRepos.profiles.create(
+      colonyName: 'Friends',
+      displayName: 'Caio',
+      timezone: 'UTC',
+      locale: 'pt_BR',
+      baseCurrency: 'BRL',
+    );
+    final person = await friendsRepos.people.create(
+      profileId: profile.id,
+      displayName: 'Ana',
+    );
+    final friendship = await friendsRepos.friendships.create(
+      profileId: profile.id,
+      personId: person.id,
+      kind: FriendshipKind.close,
+      howWeMet: 'faculdade',
+    );
+    expect(friendship.cadence, FriendshipCadence.fortnightly);
+    final again = await friendsRepos.friendships.ensureForPerson(
+      profileId: profile.id,
+      personId: person.id,
+      kind: FriendshipKind.casual,
+    );
+    expect(again.id, friendship.id);
+    expect(again.kind, FriendshipKind.close);
+
+    final circle = await friendsRepos.friendships.createCircle(
+      profileId: profile.id,
+      name: 'RPG',
+      defaultCadence: FriendshipCadence.monthly,
+    );
+    await friendsRepos.friendships.linkPersonToCircle(
+      personId: person.id,
+      circleId: circle.id,
+    );
+    await friendsRepos.people.logInteraction(
+      profileId: profile.id,
+      person: person,
+      kind: InteractionKind.meeting,
+      occurredAt: DateTime.utc(2026, 8, 1),
+    );
+
+    final snapshot = await friendsRepos.export.buildSnapshot();
+    expect(snapshot.version, 36);
+    expect(snapshot.friendships, hasLength(1));
+    expect(snapshot.friendshipCircles, hasLength(1));
+    expect(snapshot.friendshipCircleMemberships, hasLength(1));
+
+    final overviews = FriendshipOverview.assemble(
+      people: snapshot.people,
+      friendships: snapshot.friendships,
+      circles: snapshot.friendshipCircles,
+      memberships: snapshot.friendshipCircleMemberships,
+      interactions: snapshot.personInteractions,
+      now: DateTime.utc(2026, 8, 23, 12),
+    );
+    expect(overviews.single.circles.single.name, 'RPG');
+    expect(overviews.single.rhythm.daysSinceLastEncounter, 22);
+    expect(overviews.single.rhythm.attention, FriendshipAttention.overdue);
   });
 }
