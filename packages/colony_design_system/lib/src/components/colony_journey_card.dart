@@ -28,13 +28,14 @@ class ColonyJourneyCard extends StatelessWidget {
     final text = Theme.of(context).textTheme;
     final card = ClipRRect(
       borderRadius: BorderRadius.circular(ColonyRadii.soft),
-      child: SizedBox(
-        height: height,
-        width: double.infinity,
+      child: ConstrainedBox(
+        constraints: BoxConstraints(minHeight: height),
         child: Stack(
-          fit: StackFit.expand,
+          fit: StackFit.passthrough,
           children: [
-            const ColoredBox(color: ColonyColors.panel),
+            const Positioned.fill(
+              child: ColoredBox(color: ColonyColors.panel),
+            ),
             if (assetPath != null)
               Positioned.fill(
                 child: Image.asset(
@@ -46,15 +47,17 @@ class ColonyJourneyCard extends StatelessWidget {
                   ),
                 ),
               ),
-            const DecoratedBox(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.centerLeft,
-                  end: Alignment.centerRight,
-                  colors: [
-                    Color(0xF2080C10),
-                    Color(0x66080C10),
-                  ],
+            const Positioned.fill(
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.centerLeft,
+                    end: Alignment.centerRight,
+                    colors: [
+                      Color(0xF2080C10),
+                      Color(0x66080C10),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -62,6 +65,7 @@ class ColonyJourneyCard extends StatelessWidget {
               padding: const EdgeInsets.all(ColonySpacing.md),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   if (eyebrow != null)
                     Text(
@@ -71,7 +75,7 @@ class ColonyJourneyCard extends StatelessWidget {
                         letterSpacing: 0.4,
                       ),
                     ),
-                  const Spacer(),
+                  if (eyebrow != null) const SizedBox(height: ColonySpacing.sm),
                   Text(
                     title,
                     maxLines: 2,
