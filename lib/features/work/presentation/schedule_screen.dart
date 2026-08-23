@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
+import '../../../app/localization/app_locale.dart';
 import '../../../app/localization/app_strings.dart';
 import '../../../core/providers/app_providers.dart';
 import '../application/work_controllers.dart';
@@ -86,8 +87,8 @@ class _ScheduleScreenState extends ConsumerState<ScheduleScreen> {
     final use24Hour = prefs?.use24HourFormat ?? true;
     final dateLabel = isThreeDay
         ? _threeDayRangeLabel(selectedDay, locale)
-        : DateFormat('EEE, d MMM', locale).format(selectedDay);
-    final timeFormat = use24Hour ? DateFormat.Hm(locale) : DateFormat.jm(locale);
+        : AppLocale.date('EEE, d MMM', locale).format(selectedDay);
+    final timeFormat = AppLocale.time(use24Hour: use24Hour, locale: locale);
 
     return Column(
       children: [
@@ -256,10 +257,10 @@ class _ScheduleScreenState extends ConsumerState<ScheduleScreen> {
   String _threeDayRangeLabel(DateTime anchor, String locale) {
     final days = scheduleThreeDayRange(anchor);
     if (days.length < 2) {
-      return DateFormat('EEE, d MMM', locale).format(anchor);
+      return AppLocale.date('EEE, d MMM', locale).format(anchor);
     }
-    final start = DateFormat('d MMM', locale).format(days.first);
-    final end = DateFormat('d MMM', locale).format(days.last);
+    final start = AppLocale.date('d MMM', locale).format(days.first);
+    final end = AppLocale.date('d MMM', locale).format(days.last);
     return '$start – $end';
   }
 }
