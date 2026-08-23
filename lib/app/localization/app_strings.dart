@@ -820,6 +820,9 @@ abstract final class AppStrings {
       'O que notaste. Markdown serve. Não é biografia da Wikipedia.';
   static const musicAtlasSaveNotes = 'Guardar notas';
   static const musicAtlasAssignRiver = 'Ligar a um rio';
+  static const musicAtlasSearchRiver = 'Procurar género, cena ou tradição';
+  static const musicAtlasOntologyHint =
+      'Género não é tradição nem cena. Progressive sozinho não é um rio.';
   static const musicAtlasOpenInspect = 'Estados e relações';
   static const musicAtlasNoEncounters = 'Nenhum encontro ainda.';
   static const musicAtlasOpenAlbum = 'Abrir ficha do álbum';

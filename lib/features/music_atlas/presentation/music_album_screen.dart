@@ -105,10 +105,16 @@ class _MusicAlbumScreenState extends ConsumerState<MusicAlbumScreen> {
                         children: [
                           for (final spec in territories)
                             ActionChip(
-                              label: Text(spec.title),
-                              onPressed: () => context.go(
-                                '/research/music-atlas/explore?t=${spec.key}',
+                              label: Text(
+                                spec.axis == MusicAxisKind.genre
+                                    ? spec.title
+                                    : '${MusicOntologyPolicy.axisLabel(spec.axis)} · ${spec.title}',
                               ),
+                              onPressed: spec.axis == MusicAxisKind.genre
+                                  ? () => context.go(
+                                      '/research/music-atlas/explore?t=${spec.key}',
+                                    )
+                                  : null,
                             ),
                           ActionChip(
                             avatar: const Icon(Icons.add, size: 16),
@@ -286,38 +292,85 @@ class _MusicAlbumScreenState extends ConsumerState<MusicAlbumScreen> {
     final picked = await showModalBottomSheet<String>(
       context: context,
       isScrollControlled: true,
-      builder: (context) {
-        return SizedBox(
-          height: MediaQuery.sizeOf(context).height * 0.7,
-          child: ListView(
-            padding: const EdgeInsets.all(ColonySpacing.lg),
-            children: [
-              Text(
-                AppStrings.musicAtlasAssignRiver,
-                style: Theme.of(context).textTheme.titleLarge,
-              ),
-              const SizedBox(height: ColonySpacing.sm),
-              for (final spec in MusicGenreAtlas.territories)
-                ListTile(
-                  contentPadding: EdgeInsets.zero,
-                  title: Text(spec.title),
-                  subtitle: spec.parentKey == null
-                      ? null
-                      : Text(
-                          MusicGenreAtlas.byKey[spec.parentKey]?.title ?? '',
-                        ),
-                  onTap: () => Navigator.of(context).pop(spec.key),
-                ),
-            ],
-          ),
-        );
-      },
+      builder: (context) => const _CanonRiverPicker(),
     );
     if (picked == null || !mounted) return;
     final next = {...album.territoryKeys, picked}.toList();
     await ref
         .read(musicAtlasControllerProvider.notifier)
         .assignTerritories(nodeId: album.node.id, territoryKeys: next);
+  }
+}
+
+class _CanonRiverPicker extends StatefulWidget {
+  const _CanonRiverPicker();
+
+  @override
+  State<_CanonRiverPicker> createState() => _CanonRiverPickerState();
+}
+
+class _CanonRiverPickerState extends State<_CanonRiverPicker> {
+  final _query = TextEditingController();
+
+  @override
+  void dispose() {
+    _query.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final matches = MusicGenreAtlas.searchAssignable(_query.text);
+    return SizedBox(
+      height: MediaQuery.sizeOf(context).height * 0.78,
+      child: Padding(
+        padding: const EdgeInsets.all(ColonySpacing.lg),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(
+              AppStrings.musicAtlasAssignRiver,
+              style: Theme.of(context).textTheme.titleLarge,
+            ),
+            const SizedBox(height: ColonySpacing.xs),
+            Text(
+              AppStrings.musicAtlasOntologyHint,
+              style: Theme.of(context).textTheme.bodySmall,
+            ),
+            TextField(
+              controller: _query,
+              decoration: const InputDecoration(
+                labelText: AppStrings.musicAtlasSearchRiver,
+              ),
+              onChanged: (_) => setState(() {}),
+            ),
+            const SizedBox(height: ColonySpacing.sm),
+            Expanded(
+              child: ListView.builder(
+                itemCount: matches.length,
+                itemBuilder: (context, index) {
+                  final spec = matches[index];
+                  final parent = spec.parentKey == null
+                      ? null
+                      : MusicGenreAtlas.byKey[spec.parentKey]?.title;
+                  return ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    title: Text(spec.title),
+                    subtitle: Text(
+                      [
+                        if (parent != null) parent,
+                        MusicOntologyPolicy.axisLabel(spec.axis),
+                      ].join(' · '),
+                    ),
+                    onTap: () => Navigator.of(context).pop(spec.key),
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
 

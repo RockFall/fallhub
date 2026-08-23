@@ -2578,7 +2578,6 @@ LINKS = [
     ("sceneAssociatedWith", "electronic.techno.detroit", "scene.detroit_techno"),
     ("sceneAssociatedWith", "electronic.house.chicago", "scene.chicago_house"),
     ("commonlyOverlaps", "brazilian.funk_br", "electronic.club.baile"),
-    ("regionalVariantOf", "brazilian.funk_br", "funk"),
     ("siblingOf", "african.afrobeat", "african.afrobeats"),
     ("influencedBy", "hiphop.grime", "electronic.garage"),
     ("derivedFrom", "punk.postpunk", "punk.punk"),

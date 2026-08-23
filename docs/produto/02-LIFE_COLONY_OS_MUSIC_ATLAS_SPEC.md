@@ -6,14 +6,16 @@
 **Módulo pai:** `Pesquisa`, com integrações profundas em `Flashcards`, `Integrações`, `Habitat`, `Home`, `Pawn`, `Skills`, `Biblioteca`, `Crônica`, `Missões`, `Agenda`, `Relações`, `Viagens` e `Storyteller`  
 **Nome funcional:** `Atlas Musical`  
 **Codinome interno:** `Music Frontier`  
-**Status:** Especificação v1.1 — revisão de encaixe no app real  
+**Status:** Especificação v1.2 — ontologia canónica multi-eixo  
 **Data de referência:** 23 de agosto de 2026  
 **Origem v1.0:** 6 de agosto de 2026  
 **Plataforma:** Flutter — Android, iOS e desktop; experiência plenamente utilizável offline  
-**Escopo desta versão:** descoberta, escuta, contextualização, comparação, memória, prática, planejamento de explorações, importação JSON com prompt para IA externa, conector Spotify opt-in e pontes com Pesquisa/Flashcards  
+**Escopo desta versão:** descoberta, escuta, contextualização, comparação, memória, prática, planejamento de explorações, importação JSON com prompt para IA externa, conector Spotify opt-in, pontes com Pesquisa/Flashcards e **Canonical Genre Base v1** (género ≠ tradição ≠ cena)  
 **Fora de escopo:** streaming próprio, download não autorizado de áudio, reprodução integral de conteúdo protegido, substituição de Spotify/Apple Music, LLM remoto obrigatório e “nota objetiva” sobre gosto musical  
 
 **Delta v1.1 (23 ago 2026):** a v1.0 descrevia o continente cartográfico. Esta revisão **encaixa** o módulo no app que já existe (home de mini-programas, Pesquisa, Flashcards+SRS+import JSON, Integrações ICS, Habitat, Storyteller `rules_v1`) e **puxa para cedo** duas fatias que estavam implícitas ou tardias: prompt copiável + JSON (canal A) e conector Spotify opt-in. Capítulos novos: §2.4, §36.5–36.6, §45.5–45.7, §46.2, §75–§80. Roadmap M0–M13 na §67. O ensaio cartográfico das §3–§34 permanece; não foi reescrito por cosmética.
+
+**Delta v1.2 (23 ago 2026):** a árvore única `Música > Rock > Progressive Rock > Canterbury` foi **abandonada**. O Atlas passa a uma ontologia de onze eixos (género, tradição, cena, movimento, forma, função, técnica, descritor, geografia, era, conceito), vinte e seis famílias de género com subgéneros profundos, polihierarquia e grafo semântico (`derivedFrom`, `fusedWith`, …). MPB deixa de ser pai de toda a música brasileira. World Music, Progressive sozinho e moods não são raízes. Norma: §12, §81, ADR-MUSIC-015. Fonte de código: `MusicCanon`.
 
 ---
 
@@ -100,6 +102,18 @@
 - [78. Superfície no app atual](#78-superfície-no-app-atual)
 - [79. Contrato JSON v1 do Atlas](#79-contrato-json-v1-do-atlas)
 - [80. Critérios de aceite das fatias novas](#80-critérios-de-aceite-das-fatias-novas)
+- [81. Ontologia canónica multi-eixo](#81-ontologia-canónica-multi-eixo)
+  - [81.1 Porque não uma árvore única](#811-porque-não-uma-árvore-única)
+  - [81.2 Onze eixos](#812-onze-eixos)
+  - [81.3 Famílias de género (raízes oficiais)](#813-famílias-de-género-raízes-oficiais)
+  - [81.4 Categorias funcionais](#814-categorias-funcionais)
+  - [81.5 Polihierarquia e grafo semântico](#815-polihierarquia-e-grafo-semântico)
+  - [81.6 O que não é género](#816-o-que-não-é-género)
+  - [81.7 Cenas, movimentos e conceitos](#817-cenas-movimentos-e-conceitos)
+  - [81.8 Exemplos canónicos](#818-exemplos-canónicos)
+  - [81.9 Mapa e picker](#819-mapa-e-picker)
+  - [81.10 Fonte de código e long tail](#8110-fonte-de-código-e-long-tail)
+  - [81.11 Aceite desta fatia](#8111-aceite-desta-fatia)
 
 ---
 
@@ -454,7 +468,9 @@ Toda observação pode ter contexto:
 | Termo | Definição |
 |---|---|
 | `Atlas` | conjunto de mapas, projeções, escopos e estados pessoais |
-| `Território` | agrupamento coerente, como gênero, cena, movimento ou tradição |
+| `Território` | recorte navegável no **mapa de géneros** (um rio). Não é o único eixo. |
+| `Taxon` | nó da ontologia canónica (`MusicTaxon`) num eixo: género, tradição, cena, … |
+| `Eixo` | uma das onze dimensões da §81. Género ≠ tradição ≠ cena ≠ função. |
 | `Nó` | entidade explorável: artista, obra, gênero, conceito, instrumento etc. |
 | `Relação` | conexão tipada entre nós |
 | `Claim` | afirmação histórica ou analítica com fonte e confiança |
@@ -733,23 +749,38 @@ A UI deve mostrar divergência entre declaração e inferência, nunca substitui
 
 # 12. Territórios e fronteiras
 
-Um `MusicTerritory` é um recorte navegável.
+Um `MusicTerritory` no **mapa** é um rio de **género** (família → folha). Isso **não** esgota a ontologia.
 
-Tipos:
+A v1.0 tratava género, tradição, movimento, cena, técnica e função como se fossem pastas da mesma árvore. Isso produz erros: Canterbury é cena *e* estilo; Tropicália é movimento *e* recorte; MPB não é pai do samba; Baile Funk não é o Funk de Clinton; Progressive sozinho não é um género.
 
-- gênero;
-- subgênero;
-- movimento;
-- tradição;
-- cena;
-- período;
-- região;
-- escola;
-- corrente estética;
-- linguagem instrumental;
-- prática;
-- tecnologia;
-- recorte curatorial pessoal.
+A norma é a **ontologia multi-eixo** da §81 e o ADR-MUSIC-015. Cada item musical pode receber, em simultâneo:
+
+| Eixo | O que é | Exemplo |
+|---|---|---|
+| Genre | linhagem estilística | Jazz > Fusion > Jazz-Rock |
+| Tradition | tradição cultural | Música brasileira; Hindustani |
+| Scene | comunidade situada | Clube da Esquina; Detroit Techno |
+| Movement | gesto artístico deliberado | Tropicalismo; Minimalism |
+| Form | forma | Symphony; Raga; Choro |
+| Function | finalidade | Stage & Screen; library |
+| Technique | técnica | Sampling; Serialism |
+| Descriptor | carácter sonoro | Electric; Virtuosic |
+| Geography | associação geográfica | Minas Gerais; Detroit |
+| Era | período | 1970s |
+| Concept | ideia de escuta | Modal; Clave; Four-on-the-floor |
+
+Tipos que o mapa ainda mostra como rio (eixo `genre`):
+
+- gênero e subgênero (polihierarquia permitida);
+- recorte curatorial pessoal (`user.*`).
+
+Tipos que **não** entram como género-mãe, mesmo que o mapa os cite:
+
+- movimento, tradição, cena, período, região, escola;
+- mood, instrumentação, produção, “Progressive” / “Experimental” / “Fusion” sozinhos;
+- World Music;
+- MPB como pai de toda a música brasileira;
+- categorias funcionais (cinema, jogos, children’s, spoken word).
 
 Exemplos:
 
@@ -4661,6 +4692,7 @@ A feature completa só está madura quando:
 12. `ADR-MUSIC-012`: sync de metadata pública;
 13. `ADR-MUSIC-013`: Spotify local-first (PKCE, scopes incrementais, tokens fora do export, listens ≠ conhecimento, capability probe);
 14. `ADR-MUSIC-014`: importação JSON do Atlas com prompt para IA externa (clone ADR-038; parse streaming; cartões embutidos delegam ao codec de flashcards).
+15. `ADR-MUSIC-015`: ontologia canónica multi-eixo (Canonical Genre Base v1; polihierarquia; grafo semântico; 26 famílias).
 
 ADRs de produto já existentes que o Atlas **deve citar e não duplicar**:
 
@@ -5658,6 +5690,262 @@ Complementam a §65. Uma fatia só fecha com empty/loading/error/offline, string
 2. Delete de perfil / wipe remove tokens.
 3. Sem telemetry de gosto por defeito.
 4. Nenhuma percentagem “de toda a música” ou “do Spotify” na UI.
+
+---
+
+# 81. Ontologia canónica multi-eixo
+
+Norma de implementação. Substitui a árvore única da v1.0. Código: `packages/colony_domain/lib/src/music_ontology.dart`, `music_canon.dart`, `music_canon_data.dart`, `music_canon_builder.dart`. Gerador: `tool/generate_music_canon.py`. ADR-MUSIC-015.
+
+Não havia dados reais de utilizador a preservar. Vale o estado ideal — sem migração de chaves mortas, só *aliases* (`br.mpb` → `brazilian.mpb`, `rock.postpunk` → `punk.postpunk`).
+
+## 81.1 Porque não uma árvore única
+
+Uma pasta `Música > Rock > Progressive Rock > Canterbury` funciona até certo ponto e depois produz erros: **género, tradição, movimento, cena, técnica e função não são a mesma coisa**.
+
+Discogs mantém poucos géneros principais e uma camada de *styles*. AllMusic distingue *genres* de *styles*. MusicBrainz trata género como tag subjectiva e extensível. O Atlas precisa de mais: representar Beethoven, Hermeto, black metal, baile funk, gamelan, Detroit techno, qawwali e vaporwave **sem fingir que cabem na mesma pasta**.
+
+Por isso cada item musical pode receber, em simultâneo, taxons de onze eixos. O mapa continua a desenhar **rios de género**; os outros eixos vivem como fichas no álbum e como arestas do grafo.
+
+## 81.2 Onze eixos
+
+| Eixo | `MusicAxisKind` | O que é | O que não é |
+|---|---|---|---|
+| Genre | `genre` | linhagem estilística | “música popular”, mood, pasta geográfica |
+| Tradition | `tradition` | tradição cultural/musical | um subgénero de Jazz ou de “World” |
+| Scene | `scene` | comunidade situada historicamente | um filho obrigatório na árvore de género |
+| Movement | `movement` | gesto artístico deliberado | um sinónimo de estilo |
+| Form | `form` | forma (sinfonia, raga, choro, song) | um género-mãe |
+| Function | `function` | finalidade (cinema, jogos, library) | um género-mãe |
+| Technique | `technique` | técnica composicional ou de produção | um pai de linhagem |
+| Descriptor | `descriptor` | carácter sonoro (electric, virtuosic) | um rio no mapa |
+| Geography | `geography` | origem ou associação geográfica | um continente-género |
+| Era | `era` | período histórico | um estilo |
+| Concept | `concept` | ideia de escuta (modal, clave, four-on-the-floor) | um mood de playlist |
+
+Modelo:
+
+```text
+MusicTaxon
+  key, title, axis
+  parentKeys              # hierarquia primária no eixo
+  secondaryParentKeys     # polihierarquia (Blackgaze → Metal e Shoegaze)
+  aliases                 # dump Spotify / JSON / UI
+  traditionKeys, sceneKeys, movementKeys, …
+  loreMarkdown
+
+MusicTaxonLink
+  kind, fromKey, toKey    # grafo além de parentOf
+```
+
+Um álbum guarda uma lista de chaves (`territoryKeys`). Podem misturar eixos. O cartógrafo só pinta no canvas as que têm `axis == genre`.
+
+## 81.3 Famílias de género (raízes oficiais)
+
+Vinte e seis famílias. As chaves são estáveis; os títulos podem ser localizados mais tarde.
+
+```text
+western_art          Música Erudita Ocidental
+global_art           Tradições Eruditas Não-Ocidentais
+folk                 Folk e Música Tradicional
+blues                Blues
+jazz                 Jazz
+rnb                  Rhythm & Blues
+soul                 Soul
+funk                 Funk
+gospel               Gospel e Música Devocional Afro-Americana
+country              Country e Americana
+rock                 Rock
+punk                 Punk e Hardcore
+metal                Metal
+pop                  Pop
+hiphop               Hip-Hop
+reggae               Reggae e Música Jamaicana
+electronic           Electronic
+industrial           Industrial e Noise
+experimental         Experimental e Avant-Garde
+brazilian            Música Brasileira
+latin                Música Latina e Caribenha
+african              Música Africana Moderna
+mena                 Oriente Médio e Norte da África
+south_asian          Música Sul-Asiática
+east_asian           Música do Leste Asiático
+southeast_asian      Música do Sudeste Asiático
+```
+
+`brazilian`, `african`, `latin`, `mena` e as famílias asiáticas **não** são ontologicamente iguais a Jazz ou Metal: são famílias-tradição no mapa. O eixo `tradition` guarda a distinção (`tradition.brazilian`, `tradition.hindustani`, `tradition.japanese`, …). Continuam no canvas de género para a cartografia ser percorrível; o código e a spec não as tratam como “o mesmo tipo de coisa que Metal”.
+
+Profundidade mínima exigida (o cânone v1 já vai além):
+
+| Família | Ramos que o cânone tem de carregar |
+|---|---|
+| `western_art` | Early / Medieval / Renaissance / Baroque / Classical / Romantic / Modern / Postwar / Minimalism / Contemporary |
+| `global_art` | Hindustani, Carnatic, Persian, Arabic, Ottoman, Chinese, Japanese, Korean, Javanese e Balinese gamelan — **nunca** “World Music” |
+| `jazz` | Proto, Early, Swing, Manouche, Bebop, Cool, Hard Bop, Modal, Post-Bop, Third Stream, Avant, Fusion (Jazz-Rock, Canterbury Fusion, Jazz-Funk), Latin, ECM-estética, híbridos (Acid, Nu, Dark Jazz), Vocal |
+| `rock` | R&R, Surf, Garage, Beat, Folk Rock, Blues Rock, Psych, Hard, Glam, Art, Prog (Symphonic, Canterbury, Zeuhl, Krautrock, RIO, Neo), Jazz Rock, New Wave, Alternative (Shoegaze, Dream Pop, Post-Rock, Math, Grunge, Britpop, Madchester) |
+| `punk` | Proto, First-wave, Oi!, Anarcho, Pop Punk, Hardcore (NYHC, Boston, DC, Youth Crew, D-Beat, Crust, Powerviolence), Post-Punk, Emo, Post-Hardcore, Grind |
+| `metal` | Proto, Trad/NWOBHM, Speed, Thrash, Doom, Death, Black (incluindo Blackgaze com secondary Shoegaze), Power, Prog/Djent, Groove, Sludge, Stoner, Gothic, Symphonic, Folk, Industrial, Nu, Metalcore, Deathcore |
+| `electronic` | Early, Berlin School, Ambient, Disco, House, Techno, Trance, Breaks, Jungle → DnB → Techstep → Neurofunk, Hardcore, UKG, Dubstep, IDM, Electro, Downtempo, Bass, Footwork, club regional (Baile, Gqom, Amapiano), Vaporwave, Synthwave |
+| `brazilian` | Matrizes afro-brasileiras, Samba (não filho da MPB), Choro, Bossa, MPB *como macro pós-1960*, Tropicalismo, Clube da Esquina, Jovem Guarda, Rock BR, Manguebeat, Nordeste, Sertanejo, Amazônia, Axé, **Funk Brasileiro separado do Funk afro-americano**, Brega, Black Rio, instrumental |
+| `hiphop` | Old school, Golden Age, East/West/South, Trap, Drill, Alt/Experimental, Cloud, Grime (secondary Electronic), Rap Nacional |
+| `latin` | Cuba, Salsa, Porto Rico, República Dominicana, Reggaeton, Colômbia, Venezuela, Tango, México, Andes, Nueva Canción, Caribe não-hispânico |
+| `african` | Highlife, Afrobeat *≠* Afrobeats, Jùjú, Fuji, Mbalax, Rumba congolesa, Soukous, Ethio-Jazz, Mbaqanga, Kwaito, Gqom, Amapiano |
+| `folk` | Folk contemporâneo (revival, freak, neofolk, folktronica) **e** tradições (Celtic, Fado, Flamenco com árvore própria, Balkan, Nordic). Tradições históricas específicas preferem o eixo `tradition`. |
+
+Flamenco tem árvore própria debaixo de `folk` (cante, palos, nuevo, jazz, fusion) — não é um adjectivo de “world guitar”.
+
+Gospel / sacred: a família `gospel` cobre a linhagem afro-americana. Qawwali, Bhajan, canto gregoriano, Nasheed, litúrgica judaica e budista ficam nas respectivas tradições culturais — **não** há uma árvore religiosa global.
+
+## 81.4 Categorias funcionais
+
+Não são géneros-mãe. Vivem no eixo `function`:
+
+- Stage & Screen (`function.stage_screen`) — film score, TV, musical theatre, anime soundtrack
+- Música para jogos (`function.game`)
+- Música infantil
+- Spoken Word
+- Comedy
+- Field Recording
+- Sound Art
+- Religious / Devotional *como função* (a tradição religiosa continua noutro eixo)
+- Library / Production Music
+- Trailer / Incidental
+
+Um disco de jogo pode ser `function.game` + `electronic.chiptune` + `descriptor.8bit`. O mapa não inventa um continente “VGM” a tapar Electronic.
+
+## 81.5 Polihierarquia e grafo semântico
+
+`parentKeys` + `secondaryParentKeys` (polihierarquia). Além de `parentOf`:
+
+| Relação | Exemplo |
+|---|---|
+| `derivedFrom` | Punk Rock ← Garage Rock; Soul ← R&B |
+| `influencedBy` | Jazz Fusion ← Rock; Grime ← UK Garage |
+| `fusedWith` | Jazz Fusion × Rock; Jazz-Funk × Funk |
+| `siblingOf` | Bebop ↔ Hard Bop; Afrobeat ↔ Afrobeats |
+| `historicallyPrecedes` | Ska → Rocksteady → Early Reggae; Breakbeat Hardcore → Jungle → DnB |
+| `regionalVariantOf` | Brazilian Jazz / Jazz — **nunca** Funk Carioca / Funk de Clinton |
+| `revivalOf` | Neo-Psychedelia ← Psychedelic Rock |
+| `sceneAssociatedWith` | Grunge ↔ Seattle; Canterbury Rock ↔ Canterbury; Clube da Esquina ↔ a cena |
+| `movementAssociatedWith` | Tropicália ↔ Tropicalismo |
+| `commonlyOverlaps` | Dream Pop ↔ Shoegaze; Blackgaze ↔ Shoegaze; Funk BR ↔ Baile Funk (club) |
+
+Secondary parents obrigatórios neste cânone:
+
+- Blackgaze → `metal.black` *e* `rock.alt.shoegaze`
+- Grind / Deathgrind → Punk *e* Metal
+- Baile Funk (club) → Electronic *e* `brazilian.funk_br`
+- Gqom / Amapiano no club → Electronic *e* African
+- Grime → Hip-Hop *e* Electronic
+- Post-Metal → Post-Rock *e* Metal
+- Canterbury Fusion → Jazz Fusion *e* Canterbury Rock
+- Funk Carioca **não** declara `funk` como pai
+
+## 81.6 O que não é género
+
+Proibidos como raiz ou como pai universal (`MusicOntologyPolicy.forbiddenGenreRoots`):
+
+**Moods** — melancholic, euphoric, aggressive, dreamy, dark, warm, romantic.
+
+**Instrumentação** — acoustic, electric, electronic, orchestral, guitar-led, piano-led, horn-led, synth-heavy.
+
+**Técnicas sozinhas** — sampling, improvisation, serialism, polyrhythm, microtonality, loop-based, granular, field recording, generative.
+
+**Produção** — lo-fi, hi-fi, wall of sound, dub production, bedroom, analog, digital.
+
+**Modificadores órfãos** — Progressive, Experimental, Fusion, Revival, Neo-, Post-, Traditional. Existem Progressive *Rock*, Progressive *Metal*, Progressive *House* — não existe um rio chamado só “Progressive”.
+
+**Pastas coloniais** — World Music. Tradições eruditas não-ocidentais têm família própria (`global_art`).
+
+**Distorções brasileiras** — MPB não é pai do samba, do choro, do baião nem do funk carioca. MPB é macrocategoria histórica pós-1960 (`brazilian.mpb`), irmã desses rios. Funk afro-americano não é pai do Funk Brasileiro.
+
+`matchGenreLabel` é *exact match* contra título, chave e aliases. “Batida de Lisboa” não cai num rio por substring. `matchGenreLabel('world music')` e `matchGenreLabel('progressive')` devolvem `null`.
+
+## 81.7 Cenas, movimentos e conceitos
+
+Cenas (eixo `scene`, prefixo `scene.`): Canterbury, Krautrock, Clube da Esquina, Tropicália, Manguebeat, Black Rio, Madchester, Britpop, Seattle Grunge, No Wave, New York Downtown, Detroit Techno, Chicago House, Bristol Trip-Hop, Bay Area Thrash, Norwegian Second-Wave Black Metal, Gothenburg Death Metal, NWOBHM, French Touch, Shibuya-Kei.
+
+Um álbum pode pertencer a uma cena **sem** a cena ocupar uma posição estranha na árvore de géneros. Canterbury Scene Rock continua a ser um rio; `scene.canterbury` é a comunidade.
+
+Movimentos: Tropicalismo, Minimalism, Rock in Opposition, Zeuhl (também estilo), Futurism, Fluxus.
+
+Conceitos transversais (`concept.*`): tonal / modal / atonal / polytonal / microtonal; harmonia funcional, modal, quartal, extendida; swing, straight, syncopation, polyrhythm, clave, breakbeat, four-on-the-floor; improvisação (nenhuma, ornamental, solo, colectiva, livre); composição (songwriting, through-composed, process, generative); timbre (acoustic, electrified, analog/digital electronic, sample-based, electroacoustic).
+
+## 81.8 Exemplos canónicos
+
+**Heavy Weather** (Weather Report)
+
+- Genre: Jazz > Fusion > Jazz-Rock
+- Secondary: Funk > Jazz-Funk
+- Tradition: Jazz norte-americano
+- Scene: Fusion 1970s
+- Descriptors: Electric, Virtuosic, Improvisational
+
+**Clube da Esquina**
+
+- Genre: MPB (macro pós-1960, *não* pai do samba)
+- Secondary: Folk Rock, Psychedelic Pop, Progressive Pop
+- Tradition: Música brasileira
+- Scene: `scene.clube_da_esquina`
+- Geography: Minas Gerais
+- Era: 1970s
+
+**Neurofunk**
+
+```text
+Electronic → Breakbeat → Breakbeat Hardcore → Jungle → Drum & Bass → Techstep → Neurofunk
+```
+
+- originScene: London / UK DnB
+- era: late 1990s+
+- concept: breakbeat
+- related: Techstep, Darkstep
+
+**Blackgaze**
+
+```text
+Metal → Black Metal → Atmospheric Black Metal → Blackgaze
+                                    secondary → Rock → Alternative → Shoegaze
+```
+
+**Zeuhl**
+
+```text
+Rock → Progressive Rock → Avant-Prog → Zeuhl
+```
+
+- `movement = Zeuhl`
+- influências jazz e erudita *fortes*, sem virar “Classical Rock”
+
+## 81.9 Mapa e picker
+
+O canvas mostra **rios de género**. Cenas e tradições aparecem como fichas no álbum (`Cena · Clube da Esquina`), não como pastas no meio da árvore. Com mais de um milhar de taxons, o layout desenha raízes + caminhos já explorados + filhos do poço aberto.
+
+O picker (`MusicGenreAtlas.searchAssignable`):
+
+- query vazia → só as 26 raízes;
+- query preenchida → géneros, cenas, tradições, movimentos, formas, funções, conceitos;
+- `progressive` encontra Progressive Rock / Metal / House — **não** um rio chamado só “Progressive”.
+
+Não se despejam 1000 linhas sem filtro.
+
+## 81.10 Fonte de código e long tail
+
+A espinha dorsal está congelada nestas 26 raízes. A long tail (microgéneros de electronic, sublinhagens de metal extremo, tradições africanas país a país, folk europeu, Oceania, música indígena das Américas, cenas japonesas, gospel mundial, internet microgenres) **cresce debaixo** das raízes, via `tool/generate_music_canon.py`, sem as partir. MusicBrainz ilustra por que essa camada é inevitável; o Atlas não tenta fechá-la na v1.
+
+Novos nós: acrescentar no gerador, regenerar `music_canon_data.dart`, nunca criar uma 27ª raiz sem ADR.
+
+## 81.11 Aceite desta fatia
+
+1. Existem as 26 raízes; o cânone de género tem centenas de folhas (Jazz, Metal, Electronic e Brasil em profundidade real).
+2. `MusicTaxon.axis` distingue género de cena/tradição/função.
+3. Blackgaze declara secondary parent Shoegaze; o mapa acende os dois ramos se o disco foi ouvido.
+4. `matchGenreLabel('world music')` e `matchGenreLabel('progressive')` não inventam uma raiz.
+5. `matchGenreLabel('MPB')` cai em `brazilian.mpb`, irmão de `brazilian.samba`, não pai.
+6. Dump Spotify / JSON resolvem aliases (`br.mpb`, `rock.postpunk`, `jazz.modal`).
+7. O picker pesquisa; query vazia mostra raízes; “Clube da Esquina” encontra a cena.
+8. Funk Carioca não declara o Funk afro-americano como pai.
+9. Sem World Music. Sem percentagem “de toda a música”.)
 
 ---
 

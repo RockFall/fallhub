@@ -1,24 +1,53 @@
 import 'music_atlas.dart';
+import 'music_canon.dart';
 import 'music_cover_recipe.dart';
+import 'music_ontology.dart';
 
 class MusicTerritorySpec {
   const MusicTerritorySpec({
     required this.key,
     required this.title,
     this.parentKey,
+    this.secondaryParentKeys = const [],
     required this.hue,
     required this.motif,
     this.aliases = const [],
     required this.loreMarkdown,
+    this.axis = MusicAxisKind.genre,
+    this.sceneKeys = const [],
+    this.traditionKeys = const [],
+    this.movementKeys = const [],
   });
 
   final String key;
   final String title;
   final String? parentKey;
+  final List<String> secondaryParentKeys;
   final double hue;
   final MusicCoverMotif motif;
   final List<String> aliases;
   final String loreMarkdown;
+  final MusicAxisKind axis;
+  final List<String> sceneKeys;
+  final List<String> traditionKeys;
+  final List<String> movementKeys;
+
+  factory MusicTerritorySpec.fromTaxon(MusicTaxon taxon) {
+    return MusicTerritorySpec(
+      key: taxon.key,
+      title: taxon.title,
+      parentKey: taxon.primaryParent,
+      secondaryParentKeys: taxon.secondaryParentKeys,
+      hue: MusicCanon.hueOf(taxon),
+      motif: MusicCanon.motifOf(taxon),
+      aliases: taxon.aliases,
+      loreMarkdown: taxon.loreMarkdown,
+      axis: taxon.axis,
+      sceneKeys: taxon.sceneKeys,
+      traditionKeys: taxon.traditionKeys,
+      movementKeys: taxon.movementKeys,
+    );
+  }
 
   int get depth {
     if (parentKey == null) return 0;
@@ -53,7 +82,7 @@ class MusicAlbumDossier {
   final List<String> titleAliases;
 }
 
-/// Built-in cartograph of territories. Overlay of personal listening lives elsewhere.
+/// Map-facing projection of [MusicCanon] genre rivers.
 abstract final class MusicGenreAtlas {
   static const unmappedKey = 'unmapped';
   static const userRootKey = 'user';
@@ -78,500 +107,8 @@ abstract final class MusicGenreAtlas {
         'o Atlas trata-os como ramificações vivas.',
   );
 
-  static const territories = <MusicTerritorySpec>[
-    MusicTerritorySpec(
-      key: 'br',
-      title: 'Brasil',
-      hue: 42,
-      motif: MusicCoverMotif.gold,
-      aliases: ['brazilian', 'brasil', 'brazilian music'],
-      loreMarkdown: '''
-## Brasil
-Não é um género — é um continente sonoro. Quem trata "música brasileira"
-como prateleira única ainda não saiu do aeroporto.
-''',
-    ),
-    MusicTerritorySpec(
-      key: 'br.samba',
-      title: 'Samba',
-      parentKey: 'br',
-      hue: 28,
-      motif: MusicCoverMotif.pulse,
-      aliases: ['samba', 'samba-enredo', 'partido alto', 'pagode'],
-      loreMarkdown: '''
-## Samba
-O chão que falta quando só se ouve o refrão. Partido alto, enredo, a
-cozinha do surdo — o Atlas marca visita quando consegues apontar *quem*
-segura o tempo, não só a melodia.
-''',
-    ),
-    MusicTerritorySpec(
-      key: 'br.bossa',
-      title: 'Bossa nova',
-      parentKey: 'br',
-      hue: 48,
-      motif: MusicCoverMotif.tide,
-      aliases: ['bossa', 'bossa nova', 'bossa-nova'],
-      loreMarkdown: '''
-## Bossa nova
-A conversa baixa que o piano e o violão inventaram para o apartamento.
-Quem só conhece a exportação de aeroporto ainda está na praia, não no
-apartamento de Copacabana.
-''',
-    ),
-    MusicTerritorySpec(
-      key: 'br.mpb',
-      title: 'MPB',
-      parentKey: 'br',
-      hue: 36,
-      motif: MusicCoverMotif.river,
-      aliases: ['mpb', 'musica popular brasileira', 'música popular brasileira'],
-      loreMarkdown: '''
-## MPB
-Nome de arquivo para um rio que recusa fronteira. Caetano, Milton, Elis,
-o Clube — cada disco é uma margem diferente do mesmo caudal.
-''',
-    ),
-    MusicTerritorySpec(
-      key: 'br.tropicalia',
-      title: 'Tropicália',
-      parentKey: 'br',
-      hue: 12,
-      motif: MusicCoverMotif.ember,
-      aliases: ['tropicalia', 'tropicália', 'tropicalismo'],
-      loreMarkdown: '''
-## Tropicália
-Não é nostalgia de 68. É o choque deliberado entre a guitarra elétrica
-e o terreiro — uma tese, não um mood.
-''',
-    ),
-    MusicTerritorySpec(
-      key: 'br.forro',
-      title: 'Forró',
-      parentKey: 'br',
-      hue: 22,
-      motif: MusicCoverMotif.brass,
-      aliases: ['forro', 'forró', 'baião', 'xote', 'pé de serra'],
-      loreMarkdown: '''
-## Forró
-Sanfona, zabumba, triângulo: três pontos e o salão inteiro. Pé-de-serra
-não é "folk brasileiro" — é arquitectura rítmica.
-''',
-    ),
-    MusicTerritorySpec(
-      key: 'br.mangue',
-      title: 'Manguebeat',
-      parentKey: 'br',
-      hue: 95,
-      motif: MusicCoverMotif.spore,
-      aliases: ['mangue', 'manguebeat', 'mangue bit'],
-      loreMarkdown: '''
-## Manguebeat
-Recife a injectar circuitos no lodo. Nação Zumbi não é "rock brasileiro":
-é um manifesto de antena fincada no mangue.
-''',
-    ),
-    MusicTerritorySpec(
-      key: 'jazz',
-      title: 'Jazz',
-      hue: 198,
-      motif: MusicCoverMotif.brass,
-      aliases: ['jazz'],
-      loreMarkdown: '''
-## Jazz
-Território-mãe. As ramificações (bop, modal, espiritual, fusão) são
-cidades; o nome "jazz" sozinho é só o porto.
-''',
-    ),
-    MusicTerritorySpec(
-      key: 'jazz.bebop',
-      title: 'Bebop',
-      parentKey: 'jazz',
-      hue: 212,
-      motif: MusicCoverMotif.pulse,
-      aliases: ['bebop', 'be-bop', 'bop', 'hard bop', 'hardbop'],
-      loreMarkdown: '''
-## Bebop
-A linguagem acelerada que expulsou o dançarino. Se ainda contas os
-compassos com o pé, estás na porta; se ouves as substituições, já
-entraste.
-''',
-    ),
-    MusicTerritorySpec(
-      key: 'jazz.modal',
-      title: 'Jazz modal',
-      parentKey: 'jazz',
-      hue: 188,
-      motif: MusicCoverMotif.tide,
-      aliases: ['modal jazz', 'jazz modal', 'cool jazz', 'modal'],
-      loreMarkdown: '''
-## Jazz modal
-O mapa deixa de ser o acorde e passa a ser o modo. Miles não inventou o
-deserto — recusou a cidade. Quem só ouviu *Kind of Blue* no elevador
-ainda está na margem.
-''',
-    ),
-    MusicTerritorySpec(
-      key: 'jazz.spiritual',
-      title: 'Jazz espiritual',
-      parentKey: 'jazz',
-      hue: 268,
-      motif: MusicCoverMotif.spore,
-      aliases: ['spiritual jazz', 'free jazz', 'avant-garde jazz', 'fire music'],
-      loreMarkdown: '''
-## Jazz espiritual
-Coltrane depois do solo como oração. Não é "mais intenso": é outra
-função para o som. O Atlas só marca visita se houver escuta atenta —
-o rumor do nome não chega.
-''',
-    ),
-    MusicTerritorySpec(
-      key: 'jazz.fusion',
-      title: 'Fusion',
-      parentKey: 'jazz',
-      hue: 156,
-      motif: MusicCoverMotif.lattice,
-      aliases: ['fusion', 'jazz fusion', 'jazz-funk', 'jazz funk'],
-      loreMarkdown: '''
-## Fusion
-A corrente eléctrica no baixo. Bitches Brew é um portal, não um ponto
-de chegada — o rio continua para Weather Report, Mahavishnu, e para
-os discos que recusaste por "soarem a rock".
-''',
-    ),
-    MusicTerritorySpec(
-      key: 'jazz.br',
-      title: 'Jazz brasileiro',
-      parentKey: 'jazz',
-      hue: 172,
-      motif: MusicCoverMotif.river,
-      aliases: ['brazilian jazz', 'samba jazz', 'samba-jazz'],
-      loreMarkdown: '''
-## Jazz brasileiro
-Onde o ride encontra o partido. Não é bossa exportada: é improvisação
-com sotaque de surdo.
-''',
-    ),
-    MusicTerritorySpec(
-      key: 'electronic',
-      title: 'Electrónica',
-      hue: 286,
-      motif: MusicCoverMotif.lattice,
-      aliases: ['electronic', 'electronica', 'electro'],
-      loreMarkdown: '''
-## Electrónica
-Família de relógios e salas vazias. Techno, house, ambient e IDM não
-são "beats" — são arquitecturas de tempo.
-''',
-    ),
-    MusicTerritorySpec(
-      key: 'electronic.techno',
-      title: 'Techno',
-      parentKey: 'electronic',
-      hue: 300,
-      motif: MusicCoverMotif.concrete,
-      aliases: ['techno', 'detroit techno', 'minimal techno'],
-      loreMarkdown: '''
-## Techno
-Detroit como tese: a máquina a suar. Se só ouves o kick, estás no
-corredor; a visita começa quando reconheces a sala.
-''',
-    ),
-    MusicTerritorySpec(
-      key: 'electronic.house',
-      title: 'House',
-      parentKey: 'electronic',
-      hue: 328,
-      motif: MusicCoverMotif.pulse,
-      aliases: ['house', 'deep house', 'chicago house', 'acid house'],
-      loreMarkdown: '''
-## House
-Chicago, o piano jack e o corpo como instrumento. House não é playlist
-de ginásio — é uma linha de baixo que recusa acabar.
-''',
-    ),
-    MusicTerritorySpec(
-      key: 'electronic.ambient',
-      title: 'Ambient',
-      parentKey: 'electronic',
-      hue: 196,
-      motif: MusicCoverMotif.tide,
-      aliases: ['ambient', 'dark ambient', 'drone', 'new age'],
-      loreMarkdown: '''
-## Ambient
-Música que cabe numa sala sem a ocupar. Eno chamou-lhe mobiliário;
-Boards of Canada chamou-lhe memória. O Atlas distingue ouvir de
-*habitar*.
-''',
-    ),
-    MusicTerritorySpec(
-      key: 'electronic.idm',
-      title: 'IDM',
-      parentKey: 'electronic',
-      hue: 274,
-      motif: MusicCoverMotif.lattice,
-      aliases: ['idm', 'intelligent dance music', 'braindance', 'glitch'],
-      loreMarkdown: '''
-## IDM
-O nome é péssimo; o território não. Aphex, Autechre, o grid a
-desfazer-se. Cartografar aqui é conseguir *descrever* o que o beat
-recusa ser.
-''',
-    ),
-    MusicTerritorySpec(
-      key: 'electronic.jungle',
-      title: 'Jungle / DnB',
-      parentKey: 'electronic',
-      hue: 132,
-      motif: MusicCoverMotif.ember,
-      aliases: ['jungle', 'drum and bass', 'dnb', 'drum & bass', 'breakcore'],
-      loreMarkdown: '''
-## Jungle
-Amen break como matéria-prima. Velocidade com fantasma — o baixo a
-dobrar o chão.
-''',
-    ),
-    MusicTerritorySpec(
-      key: 'rock',
-      title: 'Rock',
-      hue: 8,
-      motif: MusicCoverMotif.ember,
-      aliases: ['rock', 'alternative', 'indie', 'indie rock'],
-      loreMarkdown: '''
-## Rock
-Porto velho. As ramificações (pós-punk, kraut, shoegaze) são as
-cidades onde ainda vale a pena desembarcar.
-''',
-    ),
-    MusicTerritorySpec(
-      key: 'rock.postpunk',
-      title: 'Pós-punk',
-      parentKey: 'rock',
-      hue: 350,
-      motif: MusicCoverMotif.ash,
-      aliases: ['post-punk', 'post punk', 'pós-punk', 'new wave'],
-      loreMarkdown: '''
-## Pós-punk
-O rock a desconfiar de si. Joy Division, Talking Heads, o baixo à
-frente da guitarra. Uma visita pede que apontes o *espaço* entre as
-notas, não o riff.
-''',
-    ),
-    MusicTerritorySpec(
-      key: 'rock.kraut',
-      title: 'Krautrock',
-      parentKey: 'rock',
-      hue: 18,
-      motif: MusicCoverMotif.concrete,
-      aliases: ['krautrock', 'kraut', 'kosmische', 'motorik'],
-      loreMarkdown: '''
-## Krautrock
-Motorik: o pulso que recusa o solo de estrela. Can, Neu!, Faust —
-laboratório alemão, não "rock progressivo com sotaque".
-''',
-    ),
-    MusicTerritorySpec(
-      key: 'rock.shoegaze',
-      title: 'Shoegaze',
-      parentKey: 'rock',
-      hue: 320,
-      motif: MusicCoverMotif.spore,
-      aliases: ['shoegaze', 'dream pop', 'dreampop', 'noise pop'],
-      loreMarkdown: '''
-## Shoegaze
-A parede de guitarra como clima. Loveless não se "ouve a letra" —
-habita-se. Marca visita quando consegues separar as camadas de novo.
-''',
-    ),
-    MusicTerritorySpec(
-      key: 'rock.psych',
-      title: 'Psychedelia',
-      parentKey: 'rock',
-      hue: 4,
-      motif: MusicCoverMotif.ember,
-      aliases: ['psychedelic', 'psychedelic rock', 'psych', 'acid rock'],
-      loreMarkdown: '''
-## Psychedelia
-O drone, o órgão, o tempo que estica. Não é um filtro de Instagram
-de 1967 — é uma técnica de atenção.
-''',
-    ),
-    MusicTerritorySpec(
-      key: 'hiphop',
-      title: 'Hip-hop',
-      hue: 30,
-      motif: MusicCoverMotif.concrete,
-      aliases: ['hip hop', 'hip-hop', 'rap', 'hiphop'],
-      loreMarkdown: '''
-## Hip-hop
-Território de amostra, de sala e de esquina. Boom-bap, jazz-rap e o
-laboratório experimental são bairros, não "eras".
-''',
-    ),
-    MusicTerritorySpec(
-      key: 'hiphop.boombap',
-      title: 'Boom-bap',
-      parentKey: 'hiphop',
-      hue: 24,
-      motif: MusicCoverMotif.pulse,
-      aliases: ['boom bap', 'boom-bap', 'east coast hip hop', '90s hip hop'],
-      loreMarkdown: '''
-## Boom-bap
-O kick no um, o snare a cortar o verso. A visita não é saber o
-sample — é ouvir o *espaço* que o MPC deixou.
-''',
-    ),
-    MusicTerritorySpec(
-      key: 'hiphop.jazzrap',
-      title: 'Jazz rap',
-      parentKey: 'hiphop',
-      hue: 40,
-      motif: MusicCoverMotif.brass,
-      aliases: ['jazz rap', 'jazz-rap', 'jazz hop', 'jazzhop'],
-      loreMarkdown: '''
-## Jazz rap
-Não é "rap com saxofone em cima". É o break de jazz como língua,
-de Guru a To Pimp a Butterfly.
-''',
-    ),
-    MusicTerritorySpec(
-      key: 'hiphop.experimental',
-      title: 'Rap experimental',
-      parentKey: 'hiphop',
-      hue: 16,
-      motif: MusicCoverMotif.lattice,
-      aliases: ['experimental hip hop', 'abstract hip hop', 'industrial hip hop'],
-      loreMarkdown: '''
-## Rap experimental
-Death Grips, clipping., o beat a recusar o loop confortável. Cartografar
-aqui pede comparação — um disco isolado vira fetiche.
-''',
-    ),
-    MusicTerritorySpec(
-      key: 'metal',
-      title: 'Metal',
-      hue: 0,
-      motif: MusicCoverMotif.ash,
-      aliases: ['metal', 'heavy metal'],
-      loreMarkdown: '''
-## Metal
-Família de densidade. As ramificações (doom, black, post) importam mais
-do que o guarda-chuva.
-''',
-    ),
-    MusicTerritorySpec(
-      key: 'metal.doom',
-      title: 'Doom',
-      parentKey: 'metal',
-      hue: 14,
-      motif: MusicCoverMotif.concrete,
-      aliases: ['doom', 'doom metal', 'sludge', 'stoner'],
-      loreMarkdown: '''
-## Doom
-O riff como geologia. Tempo lento não é preguiça — é peso.
-''',
-    ),
-    MusicTerritorySpec(
-      key: 'metal.black',
-      title: 'Black metal',
-      parentKey: 'metal',
-      hue: 260,
-      motif: MusicCoverMotif.ash,
-      aliases: ['black metal', 'atmospheric black metal', 'depressive black metal'],
-      loreMarkdown: '''
-## Black metal
-Atmosfera como doutrina. O Atlas não romantiza a cena: cartografa o
-som e a tua relação com ele.
-''',
-    ),
-    MusicTerritorySpec(
-      key: 'metal.post',
-      title: 'Post-metal',
-      parentKey: 'metal',
-      hue: 220,
-      motif: MusicCoverMotif.tide,
-      aliases: ['post-metal', 'post metal', 'atmospheric sludge'],
-      loreMarkdown: '''
-## Post-metal
-O crescendo como forma. Neurosis, Isis, o peso a abrir espaço em vez
-de o fechar.
-''',
-    ),
-    MusicTerritorySpec(
-      key: 'composed',
-      title: 'Música composta',
-      hue: 54,
-      motif: MusicCoverMotif.gold,
-      aliases: ['classical', 'contemporary classical', 'erudita', 'modern classical'],
-      loreMarkdown: '''
-## Música composta
-Partitura, sala, fita. Minimalismo e contemporânea são ramificações —
-"clássica" sozinha é um museu sem planta.
-''',
-    ),
-    MusicTerritorySpec(
-      key: 'composed.minimal',
-      title: 'Minimalismo',
-      parentKey: 'composed',
-      hue: 62,
-      motif: MusicCoverMotif.lattice,
-      aliases: ['minimalism', 'minimalist', 'process music'],
-      loreMarkdown: '''
-## Minimalismo
-Reich, Glass, a fase que se desloca. Visitar é conseguir *contar* o
-que muda quando parece que nada muda.
-''',
-    ),
-    MusicTerritorySpec(
-      key: 'composed.contemporary',
-      title: 'Contemporânea',
-      parentKey: 'composed',
-      hue: 70,
-      motif: MusicCoverMotif.spore,
-      aliases: ['contemporary classical', 'avant-garde classical', 'new music'],
-      loreMarkdown: '''
-## Contemporânea
-O território depois do tonal fácil. Não exige que gostes — exige que
-não finjas ter cartografado.
-''',
-    ),
-    MusicTerritorySpec(
-      key: 'folk',
-      title: 'Folk',
-      hue: 78,
-      motif: MusicCoverMotif.river,
-      aliases: ['folk', 'singer-songwriter', 'americana', 'traditional'],
-      loreMarkdown: '''
-## Folk
-Canção com chão. Americana e o nordeste brasileiro não são o mesmo
-rio — por isso ramificam.
-''',
-    ),
-    MusicTerritorySpec(
-      key: 'folk.americana',
-      title: 'Americana',
-      parentKey: 'folk',
-      hue: 32,
-      motif: MusicCoverMotif.ember,
-      aliases: ['americana', 'alt-country', 'folk rock'],
-      loreMarkdown: '''
-## Americana
-Estrada, harmónio, a guitarra a contar o quarto vazio. Visitar é
-ouvir o *espaço* rural sem o transformar em postal.
-''',
-    ),
-    MusicTerritorySpec(
-      key: 'folk.nordeste',
-      title: 'Cantoria / nordeste',
-      parentKey: 'folk',
-      hue: 44,
-      motif: MusicCoverMotif.brass,
-      aliases: ['cantoria', 'repentismo', 'coco', 'maracatu'],
-      loreMarkdown: '''
-## Cantoria
-A palavra em duelo, o coco, o maracatu. Não cabe em "world music".
-''',
-    ),
+  static final List<MusicTerritorySpec> territories = [
+    for (final taxon in MusicCanon.genres) MusicTerritorySpec.fromTaxon(taxon),
   ];
 
   static const dossiers = <MusicAlbumDossier>[
@@ -602,7 +139,7 @@ consigas dizer, sem olhar à ficha, *onde* o modo muda.
       title: 'A Love Supreme',
       artist: 'John Coltrane',
       year: 1965,
-      territoryKeys: ['jazz.spiritual'],
+      territoryKeys: ['jazz.avant.spiritual'],
       markdown: '''
 ## A Love Supreme — John Coltrane (1965)
 Quatro movimentos, uma tese. Não é "o disco espiritual" como selo de
@@ -619,7 +156,7 @@ virar oração; Psalm recita.
       title: 'Tropicália ou Panis et Circencis',
       artist: 'Vários',
       year: 1968,
-      territoryKeys: ['br.tropicalia'],
+      territoryKeys: ['brazilian.tropicalia'],
       titleAliases: ['tropicalia', 'tropicália', 'panis et circencis'],
       markdown: '''
 ## Tropicália ou Panis et Circencis (1968)
@@ -636,7 +173,7 @@ Zé, Nara — a guitarra eléctrica sentada à mesa do terreiro.
       title: 'Chega de Saudade',
       artist: 'João Gilberto',
       year: 1959,
-      territoryKeys: ['br.bossa'],
+      territoryKeys: ['brazilian.bossa'],
       markdown: '''
 ## Chega de Saudade — João Gilberto (1959)
 O violão a recusar o espetáculo. A batida que cabe num quarto. Se
@@ -649,13 +186,18 @@ postal.
       title: 'Clube da Esquina',
       artist: 'Milton Nascimento & Lô Borges',
       year: 1972,
-      territoryKeys: ['br.mpb'],
+      territoryKeys: [
+        'brazilian.clube_da_esquina',
+        'brazilian.mpb',
+        'scene.clube_da_esquina',
+      ],
       titleAliases: ['clube da esquina'],
       markdown: '''
 ## Clube da Esquina (1972)
 Minas como geografia afectiva. Dois compositores, um coro de cidade.
 **Tudo que você podia ser** e **O trem azul** não são faixas — são
-ruas do mesmo bairro.
+ruas do mesmo bairro. A cena não é um subgénero da MPB — cruza folk
+rock, pop progressivo e jazz.
 
 ### Nota de campo
 Cartografar o Clube é conseguir ligar uma faixa a um sítio (a esquina,
@@ -667,7 +209,7 @@ o trem, o frio), não só a um "mood mineiro".
       title: 'Unknown Pleasures',
       artist: 'Joy Division',
       year: 1979,
-      territoryKeys: ['rock.postpunk'],
+      territoryKeys: ['punk.postpunk'],
       markdown: '''
 ## Unknown Pleasures — Joy Division (1979)
 O baixo à frente, a voz no poço, a capa que toda a gente reconhece
@@ -680,7 +222,7 @@ pedem volume baixo e atenção ao espaço — o post-punk mora no intervalo.
       title: 'Remain in Light',
       artist: 'Talking Heads',
       year: 1980,
-      territoryKeys: ['rock.postpunk'],
+      territoryKeys: ['punk.postpunk'],
       markdown: '''
 ## Remain in Light — Talking Heads (1980)
 Afrobeat filtrado por Nova Iorque e Eno. **Once in a Lifetime** é a
@@ -720,7 +262,7 @@ the Right*. Cartografar é aguentar o disco inteiro sem tratar
       title: 'Mezzanine',
       artist: 'Massive Attack',
       year: 1998,
-      territoryKeys: ['electronic'],
+      territoryKeys: ['electronic.downtempo.trip_hop'],
       markdown: '''
 ## Mezzanine — Massive Attack (1998)
 Trip-hop no momento em que deixa de ser um género e vira uma sala
@@ -733,7 +275,7 @@ que a maior parte salta.
       title: 'To Pimp a Butterfly',
       artist: 'Kendrick Lamar',
       year: 2015,
-      territoryKeys: ['hiphop.jazzrap', 'hiphop.experimental'],
+      territoryKeys: ['hiphop.east.jazz_rap', 'hiphop.experimental'],
       titleAliases: ['to pimp a butterfly', 'tpab'],
       markdown: '''
 ## To Pimp a Butterfly — Kendrick Lamar (2015)
@@ -747,7 +289,7 @@ Jazz, funk e verso como tese política. O interlúdio da borboleta não
       title: 'Loveless',
       artist: 'My Bloody Valentine',
       year: 1991,
-      territoryKeys: ['rock.shoegaze'],
+      territoryKeys: ['rock.alt.shoegaze'],
       markdown: '''
 ## Loveless — My Bloody Valentine (1991)
 A guitarra como clima. Se tentaste "ouvir a letra" e desististe, volta
@@ -773,7 +315,7 @@ pede uma escuta contínua — saltar faixas é ficar no rumor.
       title: 'Wave',
       artist: 'Antônio Carlos Jobim',
       year: 1967,
-      territoryKeys: ['br.bossa', 'jazz.br'],
+      territoryKeys: ['brazilian.bossa', 'jazz.latin.brazilian'],
       titleAliases: ['wave'],
       markdown: '''
 ## Wave — Antônio Carlos Jobim (1967)
@@ -787,6 +329,9 @@ falte nesta edição.
 
   static final Map<String, MusicTerritorySpec> byKey = {
     for (final spec in territories) spec.key: spec,
+    for (final taxon in MusicCanon.all)
+      if (taxon.axis != MusicAxisKind.genre)
+        taxon.key: MusicTerritorySpec.fromTaxon(taxon),
     unmappedKey: unmapped,
     userRootKey: userRoot,
   };
@@ -806,13 +351,17 @@ falte nesta edição.
       ...byKey,
       for (final spec in extra) spec.key: spec,
     };
+    final seen = <String>{};
     final keys = <String>[];
-    var current = lookup[key];
-    if (current == null) return [key];
-    while (current != null) {
-      keys.add(current.key);
-      final parent = current.parentKey;
-      current = parent == null ? null : lookup[parent];
+    final queue = [key];
+    while (queue.isNotEmpty) {
+      final currentKey = queue.removeAt(0);
+      if (!seen.add(currentKey)) continue;
+      keys.add(currentKey);
+      final current = lookup[currentKey];
+      if (current == null) continue;
+      if (current.parentKey != null) queue.add(current.parentKey!);
+      queue.addAll(current.secondaryParentKeys);
     }
     return keys;
   }
@@ -825,7 +374,10 @@ falte nesta edição.
     final keys = <String>[key];
     void walk(String parent) {
       for (final spec in all) {
-        if (spec.parentKey == parent) {
+        final isChild =
+            spec.parentKey == parent ||
+            spec.secondaryParentKeys.contains(parent);
+        if (isChild && !keys.contains(spec.key)) {
           keys.add(spec.key);
           walk(spec.key);
         }
@@ -836,9 +388,36 @@ falte nesta edição.
     return keys;
   }
 
+  /// Picker pool: empty query shows genre-family roots; a needle
+  /// searches every axis so a scene or tradition can sit on the same album.
+  static List<MusicTerritorySpec> searchAssignable(String raw) {
+    final needle = MusicIdentityPolicy.normalizeTitle(raw);
+    if (needle.isEmpty) {
+      return [for (final spec in territories) if (spec.parentKey == null) spec];
+    }
+    final hits = <MusicTerritorySpec>[];
+    for (final spec in byKey.values) {
+      if (spec.key == unmappedKey || spec.key == userRootKey) continue;
+      final labels = [spec.title, spec.key, ...spec.aliases];
+      final matched = labels.any(
+        (label) => MusicIdentityPolicy.normalizeTitle(label).contains(needle),
+      );
+      if (matched) hits.add(spec);
+    }
+    hits.sort((a, b) {
+      final axis = a.axis.index.compareTo(b.axis.index);
+      if (axis != 0) return axis;
+      return a.title.toLowerCase().compareTo(b.title.toLowerCase());
+    });
+    return hits;
+  }
+
   static String? matchGenreLabel(String raw) {
     final needle = MusicIdentityPolicy.normalizeTitle(raw);
     if (needle.isEmpty) return null;
+    if (MusicOntologyPolicy.forbiddenGenreRoots.contains(needle)) {
+      return null;
+    }
     String? best;
     var bestScore = -1;
     var bestDepth = -1;
@@ -854,9 +433,6 @@ falte nesta edição.
         if (alias.isEmpty) continue;
         final score = alias == needle
             ? 1000 + alias.length
-            : (alias.length >= 4 &&
-                  (needle.contains(alias) || alias.contains(needle)))
-            ? alias.length
             : -1;
         if (score < 0) continue;
         if (score > bestScore ||

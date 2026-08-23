@@ -133,7 +133,7 @@ void main() {
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 600));
 
-    expect(find.text('Jazz modal'), findsWidgets);
+    expect(find.text('Modal Jazz'), findsWidgets);
     expect(find.text('Kind of Blue'), findsWidgets);
     expect(find.textContaining('já ouvidos neste braço'), findsOneWidget);
 

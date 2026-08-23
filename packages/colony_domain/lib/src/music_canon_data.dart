@@ -1917,7 +1917,6 @@ List<MusicTaxonLink> canonLinks() => linksFor([
   (MusicTaxonLinkKind.sceneAssociatedWith, 'electronic.techno.detroit', 'scene.detroit_techno'),
   (MusicTaxonLinkKind.sceneAssociatedWith, 'electronic.house.chicago', 'scene.chicago_house'),
   (MusicTaxonLinkKind.commonlyOverlaps, 'brazilian.funk_br', 'electronic.club.baile'),
-  (MusicTaxonLinkKind.regionalVariantOf, 'brazilian.funk_br', 'funk'),
   (MusicTaxonLinkKind.siblingOf, 'african.afrobeat', 'african.afrobeats'),
   (MusicTaxonLinkKind.influencedBy, 'hiphop.grime', 'electronic.garage'),
   (MusicTaxonLinkKind.derivedFrom, 'punk.postpunk', 'punk.punk'),

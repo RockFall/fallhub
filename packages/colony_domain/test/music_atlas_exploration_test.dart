@@ -45,8 +45,8 @@ void main() {
 
   test('genre aliases resolve to the modal jazz river', () {
     expect(MusicGenreAtlas.matchGenreLabel('modal jazz'), 'jazz.modal');
-    expect(MusicGenreAtlas.matchGenreLabel('MPB'), 'br.mpb');
-    expect(MusicGenreAtlas.matchGenreLabel('post-punk'), 'rock.postpunk');
+    expect(MusicGenreAtlas.matchGenreLabel('MPB'), 'brazilian.mpb');
+    expect(MusicGenreAtlas.matchGenreLabel('post-punk'), 'punk.postpunk');
   });
 
   test('dossier lights Kind of Blue and Google search carries artist', () {
@@ -96,7 +96,7 @@ void main() {
     expect(modal!.heardCount, 1);
     expect(modal.explored, isTrue);
     expect(map.territory('jazz')!.heardCount, 1);
-    expect(map.territory('br.samba')!.heardCount, 0);
+    expect(map.territory('brazilian.samba')!.heardCount, 0);
 
     final heard = map.albumsIn('jazz.modal');
     expect(heard.single.node.canonicalName, 'Kind of Blue');
@@ -117,10 +117,10 @@ void main() {
         identities: const [],
       ),
     );
-    final post = map.territory('rock.postpunk')!;
+    final post = map.territory('punk.postpunk')!;
     expect(post.heardCount, 0);
     expect(post.contactCount, 1);
-    expect(map.albumsIn('rock.postpunk').single.heard, isFalse);
+    expect(map.albumsIn('punk.postpunk').single.heard, isFalse);
   });
 
   test('unmapped basin collects albums without a river', () {

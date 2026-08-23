@@ -613,9 +613,11 @@ abstract final class MusicRamificationLayouter {
   }) {
     if (territories.isEmpty) return MusicRamificationLayout.empty;
     final byKey = {for (final item in territories) item.key: item};
+    final visible = _visibleKeys(territories, selectedKey);
     final children = <String?, List<MusicExplorationTerritory>>{};
     for (final item in territories) {
       if (item.key == MusicGenreAtlas.unmappedKey) continue;
+      if (!visible.contains(item.key)) continue;
       children.putIfAbsent(item.parentKey, () => []).add(item);
     }
     for (final list in children.values) {
@@ -705,5 +707,35 @@ abstract final class MusicRamificationLayouter {
       height: maxY + padding + 160,
       edges: edges,
     );
+  }
+
+  /// Deep canon has 1000+ rivers. The map shows roots, explored paths,
+  /// and the children of the well the user opened.
+  static Set<String> _visibleKeys(
+    List<MusicExplorationTerritory> territories,
+    String? selectedKey,
+  ) {
+    final byKey = {for (final item in territories) item.key: item};
+    final keep = <String>{};
+    void addAncestors(String key) {
+      var current = byKey[key];
+      while (current != null) {
+        keep.add(current.key);
+        final parent = current.parentKey;
+        current = parent == null ? null : byKey[parent];
+      }
+    }
+
+    for (final item in territories) {
+      if (item.parentKey == null) keep.add(item.key);
+      if (item.explored) addAncestors(item.key);
+    }
+    if (selectedKey != null) {
+      addAncestors(selectedKey);
+      for (final item in territories) {
+        if (item.parentKey == selectedKey) keep.add(item.key);
+      }
+    }
+    return keep;
   }
 }
