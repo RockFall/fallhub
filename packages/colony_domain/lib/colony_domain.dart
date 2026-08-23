@@ -1,6 +1,7 @@
 /// Pure Dart domain layer for Life Colony OS.
 library;
 
+export 'src/activation.dart';
 export 'src/check_in.dart';
 export 'src/colony_profile.dart';
 export 'src/domain_event.dart';

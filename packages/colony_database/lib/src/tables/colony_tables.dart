@@ -1292,3 +1292,373 @@ class FriendshipCircleMemberships extends Table {
   @override
   Set<Column<Object>> get primaryKey => {personId, circleId};
 }
+@DataClassName('ActivationProtocolRow')
+class ActivationProtocols extends Table {
+  @override
+  String get tableName => 'activation_protocols';
+
+  TextColumn get id => text()();
+  TextColumn get profileId => text().references(Profiles, #id)();
+  TextColumn get name => text()();
+  TextColumn get description => text().nullable()();
+  TextColumn get protocolType => text()();
+  TextColumn get originStateJson => text()();
+  TextColumn get targetStateJson => text()();
+  IntColumn get activeVersion => integer().withDefault(const Constant(1))();
+  BoolColumn get isEnabled => boolean().withDefault(const Constant(true))();
+  TextColumn get seedKey => text().nullable()();
+  TextColumn get linkedTaskId => text().nullable()();
+  TextColumn get maturity =>
+      text().withDefault(const Constant('experimental'))();
+  IntColumn get createdAt => integer()();
+  IntColumn get updatedAt => integer()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+}
+
+@DataClassName('ActivationProtocolVersionRow')
+class ActivationProtocolVersions extends Table {
+  @override
+  String get tableName => 'activation_protocol_versions';
+
+  TextColumn get protocolId => text().references(ActivationProtocols, #id)();
+  IntColumn get version => integer()();
+  TextColumn get triggerRulesJson => text()();
+  TextColumn get releaseConditionsJson => text()();
+  TextColumn get applicableContextsJson =>
+      text().withDefault(const Constant('[]'))();
+  TextColumn get shieldProfileId => text().nullable()();
+  TextColumn get temptationBundleId => text().nullable()();
+  TextColumn get sensorySceneId => text().nullable()();
+  TextColumn get fallbackProtocolId => text().nullable()();
+  IntColumn get createdAt => integer()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {protocolId, version};
+}
+
+@DataClassName('ActivationCommandTemplateRow')
+class ActivationCommandTemplates extends Table {
+  @override
+  String get tableName => 'activation_command_templates';
+
+  TextColumn get id => text()();
+  TextColumn get protocolId => text()();
+  IntColumn get protocolVersion => integer()();
+  TextColumn get sequenceKey => text()();
+  TextColumn get instruction => text()();
+  TextColumn get actionVerb => text()();
+  TextColumn get objectRef => text().nullable()();
+  TextColumn get destinationRef => text().nullable()();
+  TextColumn get preconditionsJson =>
+      text().withDefault(const Constant('[]'))();
+  TextColumn get proofPolicyJson => text()();
+  TextColumn get timeoutPolicyJson => text()();
+  TextColumn get fallbackJson => text()();
+  BoolColumn get skippable => boolean().withDefault(const Constant(true))();
+  IntColumn get estimatedSeconds => integer().nullable()();
+  TextColumn get waypointId => text().nullable()();
+  TextColumn get opensTaskId => text().nullable()();
+  TextColumn get deepLink => text().nullable()();
+  BoolColumn get isFirstMeaningfulAction =>
+      boolean().withDefault(const Constant(false))();
+  BoolColumn get releasesOnConfirm =>
+      boolean().withDefault(const Constant(false))();
+
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+}
+
+@DataClassName('ActivationEpisodeRow')
+class ActivationEpisodes extends Table {
+  @override
+  String get tableName => 'activation_episodes';
+
+  TextColumn get id => text()();
+  TextColumn get profileId => text().references(Profiles, #id)();
+  TextColumn get protocolId => text().nullable()();
+  IntColumn get protocolVersion => integer().nullable()();
+  TextColumn get triggerType => text()();
+  TextColumn get hypothesisType => text().nullable()();
+  RealColumn get hypothesisConfidence => real().nullable()();
+  TextColumn get capacityMode => text()();
+  TextColumn get initialStateJson => text()();
+  TextColumn get targetStateJson => text()();
+  TextColumn get status => text()();
+  IntColumn get startedAt => integer()();
+  IntColumn get firstMotionAt => integer().nullable()();
+  IntColumn get releasedAt => integer().nullable()();
+  IntColumn get endedAt => integer().nullable()();
+  IntColumn get interventionLevelMax =>
+      integer().withDefault(const Constant(0))();
+  BoolColumn get shieldUsed => boolean().withDefault(const Constant(false))();
+  BoolColumn get bundleUsed => boolean().withDefault(const Constant(false))();
+  BoolColumn get escapeUsed => boolean().withDefault(const Constant(false))();
+  TextColumn get userCorrection => text().nullable()();
+  TextColumn get linkedTaskId => text().nullable()();
+  TextColumn get experimentAssignmentId => text().nullable()();
+  TextColumn get provenanceJson => text()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+}
+
+@DataClassName('ActivationCommandRunRow')
+class ActivationCommandRuns extends Table {
+  @override
+  String get tableName => 'activation_command_runs';
+
+  TextColumn get id => text()();
+  TextColumn get episodeId => text().references(ActivationEpisodes, #id)();
+  TextColumn get templateId => text().nullable()();
+  IntColumn get sequenceIndex => integer()();
+  TextColumn get instructionRendered => text()();
+  TextColumn get status => text()();
+  IntColumn get presentedAt => integer()();
+  IntColumn get firstSignalAt => integer().nullable()();
+  IntColumn get confirmedAt => integer().nullable()();
+  IntColumn get skippedAt => integer().nullable()();
+  IntColumn get adaptedAt => integer().nullable()();
+  TextColumn get confirmationMode => text().nullable()();
+  RealColumn get proofConfidence => real().nullable()();
+  TextColumn get adaptationReason => text().nullable()();
+  BoolColumn get isFirstMeaningfulAction =>
+      boolean().withDefault(const Constant(false))();
+  TextColumn get deepLink => text().nullable()();
+  TextColumn get opensTaskId => text().nullable()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+}
+
+@DataClassName('ActivationProofRow')
+class ActivationProofs extends Table {
+  @override
+  String get tableName => 'activation_proofs';
+
+  TextColumn get id => text()();
+  TextColumn get episodeId => text().references(ActivationEpisodes, #id)();
+  TextColumn get commandRunId => text().nullable()();
+  TextColumn get proofType => text()();
+  IntColumn get observedAt => integer()();
+  TextColumn get source => text()();
+  RealColumn get confidence => real()();
+  TextColumn get privacyClass => text()();
+  TextColumn get interpretationJson =>
+      text().withDefault(const Constant('{}'))();
+  TextColumn get rawReference => text().nullable()();
+  BoolColumn get userConfirmed => boolean().nullable()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+}
+
+@DataClassName('ActivationWaypointRow')
+class ActivationWaypoints extends Table {
+  @override
+  String get tableName => 'activation_waypoints';
+
+  TextColumn get id => text()();
+  TextColumn get profileId => text().references(Profiles, #id)();
+  TextColumn get name => text()();
+  TextColumn get waypointType => text()();
+  TextColumn get zoneId => text().nullable()();
+  TextColumn get equipmentId => text().nullable()();
+  TextColumn get token => text().nullable()();
+  TextColumn get settingsJson => text().withDefault(const Constant('{}'))();
+  RealColumn get reliabilityScore => real().nullable()();
+  TextColumn get privacyClass => text()();
+  BoolColumn get isEnabled => boolean().withDefault(const Constant(true))();
+  IntColumn get createdAt => integer()();
+  IntColumn get updatedAt => integer()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+}
+
+@DataClassName('WaypointObservationRow')
+class WaypointObservations extends Table {
+  @override
+  String get tableName => 'waypoint_observations';
+
+  TextColumn get id => text()();
+  TextColumn get waypointId => text().references(ActivationWaypoints, #id)();
+  TextColumn get episodeId => text().nullable()();
+  IntColumn get observedAt => integer()();
+  TextColumn get state => text()();
+  IntColumn get latencyMs => integer()();
+  TextColumn get source => text().withDefault(const Constant('manual'))();
+
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+}
+
+@DataClassName('InertiaSignalRow')
+class InertiaSignals extends Table {
+  @override
+  String get tableName => 'inertia_signals';
+
+  TextColumn get id => text()();
+  TextColumn get episodeId => text().nullable()();
+  TextColumn get signalType => text()();
+  IntColumn get observedAt => integer()();
+  TextColumn get valueJson => text().withDefault(const Constant('{}'))();
+  TextColumn get source => text()();
+  RealColumn get confidence => real()();
+  IntColumn get expiresAt => integer().nullable()();
+  TextColumn get privacyClass => text()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+}
+
+@DataClassName('FrictionShieldProfileRow')
+class FrictionShieldProfiles extends Table {
+  @override
+  String get tableName => 'friction_shield_profiles';
+
+  TextColumn get id => text()();
+  TextColumn get profileId => text().references(Profiles, #id)();
+  TextColumn get name => text()();
+  TextColumn get platformMode => text()();
+  TextColumn get protectedCategoriesJson =>
+      text().withDefault(const Constant('[]'))();
+  TextColumn get allowlistCategoriesJson => text().withDefault(
+        const Constant('["emergency","auth","maps","medical"]'),
+      )();
+  TextColumn get escapePolicyJson => text()();
+  BoolColumn get isEnabled => boolean().withDefault(const Constant(true))();
+
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+}
+
+@DataClassName('FrictionShieldSessionRow')
+class FrictionShieldSessions extends Table {
+  @override
+  String get tableName => 'friction_shield_sessions';
+
+  TextColumn get id => text()();
+  TextColumn get profileId => text().references(Profiles, #id)();
+  TextColumn get shieldProfileId =>
+      text().references(FrictionShieldProfiles, #id)();
+  TextColumn get episodeId => text().nullable()();
+  TextColumn get state => text()();
+  IntColumn get startedAt => integer()();
+  IntColumn get endedAt => integer().nullable()();
+  IntColumn get escapeCount => integer().withDefault(const Constant(0))();
+
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+}
+
+@DataClassName('TemptationBundleRow')
+class TemptationBundles extends Table {
+  @override
+  String get tableName => 'temptation_bundles';
+
+  TextColumn get id => text()();
+  TextColumn get profileId => text().references(Profiles, #id)();
+  TextColumn get name => text()();
+  TextColumn get pleasureLabel => text()();
+  TextColumn get requiredTransition => text()();
+  TextColumn get audioHint => text().nullable()();
+  BoolColumn get isEnabled => boolean().withDefault(const Constant(true))();
+
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+}
+
+@DataClassName('ActivationSceneRow')
+class ActivationScenes extends Table {
+  @override
+  String get tableName => 'activation_scenes';
+
+  TextColumn get id => text()();
+  TextColumn get profileId => text().references(Profiles, #id)();
+  TextColumn get name => text()();
+  TextColumn get kind => text()();
+  TextColumn get payloadJson => text().withDefault(const Constant('{}'))();
+  BoolColumn get isEnabled => boolean().withDefault(const Constant(true))();
+
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+}
+
+@DataClassName('RescueContractRow')
+class RescueContracts extends Table {
+  @override
+  String get tableName => 'rescue_contracts';
+
+  TextColumn get id => text()();
+  TextColumn get profileId => text().references(Profiles, #id)();
+  TextColumn get contactLabel => text()();
+  TextColumn get messageTemplate => text()();
+  TextColumn get status => text()();
+  TextColumn get personId => text().nullable()();
+  BoolColumn get requiresConfirmation =>
+      boolean().withDefault(const Constant(true))();
+  IntColumn get lastConfirmedAt => integer().nullable()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+}
+
+@DataClassName('ActivationExperimentRow')
+class ActivationExperiments extends Table {
+  @override
+  String get tableName => 'activation_experiments';
+
+  TextColumn get id => text()();
+  TextColumn get profileId => text().references(Profiles, #id)();
+  TextColumn get name => text()();
+  TextColumn get hypothesis => text()();
+  TextColumn get variableKey => text()();
+  TextColumn get variantsJson => text()();
+  TextColumn get contextFilterJson =>
+      text().withDefault(const Constant('{}'))();
+  IntColumn get minimumSamples => integer().withDefault(const Constant(6))();
+  TextColumn get status => text()();
+  IntColumn get startedAt => integer().nullable()();
+  IntColumn get endedAt => integer().nullable()();
+  TextColumn get resultJson => text().nullable()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+}
+
+@DataClassName('ActivationExperimentAssignmentRow')
+class ActivationExperimentAssignments extends Table {
+  @override
+  String get tableName => 'activation_experiment_assignments';
+
+  TextColumn get id => text()();
+  TextColumn get experimentId =>
+      text().references(ActivationExperiments, #id)();
+  TextColumn get episodeId => text().references(ActivationEpisodes, #id)();
+  TextColumn get variant => text()();
+  IntColumn get assignedAt => integer()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+}
+
+@DataClassName('ActivationInsightRow')
+class ActivationInsights extends Table {
+  @override
+  String get tableName => 'activation_insights';
+
+  TextColumn get id => text()();
+  TextColumn get profileId => text().references(Profiles, #id)();
+  TextColumn get title => text()();
+  TextColumn get body => text()();
+  IntColumn get createdAt => integer()();
+  IntColumn get sampleSize => integer().withDefault(const Constant(0))();
+  TextColumn get confidence => text().withDefault(const Constant('low'))();
+  BoolColumn get associativeOnly =>
+      boolean().withDefault(const Constant(true))();
+
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+}

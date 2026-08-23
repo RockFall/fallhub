@@ -1858,7 +1858,7 @@ void main() {
       expect(profile.id.value, isNotEmpty);
     });
 
-    test('v39 to v41 adds friendship tables', () async {
+    test('v39 to v42 adds friendship tables', () async {
       final db = await openMigratedFrom(
         39,
         seed: (sqlite) {
@@ -1904,6 +1904,34 @@ void main() {
       expect(await repos.friendships.listAll(profile.id), hasLength(1));
       expect(await repos.friendships.listCircles(profile.id), hasLength(1));
       expect(await repos.friendships.listMemberships(profile.id), hasLength(1));
+    });
+
+    test('v40 to v42 adds activation tables', () async {
+      final db = await openMigratedFrom(
+        40,
+        seed: (sqlite) {
+          seedProfile(sqlite);
+        },
+      );
+      addTearDown(() async {
+        await db.close();
+      });
+
+      final repos = ColonyRepositories.create(
+        db,
+        idGenerator: FixedIdGenerator([
+          for (var i = 1; i <= 200; i++) 'act-mig-$i',
+        ]),
+        clock: () => DateTime.utc(2026, 8, 23, 12),
+      );
+      final profile = (await repos.profiles.getActive())!;
+      final created = await repos.activation.seedDefaults(profile.id);
+      expect(created, greaterThan(0));
+      final protocols = await repos.activation.listProtocols(profile.id);
+      expect(
+        protocols.any((p) => p.seedKey == 'morning_launch_standard'),
+        isTrue,
+      );
     });
   });
 }

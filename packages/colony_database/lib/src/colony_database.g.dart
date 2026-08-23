@@ -41487,6 +41487,11740 @@ class FriendshipCircleMembershipsCompanion
   }
 }
 
+class $ActivationProtocolsTable extends ActivationProtocols
+    with TableInfo<$ActivationProtocolsTable, ActivationProtocolRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $ActivationProtocolsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _profileIdMeta = const VerificationMeta(
+    'profileId',
+  );
+  @override
+  late final GeneratedColumn<String> profileId = GeneratedColumn<String>(
+    'profile_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES profiles (id)',
+    ),
+  );
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+    'name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _descriptionMeta = const VerificationMeta(
+    'description',
+  );
+  @override
+  late final GeneratedColumn<String> description = GeneratedColumn<String>(
+    'description',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _protocolTypeMeta = const VerificationMeta(
+    'protocolType',
+  );
+  @override
+  late final GeneratedColumn<String> protocolType = GeneratedColumn<String>(
+    'protocol_type',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _originStateJsonMeta = const VerificationMeta(
+    'originStateJson',
+  );
+  @override
+  late final GeneratedColumn<String> originStateJson = GeneratedColumn<String>(
+    'origin_state_json',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _targetStateJsonMeta = const VerificationMeta(
+    'targetStateJson',
+  );
+  @override
+  late final GeneratedColumn<String> targetStateJson = GeneratedColumn<String>(
+    'target_state_json',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _activeVersionMeta = const VerificationMeta(
+    'activeVersion',
+  );
+  @override
+  late final GeneratedColumn<int> activeVersion = GeneratedColumn<int>(
+    'active_version',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(1),
+  );
+  static const VerificationMeta _isEnabledMeta = const VerificationMeta(
+    'isEnabled',
+  );
+  @override
+  late final GeneratedColumn<bool> isEnabled = GeneratedColumn<bool>(
+    'is_enabled',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("is_enabled" IN (0, 1))',
+    ),
+    defaultValue: const Constant(true),
+  );
+  static const VerificationMeta _seedKeyMeta = const VerificationMeta(
+    'seedKey',
+  );
+  @override
+  late final GeneratedColumn<String> seedKey = GeneratedColumn<String>(
+    'seed_key',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _linkedTaskIdMeta = const VerificationMeta(
+    'linkedTaskId',
+  );
+  @override
+  late final GeneratedColumn<String> linkedTaskId = GeneratedColumn<String>(
+    'linked_task_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _maturityMeta = const VerificationMeta(
+    'maturity',
+  );
+  @override
+  late final GeneratedColumn<String> maturity = GeneratedColumn<String>(
+    'maturity',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('experimental'),
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<int> createdAt = GeneratedColumn<int>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<int> updatedAt = GeneratedColumn<int>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    profileId,
+    name,
+    description,
+    protocolType,
+    originStateJson,
+    targetStateJson,
+    activeVersion,
+    isEnabled,
+    seedKey,
+    linkedTaskId,
+    maturity,
+    createdAt,
+    updatedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'activation_protocols';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<ActivationProtocolRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('profile_id')) {
+      context.handle(
+        _profileIdMeta,
+        profileId.isAcceptableOrUnknown(data['profile_id']!, _profileIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_profileIdMeta);
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    if (data.containsKey('description')) {
+      context.handle(
+        _descriptionMeta,
+        description.isAcceptableOrUnknown(
+          data['description']!,
+          _descriptionMeta,
+        ),
+      );
+    }
+    if (data.containsKey('protocol_type')) {
+      context.handle(
+        _protocolTypeMeta,
+        protocolType.isAcceptableOrUnknown(
+          data['protocol_type']!,
+          _protocolTypeMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_protocolTypeMeta);
+    }
+    if (data.containsKey('origin_state_json')) {
+      context.handle(
+        _originStateJsonMeta,
+        originStateJson.isAcceptableOrUnknown(
+          data['origin_state_json']!,
+          _originStateJsonMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_originStateJsonMeta);
+    }
+    if (data.containsKey('target_state_json')) {
+      context.handle(
+        _targetStateJsonMeta,
+        targetStateJson.isAcceptableOrUnknown(
+          data['target_state_json']!,
+          _targetStateJsonMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_targetStateJsonMeta);
+    }
+    if (data.containsKey('active_version')) {
+      context.handle(
+        _activeVersionMeta,
+        activeVersion.isAcceptableOrUnknown(
+          data['active_version']!,
+          _activeVersionMeta,
+        ),
+      );
+    }
+    if (data.containsKey('is_enabled')) {
+      context.handle(
+        _isEnabledMeta,
+        isEnabled.isAcceptableOrUnknown(data['is_enabled']!, _isEnabledMeta),
+      );
+    }
+    if (data.containsKey('seed_key')) {
+      context.handle(
+        _seedKeyMeta,
+        seedKey.isAcceptableOrUnknown(data['seed_key']!, _seedKeyMeta),
+      );
+    }
+    if (data.containsKey('linked_task_id')) {
+      context.handle(
+        _linkedTaskIdMeta,
+        linkedTaskId.isAcceptableOrUnknown(
+          data['linked_task_id']!,
+          _linkedTaskIdMeta,
+        ),
+      );
+    }
+    if (data.containsKey('maturity')) {
+      context.handle(
+        _maturityMeta,
+        maturity.isAcceptableOrUnknown(data['maturity']!, _maturityMeta),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  ActivationProtocolRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return ActivationProtocolRow(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      profileId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}profile_id'],
+      )!,
+      name: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      )!,
+      description: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}description'],
+      ),
+      protocolType: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}protocol_type'],
+      )!,
+      originStateJson: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}origin_state_json'],
+      )!,
+      targetStateJson: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}target_state_json'],
+      )!,
+      activeVersion: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}active_version'],
+      )!,
+      isEnabled: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}is_enabled'],
+      )!,
+      seedKey: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}seed_key'],
+      ),
+      linkedTaskId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}linked_task_id'],
+      ),
+      maturity: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}maturity'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}updated_at'],
+      )!,
+    );
+  }
+
+  @override
+  $ActivationProtocolsTable createAlias(String alias) {
+    return $ActivationProtocolsTable(attachedDatabase, alias);
+  }
+}
+
+class ActivationProtocolRow extends DataClass
+    implements Insertable<ActivationProtocolRow> {
+  final String id;
+  final String profileId;
+  final String name;
+  final String? description;
+  final String protocolType;
+  final String originStateJson;
+  final String targetStateJson;
+  final int activeVersion;
+  final bool isEnabled;
+  final String? seedKey;
+  final String? linkedTaskId;
+  final String maturity;
+  final int createdAt;
+  final int updatedAt;
+  const ActivationProtocolRow({
+    required this.id,
+    required this.profileId,
+    required this.name,
+    this.description,
+    required this.protocolType,
+    required this.originStateJson,
+    required this.targetStateJson,
+    required this.activeVersion,
+    required this.isEnabled,
+    this.seedKey,
+    this.linkedTaskId,
+    required this.maturity,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['profile_id'] = Variable<String>(profileId);
+    map['name'] = Variable<String>(name);
+    if (!nullToAbsent || description != null) {
+      map['description'] = Variable<String>(description);
+    }
+    map['protocol_type'] = Variable<String>(protocolType);
+    map['origin_state_json'] = Variable<String>(originStateJson);
+    map['target_state_json'] = Variable<String>(targetStateJson);
+    map['active_version'] = Variable<int>(activeVersion);
+    map['is_enabled'] = Variable<bool>(isEnabled);
+    if (!nullToAbsent || seedKey != null) {
+      map['seed_key'] = Variable<String>(seedKey);
+    }
+    if (!nullToAbsent || linkedTaskId != null) {
+      map['linked_task_id'] = Variable<String>(linkedTaskId);
+    }
+    map['maturity'] = Variable<String>(maturity);
+    map['created_at'] = Variable<int>(createdAt);
+    map['updated_at'] = Variable<int>(updatedAt);
+    return map;
+  }
+
+  ActivationProtocolsCompanion toCompanion(bool nullToAbsent) {
+    return ActivationProtocolsCompanion(
+      id: Value(id),
+      profileId: Value(profileId),
+      name: Value(name),
+      description: description == null && nullToAbsent
+          ? const Value.absent()
+          : Value(description),
+      protocolType: Value(protocolType),
+      originStateJson: Value(originStateJson),
+      targetStateJson: Value(targetStateJson),
+      activeVersion: Value(activeVersion),
+      isEnabled: Value(isEnabled),
+      seedKey: seedKey == null && nullToAbsent
+          ? const Value.absent()
+          : Value(seedKey),
+      linkedTaskId: linkedTaskId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(linkedTaskId),
+      maturity: Value(maturity),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+    );
+  }
+
+  factory ActivationProtocolRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return ActivationProtocolRow(
+      id: serializer.fromJson<String>(json['id']),
+      profileId: serializer.fromJson<String>(json['profileId']),
+      name: serializer.fromJson<String>(json['name']),
+      description: serializer.fromJson<String?>(json['description']),
+      protocolType: serializer.fromJson<String>(json['protocolType']),
+      originStateJson: serializer.fromJson<String>(json['originStateJson']),
+      targetStateJson: serializer.fromJson<String>(json['targetStateJson']),
+      activeVersion: serializer.fromJson<int>(json['activeVersion']),
+      isEnabled: serializer.fromJson<bool>(json['isEnabled']),
+      seedKey: serializer.fromJson<String?>(json['seedKey']),
+      linkedTaskId: serializer.fromJson<String?>(json['linkedTaskId']),
+      maturity: serializer.fromJson<String>(json['maturity']),
+      createdAt: serializer.fromJson<int>(json['createdAt']),
+      updatedAt: serializer.fromJson<int>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'profileId': serializer.toJson<String>(profileId),
+      'name': serializer.toJson<String>(name),
+      'description': serializer.toJson<String?>(description),
+      'protocolType': serializer.toJson<String>(protocolType),
+      'originStateJson': serializer.toJson<String>(originStateJson),
+      'targetStateJson': serializer.toJson<String>(targetStateJson),
+      'activeVersion': serializer.toJson<int>(activeVersion),
+      'isEnabled': serializer.toJson<bool>(isEnabled),
+      'seedKey': serializer.toJson<String?>(seedKey),
+      'linkedTaskId': serializer.toJson<String?>(linkedTaskId),
+      'maturity': serializer.toJson<String>(maturity),
+      'createdAt': serializer.toJson<int>(createdAt),
+      'updatedAt': serializer.toJson<int>(updatedAt),
+    };
+  }
+
+  ActivationProtocolRow copyWith({
+    String? id,
+    String? profileId,
+    String? name,
+    Value<String?> description = const Value.absent(),
+    String? protocolType,
+    String? originStateJson,
+    String? targetStateJson,
+    int? activeVersion,
+    bool? isEnabled,
+    Value<String?> seedKey = const Value.absent(),
+    Value<String?> linkedTaskId = const Value.absent(),
+    String? maturity,
+    int? createdAt,
+    int? updatedAt,
+  }) => ActivationProtocolRow(
+    id: id ?? this.id,
+    profileId: profileId ?? this.profileId,
+    name: name ?? this.name,
+    description: description.present ? description.value : this.description,
+    protocolType: protocolType ?? this.protocolType,
+    originStateJson: originStateJson ?? this.originStateJson,
+    targetStateJson: targetStateJson ?? this.targetStateJson,
+    activeVersion: activeVersion ?? this.activeVersion,
+    isEnabled: isEnabled ?? this.isEnabled,
+    seedKey: seedKey.present ? seedKey.value : this.seedKey,
+    linkedTaskId: linkedTaskId.present ? linkedTaskId.value : this.linkedTaskId,
+    maturity: maturity ?? this.maturity,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+  );
+  ActivationProtocolRow copyWithCompanion(ActivationProtocolsCompanion data) {
+    return ActivationProtocolRow(
+      id: data.id.present ? data.id.value : this.id,
+      profileId: data.profileId.present ? data.profileId.value : this.profileId,
+      name: data.name.present ? data.name.value : this.name,
+      description: data.description.present
+          ? data.description.value
+          : this.description,
+      protocolType: data.protocolType.present
+          ? data.protocolType.value
+          : this.protocolType,
+      originStateJson: data.originStateJson.present
+          ? data.originStateJson.value
+          : this.originStateJson,
+      targetStateJson: data.targetStateJson.present
+          ? data.targetStateJson.value
+          : this.targetStateJson,
+      activeVersion: data.activeVersion.present
+          ? data.activeVersion.value
+          : this.activeVersion,
+      isEnabled: data.isEnabled.present ? data.isEnabled.value : this.isEnabled,
+      seedKey: data.seedKey.present ? data.seedKey.value : this.seedKey,
+      linkedTaskId: data.linkedTaskId.present
+          ? data.linkedTaskId.value
+          : this.linkedTaskId,
+      maturity: data.maturity.present ? data.maturity.value : this.maturity,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ActivationProtocolRow(')
+          ..write('id: $id, ')
+          ..write('profileId: $profileId, ')
+          ..write('name: $name, ')
+          ..write('description: $description, ')
+          ..write('protocolType: $protocolType, ')
+          ..write('originStateJson: $originStateJson, ')
+          ..write('targetStateJson: $targetStateJson, ')
+          ..write('activeVersion: $activeVersion, ')
+          ..write('isEnabled: $isEnabled, ')
+          ..write('seedKey: $seedKey, ')
+          ..write('linkedTaskId: $linkedTaskId, ')
+          ..write('maturity: $maturity, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    profileId,
+    name,
+    description,
+    protocolType,
+    originStateJson,
+    targetStateJson,
+    activeVersion,
+    isEnabled,
+    seedKey,
+    linkedTaskId,
+    maturity,
+    createdAt,
+    updatedAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is ActivationProtocolRow &&
+          other.id == this.id &&
+          other.profileId == this.profileId &&
+          other.name == this.name &&
+          other.description == this.description &&
+          other.protocolType == this.protocolType &&
+          other.originStateJson == this.originStateJson &&
+          other.targetStateJson == this.targetStateJson &&
+          other.activeVersion == this.activeVersion &&
+          other.isEnabled == this.isEnabled &&
+          other.seedKey == this.seedKey &&
+          other.linkedTaskId == this.linkedTaskId &&
+          other.maturity == this.maturity &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt);
+}
+
+class ActivationProtocolsCompanion
+    extends UpdateCompanion<ActivationProtocolRow> {
+  final Value<String> id;
+  final Value<String> profileId;
+  final Value<String> name;
+  final Value<String?> description;
+  final Value<String> protocolType;
+  final Value<String> originStateJson;
+  final Value<String> targetStateJson;
+  final Value<int> activeVersion;
+  final Value<bool> isEnabled;
+  final Value<String?> seedKey;
+  final Value<String?> linkedTaskId;
+  final Value<String> maturity;
+  final Value<int> createdAt;
+  final Value<int> updatedAt;
+  final Value<int> rowid;
+  const ActivationProtocolsCompanion({
+    this.id = const Value.absent(),
+    this.profileId = const Value.absent(),
+    this.name = const Value.absent(),
+    this.description = const Value.absent(),
+    this.protocolType = const Value.absent(),
+    this.originStateJson = const Value.absent(),
+    this.targetStateJson = const Value.absent(),
+    this.activeVersion = const Value.absent(),
+    this.isEnabled = const Value.absent(),
+    this.seedKey = const Value.absent(),
+    this.linkedTaskId = const Value.absent(),
+    this.maturity = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  ActivationProtocolsCompanion.insert({
+    required String id,
+    required String profileId,
+    required String name,
+    this.description = const Value.absent(),
+    required String protocolType,
+    required String originStateJson,
+    required String targetStateJson,
+    this.activeVersion = const Value.absent(),
+    this.isEnabled = const Value.absent(),
+    this.seedKey = const Value.absent(),
+    this.linkedTaskId = const Value.absent(),
+    this.maturity = const Value.absent(),
+    required int createdAt,
+    required int updatedAt,
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       profileId = Value(profileId),
+       name = Value(name),
+       protocolType = Value(protocolType),
+       originStateJson = Value(originStateJson),
+       targetStateJson = Value(targetStateJson),
+       createdAt = Value(createdAt),
+       updatedAt = Value(updatedAt);
+  static Insertable<ActivationProtocolRow> custom({
+    Expression<String>? id,
+    Expression<String>? profileId,
+    Expression<String>? name,
+    Expression<String>? description,
+    Expression<String>? protocolType,
+    Expression<String>? originStateJson,
+    Expression<String>? targetStateJson,
+    Expression<int>? activeVersion,
+    Expression<bool>? isEnabled,
+    Expression<String>? seedKey,
+    Expression<String>? linkedTaskId,
+    Expression<String>? maturity,
+    Expression<int>? createdAt,
+    Expression<int>? updatedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (profileId != null) 'profile_id': profileId,
+      if (name != null) 'name': name,
+      if (description != null) 'description': description,
+      if (protocolType != null) 'protocol_type': protocolType,
+      if (originStateJson != null) 'origin_state_json': originStateJson,
+      if (targetStateJson != null) 'target_state_json': targetStateJson,
+      if (activeVersion != null) 'active_version': activeVersion,
+      if (isEnabled != null) 'is_enabled': isEnabled,
+      if (seedKey != null) 'seed_key': seedKey,
+      if (linkedTaskId != null) 'linked_task_id': linkedTaskId,
+      if (maturity != null) 'maturity': maturity,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  ActivationProtocolsCompanion copyWith({
+    Value<String>? id,
+    Value<String>? profileId,
+    Value<String>? name,
+    Value<String?>? description,
+    Value<String>? protocolType,
+    Value<String>? originStateJson,
+    Value<String>? targetStateJson,
+    Value<int>? activeVersion,
+    Value<bool>? isEnabled,
+    Value<String?>? seedKey,
+    Value<String?>? linkedTaskId,
+    Value<String>? maturity,
+    Value<int>? createdAt,
+    Value<int>? updatedAt,
+    Value<int>? rowid,
+  }) {
+    return ActivationProtocolsCompanion(
+      id: id ?? this.id,
+      profileId: profileId ?? this.profileId,
+      name: name ?? this.name,
+      description: description ?? this.description,
+      protocolType: protocolType ?? this.protocolType,
+      originStateJson: originStateJson ?? this.originStateJson,
+      targetStateJson: targetStateJson ?? this.targetStateJson,
+      activeVersion: activeVersion ?? this.activeVersion,
+      isEnabled: isEnabled ?? this.isEnabled,
+      seedKey: seedKey ?? this.seedKey,
+      linkedTaskId: linkedTaskId ?? this.linkedTaskId,
+      maturity: maturity ?? this.maturity,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (profileId.present) {
+      map['profile_id'] = Variable<String>(profileId.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (description.present) {
+      map['description'] = Variable<String>(description.value);
+    }
+    if (protocolType.present) {
+      map['protocol_type'] = Variable<String>(protocolType.value);
+    }
+    if (originStateJson.present) {
+      map['origin_state_json'] = Variable<String>(originStateJson.value);
+    }
+    if (targetStateJson.present) {
+      map['target_state_json'] = Variable<String>(targetStateJson.value);
+    }
+    if (activeVersion.present) {
+      map['active_version'] = Variable<int>(activeVersion.value);
+    }
+    if (isEnabled.present) {
+      map['is_enabled'] = Variable<bool>(isEnabled.value);
+    }
+    if (seedKey.present) {
+      map['seed_key'] = Variable<String>(seedKey.value);
+    }
+    if (linkedTaskId.present) {
+      map['linked_task_id'] = Variable<String>(linkedTaskId.value);
+    }
+    if (maturity.present) {
+      map['maturity'] = Variable<String>(maturity.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<int>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<int>(updatedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ActivationProtocolsCompanion(')
+          ..write('id: $id, ')
+          ..write('profileId: $profileId, ')
+          ..write('name: $name, ')
+          ..write('description: $description, ')
+          ..write('protocolType: $protocolType, ')
+          ..write('originStateJson: $originStateJson, ')
+          ..write('targetStateJson: $targetStateJson, ')
+          ..write('activeVersion: $activeVersion, ')
+          ..write('isEnabled: $isEnabled, ')
+          ..write('seedKey: $seedKey, ')
+          ..write('linkedTaskId: $linkedTaskId, ')
+          ..write('maturity: $maturity, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $ActivationProtocolVersionsTable extends ActivationProtocolVersions
+    with
+        TableInfo<
+          $ActivationProtocolVersionsTable,
+          ActivationProtocolVersionRow
+        > {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $ActivationProtocolVersionsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _protocolIdMeta = const VerificationMeta(
+    'protocolId',
+  );
+  @override
+  late final GeneratedColumn<String> protocolId = GeneratedColumn<String>(
+    'protocol_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES activation_protocols (id)',
+    ),
+  );
+  static const VerificationMeta _versionMeta = const VerificationMeta(
+    'version',
+  );
+  @override
+  late final GeneratedColumn<int> version = GeneratedColumn<int>(
+    'version',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _triggerRulesJsonMeta = const VerificationMeta(
+    'triggerRulesJson',
+  );
+  @override
+  late final GeneratedColumn<String> triggerRulesJson = GeneratedColumn<String>(
+    'trigger_rules_json',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _releaseConditionsJsonMeta =
+      const VerificationMeta('releaseConditionsJson');
+  @override
+  late final GeneratedColumn<String> releaseConditionsJson =
+      GeneratedColumn<String>(
+        'release_conditions_json',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: true,
+      );
+  static const VerificationMeta _applicableContextsJsonMeta =
+      const VerificationMeta('applicableContextsJson');
+  @override
+  late final GeneratedColumn<String> applicableContextsJson =
+      GeneratedColumn<String>(
+        'applicable_contexts_json',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+        defaultValue: const Constant('[]'),
+      );
+  static const VerificationMeta _shieldProfileIdMeta = const VerificationMeta(
+    'shieldProfileId',
+  );
+  @override
+  late final GeneratedColumn<String> shieldProfileId = GeneratedColumn<String>(
+    'shield_profile_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _temptationBundleIdMeta =
+      const VerificationMeta('temptationBundleId');
+  @override
+  late final GeneratedColumn<String> temptationBundleId =
+      GeneratedColumn<String>(
+        'temptation_bundle_id',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _sensorySceneIdMeta = const VerificationMeta(
+    'sensorySceneId',
+  );
+  @override
+  late final GeneratedColumn<String> sensorySceneId = GeneratedColumn<String>(
+    'sensory_scene_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _fallbackProtocolIdMeta =
+      const VerificationMeta('fallbackProtocolId');
+  @override
+  late final GeneratedColumn<String> fallbackProtocolId =
+      GeneratedColumn<String>(
+        'fallback_protocol_id',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<int> createdAt = GeneratedColumn<int>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    protocolId,
+    version,
+    triggerRulesJson,
+    releaseConditionsJson,
+    applicableContextsJson,
+    shieldProfileId,
+    temptationBundleId,
+    sensorySceneId,
+    fallbackProtocolId,
+    createdAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'activation_protocol_versions';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<ActivationProtocolVersionRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('protocol_id')) {
+      context.handle(
+        _protocolIdMeta,
+        protocolId.isAcceptableOrUnknown(data['protocol_id']!, _protocolIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_protocolIdMeta);
+    }
+    if (data.containsKey('version')) {
+      context.handle(
+        _versionMeta,
+        version.isAcceptableOrUnknown(data['version']!, _versionMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_versionMeta);
+    }
+    if (data.containsKey('trigger_rules_json')) {
+      context.handle(
+        _triggerRulesJsonMeta,
+        triggerRulesJson.isAcceptableOrUnknown(
+          data['trigger_rules_json']!,
+          _triggerRulesJsonMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_triggerRulesJsonMeta);
+    }
+    if (data.containsKey('release_conditions_json')) {
+      context.handle(
+        _releaseConditionsJsonMeta,
+        releaseConditionsJson.isAcceptableOrUnknown(
+          data['release_conditions_json']!,
+          _releaseConditionsJsonMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_releaseConditionsJsonMeta);
+    }
+    if (data.containsKey('applicable_contexts_json')) {
+      context.handle(
+        _applicableContextsJsonMeta,
+        applicableContextsJson.isAcceptableOrUnknown(
+          data['applicable_contexts_json']!,
+          _applicableContextsJsonMeta,
+        ),
+      );
+    }
+    if (data.containsKey('shield_profile_id')) {
+      context.handle(
+        _shieldProfileIdMeta,
+        shieldProfileId.isAcceptableOrUnknown(
+          data['shield_profile_id']!,
+          _shieldProfileIdMeta,
+        ),
+      );
+    }
+    if (data.containsKey('temptation_bundle_id')) {
+      context.handle(
+        _temptationBundleIdMeta,
+        temptationBundleId.isAcceptableOrUnknown(
+          data['temptation_bundle_id']!,
+          _temptationBundleIdMeta,
+        ),
+      );
+    }
+    if (data.containsKey('sensory_scene_id')) {
+      context.handle(
+        _sensorySceneIdMeta,
+        sensorySceneId.isAcceptableOrUnknown(
+          data['sensory_scene_id']!,
+          _sensorySceneIdMeta,
+        ),
+      );
+    }
+    if (data.containsKey('fallback_protocol_id')) {
+      context.handle(
+        _fallbackProtocolIdMeta,
+        fallbackProtocolId.isAcceptableOrUnknown(
+          data['fallback_protocol_id']!,
+          _fallbackProtocolIdMeta,
+        ),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {protocolId, version};
+  @override
+  ActivationProtocolVersionRow map(
+    Map<String, dynamic> data, {
+    String? tablePrefix,
+  }) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return ActivationProtocolVersionRow(
+      protocolId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}protocol_id'],
+      )!,
+      version: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}version'],
+      )!,
+      triggerRulesJson: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}trigger_rules_json'],
+      )!,
+      releaseConditionsJson: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}release_conditions_json'],
+      )!,
+      applicableContextsJson: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}applicable_contexts_json'],
+      )!,
+      shieldProfileId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}shield_profile_id'],
+      ),
+      temptationBundleId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}temptation_bundle_id'],
+      ),
+      sensorySceneId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}sensory_scene_id'],
+      ),
+      fallbackProtocolId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}fallback_protocol_id'],
+      ),
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}created_at'],
+      )!,
+    );
+  }
+
+  @override
+  $ActivationProtocolVersionsTable createAlias(String alias) {
+    return $ActivationProtocolVersionsTable(attachedDatabase, alias);
+  }
+}
+
+class ActivationProtocolVersionRow extends DataClass
+    implements Insertable<ActivationProtocolVersionRow> {
+  final String protocolId;
+  final int version;
+  final String triggerRulesJson;
+  final String releaseConditionsJson;
+  final String applicableContextsJson;
+  final String? shieldProfileId;
+  final String? temptationBundleId;
+  final String? sensorySceneId;
+  final String? fallbackProtocolId;
+  final int createdAt;
+  const ActivationProtocolVersionRow({
+    required this.protocolId,
+    required this.version,
+    required this.triggerRulesJson,
+    required this.releaseConditionsJson,
+    required this.applicableContextsJson,
+    this.shieldProfileId,
+    this.temptationBundleId,
+    this.sensorySceneId,
+    this.fallbackProtocolId,
+    required this.createdAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['protocol_id'] = Variable<String>(protocolId);
+    map['version'] = Variable<int>(version);
+    map['trigger_rules_json'] = Variable<String>(triggerRulesJson);
+    map['release_conditions_json'] = Variable<String>(releaseConditionsJson);
+    map['applicable_contexts_json'] = Variable<String>(applicableContextsJson);
+    if (!nullToAbsent || shieldProfileId != null) {
+      map['shield_profile_id'] = Variable<String>(shieldProfileId);
+    }
+    if (!nullToAbsent || temptationBundleId != null) {
+      map['temptation_bundle_id'] = Variable<String>(temptationBundleId);
+    }
+    if (!nullToAbsent || sensorySceneId != null) {
+      map['sensory_scene_id'] = Variable<String>(sensorySceneId);
+    }
+    if (!nullToAbsent || fallbackProtocolId != null) {
+      map['fallback_protocol_id'] = Variable<String>(fallbackProtocolId);
+    }
+    map['created_at'] = Variable<int>(createdAt);
+    return map;
+  }
+
+  ActivationProtocolVersionsCompanion toCompanion(bool nullToAbsent) {
+    return ActivationProtocolVersionsCompanion(
+      protocolId: Value(protocolId),
+      version: Value(version),
+      triggerRulesJson: Value(triggerRulesJson),
+      releaseConditionsJson: Value(releaseConditionsJson),
+      applicableContextsJson: Value(applicableContextsJson),
+      shieldProfileId: shieldProfileId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(shieldProfileId),
+      temptationBundleId: temptationBundleId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(temptationBundleId),
+      sensorySceneId: sensorySceneId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(sensorySceneId),
+      fallbackProtocolId: fallbackProtocolId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(fallbackProtocolId),
+      createdAt: Value(createdAt),
+    );
+  }
+
+  factory ActivationProtocolVersionRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return ActivationProtocolVersionRow(
+      protocolId: serializer.fromJson<String>(json['protocolId']),
+      version: serializer.fromJson<int>(json['version']),
+      triggerRulesJson: serializer.fromJson<String>(json['triggerRulesJson']),
+      releaseConditionsJson: serializer.fromJson<String>(
+        json['releaseConditionsJson'],
+      ),
+      applicableContextsJson: serializer.fromJson<String>(
+        json['applicableContextsJson'],
+      ),
+      shieldProfileId: serializer.fromJson<String?>(json['shieldProfileId']),
+      temptationBundleId: serializer.fromJson<String?>(
+        json['temptationBundleId'],
+      ),
+      sensorySceneId: serializer.fromJson<String?>(json['sensorySceneId']),
+      fallbackProtocolId: serializer.fromJson<String?>(
+        json['fallbackProtocolId'],
+      ),
+      createdAt: serializer.fromJson<int>(json['createdAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'protocolId': serializer.toJson<String>(protocolId),
+      'version': serializer.toJson<int>(version),
+      'triggerRulesJson': serializer.toJson<String>(triggerRulesJson),
+      'releaseConditionsJson': serializer.toJson<String>(releaseConditionsJson),
+      'applicableContextsJson': serializer.toJson<String>(
+        applicableContextsJson,
+      ),
+      'shieldProfileId': serializer.toJson<String?>(shieldProfileId),
+      'temptationBundleId': serializer.toJson<String?>(temptationBundleId),
+      'sensorySceneId': serializer.toJson<String?>(sensorySceneId),
+      'fallbackProtocolId': serializer.toJson<String?>(fallbackProtocolId),
+      'createdAt': serializer.toJson<int>(createdAt),
+    };
+  }
+
+  ActivationProtocolVersionRow copyWith({
+    String? protocolId,
+    int? version,
+    String? triggerRulesJson,
+    String? releaseConditionsJson,
+    String? applicableContextsJson,
+    Value<String?> shieldProfileId = const Value.absent(),
+    Value<String?> temptationBundleId = const Value.absent(),
+    Value<String?> sensorySceneId = const Value.absent(),
+    Value<String?> fallbackProtocolId = const Value.absent(),
+    int? createdAt,
+  }) => ActivationProtocolVersionRow(
+    protocolId: protocolId ?? this.protocolId,
+    version: version ?? this.version,
+    triggerRulesJson: triggerRulesJson ?? this.triggerRulesJson,
+    releaseConditionsJson: releaseConditionsJson ?? this.releaseConditionsJson,
+    applicableContextsJson:
+        applicableContextsJson ?? this.applicableContextsJson,
+    shieldProfileId: shieldProfileId.present
+        ? shieldProfileId.value
+        : this.shieldProfileId,
+    temptationBundleId: temptationBundleId.present
+        ? temptationBundleId.value
+        : this.temptationBundleId,
+    sensorySceneId: sensorySceneId.present
+        ? sensorySceneId.value
+        : this.sensorySceneId,
+    fallbackProtocolId: fallbackProtocolId.present
+        ? fallbackProtocolId.value
+        : this.fallbackProtocolId,
+    createdAt: createdAt ?? this.createdAt,
+  );
+  ActivationProtocolVersionRow copyWithCompanion(
+    ActivationProtocolVersionsCompanion data,
+  ) {
+    return ActivationProtocolVersionRow(
+      protocolId: data.protocolId.present
+          ? data.protocolId.value
+          : this.protocolId,
+      version: data.version.present ? data.version.value : this.version,
+      triggerRulesJson: data.triggerRulesJson.present
+          ? data.triggerRulesJson.value
+          : this.triggerRulesJson,
+      releaseConditionsJson: data.releaseConditionsJson.present
+          ? data.releaseConditionsJson.value
+          : this.releaseConditionsJson,
+      applicableContextsJson: data.applicableContextsJson.present
+          ? data.applicableContextsJson.value
+          : this.applicableContextsJson,
+      shieldProfileId: data.shieldProfileId.present
+          ? data.shieldProfileId.value
+          : this.shieldProfileId,
+      temptationBundleId: data.temptationBundleId.present
+          ? data.temptationBundleId.value
+          : this.temptationBundleId,
+      sensorySceneId: data.sensorySceneId.present
+          ? data.sensorySceneId.value
+          : this.sensorySceneId,
+      fallbackProtocolId: data.fallbackProtocolId.present
+          ? data.fallbackProtocolId.value
+          : this.fallbackProtocolId,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ActivationProtocolVersionRow(')
+          ..write('protocolId: $protocolId, ')
+          ..write('version: $version, ')
+          ..write('triggerRulesJson: $triggerRulesJson, ')
+          ..write('releaseConditionsJson: $releaseConditionsJson, ')
+          ..write('applicableContextsJson: $applicableContextsJson, ')
+          ..write('shieldProfileId: $shieldProfileId, ')
+          ..write('temptationBundleId: $temptationBundleId, ')
+          ..write('sensorySceneId: $sensorySceneId, ')
+          ..write('fallbackProtocolId: $fallbackProtocolId, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    protocolId,
+    version,
+    triggerRulesJson,
+    releaseConditionsJson,
+    applicableContextsJson,
+    shieldProfileId,
+    temptationBundleId,
+    sensorySceneId,
+    fallbackProtocolId,
+    createdAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is ActivationProtocolVersionRow &&
+          other.protocolId == this.protocolId &&
+          other.version == this.version &&
+          other.triggerRulesJson == this.triggerRulesJson &&
+          other.releaseConditionsJson == this.releaseConditionsJson &&
+          other.applicableContextsJson == this.applicableContextsJson &&
+          other.shieldProfileId == this.shieldProfileId &&
+          other.temptationBundleId == this.temptationBundleId &&
+          other.sensorySceneId == this.sensorySceneId &&
+          other.fallbackProtocolId == this.fallbackProtocolId &&
+          other.createdAt == this.createdAt);
+}
+
+class ActivationProtocolVersionsCompanion
+    extends UpdateCompanion<ActivationProtocolVersionRow> {
+  final Value<String> protocolId;
+  final Value<int> version;
+  final Value<String> triggerRulesJson;
+  final Value<String> releaseConditionsJson;
+  final Value<String> applicableContextsJson;
+  final Value<String?> shieldProfileId;
+  final Value<String?> temptationBundleId;
+  final Value<String?> sensorySceneId;
+  final Value<String?> fallbackProtocolId;
+  final Value<int> createdAt;
+  final Value<int> rowid;
+  const ActivationProtocolVersionsCompanion({
+    this.protocolId = const Value.absent(),
+    this.version = const Value.absent(),
+    this.triggerRulesJson = const Value.absent(),
+    this.releaseConditionsJson = const Value.absent(),
+    this.applicableContextsJson = const Value.absent(),
+    this.shieldProfileId = const Value.absent(),
+    this.temptationBundleId = const Value.absent(),
+    this.sensorySceneId = const Value.absent(),
+    this.fallbackProtocolId = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  ActivationProtocolVersionsCompanion.insert({
+    required String protocolId,
+    required int version,
+    required String triggerRulesJson,
+    required String releaseConditionsJson,
+    this.applicableContextsJson = const Value.absent(),
+    this.shieldProfileId = const Value.absent(),
+    this.temptationBundleId = const Value.absent(),
+    this.sensorySceneId = const Value.absent(),
+    this.fallbackProtocolId = const Value.absent(),
+    required int createdAt,
+    this.rowid = const Value.absent(),
+  }) : protocolId = Value(protocolId),
+       version = Value(version),
+       triggerRulesJson = Value(triggerRulesJson),
+       releaseConditionsJson = Value(releaseConditionsJson),
+       createdAt = Value(createdAt);
+  static Insertable<ActivationProtocolVersionRow> custom({
+    Expression<String>? protocolId,
+    Expression<int>? version,
+    Expression<String>? triggerRulesJson,
+    Expression<String>? releaseConditionsJson,
+    Expression<String>? applicableContextsJson,
+    Expression<String>? shieldProfileId,
+    Expression<String>? temptationBundleId,
+    Expression<String>? sensorySceneId,
+    Expression<String>? fallbackProtocolId,
+    Expression<int>? createdAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (protocolId != null) 'protocol_id': protocolId,
+      if (version != null) 'version': version,
+      if (triggerRulesJson != null) 'trigger_rules_json': triggerRulesJson,
+      if (releaseConditionsJson != null)
+        'release_conditions_json': releaseConditionsJson,
+      if (applicableContextsJson != null)
+        'applicable_contexts_json': applicableContextsJson,
+      if (shieldProfileId != null) 'shield_profile_id': shieldProfileId,
+      if (temptationBundleId != null)
+        'temptation_bundle_id': temptationBundleId,
+      if (sensorySceneId != null) 'sensory_scene_id': sensorySceneId,
+      if (fallbackProtocolId != null)
+        'fallback_protocol_id': fallbackProtocolId,
+      if (createdAt != null) 'created_at': createdAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  ActivationProtocolVersionsCompanion copyWith({
+    Value<String>? protocolId,
+    Value<int>? version,
+    Value<String>? triggerRulesJson,
+    Value<String>? releaseConditionsJson,
+    Value<String>? applicableContextsJson,
+    Value<String?>? shieldProfileId,
+    Value<String?>? temptationBundleId,
+    Value<String?>? sensorySceneId,
+    Value<String?>? fallbackProtocolId,
+    Value<int>? createdAt,
+    Value<int>? rowid,
+  }) {
+    return ActivationProtocolVersionsCompanion(
+      protocolId: protocolId ?? this.protocolId,
+      version: version ?? this.version,
+      triggerRulesJson: triggerRulesJson ?? this.triggerRulesJson,
+      releaseConditionsJson:
+          releaseConditionsJson ?? this.releaseConditionsJson,
+      applicableContextsJson:
+          applicableContextsJson ?? this.applicableContextsJson,
+      shieldProfileId: shieldProfileId ?? this.shieldProfileId,
+      temptationBundleId: temptationBundleId ?? this.temptationBundleId,
+      sensorySceneId: sensorySceneId ?? this.sensorySceneId,
+      fallbackProtocolId: fallbackProtocolId ?? this.fallbackProtocolId,
+      createdAt: createdAt ?? this.createdAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (protocolId.present) {
+      map['protocol_id'] = Variable<String>(protocolId.value);
+    }
+    if (version.present) {
+      map['version'] = Variable<int>(version.value);
+    }
+    if (triggerRulesJson.present) {
+      map['trigger_rules_json'] = Variable<String>(triggerRulesJson.value);
+    }
+    if (releaseConditionsJson.present) {
+      map['release_conditions_json'] = Variable<String>(
+        releaseConditionsJson.value,
+      );
+    }
+    if (applicableContextsJson.present) {
+      map['applicable_contexts_json'] = Variable<String>(
+        applicableContextsJson.value,
+      );
+    }
+    if (shieldProfileId.present) {
+      map['shield_profile_id'] = Variable<String>(shieldProfileId.value);
+    }
+    if (temptationBundleId.present) {
+      map['temptation_bundle_id'] = Variable<String>(temptationBundleId.value);
+    }
+    if (sensorySceneId.present) {
+      map['sensory_scene_id'] = Variable<String>(sensorySceneId.value);
+    }
+    if (fallbackProtocolId.present) {
+      map['fallback_protocol_id'] = Variable<String>(fallbackProtocolId.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<int>(createdAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ActivationProtocolVersionsCompanion(')
+          ..write('protocolId: $protocolId, ')
+          ..write('version: $version, ')
+          ..write('triggerRulesJson: $triggerRulesJson, ')
+          ..write('releaseConditionsJson: $releaseConditionsJson, ')
+          ..write('applicableContextsJson: $applicableContextsJson, ')
+          ..write('shieldProfileId: $shieldProfileId, ')
+          ..write('temptationBundleId: $temptationBundleId, ')
+          ..write('sensorySceneId: $sensorySceneId, ')
+          ..write('fallbackProtocolId: $fallbackProtocolId, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $ActivationCommandTemplatesTable extends ActivationCommandTemplates
+    with
+        TableInfo<
+          $ActivationCommandTemplatesTable,
+          ActivationCommandTemplateRow
+        > {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $ActivationCommandTemplatesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _protocolIdMeta = const VerificationMeta(
+    'protocolId',
+  );
+  @override
+  late final GeneratedColumn<String> protocolId = GeneratedColumn<String>(
+    'protocol_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _protocolVersionMeta = const VerificationMeta(
+    'protocolVersion',
+  );
+  @override
+  late final GeneratedColumn<int> protocolVersion = GeneratedColumn<int>(
+    'protocol_version',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _sequenceKeyMeta = const VerificationMeta(
+    'sequenceKey',
+  );
+  @override
+  late final GeneratedColumn<String> sequenceKey = GeneratedColumn<String>(
+    'sequence_key',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _instructionMeta = const VerificationMeta(
+    'instruction',
+  );
+  @override
+  late final GeneratedColumn<String> instruction = GeneratedColumn<String>(
+    'instruction',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _actionVerbMeta = const VerificationMeta(
+    'actionVerb',
+  );
+  @override
+  late final GeneratedColumn<String> actionVerb = GeneratedColumn<String>(
+    'action_verb',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _objectRefMeta = const VerificationMeta(
+    'objectRef',
+  );
+  @override
+  late final GeneratedColumn<String> objectRef = GeneratedColumn<String>(
+    'object_ref',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _destinationRefMeta = const VerificationMeta(
+    'destinationRef',
+  );
+  @override
+  late final GeneratedColumn<String> destinationRef = GeneratedColumn<String>(
+    'destination_ref',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _preconditionsJsonMeta = const VerificationMeta(
+    'preconditionsJson',
+  );
+  @override
+  late final GeneratedColumn<String> preconditionsJson =
+      GeneratedColumn<String>(
+        'preconditions_json',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+        defaultValue: const Constant('[]'),
+      );
+  static const VerificationMeta _proofPolicyJsonMeta = const VerificationMeta(
+    'proofPolicyJson',
+  );
+  @override
+  late final GeneratedColumn<String> proofPolicyJson = GeneratedColumn<String>(
+    'proof_policy_json',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _timeoutPolicyJsonMeta = const VerificationMeta(
+    'timeoutPolicyJson',
+  );
+  @override
+  late final GeneratedColumn<String> timeoutPolicyJson =
+      GeneratedColumn<String>(
+        'timeout_policy_json',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: true,
+      );
+  static const VerificationMeta _fallbackJsonMeta = const VerificationMeta(
+    'fallbackJson',
+  );
+  @override
+  late final GeneratedColumn<String> fallbackJson = GeneratedColumn<String>(
+    'fallback_json',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _skippableMeta = const VerificationMeta(
+    'skippable',
+  );
+  @override
+  late final GeneratedColumn<bool> skippable = GeneratedColumn<bool>(
+    'skippable',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("skippable" IN (0, 1))',
+    ),
+    defaultValue: const Constant(true),
+  );
+  static const VerificationMeta _estimatedSecondsMeta = const VerificationMeta(
+    'estimatedSeconds',
+  );
+  @override
+  late final GeneratedColumn<int> estimatedSeconds = GeneratedColumn<int>(
+    'estimated_seconds',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _waypointIdMeta = const VerificationMeta(
+    'waypointId',
+  );
+  @override
+  late final GeneratedColumn<String> waypointId = GeneratedColumn<String>(
+    'waypoint_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _opensTaskIdMeta = const VerificationMeta(
+    'opensTaskId',
+  );
+  @override
+  late final GeneratedColumn<String> opensTaskId = GeneratedColumn<String>(
+    'opens_task_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _deepLinkMeta = const VerificationMeta(
+    'deepLink',
+  );
+  @override
+  late final GeneratedColumn<String> deepLink = GeneratedColumn<String>(
+    'deep_link',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _isFirstMeaningfulActionMeta =
+      const VerificationMeta('isFirstMeaningfulAction');
+  @override
+  late final GeneratedColumn<bool> isFirstMeaningfulAction =
+      GeneratedColumn<bool>(
+        'is_first_meaningful_action',
+        aliasedName,
+        false,
+        type: DriftSqlType.bool,
+        requiredDuringInsert: false,
+        defaultConstraints: GeneratedColumn.constraintIsAlways(
+          'CHECK ("is_first_meaningful_action" IN (0, 1))',
+        ),
+        defaultValue: const Constant(false),
+      );
+  static const VerificationMeta _releasesOnConfirmMeta = const VerificationMeta(
+    'releasesOnConfirm',
+  );
+  @override
+  late final GeneratedColumn<bool> releasesOnConfirm = GeneratedColumn<bool>(
+    'releases_on_confirm',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("releases_on_confirm" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    protocolId,
+    protocolVersion,
+    sequenceKey,
+    instruction,
+    actionVerb,
+    objectRef,
+    destinationRef,
+    preconditionsJson,
+    proofPolicyJson,
+    timeoutPolicyJson,
+    fallbackJson,
+    skippable,
+    estimatedSeconds,
+    waypointId,
+    opensTaskId,
+    deepLink,
+    isFirstMeaningfulAction,
+    releasesOnConfirm,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'activation_command_templates';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<ActivationCommandTemplateRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('protocol_id')) {
+      context.handle(
+        _protocolIdMeta,
+        protocolId.isAcceptableOrUnknown(data['protocol_id']!, _protocolIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_protocolIdMeta);
+    }
+    if (data.containsKey('protocol_version')) {
+      context.handle(
+        _protocolVersionMeta,
+        protocolVersion.isAcceptableOrUnknown(
+          data['protocol_version']!,
+          _protocolVersionMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_protocolVersionMeta);
+    }
+    if (data.containsKey('sequence_key')) {
+      context.handle(
+        _sequenceKeyMeta,
+        sequenceKey.isAcceptableOrUnknown(
+          data['sequence_key']!,
+          _sequenceKeyMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_sequenceKeyMeta);
+    }
+    if (data.containsKey('instruction')) {
+      context.handle(
+        _instructionMeta,
+        instruction.isAcceptableOrUnknown(
+          data['instruction']!,
+          _instructionMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_instructionMeta);
+    }
+    if (data.containsKey('action_verb')) {
+      context.handle(
+        _actionVerbMeta,
+        actionVerb.isAcceptableOrUnknown(data['action_verb']!, _actionVerbMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_actionVerbMeta);
+    }
+    if (data.containsKey('object_ref')) {
+      context.handle(
+        _objectRefMeta,
+        objectRef.isAcceptableOrUnknown(data['object_ref']!, _objectRefMeta),
+      );
+    }
+    if (data.containsKey('destination_ref')) {
+      context.handle(
+        _destinationRefMeta,
+        destinationRef.isAcceptableOrUnknown(
+          data['destination_ref']!,
+          _destinationRefMeta,
+        ),
+      );
+    }
+    if (data.containsKey('preconditions_json')) {
+      context.handle(
+        _preconditionsJsonMeta,
+        preconditionsJson.isAcceptableOrUnknown(
+          data['preconditions_json']!,
+          _preconditionsJsonMeta,
+        ),
+      );
+    }
+    if (data.containsKey('proof_policy_json')) {
+      context.handle(
+        _proofPolicyJsonMeta,
+        proofPolicyJson.isAcceptableOrUnknown(
+          data['proof_policy_json']!,
+          _proofPolicyJsonMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_proofPolicyJsonMeta);
+    }
+    if (data.containsKey('timeout_policy_json')) {
+      context.handle(
+        _timeoutPolicyJsonMeta,
+        timeoutPolicyJson.isAcceptableOrUnknown(
+          data['timeout_policy_json']!,
+          _timeoutPolicyJsonMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_timeoutPolicyJsonMeta);
+    }
+    if (data.containsKey('fallback_json')) {
+      context.handle(
+        _fallbackJsonMeta,
+        fallbackJson.isAcceptableOrUnknown(
+          data['fallback_json']!,
+          _fallbackJsonMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_fallbackJsonMeta);
+    }
+    if (data.containsKey('skippable')) {
+      context.handle(
+        _skippableMeta,
+        skippable.isAcceptableOrUnknown(data['skippable']!, _skippableMeta),
+      );
+    }
+    if (data.containsKey('estimated_seconds')) {
+      context.handle(
+        _estimatedSecondsMeta,
+        estimatedSeconds.isAcceptableOrUnknown(
+          data['estimated_seconds']!,
+          _estimatedSecondsMeta,
+        ),
+      );
+    }
+    if (data.containsKey('waypoint_id')) {
+      context.handle(
+        _waypointIdMeta,
+        waypointId.isAcceptableOrUnknown(data['waypoint_id']!, _waypointIdMeta),
+      );
+    }
+    if (data.containsKey('opens_task_id')) {
+      context.handle(
+        _opensTaskIdMeta,
+        opensTaskId.isAcceptableOrUnknown(
+          data['opens_task_id']!,
+          _opensTaskIdMeta,
+        ),
+      );
+    }
+    if (data.containsKey('deep_link')) {
+      context.handle(
+        _deepLinkMeta,
+        deepLink.isAcceptableOrUnknown(data['deep_link']!, _deepLinkMeta),
+      );
+    }
+    if (data.containsKey('is_first_meaningful_action')) {
+      context.handle(
+        _isFirstMeaningfulActionMeta,
+        isFirstMeaningfulAction.isAcceptableOrUnknown(
+          data['is_first_meaningful_action']!,
+          _isFirstMeaningfulActionMeta,
+        ),
+      );
+    }
+    if (data.containsKey('releases_on_confirm')) {
+      context.handle(
+        _releasesOnConfirmMeta,
+        releasesOnConfirm.isAcceptableOrUnknown(
+          data['releases_on_confirm']!,
+          _releasesOnConfirmMeta,
+        ),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  ActivationCommandTemplateRow map(
+    Map<String, dynamic> data, {
+    String? tablePrefix,
+  }) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return ActivationCommandTemplateRow(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      protocolId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}protocol_id'],
+      )!,
+      protocolVersion: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}protocol_version'],
+      )!,
+      sequenceKey: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}sequence_key'],
+      )!,
+      instruction: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}instruction'],
+      )!,
+      actionVerb: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}action_verb'],
+      )!,
+      objectRef: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}object_ref'],
+      ),
+      destinationRef: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}destination_ref'],
+      ),
+      preconditionsJson: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}preconditions_json'],
+      )!,
+      proofPolicyJson: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}proof_policy_json'],
+      )!,
+      timeoutPolicyJson: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}timeout_policy_json'],
+      )!,
+      fallbackJson: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}fallback_json'],
+      )!,
+      skippable: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}skippable'],
+      )!,
+      estimatedSeconds: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}estimated_seconds'],
+      ),
+      waypointId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}waypoint_id'],
+      ),
+      opensTaskId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}opens_task_id'],
+      ),
+      deepLink: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}deep_link'],
+      ),
+      isFirstMeaningfulAction: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}is_first_meaningful_action'],
+      )!,
+      releasesOnConfirm: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}releases_on_confirm'],
+      )!,
+    );
+  }
+
+  @override
+  $ActivationCommandTemplatesTable createAlias(String alias) {
+    return $ActivationCommandTemplatesTable(attachedDatabase, alias);
+  }
+}
+
+class ActivationCommandTemplateRow extends DataClass
+    implements Insertable<ActivationCommandTemplateRow> {
+  final String id;
+  final String protocolId;
+  final int protocolVersion;
+  final String sequenceKey;
+  final String instruction;
+  final String actionVerb;
+  final String? objectRef;
+  final String? destinationRef;
+  final String preconditionsJson;
+  final String proofPolicyJson;
+  final String timeoutPolicyJson;
+  final String fallbackJson;
+  final bool skippable;
+  final int? estimatedSeconds;
+  final String? waypointId;
+  final String? opensTaskId;
+  final String? deepLink;
+  final bool isFirstMeaningfulAction;
+  final bool releasesOnConfirm;
+  const ActivationCommandTemplateRow({
+    required this.id,
+    required this.protocolId,
+    required this.protocolVersion,
+    required this.sequenceKey,
+    required this.instruction,
+    required this.actionVerb,
+    this.objectRef,
+    this.destinationRef,
+    required this.preconditionsJson,
+    required this.proofPolicyJson,
+    required this.timeoutPolicyJson,
+    required this.fallbackJson,
+    required this.skippable,
+    this.estimatedSeconds,
+    this.waypointId,
+    this.opensTaskId,
+    this.deepLink,
+    required this.isFirstMeaningfulAction,
+    required this.releasesOnConfirm,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['protocol_id'] = Variable<String>(protocolId);
+    map['protocol_version'] = Variable<int>(protocolVersion);
+    map['sequence_key'] = Variable<String>(sequenceKey);
+    map['instruction'] = Variable<String>(instruction);
+    map['action_verb'] = Variable<String>(actionVerb);
+    if (!nullToAbsent || objectRef != null) {
+      map['object_ref'] = Variable<String>(objectRef);
+    }
+    if (!nullToAbsent || destinationRef != null) {
+      map['destination_ref'] = Variable<String>(destinationRef);
+    }
+    map['preconditions_json'] = Variable<String>(preconditionsJson);
+    map['proof_policy_json'] = Variable<String>(proofPolicyJson);
+    map['timeout_policy_json'] = Variable<String>(timeoutPolicyJson);
+    map['fallback_json'] = Variable<String>(fallbackJson);
+    map['skippable'] = Variable<bool>(skippable);
+    if (!nullToAbsent || estimatedSeconds != null) {
+      map['estimated_seconds'] = Variable<int>(estimatedSeconds);
+    }
+    if (!nullToAbsent || waypointId != null) {
+      map['waypoint_id'] = Variable<String>(waypointId);
+    }
+    if (!nullToAbsent || opensTaskId != null) {
+      map['opens_task_id'] = Variable<String>(opensTaskId);
+    }
+    if (!nullToAbsent || deepLink != null) {
+      map['deep_link'] = Variable<String>(deepLink);
+    }
+    map['is_first_meaningful_action'] = Variable<bool>(isFirstMeaningfulAction);
+    map['releases_on_confirm'] = Variable<bool>(releasesOnConfirm);
+    return map;
+  }
+
+  ActivationCommandTemplatesCompanion toCompanion(bool nullToAbsent) {
+    return ActivationCommandTemplatesCompanion(
+      id: Value(id),
+      protocolId: Value(protocolId),
+      protocolVersion: Value(protocolVersion),
+      sequenceKey: Value(sequenceKey),
+      instruction: Value(instruction),
+      actionVerb: Value(actionVerb),
+      objectRef: objectRef == null && nullToAbsent
+          ? const Value.absent()
+          : Value(objectRef),
+      destinationRef: destinationRef == null && nullToAbsent
+          ? const Value.absent()
+          : Value(destinationRef),
+      preconditionsJson: Value(preconditionsJson),
+      proofPolicyJson: Value(proofPolicyJson),
+      timeoutPolicyJson: Value(timeoutPolicyJson),
+      fallbackJson: Value(fallbackJson),
+      skippable: Value(skippable),
+      estimatedSeconds: estimatedSeconds == null && nullToAbsent
+          ? const Value.absent()
+          : Value(estimatedSeconds),
+      waypointId: waypointId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(waypointId),
+      opensTaskId: opensTaskId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(opensTaskId),
+      deepLink: deepLink == null && nullToAbsent
+          ? const Value.absent()
+          : Value(deepLink),
+      isFirstMeaningfulAction: Value(isFirstMeaningfulAction),
+      releasesOnConfirm: Value(releasesOnConfirm),
+    );
+  }
+
+  factory ActivationCommandTemplateRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return ActivationCommandTemplateRow(
+      id: serializer.fromJson<String>(json['id']),
+      protocolId: serializer.fromJson<String>(json['protocolId']),
+      protocolVersion: serializer.fromJson<int>(json['protocolVersion']),
+      sequenceKey: serializer.fromJson<String>(json['sequenceKey']),
+      instruction: serializer.fromJson<String>(json['instruction']),
+      actionVerb: serializer.fromJson<String>(json['actionVerb']),
+      objectRef: serializer.fromJson<String?>(json['objectRef']),
+      destinationRef: serializer.fromJson<String?>(json['destinationRef']),
+      preconditionsJson: serializer.fromJson<String>(json['preconditionsJson']),
+      proofPolicyJson: serializer.fromJson<String>(json['proofPolicyJson']),
+      timeoutPolicyJson: serializer.fromJson<String>(json['timeoutPolicyJson']),
+      fallbackJson: serializer.fromJson<String>(json['fallbackJson']),
+      skippable: serializer.fromJson<bool>(json['skippable']),
+      estimatedSeconds: serializer.fromJson<int?>(json['estimatedSeconds']),
+      waypointId: serializer.fromJson<String?>(json['waypointId']),
+      opensTaskId: serializer.fromJson<String?>(json['opensTaskId']),
+      deepLink: serializer.fromJson<String?>(json['deepLink']),
+      isFirstMeaningfulAction: serializer.fromJson<bool>(
+        json['isFirstMeaningfulAction'],
+      ),
+      releasesOnConfirm: serializer.fromJson<bool>(json['releasesOnConfirm']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'protocolId': serializer.toJson<String>(protocolId),
+      'protocolVersion': serializer.toJson<int>(protocolVersion),
+      'sequenceKey': serializer.toJson<String>(sequenceKey),
+      'instruction': serializer.toJson<String>(instruction),
+      'actionVerb': serializer.toJson<String>(actionVerb),
+      'objectRef': serializer.toJson<String?>(objectRef),
+      'destinationRef': serializer.toJson<String?>(destinationRef),
+      'preconditionsJson': serializer.toJson<String>(preconditionsJson),
+      'proofPolicyJson': serializer.toJson<String>(proofPolicyJson),
+      'timeoutPolicyJson': serializer.toJson<String>(timeoutPolicyJson),
+      'fallbackJson': serializer.toJson<String>(fallbackJson),
+      'skippable': serializer.toJson<bool>(skippable),
+      'estimatedSeconds': serializer.toJson<int?>(estimatedSeconds),
+      'waypointId': serializer.toJson<String?>(waypointId),
+      'opensTaskId': serializer.toJson<String?>(opensTaskId),
+      'deepLink': serializer.toJson<String?>(deepLink),
+      'isFirstMeaningfulAction': serializer.toJson<bool>(
+        isFirstMeaningfulAction,
+      ),
+      'releasesOnConfirm': serializer.toJson<bool>(releasesOnConfirm),
+    };
+  }
+
+  ActivationCommandTemplateRow copyWith({
+    String? id,
+    String? protocolId,
+    int? protocolVersion,
+    String? sequenceKey,
+    String? instruction,
+    String? actionVerb,
+    Value<String?> objectRef = const Value.absent(),
+    Value<String?> destinationRef = const Value.absent(),
+    String? preconditionsJson,
+    String? proofPolicyJson,
+    String? timeoutPolicyJson,
+    String? fallbackJson,
+    bool? skippable,
+    Value<int?> estimatedSeconds = const Value.absent(),
+    Value<String?> waypointId = const Value.absent(),
+    Value<String?> opensTaskId = const Value.absent(),
+    Value<String?> deepLink = const Value.absent(),
+    bool? isFirstMeaningfulAction,
+    bool? releasesOnConfirm,
+  }) => ActivationCommandTemplateRow(
+    id: id ?? this.id,
+    protocolId: protocolId ?? this.protocolId,
+    protocolVersion: protocolVersion ?? this.protocolVersion,
+    sequenceKey: sequenceKey ?? this.sequenceKey,
+    instruction: instruction ?? this.instruction,
+    actionVerb: actionVerb ?? this.actionVerb,
+    objectRef: objectRef.present ? objectRef.value : this.objectRef,
+    destinationRef: destinationRef.present
+        ? destinationRef.value
+        : this.destinationRef,
+    preconditionsJson: preconditionsJson ?? this.preconditionsJson,
+    proofPolicyJson: proofPolicyJson ?? this.proofPolicyJson,
+    timeoutPolicyJson: timeoutPolicyJson ?? this.timeoutPolicyJson,
+    fallbackJson: fallbackJson ?? this.fallbackJson,
+    skippable: skippable ?? this.skippable,
+    estimatedSeconds: estimatedSeconds.present
+        ? estimatedSeconds.value
+        : this.estimatedSeconds,
+    waypointId: waypointId.present ? waypointId.value : this.waypointId,
+    opensTaskId: opensTaskId.present ? opensTaskId.value : this.opensTaskId,
+    deepLink: deepLink.present ? deepLink.value : this.deepLink,
+    isFirstMeaningfulAction:
+        isFirstMeaningfulAction ?? this.isFirstMeaningfulAction,
+    releasesOnConfirm: releasesOnConfirm ?? this.releasesOnConfirm,
+  );
+  ActivationCommandTemplateRow copyWithCompanion(
+    ActivationCommandTemplatesCompanion data,
+  ) {
+    return ActivationCommandTemplateRow(
+      id: data.id.present ? data.id.value : this.id,
+      protocolId: data.protocolId.present
+          ? data.protocolId.value
+          : this.protocolId,
+      protocolVersion: data.protocolVersion.present
+          ? data.protocolVersion.value
+          : this.protocolVersion,
+      sequenceKey: data.sequenceKey.present
+          ? data.sequenceKey.value
+          : this.sequenceKey,
+      instruction: data.instruction.present
+          ? data.instruction.value
+          : this.instruction,
+      actionVerb: data.actionVerb.present
+          ? data.actionVerb.value
+          : this.actionVerb,
+      objectRef: data.objectRef.present ? data.objectRef.value : this.objectRef,
+      destinationRef: data.destinationRef.present
+          ? data.destinationRef.value
+          : this.destinationRef,
+      preconditionsJson: data.preconditionsJson.present
+          ? data.preconditionsJson.value
+          : this.preconditionsJson,
+      proofPolicyJson: data.proofPolicyJson.present
+          ? data.proofPolicyJson.value
+          : this.proofPolicyJson,
+      timeoutPolicyJson: data.timeoutPolicyJson.present
+          ? data.timeoutPolicyJson.value
+          : this.timeoutPolicyJson,
+      fallbackJson: data.fallbackJson.present
+          ? data.fallbackJson.value
+          : this.fallbackJson,
+      skippable: data.skippable.present ? data.skippable.value : this.skippable,
+      estimatedSeconds: data.estimatedSeconds.present
+          ? data.estimatedSeconds.value
+          : this.estimatedSeconds,
+      waypointId: data.waypointId.present
+          ? data.waypointId.value
+          : this.waypointId,
+      opensTaskId: data.opensTaskId.present
+          ? data.opensTaskId.value
+          : this.opensTaskId,
+      deepLink: data.deepLink.present ? data.deepLink.value : this.deepLink,
+      isFirstMeaningfulAction: data.isFirstMeaningfulAction.present
+          ? data.isFirstMeaningfulAction.value
+          : this.isFirstMeaningfulAction,
+      releasesOnConfirm: data.releasesOnConfirm.present
+          ? data.releasesOnConfirm.value
+          : this.releasesOnConfirm,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ActivationCommandTemplateRow(')
+          ..write('id: $id, ')
+          ..write('protocolId: $protocolId, ')
+          ..write('protocolVersion: $protocolVersion, ')
+          ..write('sequenceKey: $sequenceKey, ')
+          ..write('instruction: $instruction, ')
+          ..write('actionVerb: $actionVerb, ')
+          ..write('objectRef: $objectRef, ')
+          ..write('destinationRef: $destinationRef, ')
+          ..write('preconditionsJson: $preconditionsJson, ')
+          ..write('proofPolicyJson: $proofPolicyJson, ')
+          ..write('timeoutPolicyJson: $timeoutPolicyJson, ')
+          ..write('fallbackJson: $fallbackJson, ')
+          ..write('skippable: $skippable, ')
+          ..write('estimatedSeconds: $estimatedSeconds, ')
+          ..write('waypointId: $waypointId, ')
+          ..write('opensTaskId: $opensTaskId, ')
+          ..write('deepLink: $deepLink, ')
+          ..write('isFirstMeaningfulAction: $isFirstMeaningfulAction, ')
+          ..write('releasesOnConfirm: $releasesOnConfirm')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    protocolId,
+    protocolVersion,
+    sequenceKey,
+    instruction,
+    actionVerb,
+    objectRef,
+    destinationRef,
+    preconditionsJson,
+    proofPolicyJson,
+    timeoutPolicyJson,
+    fallbackJson,
+    skippable,
+    estimatedSeconds,
+    waypointId,
+    opensTaskId,
+    deepLink,
+    isFirstMeaningfulAction,
+    releasesOnConfirm,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is ActivationCommandTemplateRow &&
+          other.id == this.id &&
+          other.protocolId == this.protocolId &&
+          other.protocolVersion == this.protocolVersion &&
+          other.sequenceKey == this.sequenceKey &&
+          other.instruction == this.instruction &&
+          other.actionVerb == this.actionVerb &&
+          other.objectRef == this.objectRef &&
+          other.destinationRef == this.destinationRef &&
+          other.preconditionsJson == this.preconditionsJson &&
+          other.proofPolicyJson == this.proofPolicyJson &&
+          other.timeoutPolicyJson == this.timeoutPolicyJson &&
+          other.fallbackJson == this.fallbackJson &&
+          other.skippable == this.skippable &&
+          other.estimatedSeconds == this.estimatedSeconds &&
+          other.waypointId == this.waypointId &&
+          other.opensTaskId == this.opensTaskId &&
+          other.deepLink == this.deepLink &&
+          other.isFirstMeaningfulAction == this.isFirstMeaningfulAction &&
+          other.releasesOnConfirm == this.releasesOnConfirm);
+}
+
+class ActivationCommandTemplatesCompanion
+    extends UpdateCompanion<ActivationCommandTemplateRow> {
+  final Value<String> id;
+  final Value<String> protocolId;
+  final Value<int> protocolVersion;
+  final Value<String> sequenceKey;
+  final Value<String> instruction;
+  final Value<String> actionVerb;
+  final Value<String?> objectRef;
+  final Value<String?> destinationRef;
+  final Value<String> preconditionsJson;
+  final Value<String> proofPolicyJson;
+  final Value<String> timeoutPolicyJson;
+  final Value<String> fallbackJson;
+  final Value<bool> skippable;
+  final Value<int?> estimatedSeconds;
+  final Value<String?> waypointId;
+  final Value<String?> opensTaskId;
+  final Value<String?> deepLink;
+  final Value<bool> isFirstMeaningfulAction;
+  final Value<bool> releasesOnConfirm;
+  final Value<int> rowid;
+  const ActivationCommandTemplatesCompanion({
+    this.id = const Value.absent(),
+    this.protocolId = const Value.absent(),
+    this.protocolVersion = const Value.absent(),
+    this.sequenceKey = const Value.absent(),
+    this.instruction = const Value.absent(),
+    this.actionVerb = const Value.absent(),
+    this.objectRef = const Value.absent(),
+    this.destinationRef = const Value.absent(),
+    this.preconditionsJson = const Value.absent(),
+    this.proofPolicyJson = const Value.absent(),
+    this.timeoutPolicyJson = const Value.absent(),
+    this.fallbackJson = const Value.absent(),
+    this.skippable = const Value.absent(),
+    this.estimatedSeconds = const Value.absent(),
+    this.waypointId = const Value.absent(),
+    this.opensTaskId = const Value.absent(),
+    this.deepLink = const Value.absent(),
+    this.isFirstMeaningfulAction = const Value.absent(),
+    this.releasesOnConfirm = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  ActivationCommandTemplatesCompanion.insert({
+    required String id,
+    required String protocolId,
+    required int protocolVersion,
+    required String sequenceKey,
+    required String instruction,
+    required String actionVerb,
+    this.objectRef = const Value.absent(),
+    this.destinationRef = const Value.absent(),
+    this.preconditionsJson = const Value.absent(),
+    required String proofPolicyJson,
+    required String timeoutPolicyJson,
+    required String fallbackJson,
+    this.skippable = const Value.absent(),
+    this.estimatedSeconds = const Value.absent(),
+    this.waypointId = const Value.absent(),
+    this.opensTaskId = const Value.absent(),
+    this.deepLink = const Value.absent(),
+    this.isFirstMeaningfulAction = const Value.absent(),
+    this.releasesOnConfirm = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       protocolId = Value(protocolId),
+       protocolVersion = Value(protocolVersion),
+       sequenceKey = Value(sequenceKey),
+       instruction = Value(instruction),
+       actionVerb = Value(actionVerb),
+       proofPolicyJson = Value(proofPolicyJson),
+       timeoutPolicyJson = Value(timeoutPolicyJson),
+       fallbackJson = Value(fallbackJson);
+  static Insertable<ActivationCommandTemplateRow> custom({
+    Expression<String>? id,
+    Expression<String>? protocolId,
+    Expression<int>? protocolVersion,
+    Expression<String>? sequenceKey,
+    Expression<String>? instruction,
+    Expression<String>? actionVerb,
+    Expression<String>? objectRef,
+    Expression<String>? destinationRef,
+    Expression<String>? preconditionsJson,
+    Expression<String>? proofPolicyJson,
+    Expression<String>? timeoutPolicyJson,
+    Expression<String>? fallbackJson,
+    Expression<bool>? skippable,
+    Expression<int>? estimatedSeconds,
+    Expression<String>? waypointId,
+    Expression<String>? opensTaskId,
+    Expression<String>? deepLink,
+    Expression<bool>? isFirstMeaningfulAction,
+    Expression<bool>? releasesOnConfirm,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (protocolId != null) 'protocol_id': protocolId,
+      if (protocolVersion != null) 'protocol_version': protocolVersion,
+      if (sequenceKey != null) 'sequence_key': sequenceKey,
+      if (instruction != null) 'instruction': instruction,
+      if (actionVerb != null) 'action_verb': actionVerb,
+      if (objectRef != null) 'object_ref': objectRef,
+      if (destinationRef != null) 'destination_ref': destinationRef,
+      if (preconditionsJson != null) 'preconditions_json': preconditionsJson,
+      if (proofPolicyJson != null) 'proof_policy_json': proofPolicyJson,
+      if (timeoutPolicyJson != null) 'timeout_policy_json': timeoutPolicyJson,
+      if (fallbackJson != null) 'fallback_json': fallbackJson,
+      if (skippable != null) 'skippable': skippable,
+      if (estimatedSeconds != null) 'estimated_seconds': estimatedSeconds,
+      if (waypointId != null) 'waypoint_id': waypointId,
+      if (opensTaskId != null) 'opens_task_id': opensTaskId,
+      if (deepLink != null) 'deep_link': deepLink,
+      if (isFirstMeaningfulAction != null)
+        'is_first_meaningful_action': isFirstMeaningfulAction,
+      if (releasesOnConfirm != null) 'releases_on_confirm': releasesOnConfirm,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  ActivationCommandTemplatesCompanion copyWith({
+    Value<String>? id,
+    Value<String>? protocolId,
+    Value<int>? protocolVersion,
+    Value<String>? sequenceKey,
+    Value<String>? instruction,
+    Value<String>? actionVerb,
+    Value<String?>? objectRef,
+    Value<String?>? destinationRef,
+    Value<String>? preconditionsJson,
+    Value<String>? proofPolicyJson,
+    Value<String>? timeoutPolicyJson,
+    Value<String>? fallbackJson,
+    Value<bool>? skippable,
+    Value<int?>? estimatedSeconds,
+    Value<String?>? waypointId,
+    Value<String?>? opensTaskId,
+    Value<String?>? deepLink,
+    Value<bool>? isFirstMeaningfulAction,
+    Value<bool>? releasesOnConfirm,
+    Value<int>? rowid,
+  }) {
+    return ActivationCommandTemplatesCompanion(
+      id: id ?? this.id,
+      protocolId: protocolId ?? this.protocolId,
+      protocolVersion: protocolVersion ?? this.protocolVersion,
+      sequenceKey: sequenceKey ?? this.sequenceKey,
+      instruction: instruction ?? this.instruction,
+      actionVerb: actionVerb ?? this.actionVerb,
+      objectRef: objectRef ?? this.objectRef,
+      destinationRef: destinationRef ?? this.destinationRef,
+      preconditionsJson: preconditionsJson ?? this.preconditionsJson,
+      proofPolicyJson: proofPolicyJson ?? this.proofPolicyJson,
+      timeoutPolicyJson: timeoutPolicyJson ?? this.timeoutPolicyJson,
+      fallbackJson: fallbackJson ?? this.fallbackJson,
+      skippable: skippable ?? this.skippable,
+      estimatedSeconds: estimatedSeconds ?? this.estimatedSeconds,
+      waypointId: waypointId ?? this.waypointId,
+      opensTaskId: opensTaskId ?? this.opensTaskId,
+      deepLink: deepLink ?? this.deepLink,
+      isFirstMeaningfulAction:
+          isFirstMeaningfulAction ?? this.isFirstMeaningfulAction,
+      releasesOnConfirm: releasesOnConfirm ?? this.releasesOnConfirm,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (protocolId.present) {
+      map['protocol_id'] = Variable<String>(protocolId.value);
+    }
+    if (protocolVersion.present) {
+      map['protocol_version'] = Variable<int>(protocolVersion.value);
+    }
+    if (sequenceKey.present) {
+      map['sequence_key'] = Variable<String>(sequenceKey.value);
+    }
+    if (instruction.present) {
+      map['instruction'] = Variable<String>(instruction.value);
+    }
+    if (actionVerb.present) {
+      map['action_verb'] = Variable<String>(actionVerb.value);
+    }
+    if (objectRef.present) {
+      map['object_ref'] = Variable<String>(objectRef.value);
+    }
+    if (destinationRef.present) {
+      map['destination_ref'] = Variable<String>(destinationRef.value);
+    }
+    if (preconditionsJson.present) {
+      map['preconditions_json'] = Variable<String>(preconditionsJson.value);
+    }
+    if (proofPolicyJson.present) {
+      map['proof_policy_json'] = Variable<String>(proofPolicyJson.value);
+    }
+    if (timeoutPolicyJson.present) {
+      map['timeout_policy_json'] = Variable<String>(timeoutPolicyJson.value);
+    }
+    if (fallbackJson.present) {
+      map['fallback_json'] = Variable<String>(fallbackJson.value);
+    }
+    if (skippable.present) {
+      map['skippable'] = Variable<bool>(skippable.value);
+    }
+    if (estimatedSeconds.present) {
+      map['estimated_seconds'] = Variable<int>(estimatedSeconds.value);
+    }
+    if (waypointId.present) {
+      map['waypoint_id'] = Variable<String>(waypointId.value);
+    }
+    if (opensTaskId.present) {
+      map['opens_task_id'] = Variable<String>(opensTaskId.value);
+    }
+    if (deepLink.present) {
+      map['deep_link'] = Variable<String>(deepLink.value);
+    }
+    if (isFirstMeaningfulAction.present) {
+      map['is_first_meaningful_action'] = Variable<bool>(
+        isFirstMeaningfulAction.value,
+      );
+    }
+    if (releasesOnConfirm.present) {
+      map['releases_on_confirm'] = Variable<bool>(releasesOnConfirm.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ActivationCommandTemplatesCompanion(')
+          ..write('id: $id, ')
+          ..write('protocolId: $protocolId, ')
+          ..write('protocolVersion: $protocolVersion, ')
+          ..write('sequenceKey: $sequenceKey, ')
+          ..write('instruction: $instruction, ')
+          ..write('actionVerb: $actionVerb, ')
+          ..write('objectRef: $objectRef, ')
+          ..write('destinationRef: $destinationRef, ')
+          ..write('preconditionsJson: $preconditionsJson, ')
+          ..write('proofPolicyJson: $proofPolicyJson, ')
+          ..write('timeoutPolicyJson: $timeoutPolicyJson, ')
+          ..write('fallbackJson: $fallbackJson, ')
+          ..write('skippable: $skippable, ')
+          ..write('estimatedSeconds: $estimatedSeconds, ')
+          ..write('waypointId: $waypointId, ')
+          ..write('opensTaskId: $opensTaskId, ')
+          ..write('deepLink: $deepLink, ')
+          ..write('isFirstMeaningfulAction: $isFirstMeaningfulAction, ')
+          ..write('releasesOnConfirm: $releasesOnConfirm, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $ActivationEpisodesTable extends ActivationEpisodes
+    with TableInfo<$ActivationEpisodesTable, ActivationEpisodeRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $ActivationEpisodesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _profileIdMeta = const VerificationMeta(
+    'profileId',
+  );
+  @override
+  late final GeneratedColumn<String> profileId = GeneratedColumn<String>(
+    'profile_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES profiles (id)',
+    ),
+  );
+  static const VerificationMeta _protocolIdMeta = const VerificationMeta(
+    'protocolId',
+  );
+  @override
+  late final GeneratedColumn<String> protocolId = GeneratedColumn<String>(
+    'protocol_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _protocolVersionMeta = const VerificationMeta(
+    'protocolVersion',
+  );
+  @override
+  late final GeneratedColumn<int> protocolVersion = GeneratedColumn<int>(
+    'protocol_version',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _triggerTypeMeta = const VerificationMeta(
+    'triggerType',
+  );
+  @override
+  late final GeneratedColumn<String> triggerType = GeneratedColumn<String>(
+    'trigger_type',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _hypothesisTypeMeta = const VerificationMeta(
+    'hypothesisType',
+  );
+  @override
+  late final GeneratedColumn<String> hypothesisType = GeneratedColumn<String>(
+    'hypothesis_type',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _hypothesisConfidenceMeta =
+      const VerificationMeta('hypothesisConfidence');
+  @override
+  late final GeneratedColumn<double> hypothesisConfidence =
+      GeneratedColumn<double>(
+        'hypothesis_confidence',
+        aliasedName,
+        true,
+        type: DriftSqlType.double,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _capacityModeMeta = const VerificationMeta(
+    'capacityMode',
+  );
+  @override
+  late final GeneratedColumn<String> capacityMode = GeneratedColumn<String>(
+    'capacity_mode',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _initialStateJsonMeta = const VerificationMeta(
+    'initialStateJson',
+  );
+  @override
+  late final GeneratedColumn<String> initialStateJson = GeneratedColumn<String>(
+    'initial_state_json',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _targetStateJsonMeta = const VerificationMeta(
+    'targetStateJson',
+  );
+  @override
+  late final GeneratedColumn<String> targetStateJson = GeneratedColumn<String>(
+    'target_state_json',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _statusMeta = const VerificationMeta('status');
+  @override
+  late final GeneratedColumn<String> status = GeneratedColumn<String>(
+    'status',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _startedAtMeta = const VerificationMeta(
+    'startedAt',
+  );
+  @override
+  late final GeneratedColumn<int> startedAt = GeneratedColumn<int>(
+    'started_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _firstMotionAtMeta = const VerificationMeta(
+    'firstMotionAt',
+  );
+  @override
+  late final GeneratedColumn<int> firstMotionAt = GeneratedColumn<int>(
+    'first_motion_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _releasedAtMeta = const VerificationMeta(
+    'releasedAt',
+  );
+  @override
+  late final GeneratedColumn<int> releasedAt = GeneratedColumn<int>(
+    'released_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _endedAtMeta = const VerificationMeta(
+    'endedAt',
+  );
+  @override
+  late final GeneratedColumn<int> endedAt = GeneratedColumn<int>(
+    'ended_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _interventionLevelMaxMeta =
+      const VerificationMeta('interventionLevelMax');
+  @override
+  late final GeneratedColumn<int> interventionLevelMax = GeneratedColumn<int>(
+    'intervention_level_max',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _shieldUsedMeta = const VerificationMeta(
+    'shieldUsed',
+  );
+  @override
+  late final GeneratedColumn<bool> shieldUsed = GeneratedColumn<bool>(
+    'shield_used',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("shield_used" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _bundleUsedMeta = const VerificationMeta(
+    'bundleUsed',
+  );
+  @override
+  late final GeneratedColumn<bool> bundleUsed = GeneratedColumn<bool>(
+    'bundle_used',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("bundle_used" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _escapeUsedMeta = const VerificationMeta(
+    'escapeUsed',
+  );
+  @override
+  late final GeneratedColumn<bool> escapeUsed = GeneratedColumn<bool>(
+    'escape_used',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("escape_used" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _userCorrectionMeta = const VerificationMeta(
+    'userCorrection',
+  );
+  @override
+  late final GeneratedColumn<String> userCorrection = GeneratedColumn<String>(
+    'user_correction',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _linkedTaskIdMeta = const VerificationMeta(
+    'linkedTaskId',
+  );
+  @override
+  late final GeneratedColumn<String> linkedTaskId = GeneratedColumn<String>(
+    'linked_task_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _experimentAssignmentIdMeta =
+      const VerificationMeta('experimentAssignmentId');
+  @override
+  late final GeneratedColumn<String> experimentAssignmentId =
+      GeneratedColumn<String>(
+        'experiment_assignment_id',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _provenanceJsonMeta = const VerificationMeta(
+    'provenanceJson',
+  );
+  @override
+  late final GeneratedColumn<String> provenanceJson = GeneratedColumn<String>(
+    'provenance_json',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    profileId,
+    protocolId,
+    protocolVersion,
+    triggerType,
+    hypothesisType,
+    hypothesisConfidence,
+    capacityMode,
+    initialStateJson,
+    targetStateJson,
+    status,
+    startedAt,
+    firstMotionAt,
+    releasedAt,
+    endedAt,
+    interventionLevelMax,
+    shieldUsed,
+    bundleUsed,
+    escapeUsed,
+    userCorrection,
+    linkedTaskId,
+    experimentAssignmentId,
+    provenanceJson,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'activation_episodes';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<ActivationEpisodeRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('profile_id')) {
+      context.handle(
+        _profileIdMeta,
+        profileId.isAcceptableOrUnknown(data['profile_id']!, _profileIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_profileIdMeta);
+    }
+    if (data.containsKey('protocol_id')) {
+      context.handle(
+        _protocolIdMeta,
+        protocolId.isAcceptableOrUnknown(data['protocol_id']!, _protocolIdMeta),
+      );
+    }
+    if (data.containsKey('protocol_version')) {
+      context.handle(
+        _protocolVersionMeta,
+        protocolVersion.isAcceptableOrUnknown(
+          data['protocol_version']!,
+          _protocolVersionMeta,
+        ),
+      );
+    }
+    if (data.containsKey('trigger_type')) {
+      context.handle(
+        _triggerTypeMeta,
+        triggerType.isAcceptableOrUnknown(
+          data['trigger_type']!,
+          _triggerTypeMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_triggerTypeMeta);
+    }
+    if (data.containsKey('hypothesis_type')) {
+      context.handle(
+        _hypothesisTypeMeta,
+        hypothesisType.isAcceptableOrUnknown(
+          data['hypothesis_type']!,
+          _hypothesisTypeMeta,
+        ),
+      );
+    }
+    if (data.containsKey('hypothesis_confidence')) {
+      context.handle(
+        _hypothesisConfidenceMeta,
+        hypothesisConfidence.isAcceptableOrUnknown(
+          data['hypothesis_confidence']!,
+          _hypothesisConfidenceMeta,
+        ),
+      );
+    }
+    if (data.containsKey('capacity_mode')) {
+      context.handle(
+        _capacityModeMeta,
+        capacityMode.isAcceptableOrUnknown(
+          data['capacity_mode']!,
+          _capacityModeMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_capacityModeMeta);
+    }
+    if (data.containsKey('initial_state_json')) {
+      context.handle(
+        _initialStateJsonMeta,
+        initialStateJson.isAcceptableOrUnknown(
+          data['initial_state_json']!,
+          _initialStateJsonMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_initialStateJsonMeta);
+    }
+    if (data.containsKey('target_state_json')) {
+      context.handle(
+        _targetStateJsonMeta,
+        targetStateJson.isAcceptableOrUnknown(
+          data['target_state_json']!,
+          _targetStateJsonMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_targetStateJsonMeta);
+    }
+    if (data.containsKey('status')) {
+      context.handle(
+        _statusMeta,
+        status.isAcceptableOrUnknown(data['status']!, _statusMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_statusMeta);
+    }
+    if (data.containsKey('started_at')) {
+      context.handle(
+        _startedAtMeta,
+        startedAt.isAcceptableOrUnknown(data['started_at']!, _startedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_startedAtMeta);
+    }
+    if (data.containsKey('first_motion_at')) {
+      context.handle(
+        _firstMotionAtMeta,
+        firstMotionAt.isAcceptableOrUnknown(
+          data['first_motion_at']!,
+          _firstMotionAtMeta,
+        ),
+      );
+    }
+    if (data.containsKey('released_at')) {
+      context.handle(
+        _releasedAtMeta,
+        releasedAt.isAcceptableOrUnknown(data['released_at']!, _releasedAtMeta),
+      );
+    }
+    if (data.containsKey('ended_at')) {
+      context.handle(
+        _endedAtMeta,
+        endedAt.isAcceptableOrUnknown(data['ended_at']!, _endedAtMeta),
+      );
+    }
+    if (data.containsKey('intervention_level_max')) {
+      context.handle(
+        _interventionLevelMaxMeta,
+        interventionLevelMax.isAcceptableOrUnknown(
+          data['intervention_level_max']!,
+          _interventionLevelMaxMeta,
+        ),
+      );
+    }
+    if (data.containsKey('shield_used')) {
+      context.handle(
+        _shieldUsedMeta,
+        shieldUsed.isAcceptableOrUnknown(data['shield_used']!, _shieldUsedMeta),
+      );
+    }
+    if (data.containsKey('bundle_used')) {
+      context.handle(
+        _bundleUsedMeta,
+        bundleUsed.isAcceptableOrUnknown(data['bundle_used']!, _bundleUsedMeta),
+      );
+    }
+    if (data.containsKey('escape_used')) {
+      context.handle(
+        _escapeUsedMeta,
+        escapeUsed.isAcceptableOrUnknown(data['escape_used']!, _escapeUsedMeta),
+      );
+    }
+    if (data.containsKey('user_correction')) {
+      context.handle(
+        _userCorrectionMeta,
+        userCorrection.isAcceptableOrUnknown(
+          data['user_correction']!,
+          _userCorrectionMeta,
+        ),
+      );
+    }
+    if (data.containsKey('linked_task_id')) {
+      context.handle(
+        _linkedTaskIdMeta,
+        linkedTaskId.isAcceptableOrUnknown(
+          data['linked_task_id']!,
+          _linkedTaskIdMeta,
+        ),
+      );
+    }
+    if (data.containsKey('experiment_assignment_id')) {
+      context.handle(
+        _experimentAssignmentIdMeta,
+        experimentAssignmentId.isAcceptableOrUnknown(
+          data['experiment_assignment_id']!,
+          _experimentAssignmentIdMeta,
+        ),
+      );
+    }
+    if (data.containsKey('provenance_json')) {
+      context.handle(
+        _provenanceJsonMeta,
+        provenanceJson.isAcceptableOrUnknown(
+          data['provenance_json']!,
+          _provenanceJsonMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_provenanceJsonMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  ActivationEpisodeRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return ActivationEpisodeRow(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      profileId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}profile_id'],
+      )!,
+      protocolId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}protocol_id'],
+      ),
+      protocolVersion: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}protocol_version'],
+      ),
+      triggerType: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}trigger_type'],
+      )!,
+      hypothesisType: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}hypothesis_type'],
+      ),
+      hypothesisConfidence: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}hypothesis_confidence'],
+      ),
+      capacityMode: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}capacity_mode'],
+      )!,
+      initialStateJson: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}initial_state_json'],
+      )!,
+      targetStateJson: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}target_state_json'],
+      )!,
+      status: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}status'],
+      )!,
+      startedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}started_at'],
+      )!,
+      firstMotionAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}first_motion_at'],
+      ),
+      releasedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}released_at'],
+      ),
+      endedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}ended_at'],
+      ),
+      interventionLevelMax: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}intervention_level_max'],
+      )!,
+      shieldUsed: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}shield_used'],
+      )!,
+      bundleUsed: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}bundle_used'],
+      )!,
+      escapeUsed: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}escape_used'],
+      )!,
+      userCorrection: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}user_correction'],
+      ),
+      linkedTaskId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}linked_task_id'],
+      ),
+      experimentAssignmentId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}experiment_assignment_id'],
+      ),
+      provenanceJson: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}provenance_json'],
+      )!,
+    );
+  }
+
+  @override
+  $ActivationEpisodesTable createAlias(String alias) {
+    return $ActivationEpisodesTable(attachedDatabase, alias);
+  }
+}
+
+class ActivationEpisodeRow extends DataClass
+    implements Insertable<ActivationEpisodeRow> {
+  final String id;
+  final String profileId;
+  final String? protocolId;
+  final int? protocolVersion;
+  final String triggerType;
+  final String? hypothesisType;
+  final double? hypothesisConfidence;
+  final String capacityMode;
+  final String initialStateJson;
+  final String targetStateJson;
+  final String status;
+  final int startedAt;
+  final int? firstMotionAt;
+  final int? releasedAt;
+  final int? endedAt;
+  final int interventionLevelMax;
+  final bool shieldUsed;
+  final bool bundleUsed;
+  final bool escapeUsed;
+  final String? userCorrection;
+  final String? linkedTaskId;
+  final String? experimentAssignmentId;
+  final String provenanceJson;
+  const ActivationEpisodeRow({
+    required this.id,
+    required this.profileId,
+    this.protocolId,
+    this.protocolVersion,
+    required this.triggerType,
+    this.hypothesisType,
+    this.hypothesisConfidence,
+    required this.capacityMode,
+    required this.initialStateJson,
+    required this.targetStateJson,
+    required this.status,
+    required this.startedAt,
+    this.firstMotionAt,
+    this.releasedAt,
+    this.endedAt,
+    required this.interventionLevelMax,
+    required this.shieldUsed,
+    required this.bundleUsed,
+    required this.escapeUsed,
+    this.userCorrection,
+    this.linkedTaskId,
+    this.experimentAssignmentId,
+    required this.provenanceJson,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['profile_id'] = Variable<String>(profileId);
+    if (!nullToAbsent || protocolId != null) {
+      map['protocol_id'] = Variable<String>(protocolId);
+    }
+    if (!nullToAbsent || protocolVersion != null) {
+      map['protocol_version'] = Variable<int>(protocolVersion);
+    }
+    map['trigger_type'] = Variable<String>(triggerType);
+    if (!nullToAbsent || hypothesisType != null) {
+      map['hypothesis_type'] = Variable<String>(hypothesisType);
+    }
+    if (!nullToAbsent || hypothesisConfidence != null) {
+      map['hypothesis_confidence'] = Variable<double>(hypothesisConfidence);
+    }
+    map['capacity_mode'] = Variable<String>(capacityMode);
+    map['initial_state_json'] = Variable<String>(initialStateJson);
+    map['target_state_json'] = Variable<String>(targetStateJson);
+    map['status'] = Variable<String>(status);
+    map['started_at'] = Variable<int>(startedAt);
+    if (!nullToAbsent || firstMotionAt != null) {
+      map['first_motion_at'] = Variable<int>(firstMotionAt);
+    }
+    if (!nullToAbsent || releasedAt != null) {
+      map['released_at'] = Variable<int>(releasedAt);
+    }
+    if (!nullToAbsent || endedAt != null) {
+      map['ended_at'] = Variable<int>(endedAt);
+    }
+    map['intervention_level_max'] = Variable<int>(interventionLevelMax);
+    map['shield_used'] = Variable<bool>(shieldUsed);
+    map['bundle_used'] = Variable<bool>(bundleUsed);
+    map['escape_used'] = Variable<bool>(escapeUsed);
+    if (!nullToAbsent || userCorrection != null) {
+      map['user_correction'] = Variable<String>(userCorrection);
+    }
+    if (!nullToAbsent || linkedTaskId != null) {
+      map['linked_task_id'] = Variable<String>(linkedTaskId);
+    }
+    if (!nullToAbsent || experimentAssignmentId != null) {
+      map['experiment_assignment_id'] = Variable<String>(
+        experimentAssignmentId,
+      );
+    }
+    map['provenance_json'] = Variable<String>(provenanceJson);
+    return map;
+  }
+
+  ActivationEpisodesCompanion toCompanion(bool nullToAbsent) {
+    return ActivationEpisodesCompanion(
+      id: Value(id),
+      profileId: Value(profileId),
+      protocolId: protocolId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(protocolId),
+      protocolVersion: protocolVersion == null && nullToAbsent
+          ? const Value.absent()
+          : Value(protocolVersion),
+      triggerType: Value(triggerType),
+      hypothesisType: hypothesisType == null && nullToAbsent
+          ? const Value.absent()
+          : Value(hypothesisType),
+      hypothesisConfidence: hypothesisConfidence == null && nullToAbsent
+          ? const Value.absent()
+          : Value(hypothesisConfidence),
+      capacityMode: Value(capacityMode),
+      initialStateJson: Value(initialStateJson),
+      targetStateJson: Value(targetStateJson),
+      status: Value(status),
+      startedAt: Value(startedAt),
+      firstMotionAt: firstMotionAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(firstMotionAt),
+      releasedAt: releasedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(releasedAt),
+      endedAt: endedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(endedAt),
+      interventionLevelMax: Value(interventionLevelMax),
+      shieldUsed: Value(shieldUsed),
+      bundleUsed: Value(bundleUsed),
+      escapeUsed: Value(escapeUsed),
+      userCorrection: userCorrection == null && nullToAbsent
+          ? const Value.absent()
+          : Value(userCorrection),
+      linkedTaskId: linkedTaskId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(linkedTaskId),
+      experimentAssignmentId: experimentAssignmentId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(experimentAssignmentId),
+      provenanceJson: Value(provenanceJson),
+    );
+  }
+
+  factory ActivationEpisodeRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return ActivationEpisodeRow(
+      id: serializer.fromJson<String>(json['id']),
+      profileId: serializer.fromJson<String>(json['profileId']),
+      protocolId: serializer.fromJson<String?>(json['protocolId']),
+      protocolVersion: serializer.fromJson<int?>(json['protocolVersion']),
+      triggerType: serializer.fromJson<String>(json['triggerType']),
+      hypothesisType: serializer.fromJson<String?>(json['hypothesisType']),
+      hypothesisConfidence: serializer.fromJson<double?>(
+        json['hypothesisConfidence'],
+      ),
+      capacityMode: serializer.fromJson<String>(json['capacityMode']),
+      initialStateJson: serializer.fromJson<String>(json['initialStateJson']),
+      targetStateJson: serializer.fromJson<String>(json['targetStateJson']),
+      status: serializer.fromJson<String>(json['status']),
+      startedAt: serializer.fromJson<int>(json['startedAt']),
+      firstMotionAt: serializer.fromJson<int?>(json['firstMotionAt']),
+      releasedAt: serializer.fromJson<int?>(json['releasedAt']),
+      endedAt: serializer.fromJson<int?>(json['endedAt']),
+      interventionLevelMax: serializer.fromJson<int>(
+        json['interventionLevelMax'],
+      ),
+      shieldUsed: serializer.fromJson<bool>(json['shieldUsed']),
+      bundleUsed: serializer.fromJson<bool>(json['bundleUsed']),
+      escapeUsed: serializer.fromJson<bool>(json['escapeUsed']),
+      userCorrection: serializer.fromJson<String?>(json['userCorrection']),
+      linkedTaskId: serializer.fromJson<String?>(json['linkedTaskId']),
+      experimentAssignmentId: serializer.fromJson<String?>(
+        json['experimentAssignmentId'],
+      ),
+      provenanceJson: serializer.fromJson<String>(json['provenanceJson']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'profileId': serializer.toJson<String>(profileId),
+      'protocolId': serializer.toJson<String?>(protocolId),
+      'protocolVersion': serializer.toJson<int?>(protocolVersion),
+      'triggerType': serializer.toJson<String>(triggerType),
+      'hypothesisType': serializer.toJson<String?>(hypothesisType),
+      'hypothesisConfidence': serializer.toJson<double?>(hypothesisConfidence),
+      'capacityMode': serializer.toJson<String>(capacityMode),
+      'initialStateJson': serializer.toJson<String>(initialStateJson),
+      'targetStateJson': serializer.toJson<String>(targetStateJson),
+      'status': serializer.toJson<String>(status),
+      'startedAt': serializer.toJson<int>(startedAt),
+      'firstMotionAt': serializer.toJson<int?>(firstMotionAt),
+      'releasedAt': serializer.toJson<int?>(releasedAt),
+      'endedAt': serializer.toJson<int?>(endedAt),
+      'interventionLevelMax': serializer.toJson<int>(interventionLevelMax),
+      'shieldUsed': serializer.toJson<bool>(shieldUsed),
+      'bundleUsed': serializer.toJson<bool>(bundleUsed),
+      'escapeUsed': serializer.toJson<bool>(escapeUsed),
+      'userCorrection': serializer.toJson<String?>(userCorrection),
+      'linkedTaskId': serializer.toJson<String?>(linkedTaskId),
+      'experimentAssignmentId': serializer.toJson<String?>(
+        experimentAssignmentId,
+      ),
+      'provenanceJson': serializer.toJson<String>(provenanceJson),
+    };
+  }
+
+  ActivationEpisodeRow copyWith({
+    String? id,
+    String? profileId,
+    Value<String?> protocolId = const Value.absent(),
+    Value<int?> protocolVersion = const Value.absent(),
+    String? triggerType,
+    Value<String?> hypothesisType = const Value.absent(),
+    Value<double?> hypothesisConfidence = const Value.absent(),
+    String? capacityMode,
+    String? initialStateJson,
+    String? targetStateJson,
+    String? status,
+    int? startedAt,
+    Value<int?> firstMotionAt = const Value.absent(),
+    Value<int?> releasedAt = const Value.absent(),
+    Value<int?> endedAt = const Value.absent(),
+    int? interventionLevelMax,
+    bool? shieldUsed,
+    bool? bundleUsed,
+    bool? escapeUsed,
+    Value<String?> userCorrection = const Value.absent(),
+    Value<String?> linkedTaskId = const Value.absent(),
+    Value<String?> experimentAssignmentId = const Value.absent(),
+    String? provenanceJson,
+  }) => ActivationEpisodeRow(
+    id: id ?? this.id,
+    profileId: profileId ?? this.profileId,
+    protocolId: protocolId.present ? protocolId.value : this.protocolId,
+    protocolVersion: protocolVersion.present
+        ? protocolVersion.value
+        : this.protocolVersion,
+    triggerType: triggerType ?? this.triggerType,
+    hypothesisType: hypothesisType.present
+        ? hypothesisType.value
+        : this.hypothesisType,
+    hypothesisConfidence: hypothesisConfidence.present
+        ? hypothesisConfidence.value
+        : this.hypothesisConfidence,
+    capacityMode: capacityMode ?? this.capacityMode,
+    initialStateJson: initialStateJson ?? this.initialStateJson,
+    targetStateJson: targetStateJson ?? this.targetStateJson,
+    status: status ?? this.status,
+    startedAt: startedAt ?? this.startedAt,
+    firstMotionAt: firstMotionAt.present
+        ? firstMotionAt.value
+        : this.firstMotionAt,
+    releasedAt: releasedAt.present ? releasedAt.value : this.releasedAt,
+    endedAt: endedAt.present ? endedAt.value : this.endedAt,
+    interventionLevelMax: interventionLevelMax ?? this.interventionLevelMax,
+    shieldUsed: shieldUsed ?? this.shieldUsed,
+    bundleUsed: bundleUsed ?? this.bundleUsed,
+    escapeUsed: escapeUsed ?? this.escapeUsed,
+    userCorrection: userCorrection.present
+        ? userCorrection.value
+        : this.userCorrection,
+    linkedTaskId: linkedTaskId.present ? linkedTaskId.value : this.linkedTaskId,
+    experimentAssignmentId: experimentAssignmentId.present
+        ? experimentAssignmentId.value
+        : this.experimentAssignmentId,
+    provenanceJson: provenanceJson ?? this.provenanceJson,
+  );
+  ActivationEpisodeRow copyWithCompanion(ActivationEpisodesCompanion data) {
+    return ActivationEpisodeRow(
+      id: data.id.present ? data.id.value : this.id,
+      profileId: data.profileId.present ? data.profileId.value : this.profileId,
+      protocolId: data.protocolId.present
+          ? data.protocolId.value
+          : this.protocolId,
+      protocolVersion: data.protocolVersion.present
+          ? data.protocolVersion.value
+          : this.protocolVersion,
+      triggerType: data.triggerType.present
+          ? data.triggerType.value
+          : this.triggerType,
+      hypothesisType: data.hypothesisType.present
+          ? data.hypothesisType.value
+          : this.hypothesisType,
+      hypothesisConfidence: data.hypothesisConfidence.present
+          ? data.hypothesisConfidence.value
+          : this.hypothesisConfidence,
+      capacityMode: data.capacityMode.present
+          ? data.capacityMode.value
+          : this.capacityMode,
+      initialStateJson: data.initialStateJson.present
+          ? data.initialStateJson.value
+          : this.initialStateJson,
+      targetStateJson: data.targetStateJson.present
+          ? data.targetStateJson.value
+          : this.targetStateJson,
+      status: data.status.present ? data.status.value : this.status,
+      startedAt: data.startedAt.present ? data.startedAt.value : this.startedAt,
+      firstMotionAt: data.firstMotionAt.present
+          ? data.firstMotionAt.value
+          : this.firstMotionAt,
+      releasedAt: data.releasedAt.present
+          ? data.releasedAt.value
+          : this.releasedAt,
+      endedAt: data.endedAt.present ? data.endedAt.value : this.endedAt,
+      interventionLevelMax: data.interventionLevelMax.present
+          ? data.interventionLevelMax.value
+          : this.interventionLevelMax,
+      shieldUsed: data.shieldUsed.present
+          ? data.shieldUsed.value
+          : this.shieldUsed,
+      bundleUsed: data.bundleUsed.present
+          ? data.bundleUsed.value
+          : this.bundleUsed,
+      escapeUsed: data.escapeUsed.present
+          ? data.escapeUsed.value
+          : this.escapeUsed,
+      userCorrection: data.userCorrection.present
+          ? data.userCorrection.value
+          : this.userCorrection,
+      linkedTaskId: data.linkedTaskId.present
+          ? data.linkedTaskId.value
+          : this.linkedTaskId,
+      experimentAssignmentId: data.experimentAssignmentId.present
+          ? data.experimentAssignmentId.value
+          : this.experimentAssignmentId,
+      provenanceJson: data.provenanceJson.present
+          ? data.provenanceJson.value
+          : this.provenanceJson,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ActivationEpisodeRow(')
+          ..write('id: $id, ')
+          ..write('profileId: $profileId, ')
+          ..write('protocolId: $protocolId, ')
+          ..write('protocolVersion: $protocolVersion, ')
+          ..write('triggerType: $triggerType, ')
+          ..write('hypothesisType: $hypothesisType, ')
+          ..write('hypothesisConfidence: $hypothesisConfidence, ')
+          ..write('capacityMode: $capacityMode, ')
+          ..write('initialStateJson: $initialStateJson, ')
+          ..write('targetStateJson: $targetStateJson, ')
+          ..write('status: $status, ')
+          ..write('startedAt: $startedAt, ')
+          ..write('firstMotionAt: $firstMotionAt, ')
+          ..write('releasedAt: $releasedAt, ')
+          ..write('endedAt: $endedAt, ')
+          ..write('interventionLevelMax: $interventionLevelMax, ')
+          ..write('shieldUsed: $shieldUsed, ')
+          ..write('bundleUsed: $bundleUsed, ')
+          ..write('escapeUsed: $escapeUsed, ')
+          ..write('userCorrection: $userCorrection, ')
+          ..write('linkedTaskId: $linkedTaskId, ')
+          ..write('experimentAssignmentId: $experimentAssignmentId, ')
+          ..write('provenanceJson: $provenanceJson')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hashAll([
+    id,
+    profileId,
+    protocolId,
+    protocolVersion,
+    triggerType,
+    hypothesisType,
+    hypothesisConfidence,
+    capacityMode,
+    initialStateJson,
+    targetStateJson,
+    status,
+    startedAt,
+    firstMotionAt,
+    releasedAt,
+    endedAt,
+    interventionLevelMax,
+    shieldUsed,
+    bundleUsed,
+    escapeUsed,
+    userCorrection,
+    linkedTaskId,
+    experimentAssignmentId,
+    provenanceJson,
+  ]);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is ActivationEpisodeRow &&
+          other.id == this.id &&
+          other.profileId == this.profileId &&
+          other.protocolId == this.protocolId &&
+          other.protocolVersion == this.protocolVersion &&
+          other.triggerType == this.triggerType &&
+          other.hypothesisType == this.hypothesisType &&
+          other.hypothesisConfidence == this.hypothesisConfidence &&
+          other.capacityMode == this.capacityMode &&
+          other.initialStateJson == this.initialStateJson &&
+          other.targetStateJson == this.targetStateJson &&
+          other.status == this.status &&
+          other.startedAt == this.startedAt &&
+          other.firstMotionAt == this.firstMotionAt &&
+          other.releasedAt == this.releasedAt &&
+          other.endedAt == this.endedAt &&
+          other.interventionLevelMax == this.interventionLevelMax &&
+          other.shieldUsed == this.shieldUsed &&
+          other.bundleUsed == this.bundleUsed &&
+          other.escapeUsed == this.escapeUsed &&
+          other.userCorrection == this.userCorrection &&
+          other.linkedTaskId == this.linkedTaskId &&
+          other.experimentAssignmentId == this.experimentAssignmentId &&
+          other.provenanceJson == this.provenanceJson);
+}
+
+class ActivationEpisodesCompanion
+    extends UpdateCompanion<ActivationEpisodeRow> {
+  final Value<String> id;
+  final Value<String> profileId;
+  final Value<String?> protocolId;
+  final Value<int?> protocolVersion;
+  final Value<String> triggerType;
+  final Value<String?> hypothesisType;
+  final Value<double?> hypothesisConfidence;
+  final Value<String> capacityMode;
+  final Value<String> initialStateJson;
+  final Value<String> targetStateJson;
+  final Value<String> status;
+  final Value<int> startedAt;
+  final Value<int?> firstMotionAt;
+  final Value<int?> releasedAt;
+  final Value<int?> endedAt;
+  final Value<int> interventionLevelMax;
+  final Value<bool> shieldUsed;
+  final Value<bool> bundleUsed;
+  final Value<bool> escapeUsed;
+  final Value<String?> userCorrection;
+  final Value<String?> linkedTaskId;
+  final Value<String?> experimentAssignmentId;
+  final Value<String> provenanceJson;
+  final Value<int> rowid;
+  const ActivationEpisodesCompanion({
+    this.id = const Value.absent(),
+    this.profileId = const Value.absent(),
+    this.protocolId = const Value.absent(),
+    this.protocolVersion = const Value.absent(),
+    this.triggerType = const Value.absent(),
+    this.hypothesisType = const Value.absent(),
+    this.hypothesisConfidence = const Value.absent(),
+    this.capacityMode = const Value.absent(),
+    this.initialStateJson = const Value.absent(),
+    this.targetStateJson = const Value.absent(),
+    this.status = const Value.absent(),
+    this.startedAt = const Value.absent(),
+    this.firstMotionAt = const Value.absent(),
+    this.releasedAt = const Value.absent(),
+    this.endedAt = const Value.absent(),
+    this.interventionLevelMax = const Value.absent(),
+    this.shieldUsed = const Value.absent(),
+    this.bundleUsed = const Value.absent(),
+    this.escapeUsed = const Value.absent(),
+    this.userCorrection = const Value.absent(),
+    this.linkedTaskId = const Value.absent(),
+    this.experimentAssignmentId = const Value.absent(),
+    this.provenanceJson = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  ActivationEpisodesCompanion.insert({
+    required String id,
+    required String profileId,
+    this.protocolId = const Value.absent(),
+    this.protocolVersion = const Value.absent(),
+    required String triggerType,
+    this.hypothesisType = const Value.absent(),
+    this.hypothesisConfidence = const Value.absent(),
+    required String capacityMode,
+    required String initialStateJson,
+    required String targetStateJson,
+    required String status,
+    required int startedAt,
+    this.firstMotionAt = const Value.absent(),
+    this.releasedAt = const Value.absent(),
+    this.endedAt = const Value.absent(),
+    this.interventionLevelMax = const Value.absent(),
+    this.shieldUsed = const Value.absent(),
+    this.bundleUsed = const Value.absent(),
+    this.escapeUsed = const Value.absent(),
+    this.userCorrection = const Value.absent(),
+    this.linkedTaskId = const Value.absent(),
+    this.experimentAssignmentId = const Value.absent(),
+    required String provenanceJson,
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       profileId = Value(profileId),
+       triggerType = Value(triggerType),
+       capacityMode = Value(capacityMode),
+       initialStateJson = Value(initialStateJson),
+       targetStateJson = Value(targetStateJson),
+       status = Value(status),
+       startedAt = Value(startedAt),
+       provenanceJson = Value(provenanceJson);
+  static Insertable<ActivationEpisodeRow> custom({
+    Expression<String>? id,
+    Expression<String>? profileId,
+    Expression<String>? protocolId,
+    Expression<int>? protocolVersion,
+    Expression<String>? triggerType,
+    Expression<String>? hypothesisType,
+    Expression<double>? hypothesisConfidence,
+    Expression<String>? capacityMode,
+    Expression<String>? initialStateJson,
+    Expression<String>? targetStateJson,
+    Expression<String>? status,
+    Expression<int>? startedAt,
+    Expression<int>? firstMotionAt,
+    Expression<int>? releasedAt,
+    Expression<int>? endedAt,
+    Expression<int>? interventionLevelMax,
+    Expression<bool>? shieldUsed,
+    Expression<bool>? bundleUsed,
+    Expression<bool>? escapeUsed,
+    Expression<String>? userCorrection,
+    Expression<String>? linkedTaskId,
+    Expression<String>? experimentAssignmentId,
+    Expression<String>? provenanceJson,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (profileId != null) 'profile_id': profileId,
+      if (protocolId != null) 'protocol_id': protocolId,
+      if (protocolVersion != null) 'protocol_version': protocolVersion,
+      if (triggerType != null) 'trigger_type': triggerType,
+      if (hypothesisType != null) 'hypothesis_type': hypothesisType,
+      if (hypothesisConfidence != null)
+        'hypothesis_confidence': hypothesisConfidence,
+      if (capacityMode != null) 'capacity_mode': capacityMode,
+      if (initialStateJson != null) 'initial_state_json': initialStateJson,
+      if (targetStateJson != null) 'target_state_json': targetStateJson,
+      if (status != null) 'status': status,
+      if (startedAt != null) 'started_at': startedAt,
+      if (firstMotionAt != null) 'first_motion_at': firstMotionAt,
+      if (releasedAt != null) 'released_at': releasedAt,
+      if (endedAt != null) 'ended_at': endedAt,
+      if (interventionLevelMax != null)
+        'intervention_level_max': interventionLevelMax,
+      if (shieldUsed != null) 'shield_used': shieldUsed,
+      if (bundleUsed != null) 'bundle_used': bundleUsed,
+      if (escapeUsed != null) 'escape_used': escapeUsed,
+      if (userCorrection != null) 'user_correction': userCorrection,
+      if (linkedTaskId != null) 'linked_task_id': linkedTaskId,
+      if (experimentAssignmentId != null)
+        'experiment_assignment_id': experimentAssignmentId,
+      if (provenanceJson != null) 'provenance_json': provenanceJson,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  ActivationEpisodesCompanion copyWith({
+    Value<String>? id,
+    Value<String>? profileId,
+    Value<String?>? protocolId,
+    Value<int?>? protocolVersion,
+    Value<String>? triggerType,
+    Value<String?>? hypothesisType,
+    Value<double?>? hypothesisConfidence,
+    Value<String>? capacityMode,
+    Value<String>? initialStateJson,
+    Value<String>? targetStateJson,
+    Value<String>? status,
+    Value<int>? startedAt,
+    Value<int?>? firstMotionAt,
+    Value<int?>? releasedAt,
+    Value<int?>? endedAt,
+    Value<int>? interventionLevelMax,
+    Value<bool>? shieldUsed,
+    Value<bool>? bundleUsed,
+    Value<bool>? escapeUsed,
+    Value<String?>? userCorrection,
+    Value<String?>? linkedTaskId,
+    Value<String?>? experimentAssignmentId,
+    Value<String>? provenanceJson,
+    Value<int>? rowid,
+  }) {
+    return ActivationEpisodesCompanion(
+      id: id ?? this.id,
+      profileId: profileId ?? this.profileId,
+      protocolId: protocolId ?? this.protocolId,
+      protocolVersion: protocolVersion ?? this.protocolVersion,
+      triggerType: triggerType ?? this.triggerType,
+      hypothesisType: hypothesisType ?? this.hypothesisType,
+      hypothesisConfidence: hypothesisConfidence ?? this.hypothesisConfidence,
+      capacityMode: capacityMode ?? this.capacityMode,
+      initialStateJson: initialStateJson ?? this.initialStateJson,
+      targetStateJson: targetStateJson ?? this.targetStateJson,
+      status: status ?? this.status,
+      startedAt: startedAt ?? this.startedAt,
+      firstMotionAt: firstMotionAt ?? this.firstMotionAt,
+      releasedAt: releasedAt ?? this.releasedAt,
+      endedAt: endedAt ?? this.endedAt,
+      interventionLevelMax: interventionLevelMax ?? this.interventionLevelMax,
+      shieldUsed: shieldUsed ?? this.shieldUsed,
+      bundleUsed: bundleUsed ?? this.bundleUsed,
+      escapeUsed: escapeUsed ?? this.escapeUsed,
+      userCorrection: userCorrection ?? this.userCorrection,
+      linkedTaskId: linkedTaskId ?? this.linkedTaskId,
+      experimentAssignmentId:
+          experimentAssignmentId ?? this.experimentAssignmentId,
+      provenanceJson: provenanceJson ?? this.provenanceJson,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (profileId.present) {
+      map['profile_id'] = Variable<String>(profileId.value);
+    }
+    if (protocolId.present) {
+      map['protocol_id'] = Variable<String>(protocolId.value);
+    }
+    if (protocolVersion.present) {
+      map['protocol_version'] = Variable<int>(protocolVersion.value);
+    }
+    if (triggerType.present) {
+      map['trigger_type'] = Variable<String>(triggerType.value);
+    }
+    if (hypothesisType.present) {
+      map['hypothesis_type'] = Variable<String>(hypothesisType.value);
+    }
+    if (hypothesisConfidence.present) {
+      map['hypothesis_confidence'] = Variable<double>(
+        hypothesisConfidence.value,
+      );
+    }
+    if (capacityMode.present) {
+      map['capacity_mode'] = Variable<String>(capacityMode.value);
+    }
+    if (initialStateJson.present) {
+      map['initial_state_json'] = Variable<String>(initialStateJson.value);
+    }
+    if (targetStateJson.present) {
+      map['target_state_json'] = Variable<String>(targetStateJson.value);
+    }
+    if (status.present) {
+      map['status'] = Variable<String>(status.value);
+    }
+    if (startedAt.present) {
+      map['started_at'] = Variable<int>(startedAt.value);
+    }
+    if (firstMotionAt.present) {
+      map['first_motion_at'] = Variable<int>(firstMotionAt.value);
+    }
+    if (releasedAt.present) {
+      map['released_at'] = Variable<int>(releasedAt.value);
+    }
+    if (endedAt.present) {
+      map['ended_at'] = Variable<int>(endedAt.value);
+    }
+    if (interventionLevelMax.present) {
+      map['intervention_level_max'] = Variable<int>(interventionLevelMax.value);
+    }
+    if (shieldUsed.present) {
+      map['shield_used'] = Variable<bool>(shieldUsed.value);
+    }
+    if (bundleUsed.present) {
+      map['bundle_used'] = Variable<bool>(bundleUsed.value);
+    }
+    if (escapeUsed.present) {
+      map['escape_used'] = Variable<bool>(escapeUsed.value);
+    }
+    if (userCorrection.present) {
+      map['user_correction'] = Variable<String>(userCorrection.value);
+    }
+    if (linkedTaskId.present) {
+      map['linked_task_id'] = Variable<String>(linkedTaskId.value);
+    }
+    if (experimentAssignmentId.present) {
+      map['experiment_assignment_id'] = Variable<String>(
+        experimentAssignmentId.value,
+      );
+    }
+    if (provenanceJson.present) {
+      map['provenance_json'] = Variable<String>(provenanceJson.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ActivationEpisodesCompanion(')
+          ..write('id: $id, ')
+          ..write('profileId: $profileId, ')
+          ..write('protocolId: $protocolId, ')
+          ..write('protocolVersion: $protocolVersion, ')
+          ..write('triggerType: $triggerType, ')
+          ..write('hypothesisType: $hypothesisType, ')
+          ..write('hypothesisConfidence: $hypothesisConfidence, ')
+          ..write('capacityMode: $capacityMode, ')
+          ..write('initialStateJson: $initialStateJson, ')
+          ..write('targetStateJson: $targetStateJson, ')
+          ..write('status: $status, ')
+          ..write('startedAt: $startedAt, ')
+          ..write('firstMotionAt: $firstMotionAt, ')
+          ..write('releasedAt: $releasedAt, ')
+          ..write('endedAt: $endedAt, ')
+          ..write('interventionLevelMax: $interventionLevelMax, ')
+          ..write('shieldUsed: $shieldUsed, ')
+          ..write('bundleUsed: $bundleUsed, ')
+          ..write('escapeUsed: $escapeUsed, ')
+          ..write('userCorrection: $userCorrection, ')
+          ..write('linkedTaskId: $linkedTaskId, ')
+          ..write('experimentAssignmentId: $experimentAssignmentId, ')
+          ..write('provenanceJson: $provenanceJson, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $ActivationCommandRunsTable extends ActivationCommandRuns
+    with TableInfo<$ActivationCommandRunsTable, ActivationCommandRunRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $ActivationCommandRunsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _episodeIdMeta = const VerificationMeta(
+    'episodeId',
+  );
+  @override
+  late final GeneratedColumn<String> episodeId = GeneratedColumn<String>(
+    'episode_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES activation_episodes (id)',
+    ),
+  );
+  static const VerificationMeta _templateIdMeta = const VerificationMeta(
+    'templateId',
+  );
+  @override
+  late final GeneratedColumn<String> templateId = GeneratedColumn<String>(
+    'template_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _sequenceIndexMeta = const VerificationMeta(
+    'sequenceIndex',
+  );
+  @override
+  late final GeneratedColumn<int> sequenceIndex = GeneratedColumn<int>(
+    'sequence_index',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _instructionRenderedMeta =
+      const VerificationMeta('instructionRendered');
+  @override
+  late final GeneratedColumn<String> instructionRendered =
+      GeneratedColumn<String>(
+        'instruction_rendered',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: true,
+      );
+  static const VerificationMeta _statusMeta = const VerificationMeta('status');
+  @override
+  late final GeneratedColumn<String> status = GeneratedColumn<String>(
+    'status',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _presentedAtMeta = const VerificationMeta(
+    'presentedAt',
+  );
+  @override
+  late final GeneratedColumn<int> presentedAt = GeneratedColumn<int>(
+    'presented_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _firstSignalAtMeta = const VerificationMeta(
+    'firstSignalAt',
+  );
+  @override
+  late final GeneratedColumn<int> firstSignalAt = GeneratedColumn<int>(
+    'first_signal_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _confirmedAtMeta = const VerificationMeta(
+    'confirmedAt',
+  );
+  @override
+  late final GeneratedColumn<int> confirmedAt = GeneratedColumn<int>(
+    'confirmed_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _skippedAtMeta = const VerificationMeta(
+    'skippedAt',
+  );
+  @override
+  late final GeneratedColumn<int> skippedAt = GeneratedColumn<int>(
+    'skipped_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _adaptedAtMeta = const VerificationMeta(
+    'adaptedAt',
+  );
+  @override
+  late final GeneratedColumn<int> adaptedAt = GeneratedColumn<int>(
+    'adapted_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _confirmationModeMeta = const VerificationMeta(
+    'confirmationMode',
+  );
+  @override
+  late final GeneratedColumn<String> confirmationMode = GeneratedColumn<String>(
+    'confirmation_mode',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _proofConfidenceMeta = const VerificationMeta(
+    'proofConfidence',
+  );
+  @override
+  late final GeneratedColumn<double> proofConfidence = GeneratedColumn<double>(
+    'proof_confidence',
+    aliasedName,
+    true,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _adaptationReasonMeta = const VerificationMeta(
+    'adaptationReason',
+  );
+  @override
+  late final GeneratedColumn<String> adaptationReason = GeneratedColumn<String>(
+    'adaptation_reason',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _isFirstMeaningfulActionMeta =
+      const VerificationMeta('isFirstMeaningfulAction');
+  @override
+  late final GeneratedColumn<bool> isFirstMeaningfulAction =
+      GeneratedColumn<bool>(
+        'is_first_meaningful_action',
+        aliasedName,
+        false,
+        type: DriftSqlType.bool,
+        requiredDuringInsert: false,
+        defaultConstraints: GeneratedColumn.constraintIsAlways(
+          'CHECK ("is_first_meaningful_action" IN (0, 1))',
+        ),
+        defaultValue: const Constant(false),
+      );
+  static const VerificationMeta _deepLinkMeta = const VerificationMeta(
+    'deepLink',
+  );
+  @override
+  late final GeneratedColumn<String> deepLink = GeneratedColumn<String>(
+    'deep_link',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _opensTaskIdMeta = const VerificationMeta(
+    'opensTaskId',
+  );
+  @override
+  late final GeneratedColumn<String> opensTaskId = GeneratedColumn<String>(
+    'opens_task_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    episodeId,
+    templateId,
+    sequenceIndex,
+    instructionRendered,
+    status,
+    presentedAt,
+    firstSignalAt,
+    confirmedAt,
+    skippedAt,
+    adaptedAt,
+    confirmationMode,
+    proofConfidence,
+    adaptationReason,
+    isFirstMeaningfulAction,
+    deepLink,
+    opensTaskId,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'activation_command_runs';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<ActivationCommandRunRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('episode_id')) {
+      context.handle(
+        _episodeIdMeta,
+        episodeId.isAcceptableOrUnknown(data['episode_id']!, _episodeIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_episodeIdMeta);
+    }
+    if (data.containsKey('template_id')) {
+      context.handle(
+        _templateIdMeta,
+        templateId.isAcceptableOrUnknown(data['template_id']!, _templateIdMeta),
+      );
+    }
+    if (data.containsKey('sequence_index')) {
+      context.handle(
+        _sequenceIndexMeta,
+        sequenceIndex.isAcceptableOrUnknown(
+          data['sequence_index']!,
+          _sequenceIndexMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_sequenceIndexMeta);
+    }
+    if (data.containsKey('instruction_rendered')) {
+      context.handle(
+        _instructionRenderedMeta,
+        instructionRendered.isAcceptableOrUnknown(
+          data['instruction_rendered']!,
+          _instructionRenderedMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_instructionRenderedMeta);
+    }
+    if (data.containsKey('status')) {
+      context.handle(
+        _statusMeta,
+        status.isAcceptableOrUnknown(data['status']!, _statusMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_statusMeta);
+    }
+    if (data.containsKey('presented_at')) {
+      context.handle(
+        _presentedAtMeta,
+        presentedAt.isAcceptableOrUnknown(
+          data['presented_at']!,
+          _presentedAtMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_presentedAtMeta);
+    }
+    if (data.containsKey('first_signal_at')) {
+      context.handle(
+        _firstSignalAtMeta,
+        firstSignalAt.isAcceptableOrUnknown(
+          data['first_signal_at']!,
+          _firstSignalAtMeta,
+        ),
+      );
+    }
+    if (data.containsKey('confirmed_at')) {
+      context.handle(
+        _confirmedAtMeta,
+        confirmedAt.isAcceptableOrUnknown(
+          data['confirmed_at']!,
+          _confirmedAtMeta,
+        ),
+      );
+    }
+    if (data.containsKey('skipped_at')) {
+      context.handle(
+        _skippedAtMeta,
+        skippedAt.isAcceptableOrUnknown(data['skipped_at']!, _skippedAtMeta),
+      );
+    }
+    if (data.containsKey('adapted_at')) {
+      context.handle(
+        _adaptedAtMeta,
+        adaptedAt.isAcceptableOrUnknown(data['adapted_at']!, _adaptedAtMeta),
+      );
+    }
+    if (data.containsKey('confirmation_mode')) {
+      context.handle(
+        _confirmationModeMeta,
+        confirmationMode.isAcceptableOrUnknown(
+          data['confirmation_mode']!,
+          _confirmationModeMeta,
+        ),
+      );
+    }
+    if (data.containsKey('proof_confidence')) {
+      context.handle(
+        _proofConfidenceMeta,
+        proofConfidence.isAcceptableOrUnknown(
+          data['proof_confidence']!,
+          _proofConfidenceMeta,
+        ),
+      );
+    }
+    if (data.containsKey('adaptation_reason')) {
+      context.handle(
+        _adaptationReasonMeta,
+        adaptationReason.isAcceptableOrUnknown(
+          data['adaptation_reason']!,
+          _adaptationReasonMeta,
+        ),
+      );
+    }
+    if (data.containsKey('is_first_meaningful_action')) {
+      context.handle(
+        _isFirstMeaningfulActionMeta,
+        isFirstMeaningfulAction.isAcceptableOrUnknown(
+          data['is_first_meaningful_action']!,
+          _isFirstMeaningfulActionMeta,
+        ),
+      );
+    }
+    if (data.containsKey('deep_link')) {
+      context.handle(
+        _deepLinkMeta,
+        deepLink.isAcceptableOrUnknown(data['deep_link']!, _deepLinkMeta),
+      );
+    }
+    if (data.containsKey('opens_task_id')) {
+      context.handle(
+        _opensTaskIdMeta,
+        opensTaskId.isAcceptableOrUnknown(
+          data['opens_task_id']!,
+          _opensTaskIdMeta,
+        ),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  ActivationCommandRunRow map(
+    Map<String, dynamic> data, {
+    String? tablePrefix,
+  }) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return ActivationCommandRunRow(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      episodeId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}episode_id'],
+      )!,
+      templateId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}template_id'],
+      ),
+      sequenceIndex: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}sequence_index'],
+      )!,
+      instructionRendered: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}instruction_rendered'],
+      )!,
+      status: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}status'],
+      )!,
+      presentedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}presented_at'],
+      )!,
+      firstSignalAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}first_signal_at'],
+      ),
+      confirmedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}confirmed_at'],
+      ),
+      skippedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}skipped_at'],
+      ),
+      adaptedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}adapted_at'],
+      ),
+      confirmationMode: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}confirmation_mode'],
+      ),
+      proofConfidence: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}proof_confidence'],
+      ),
+      adaptationReason: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}adaptation_reason'],
+      ),
+      isFirstMeaningfulAction: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}is_first_meaningful_action'],
+      )!,
+      deepLink: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}deep_link'],
+      ),
+      opensTaskId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}opens_task_id'],
+      ),
+    );
+  }
+
+  @override
+  $ActivationCommandRunsTable createAlias(String alias) {
+    return $ActivationCommandRunsTable(attachedDatabase, alias);
+  }
+}
+
+class ActivationCommandRunRow extends DataClass
+    implements Insertable<ActivationCommandRunRow> {
+  final String id;
+  final String episodeId;
+  final String? templateId;
+  final int sequenceIndex;
+  final String instructionRendered;
+  final String status;
+  final int presentedAt;
+  final int? firstSignalAt;
+  final int? confirmedAt;
+  final int? skippedAt;
+  final int? adaptedAt;
+  final String? confirmationMode;
+  final double? proofConfidence;
+  final String? adaptationReason;
+  final bool isFirstMeaningfulAction;
+  final String? deepLink;
+  final String? opensTaskId;
+  const ActivationCommandRunRow({
+    required this.id,
+    required this.episodeId,
+    this.templateId,
+    required this.sequenceIndex,
+    required this.instructionRendered,
+    required this.status,
+    required this.presentedAt,
+    this.firstSignalAt,
+    this.confirmedAt,
+    this.skippedAt,
+    this.adaptedAt,
+    this.confirmationMode,
+    this.proofConfidence,
+    this.adaptationReason,
+    required this.isFirstMeaningfulAction,
+    this.deepLink,
+    this.opensTaskId,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['episode_id'] = Variable<String>(episodeId);
+    if (!nullToAbsent || templateId != null) {
+      map['template_id'] = Variable<String>(templateId);
+    }
+    map['sequence_index'] = Variable<int>(sequenceIndex);
+    map['instruction_rendered'] = Variable<String>(instructionRendered);
+    map['status'] = Variable<String>(status);
+    map['presented_at'] = Variable<int>(presentedAt);
+    if (!nullToAbsent || firstSignalAt != null) {
+      map['first_signal_at'] = Variable<int>(firstSignalAt);
+    }
+    if (!nullToAbsent || confirmedAt != null) {
+      map['confirmed_at'] = Variable<int>(confirmedAt);
+    }
+    if (!nullToAbsent || skippedAt != null) {
+      map['skipped_at'] = Variable<int>(skippedAt);
+    }
+    if (!nullToAbsent || adaptedAt != null) {
+      map['adapted_at'] = Variable<int>(adaptedAt);
+    }
+    if (!nullToAbsent || confirmationMode != null) {
+      map['confirmation_mode'] = Variable<String>(confirmationMode);
+    }
+    if (!nullToAbsent || proofConfidence != null) {
+      map['proof_confidence'] = Variable<double>(proofConfidence);
+    }
+    if (!nullToAbsent || adaptationReason != null) {
+      map['adaptation_reason'] = Variable<String>(adaptationReason);
+    }
+    map['is_first_meaningful_action'] = Variable<bool>(isFirstMeaningfulAction);
+    if (!nullToAbsent || deepLink != null) {
+      map['deep_link'] = Variable<String>(deepLink);
+    }
+    if (!nullToAbsent || opensTaskId != null) {
+      map['opens_task_id'] = Variable<String>(opensTaskId);
+    }
+    return map;
+  }
+
+  ActivationCommandRunsCompanion toCompanion(bool nullToAbsent) {
+    return ActivationCommandRunsCompanion(
+      id: Value(id),
+      episodeId: Value(episodeId),
+      templateId: templateId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(templateId),
+      sequenceIndex: Value(sequenceIndex),
+      instructionRendered: Value(instructionRendered),
+      status: Value(status),
+      presentedAt: Value(presentedAt),
+      firstSignalAt: firstSignalAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(firstSignalAt),
+      confirmedAt: confirmedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(confirmedAt),
+      skippedAt: skippedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(skippedAt),
+      adaptedAt: adaptedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(adaptedAt),
+      confirmationMode: confirmationMode == null && nullToAbsent
+          ? const Value.absent()
+          : Value(confirmationMode),
+      proofConfidence: proofConfidence == null && nullToAbsent
+          ? const Value.absent()
+          : Value(proofConfidence),
+      adaptationReason: adaptationReason == null && nullToAbsent
+          ? const Value.absent()
+          : Value(adaptationReason),
+      isFirstMeaningfulAction: Value(isFirstMeaningfulAction),
+      deepLink: deepLink == null && nullToAbsent
+          ? const Value.absent()
+          : Value(deepLink),
+      opensTaskId: opensTaskId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(opensTaskId),
+    );
+  }
+
+  factory ActivationCommandRunRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return ActivationCommandRunRow(
+      id: serializer.fromJson<String>(json['id']),
+      episodeId: serializer.fromJson<String>(json['episodeId']),
+      templateId: serializer.fromJson<String?>(json['templateId']),
+      sequenceIndex: serializer.fromJson<int>(json['sequenceIndex']),
+      instructionRendered: serializer.fromJson<String>(
+        json['instructionRendered'],
+      ),
+      status: serializer.fromJson<String>(json['status']),
+      presentedAt: serializer.fromJson<int>(json['presentedAt']),
+      firstSignalAt: serializer.fromJson<int?>(json['firstSignalAt']),
+      confirmedAt: serializer.fromJson<int?>(json['confirmedAt']),
+      skippedAt: serializer.fromJson<int?>(json['skippedAt']),
+      adaptedAt: serializer.fromJson<int?>(json['adaptedAt']),
+      confirmationMode: serializer.fromJson<String?>(json['confirmationMode']),
+      proofConfidence: serializer.fromJson<double?>(json['proofConfidence']),
+      adaptationReason: serializer.fromJson<String?>(json['adaptationReason']),
+      isFirstMeaningfulAction: serializer.fromJson<bool>(
+        json['isFirstMeaningfulAction'],
+      ),
+      deepLink: serializer.fromJson<String?>(json['deepLink']),
+      opensTaskId: serializer.fromJson<String?>(json['opensTaskId']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'episodeId': serializer.toJson<String>(episodeId),
+      'templateId': serializer.toJson<String?>(templateId),
+      'sequenceIndex': serializer.toJson<int>(sequenceIndex),
+      'instructionRendered': serializer.toJson<String>(instructionRendered),
+      'status': serializer.toJson<String>(status),
+      'presentedAt': serializer.toJson<int>(presentedAt),
+      'firstSignalAt': serializer.toJson<int?>(firstSignalAt),
+      'confirmedAt': serializer.toJson<int?>(confirmedAt),
+      'skippedAt': serializer.toJson<int?>(skippedAt),
+      'adaptedAt': serializer.toJson<int?>(adaptedAt),
+      'confirmationMode': serializer.toJson<String?>(confirmationMode),
+      'proofConfidence': serializer.toJson<double?>(proofConfidence),
+      'adaptationReason': serializer.toJson<String?>(adaptationReason),
+      'isFirstMeaningfulAction': serializer.toJson<bool>(
+        isFirstMeaningfulAction,
+      ),
+      'deepLink': serializer.toJson<String?>(deepLink),
+      'opensTaskId': serializer.toJson<String?>(opensTaskId),
+    };
+  }
+
+  ActivationCommandRunRow copyWith({
+    String? id,
+    String? episodeId,
+    Value<String?> templateId = const Value.absent(),
+    int? sequenceIndex,
+    String? instructionRendered,
+    String? status,
+    int? presentedAt,
+    Value<int?> firstSignalAt = const Value.absent(),
+    Value<int?> confirmedAt = const Value.absent(),
+    Value<int?> skippedAt = const Value.absent(),
+    Value<int?> adaptedAt = const Value.absent(),
+    Value<String?> confirmationMode = const Value.absent(),
+    Value<double?> proofConfidence = const Value.absent(),
+    Value<String?> adaptationReason = const Value.absent(),
+    bool? isFirstMeaningfulAction,
+    Value<String?> deepLink = const Value.absent(),
+    Value<String?> opensTaskId = const Value.absent(),
+  }) => ActivationCommandRunRow(
+    id: id ?? this.id,
+    episodeId: episodeId ?? this.episodeId,
+    templateId: templateId.present ? templateId.value : this.templateId,
+    sequenceIndex: sequenceIndex ?? this.sequenceIndex,
+    instructionRendered: instructionRendered ?? this.instructionRendered,
+    status: status ?? this.status,
+    presentedAt: presentedAt ?? this.presentedAt,
+    firstSignalAt: firstSignalAt.present
+        ? firstSignalAt.value
+        : this.firstSignalAt,
+    confirmedAt: confirmedAt.present ? confirmedAt.value : this.confirmedAt,
+    skippedAt: skippedAt.present ? skippedAt.value : this.skippedAt,
+    adaptedAt: adaptedAt.present ? adaptedAt.value : this.adaptedAt,
+    confirmationMode: confirmationMode.present
+        ? confirmationMode.value
+        : this.confirmationMode,
+    proofConfidence: proofConfidence.present
+        ? proofConfidence.value
+        : this.proofConfidence,
+    adaptationReason: adaptationReason.present
+        ? adaptationReason.value
+        : this.adaptationReason,
+    isFirstMeaningfulAction:
+        isFirstMeaningfulAction ?? this.isFirstMeaningfulAction,
+    deepLink: deepLink.present ? deepLink.value : this.deepLink,
+    opensTaskId: opensTaskId.present ? opensTaskId.value : this.opensTaskId,
+  );
+  ActivationCommandRunRow copyWithCompanion(
+    ActivationCommandRunsCompanion data,
+  ) {
+    return ActivationCommandRunRow(
+      id: data.id.present ? data.id.value : this.id,
+      episodeId: data.episodeId.present ? data.episodeId.value : this.episodeId,
+      templateId: data.templateId.present
+          ? data.templateId.value
+          : this.templateId,
+      sequenceIndex: data.sequenceIndex.present
+          ? data.sequenceIndex.value
+          : this.sequenceIndex,
+      instructionRendered: data.instructionRendered.present
+          ? data.instructionRendered.value
+          : this.instructionRendered,
+      status: data.status.present ? data.status.value : this.status,
+      presentedAt: data.presentedAt.present
+          ? data.presentedAt.value
+          : this.presentedAt,
+      firstSignalAt: data.firstSignalAt.present
+          ? data.firstSignalAt.value
+          : this.firstSignalAt,
+      confirmedAt: data.confirmedAt.present
+          ? data.confirmedAt.value
+          : this.confirmedAt,
+      skippedAt: data.skippedAt.present ? data.skippedAt.value : this.skippedAt,
+      adaptedAt: data.adaptedAt.present ? data.adaptedAt.value : this.adaptedAt,
+      confirmationMode: data.confirmationMode.present
+          ? data.confirmationMode.value
+          : this.confirmationMode,
+      proofConfidence: data.proofConfidence.present
+          ? data.proofConfidence.value
+          : this.proofConfidence,
+      adaptationReason: data.adaptationReason.present
+          ? data.adaptationReason.value
+          : this.adaptationReason,
+      isFirstMeaningfulAction: data.isFirstMeaningfulAction.present
+          ? data.isFirstMeaningfulAction.value
+          : this.isFirstMeaningfulAction,
+      deepLink: data.deepLink.present ? data.deepLink.value : this.deepLink,
+      opensTaskId: data.opensTaskId.present
+          ? data.opensTaskId.value
+          : this.opensTaskId,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ActivationCommandRunRow(')
+          ..write('id: $id, ')
+          ..write('episodeId: $episodeId, ')
+          ..write('templateId: $templateId, ')
+          ..write('sequenceIndex: $sequenceIndex, ')
+          ..write('instructionRendered: $instructionRendered, ')
+          ..write('status: $status, ')
+          ..write('presentedAt: $presentedAt, ')
+          ..write('firstSignalAt: $firstSignalAt, ')
+          ..write('confirmedAt: $confirmedAt, ')
+          ..write('skippedAt: $skippedAt, ')
+          ..write('adaptedAt: $adaptedAt, ')
+          ..write('confirmationMode: $confirmationMode, ')
+          ..write('proofConfidence: $proofConfidence, ')
+          ..write('adaptationReason: $adaptationReason, ')
+          ..write('isFirstMeaningfulAction: $isFirstMeaningfulAction, ')
+          ..write('deepLink: $deepLink, ')
+          ..write('opensTaskId: $opensTaskId')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    episodeId,
+    templateId,
+    sequenceIndex,
+    instructionRendered,
+    status,
+    presentedAt,
+    firstSignalAt,
+    confirmedAt,
+    skippedAt,
+    adaptedAt,
+    confirmationMode,
+    proofConfidence,
+    adaptationReason,
+    isFirstMeaningfulAction,
+    deepLink,
+    opensTaskId,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is ActivationCommandRunRow &&
+          other.id == this.id &&
+          other.episodeId == this.episodeId &&
+          other.templateId == this.templateId &&
+          other.sequenceIndex == this.sequenceIndex &&
+          other.instructionRendered == this.instructionRendered &&
+          other.status == this.status &&
+          other.presentedAt == this.presentedAt &&
+          other.firstSignalAt == this.firstSignalAt &&
+          other.confirmedAt == this.confirmedAt &&
+          other.skippedAt == this.skippedAt &&
+          other.adaptedAt == this.adaptedAt &&
+          other.confirmationMode == this.confirmationMode &&
+          other.proofConfidence == this.proofConfidence &&
+          other.adaptationReason == this.adaptationReason &&
+          other.isFirstMeaningfulAction == this.isFirstMeaningfulAction &&
+          other.deepLink == this.deepLink &&
+          other.opensTaskId == this.opensTaskId);
+}
+
+class ActivationCommandRunsCompanion
+    extends UpdateCompanion<ActivationCommandRunRow> {
+  final Value<String> id;
+  final Value<String> episodeId;
+  final Value<String?> templateId;
+  final Value<int> sequenceIndex;
+  final Value<String> instructionRendered;
+  final Value<String> status;
+  final Value<int> presentedAt;
+  final Value<int?> firstSignalAt;
+  final Value<int?> confirmedAt;
+  final Value<int?> skippedAt;
+  final Value<int?> adaptedAt;
+  final Value<String?> confirmationMode;
+  final Value<double?> proofConfidence;
+  final Value<String?> adaptationReason;
+  final Value<bool> isFirstMeaningfulAction;
+  final Value<String?> deepLink;
+  final Value<String?> opensTaskId;
+  final Value<int> rowid;
+  const ActivationCommandRunsCompanion({
+    this.id = const Value.absent(),
+    this.episodeId = const Value.absent(),
+    this.templateId = const Value.absent(),
+    this.sequenceIndex = const Value.absent(),
+    this.instructionRendered = const Value.absent(),
+    this.status = const Value.absent(),
+    this.presentedAt = const Value.absent(),
+    this.firstSignalAt = const Value.absent(),
+    this.confirmedAt = const Value.absent(),
+    this.skippedAt = const Value.absent(),
+    this.adaptedAt = const Value.absent(),
+    this.confirmationMode = const Value.absent(),
+    this.proofConfidence = const Value.absent(),
+    this.adaptationReason = const Value.absent(),
+    this.isFirstMeaningfulAction = const Value.absent(),
+    this.deepLink = const Value.absent(),
+    this.opensTaskId = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  ActivationCommandRunsCompanion.insert({
+    required String id,
+    required String episodeId,
+    this.templateId = const Value.absent(),
+    required int sequenceIndex,
+    required String instructionRendered,
+    required String status,
+    required int presentedAt,
+    this.firstSignalAt = const Value.absent(),
+    this.confirmedAt = const Value.absent(),
+    this.skippedAt = const Value.absent(),
+    this.adaptedAt = const Value.absent(),
+    this.confirmationMode = const Value.absent(),
+    this.proofConfidence = const Value.absent(),
+    this.adaptationReason = const Value.absent(),
+    this.isFirstMeaningfulAction = const Value.absent(),
+    this.deepLink = const Value.absent(),
+    this.opensTaskId = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       episodeId = Value(episodeId),
+       sequenceIndex = Value(sequenceIndex),
+       instructionRendered = Value(instructionRendered),
+       status = Value(status),
+       presentedAt = Value(presentedAt);
+  static Insertable<ActivationCommandRunRow> custom({
+    Expression<String>? id,
+    Expression<String>? episodeId,
+    Expression<String>? templateId,
+    Expression<int>? sequenceIndex,
+    Expression<String>? instructionRendered,
+    Expression<String>? status,
+    Expression<int>? presentedAt,
+    Expression<int>? firstSignalAt,
+    Expression<int>? confirmedAt,
+    Expression<int>? skippedAt,
+    Expression<int>? adaptedAt,
+    Expression<String>? confirmationMode,
+    Expression<double>? proofConfidence,
+    Expression<String>? adaptationReason,
+    Expression<bool>? isFirstMeaningfulAction,
+    Expression<String>? deepLink,
+    Expression<String>? opensTaskId,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (episodeId != null) 'episode_id': episodeId,
+      if (templateId != null) 'template_id': templateId,
+      if (sequenceIndex != null) 'sequence_index': sequenceIndex,
+      if (instructionRendered != null)
+        'instruction_rendered': instructionRendered,
+      if (status != null) 'status': status,
+      if (presentedAt != null) 'presented_at': presentedAt,
+      if (firstSignalAt != null) 'first_signal_at': firstSignalAt,
+      if (confirmedAt != null) 'confirmed_at': confirmedAt,
+      if (skippedAt != null) 'skipped_at': skippedAt,
+      if (adaptedAt != null) 'adapted_at': adaptedAt,
+      if (confirmationMode != null) 'confirmation_mode': confirmationMode,
+      if (proofConfidence != null) 'proof_confidence': proofConfidence,
+      if (adaptationReason != null) 'adaptation_reason': adaptationReason,
+      if (isFirstMeaningfulAction != null)
+        'is_first_meaningful_action': isFirstMeaningfulAction,
+      if (deepLink != null) 'deep_link': deepLink,
+      if (opensTaskId != null) 'opens_task_id': opensTaskId,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  ActivationCommandRunsCompanion copyWith({
+    Value<String>? id,
+    Value<String>? episodeId,
+    Value<String?>? templateId,
+    Value<int>? sequenceIndex,
+    Value<String>? instructionRendered,
+    Value<String>? status,
+    Value<int>? presentedAt,
+    Value<int?>? firstSignalAt,
+    Value<int?>? confirmedAt,
+    Value<int?>? skippedAt,
+    Value<int?>? adaptedAt,
+    Value<String?>? confirmationMode,
+    Value<double?>? proofConfidence,
+    Value<String?>? adaptationReason,
+    Value<bool>? isFirstMeaningfulAction,
+    Value<String?>? deepLink,
+    Value<String?>? opensTaskId,
+    Value<int>? rowid,
+  }) {
+    return ActivationCommandRunsCompanion(
+      id: id ?? this.id,
+      episodeId: episodeId ?? this.episodeId,
+      templateId: templateId ?? this.templateId,
+      sequenceIndex: sequenceIndex ?? this.sequenceIndex,
+      instructionRendered: instructionRendered ?? this.instructionRendered,
+      status: status ?? this.status,
+      presentedAt: presentedAt ?? this.presentedAt,
+      firstSignalAt: firstSignalAt ?? this.firstSignalAt,
+      confirmedAt: confirmedAt ?? this.confirmedAt,
+      skippedAt: skippedAt ?? this.skippedAt,
+      adaptedAt: adaptedAt ?? this.adaptedAt,
+      confirmationMode: confirmationMode ?? this.confirmationMode,
+      proofConfidence: proofConfidence ?? this.proofConfidence,
+      adaptationReason: adaptationReason ?? this.adaptationReason,
+      isFirstMeaningfulAction:
+          isFirstMeaningfulAction ?? this.isFirstMeaningfulAction,
+      deepLink: deepLink ?? this.deepLink,
+      opensTaskId: opensTaskId ?? this.opensTaskId,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (episodeId.present) {
+      map['episode_id'] = Variable<String>(episodeId.value);
+    }
+    if (templateId.present) {
+      map['template_id'] = Variable<String>(templateId.value);
+    }
+    if (sequenceIndex.present) {
+      map['sequence_index'] = Variable<int>(sequenceIndex.value);
+    }
+    if (instructionRendered.present) {
+      map['instruction_rendered'] = Variable<String>(instructionRendered.value);
+    }
+    if (status.present) {
+      map['status'] = Variable<String>(status.value);
+    }
+    if (presentedAt.present) {
+      map['presented_at'] = Variable<int>(presentedAt.value);
+    }
+    if (firstSignalAt.present) {
+      map['first_signal_at'] = Variable<int>(firstSignalAt.value);
+    }
+    if (confirmedAt.present) {
+      map['confirmed_at'] = Variable<int>(confirmedAt.value);
+    }
+    if (skippedAt.present) {
+      map['skipped_at'] = Variable<int>(skippedAt.value);
+    }
+    if (adaptedAt.present) {
+      map['adapted_at'] = Variable<int>(adaptedAt.value);
+    }
+    if (confirmationMode.present) {
+      map['confirmation_mode'] = Variable<String>(confirmationMode.value);
+    }
+    if (proofConfidence.present) {
+      map['proof_confidence'] = Variable<double>(proofConfidence.value);
+    }
+    if (adaptationReason.present) {
+      map['adaptation_reason'] = Variable<String>(adaptationReason.value);
+    }
+    if (isFirstMeaningfulAction.present) {
+      map['is_first_meaningful_action'] = Variable<bool>(
+        isFirstMeaningfulAction.value,
+      );
+    }
+    if (deepLink.present) {
+      map['deep_link'] = Variable<String>(deepLink.value);
+    }
+    if (opensTaskId.present) {
+      map['opens_task_id'] = Variable<String>(opensTaskId.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ActivationCommandRunsCompanion(')
+          ..write('id: $id, ')
+          ..write('episodeId: $episodeId, ')
+          ..write('templateId: $templateId, ')
+          ..write('sequenceIndex: $sequenceIndex, ')
+          ..write('instructionRendered: $instructionRendered, ')
+          ..write('status: $status, ')
+          ..write('presentedAt: $presentedAt, ')
+          ..write('firstSignalAt: $firstSignalAt, ')
+          ..write('confirmedAt: $confirmedAt, ')
+          ..write('skippedAt: $skippedAt, ')
+          ..write('adaptedAt: $adaptedAt, ')
+          ..write('confirmationMode: $confirmationMode, ')
+          ..write('proofConfidence: $proofConfidence, ')
+          ..write('adaptationReason: $adaptationReason, ')
+          ..write('isFirstMeaningfulAction: $isFirstMeaningfulAction, ')
+          ..write('deepLink: $deepLink, ')
+          ..write('opensTaskId: $opensTaskId, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $ActivationProofsTable extends ActivationProofs
+    with TableInfo<$ActivationProofsTable, ActivationProofRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $ActivationProofsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _episodeIdMeta = const VerificationMeta(
+    'episodeId',
+  );
+  @override
+  late final GeneratedColumn<String> episodeId = GeneratedColumn<String>(
+    'episode_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES activation_episodes (id)',
+    ),
+  );
+  static const VerificationMeta _commandRunIdMeta = const VerificationMeta(
+    'commandRunId',
+  );
+  @override
+  late final GeneratedColumn<String> commandRunId = GeneratedColumn<String>(
+    'command_run_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _proofTypeMeta = const VerificationMeta(
+    'proofType',
+  );
+  @override
+  late final GeneratedColumn<String> proofType = GeneratedColumn<String>(
+    'proof_type',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _observedAtMeta = const VerificationMeta(
+    'observedAt',
+  );
+  @override
+  late final GeneratedColumn<int> observedAt = GeneratedColumn<int>(
+    'observed_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _sourceMeta = const VerificationMeta('source');
+  @override
+  late final GeneratedColumn<String> source = GeneratedColumn<String>(
+    'source',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _confidenceMeta = const VerificationMeta(
+    'confidence',
+  );
+  @override
+  late final GeneratedColumn<double> confidence = GeneratedColumn<double>(
+    'confidence',
+    aliasedName,
+    false,
+    type: DriftSqlType.double,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _privacyClassMeta = const VerificationMeta(
+    'privacyClass',
+  );
+  @override
+  late final GeneratedColumn<String> privacyClass = GeneratedColumn<String>(
+    'privacy_class',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _interpretationJsonMeta =
+      const VerificationMeta('interpretationJson');
+  @override
+  late final GeneratedColumn<String> interpretationJson =
+      GeneratedColumn<String>(
+        'interpretation_json',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+        defaultValue: const Constant('{}'),
+      );
+  static const VerificationMeta _rawReferenceMeta = const VerificationMeta(
+    'rawReference',
+  );
+  @override
+  late final GeneratedColumn<String> rawReference = GeneratedColumn<String>(
+    'raw_reference',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _userConfirmedMeta = const VerificationMeta(
+    'userConfirmed',
+  );
+  @override
+  late final GeneratedColumn<bool> userConfirmed = GeneratedColumn<bool>(
+    'user_confirmed',
+    aliasedName,
+    true,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("user_confirmed" IN (0, 1))',
+    ),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    episodeId,
+    commandRunId,
+    proofType,
+    observedAt,
+    source,
+    confidence,
+    privacyClass,
+    interpretationJson,
+    rawReference,
+    userConfirmed,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'activation_proofs';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<ActivationProofRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('episode_id')) {
+      context.handle(
+        _episodeIdMeta,
+        episodeId.isAcceptableOrUnknown(data['episode_id']!, _episodeIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_episodeIdMeta);
+    }
+    if (data.containsKey('command_run_id')) {
+      context.handle(
+        _commandRunIdMeta,
+        commandRunId.isAcceptableOrUnknown(
+          data['command_run_id']!,
+          _commandRunIdMeta,
+        ),
+      );
+    }
+    if (data.containsKey('proof_type')) {
+      context.handle(
+        _proofTypeMeta,
+        proofType.isAcceptableOrUnknown(data['proof_type']!, _proofTypeMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_proofTypeMeta);
+    }
+    if (data.containsKey('observed_at')) {
+      context.handle(
+        _observedAtMeta,
+        observedAt.isAcceptableOrUnknown(data['observed_at']!, _observedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_observedAtMeta);
+    }
+    if (data.containsKey('source')) {
+      context.handle(
+        _sourceMeta,
+        source.isAcceptableOrUnknown(data['source']!, _sourceMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_sourceMeta);
+    }
+    if (data.containsKey('confidence')) {
+      context.handle(
+        _confidenceMeta,
+        confidence.isAcceptableOrUnknown(data['confidence']!, _confidenceMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_confidenceMeta);
+    }
+    if (data.containsKey('privacy_class')) {
+      context.handle(
+        _privacyClassMeta,
+        privacyClass.isAcceptableOrUnknown(
+          data['privacy_class']!,
+          _privacyClassMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_privacyClassMeta);
+    }
+    if (data.containsKey('interpretation_json')) {
+      context.handle(
+        _interpretationJsonMeta,
+        interpretationJson.isAcceptableOrUnknown(
+          data['interpretation_json']!,
+          _interpretationJsonMeta,
+        ),
+      );
+    }
+    if (data.containsKey('raw_reference')) {
+      context.handle(
+        _rawReferenceMeta,
+        rawReference.isAcceptableOrUnknown(
+          data['raw_reference']!,
+          _rawReferenceMeta,
+        ),
+      );
+    }
+    if (data.containsKey('user_confirmed')) {
+      context.handle(
+        _userConfirmedMeta,
+        userConfirmed.isAcceptableOrUnknown(
+          data['user_confirmed']!,
+          _userConfirmedMeta,
+        ),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  ActivationProofRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return ActivationProofRow(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      episodeId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}episode_id'],
+      )!,
+      commandRunId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}command_run_id'],
+      ),
+      proofType: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}proof_type'],
+      )!,
+      observedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}observed_at'],
+      )!,
+      source: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}source'],
+      )!,
+      confidence: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}confidence'],
+      )!,
+      privacyClass: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}privacy_class'],
+      )!,
+      interpretationJson: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}interpretation_json'],
+      )!,
+      rawReference: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}raw_reference'],
+      ),
+      userConfirmed: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}user_confirmed'],
+      ),
+    );
+  }
+
+  @override
+  $ActivationProofsTable createAlias(String alias) {
+    return $ActivationProofsTable(attachedDatabase, alias);
+  }
+}
+
+class ActivationProofRow extends DataClass
+    implements Insertable<ActivationProofRow> {
+  final String id;
+  final String episodeId;
+  final String? commandRunId;
+  final String proofType;
+  final int observedAt;
+  final String source;
+  final double confidence;
+  final String privacyClass;
+  final String interpretationJson;
+  final String? rawReference;
+  final bool? userConfirmed;
+  const ActivationProofRow({
+    required this.id,
+    required this.episodeId,
+    this.commandRunId,
+    required this.proofType,
+    required this.observedAt,
+    required this.source,
+    required this.confidence,
+    required this.privacyClass,
+    required this.interpretationJson,
+    this.rawReference,
+    this.userConfirmed,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['episode_id'] = Variable<String>(episodeId);
+    if (!nullToAbsent || commandRunId != null) {
+      map['command_run_id'] = Variable<String>(commandRunId);
+    }
+    map['proof_type'] = Variable<String>(proofType);
+    map['observed_at'] = Variable<int>(observedAt);
+    map['source'] = Variable<String>(source);
+    map['confidence'] = Variable<double>(confidence);
+    map['privacy_class'] = Variable<String>(privacyClass);
+    map['interpretation_json'] = Variable<String>(interpretationJson);
+    if (!nullToAbsent || rawReference != null) {
+      map['raw_reference'] = Variable<String>(rawReference);
+    }
+    if (!nullToAbsent || userConfirmed != null) {
+      map['user_confirmed'] = Variable<bool>(userConfirmed);
+    }
+    return map;
+  }
+
+  ActivationProofsCompanion toCompanion(bool nullToAbsent) {
+    return ActivationProofsCompanion(
+      id: Value(id),
+      episodeId: Value(episodeId),
+      commandRunId: commandRunId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(commandRunId),
+      proofType: Value(proofType),
+      observedAt: Value(observedAt),
+      source: Value(source),
+      confidence: Value(confidence),
+      privacyClass: Value(privacyClass),
+      interpretationJson: Value(interpretationJson),
+      rawReference: rawReference == null && nullToAbsent
+          ? const Value.absent()
+          : Value(rawReference),
+      userConfirmed: userConfirmed == null && nullToAbsent
+          ? const Value.absent()
+          : Value(userConfirmed),
+    );
+  }
+
+  factory ActivationProofRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return ActivationProofRow(
+      id: serializer.fromJson<String>(json['id']),
+      episodeId: serializer.fromJson<String>(json['episodeId']),
+      commandRunId: serializer.fromJson<String?>(json['commandRunId']),
+      proofType: serializer.fromJson<String>(json['proofType']),
+      observedAt: serializer.fromJson<int>(json['observedAt']),
+      source: serializer.fromJson<String>(json['source']),
+      confidence: serializer.fromJson<double>(json['confidence']),
+      privacyClass: serializer.fromJson<String>(json['privacyClass']),
+      interpretationJson: serializer.fromJson<String>(
+        json['interpretationJson'],
+      ),
+      rawReference: serializer.fromJson<String?>(json['rawReference']),
+      userConfirmed: serializer.fromJson<bool?>(json['userConfirmed']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'episodeId': serializer.toJson<String>(episodeId),
+      'commandRunId': serializer.toJson<String?>(commandRunId),
+      'proofType': serializer.toJson<String>(proofType),
+      'observedAt': serializer.toJson<int>(observedAt),
+      'source': serializer.toJson<String>(source),
+      'confidence': serializer.toJson<double>(confidence),
+      'privacyClass': serializer.toJson<String>(privacyClass),
+      'interpretationJson': serializer.toJson<String>(interpretationJson),
+      'rawReference': serializer.toJson<String?>(rawReference),
+      'userConfirmed': serializer.toJson<bool?>(userConfirmed),
+    };
+  }
+
+  ActivationProofRow copyWith({
+    String? id,
+    String? episodeId,
+    Value<String?> commandRunId = const Value.absent(),
+    String? proofType,
+    int? observedAt,
+    String? source,
+    double? confidence,
+    String? privacyClass,
+    String? interpretationJson,
+    Value<String?> rawReference = const Value.absent(),
+    Value<bool?> userConfirmed = const Value.absent(),
+  }) => ActivationProofRow(
+    id: id ?? this.id,
+    episodeId: episodeId ?? this.episodeId,
+    commandRunId: commandRunId.present ? commandRunId.value : this.commandRunId,
+    proofType: proofType ?? this.proofType,
+    observedAt: observedAt ?? this.observedAt,
+    source: source ?? this.source,
+    confidence: confidence ?? this.confidence,
+    privacyClass: privacyClass ?? this.privacyClass,
+    interpretationJson: interpretationJson ?? this.interpretationJson,
+    rawReference: rawReference.present ? rawReference.value : this.rawReference,
+    userConfirmed: userConfirmed.present
+        ? userConfirmed.value
+        : this.userConfirmed,
+  );
+  ActivationProofRow copyWithCompanion(ActivationProofsCompanion data) {
+    return ActivationProofRow(
+      id: data.id.present ? data.id.value : this.id,
+      episodeId: data.episodeId.present ? data.episodeId.value : this.episodeId,
+      commandRunId: data.commandRunId.present
+          ? data.commandRunId.value
+          : this.commandRunId,
+      proofType: data.proofType.present ? data.proofType.value : this.proofType,
+      observedAt: data.observedAt.present
+          ? data.observedAt.value
+          : this.observedAt,
+      source: data.source.present ? data.source.value : this.source,
+      confidence: data.confidence.present
+          ? data.confidence.value
+          : this.confidence,
+      privacyClass: data.privacyClass.present
+          ? data.privacyClass.value
+          : this.privacyClass,
+      interpretationJson: data.interpretationJson.present
+          ? data.interpretationJson.value
+          : this.interpretationJson,
+      rawReference: data.rawReference.present
+          ? data.rawReference.value
+          : this.rawReference,
+      userConfirmed: data.userConfirmed.present
+          ? data.userConfirmed.value
+          : this.userConfirmed,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ActivationProofRow(')
+          ..write('id: $id, ')
+          ..write('episodeId: $episodeId, ')
+          ..write('commandRunId: $commandRunId, ')
+          ..write('proofType: $proofType, ')
+          ..write('observedAt: $observedAt, ')
+          ..write('source: $source, ')
+          ..write('confidence: $confidence, ')
+          ..write('privacyClass: $privacyClass, ')
+          ..write('interpretationJson: $interpretationJson, ')
+          ..write('rawReference: $rawReference, ')
+          ..write('userConfirmed: $userConfirmed')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    episodeId,
+    commandRunId,
+    proofType,
+    observedAt,
+    source,
+    confidence,
+    privacyClass,
+    interpretationJson,
+    rawReference,
+    userConfirmed,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is ActivationProofRow &&
+          other.id == this.id &&
+          other.episodeId == this.episodeId &&
+          other.commandRunId == this.commandRunId &&
+          other.proofType == this.proofType &&
+          other.observedAt == this.observedAt &&
+          other.source == this.source &&
+          other.confidence == this.confidence &&
+          other.privacyClass == this.privacyClass &&
+          other.interpretationJson == this.interpretationJson &&
+          other.rawReference == this.rawReference &&
+          other.userConfirmed == this.userConfirmed);
+}
+
+class ActivationProofsCompanion extends UpdateCompanion<ActivationProofRow> {
+  final Value<String> id;
+  final Value<String> episodeId;
+  final Value<String?> commandRunId;
+  final Value<String> proofType;
+  final Value<int> observedAt;
+  final Value<String> source;
+  final Value<double> confidence;
+  final Value<String> privacyClass;
+  final Value<String> interpretationJson;
+  final Value<String?> rawReference;
+  final Value<bool?> userConfirmed;
+  final Value<int> rowid;
+  const ActivationProofsCompanion({
+    this.id = const Value.absent(),
+    this.episodeId = const Value.absent(),
+    this.commandRunId = const Value.absent(),
+    this.proofType = const Value.absent(),
+    this.observedAt = const Value.absent(),
+    this.source = const Value.absent(),
+    this.confidence = const Value.absent(),
+    this.privacyClass = const Value.absent(),
+    this.interpretationJson = const Value.absent(),
+    this.rawReference = const Value.absent(),
+    this.userConfirmed = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  ActivationProofsCompanion.insert({
+    required String id,
+    required String episodeId,
+    this.commandRunId = const Value.absent(),
+    required String proofType,
+    required int observedAt,
+    required String source,
+    required double confidence,
+    required String privacyClass,
+    this.interpretationJson = const Value.absent(),
+    this.rawReference = const Value.absent(),
+    this.userConfirmed = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       episodeId = Value(episodeId),
+       proofType = Value(proofType),
+       observedAt = Value(observedAt),
+       source = Value(source),
+       confidence = Value(confidence),
+       privacyClass = Value(privacyClass);
+  static Insertable<ActivationProofRow> custom({
+    Expression<String>? id,
+    Expression<String>? episodeId,
+    Expression<String>? commandRunId,
+    Expression<String>? proofType,
+    Expression<int>? observedAt,
+    Expression<String>? source,
+    Expression<double>? confidence,
+    Expression<String>? privacyClass,
+    Expression<String>? interpretationJson,
+    Expression<String>? rawReference,
+    Expression<bool>? userConfirmed,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (episodeId != null) 'episode_id': episodeId,
+      if (commandRunId != null) 'command_run_id': commandRunId,
+      if (proofType != null) 'proof_type': proofType,
+      if (observedAt != null) 'observed_at': observedAt,
+      if (source != null) 'source': source,
+      if (confidence != null) 'confidence': confidence,
+      if (privacyClass != null) 'privacy_class': privacyClass,
+      if (interpretationJson != null) 'interpretation_json': interpretationJson,
+      if (rawReference != null) 'raw_reference': rawReference,
+      if (userConfirmed != null) 'user_confirmed': userConfirmed,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  ActivationProofsCompanion copyWith({
+    Value<String>? id,
+    Value<String>? episodeId,
+    Value<String?>? commandRunId,
+    Value<String>? proofType,
+    Value<int>? observedAt,
+    Value<String>? source,
+    Value<double>? confidence,
+    Value<String>? privacyClass,
+    Value<String>? interpretationJson,
+    Value<String?>? rawReference,
+    Value<bool?>? userConfirmed,
+    Value<int>? rowid,
+  }) {
+    return ActivationProofsCompanion(
+      id: id ?? this.id,
+      episodeId: episodeId ?? this.episodeId,
+      commandRunId: commandRunId ?? this.commandRunId,
+      proofType: proofType ?? this.proofType,
+      observedAt: observedAt ?? this.observedAt,
+      source: source ?? this.source,
+      confidence: confidence ?? this.confidence,
+      privacyClass: privacyClass ?? this.privacyClass,
+      interpretationJson: interpretationJson ?? this.interpretationJson,
+      rawReference: rawReference ?? this.rawReference,
+      userConfirmed: userConfirmed ?? this.userConfirmed,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (episodeId.present) {
+      map['episode_id'] = Variable<String>(episodeId.value);
+    }
+    if (commandRunId.present) {
+      map['command_run_id'] = Variable<String>(commandRunId.value);
+    }
+    if (proofType.present) {
+      map['proof_type'] = Variable<String>(proofType.value);
+    }
+    if (observedAt.present) {
+      map['observed_at'] = Variable<int>(observedAt.value);
+    }
+    if (source.present) {
+      map['source'] = Variable<String>(source.value);
+    }
+    if (confidence.present) {
+      map['confidence'] = Variable<double>(confidence.value);
+    }
+    if (privacyClass.present) {
+      map['privacy_class'] = Variable<String>(privacyClass.value);
+    }
+    if (interpretationJson.present) {
+      map['interpretation_json'] = Variable<String>(interpretationJson.value);
+    }
+    if (rawReference.present) {
+      map['raw_reference'] = Variable<String>(rawReference.value);
+    }
+    if (userConfirmed.present) {
+      map['user_confirmed'] = Variable<bool>(userConfirmed.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ActivationProofsCompanion(')
+          ..write('id: $id, ')
+          ..write('episodeId: $episodeId, ')
+          ..write('commandRunId: $commandRunId, ')
+          ..write('proofType: $proofType, ')
+          ..write('observedAt: $observedAt, ')
+          ..write('source: $source, ')
+          ..write('confidence: $confidence, ')
+          ..write('privacyClass: $privacyClass, ')
+          ..write('interpretationJson: $interpretationJson, ')
+          ..write('rawReference: $rawReference, ')
+          ..write('userConfirmed: $userConfirmed, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $ActivationWaypointsTable extends ActivationWaypoints
+    with TableInfo<$ActivationWaypointsTable, ActivationWaypointRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $ActivationWaypointsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _profileIdMeta = const VerificationMeta(
+    'profileId',
+  );
+  @override
+  late final GeneratedColumn<String> profileId = GeneratedColumn<String>(
+    'profile_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES profiles (id)',
+    ),
+  );
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+    'name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _waypointTypeMeta = const VerificationMeta(
+    'waypointType',
+  );
+  @override
+  late final GeneratedColumn<String> waypointType = GeneratedColumn<String>(
+    'waypoint_type',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _zoneIdMeta = const VerificationMeta('zoneId');
+  @override
+  late final GeneratedColumn<String> zoneId = GeneratedColumn<String>(
+    'zone_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _equipmentIdMeta = const VerificationMeta(
+    'equipmentId',
+  );
+  @override
+  late final GeneratedColumn<String> equipmentId = GeneratedColumn<String>(
+    'equipment_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _tokenMeta = const VerificationMeta('token');
+  @override
+  late final GeneratedColumn<String> token = GeneratedColumn<String>(
+    'token',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _settingsJsonMeta = const VerificationMeta(
+    'settingsJson',
+  );
+  @override
+  late final GeneratedColumn<String> settingsJson = GeneratedColumn<String>(
+    'settings_json',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('{}'),
+  );
+  static const VerificationMeta _reliabilityScoreMeta = const VerificationMeta(
+    'reliabilityScore',
+  );
+  @override
+  late final GeneratedColumn<double> reliabilityScore = GeneratedColumn<double>(
+    'reliability_score',
+    aliasedName,
+    true,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _privacyClassMeta = const VerificationMeta(
+    'privacyClass',
+  );
+  @override
+  late final GeneratedColumn<String> privacyClass = GeneratedColumn<String>(
+    'privacy_class',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _isEnabledMeta = const VerificationMeta(
+    'isEnabled',
+  );
+  @override
+  late final GeneratedColumn<bool> isEnabled = GeneratedColumn<bool>(
+    'is_enabled',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("is_enabled" IN (0, 1))',
+    ),
+    defaultValue: const Constant(true),
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<int> createdAt = GeneratedColumn<int>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<int> updatedAt = GeneratedColumn<int>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    profileId,
+    name,
+    waypointType,
+    zoneId,
+    equipmentId,
+    token,
+    settingsJson,
+    reliabilityScore,
+    privacyClass,
+    isEnabled,
+    createdAt,
+    updatedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'activation_waypoints';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<ActivationWaypointRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('profile_id')) {
+      context.handle(
+        _profileIdMeta,
+        profileId.isAcceptableOrUnknown(data['profile_id']!, _profileIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_profileIdMeta);
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    if (data.containsKey('waypoint_type')) {
+      context.handle(
+        _waypointTypeMeta,
+        waypointType.isAcceptableOrUnknown(
+          data['waypoint_type']!,
+          _waypointTypeMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_waypointTypeMeta);
+    }
+    if (data.containsKey('zone_id')) {
+      context.handle(
+        _zoneIdMeta,
+        zoneId.isAcceptableOrUnknown(data['zone_id']!, _zoneIdMeta),
+      );
+    }
+    if (data.containsKey('equipment_id')) {
+      context.handle(
+        _equipmentIdMeta,
+        equipmentId.isAcceptableOrUnknown(
+          data['equipment_id']!,
+          _equipmentIdMeta,
+        ),
+      );
+    }
+    if (data.containsKey('token')) {
+      context.handle(
+        _tokenMeta,
+        token.isAcceptableOrUnknown(data['token']!, _tokenMeta),
+      );
+    }
+    if (data.containsKey('settings_json')) {
+      context.handle(
+        _settingsJsonMeta,
+        settingsJson.isAcceptableOrUnknown(
+          data['settings_json']!,
+          _settingsJsonMeta,
+        ),
+      );
+    }
+    if (data.containsKey('reliability_score')) {
+      context.handle(
+        _reliabilityScoreMeta,
+        reliabilityScore.isAcceptableOrUnknown(
+          data['reliability_score']!,
+          _reliabilityScoreMeta,
+        ),
+      );
+    }
+    if (data.containsKey('privacy_class')) {
+      context.handle(
+        _privacyClassMeta,
+        privacyClass.isAcceptableOrUnknown(
+          data['privacy_class']!,
+          _privacyClassMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_privacyClassMeta);
+    }
+    if (data.containsKey('is_enabled')) {
+      context.handle(
+        _isEnabledMeta,
+        isEnabled.isAcceptableOrUnknown(data['is_enabled']!, _isEnabledMeta),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  ActivationWaypointRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return ActivationWaypointRow(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      profileId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}profile_id'],
+      )!,
+      name: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      )!,
+      waypointType: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}waypoint_type'],
+      )!,
+      zoneId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}zone_id'],
+      ),
+      equipmentId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}equipment_id'],
+      ),
+      token: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}token'],
+      ),
+      settingsJson: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}settings_json'],
+      )!,
+      reliabilityScore: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}reliability_score'],
+      ),
+      privacyClass: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}privacy_class'],
+      )!,
+      isEnabled: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}is_enabled'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}updated_at'],
+      )!,
+    );
+  }
+
+  @override
+  $ActivationWaypointsTable createAlias(String alias) {
+    return $ActivationWaypointsTable(attachedDatabase, alias);
+  }
+}
+
+class ActivationWaypointRow extends DataClass
+    implements Insertable<ActivationWaypointRow> {
+  final String id;
+  final String profileId;
+  final String name;
+  final String waypointType;
+  final String? zoneId;
+  final String? equipmentId;
+  final String? token;
+  final String settingsJson;
+  final double? reliabilityScore;
+  final String privacyClass;
+  final bool isEnabled;
+  final int createdAt;
+  final int updatedAt;
+  const ActivationWaypointRow({
+    required this.id,
+    required this.profileId,
+    required this.name,
+    required this.waypointType,
+    this.zoneId,
+    this.equipmentId,
+    this.token,
+    required this.settingsJson,
+    this.reliabilityScore,
+    required this.privacyClass,
+    required this.isEnabled,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['profile_id'] = Variable<String>(profileId);
+    map['name'] = Variable<String>(name);
+    map['waypoint_type'] = Variable<String>(waypointType);
+    if (!nullToAbsent || zoneId != null) {
+      map['zone_id'] = Variable<String>(zoneId);
+    }
+    if (!nullToAbsent || equipmentId != null) {
+      map['equipment_id'] = Variable<String>(equipmentId);
+    }
+    if (!nullToAbsent || token != null) {
+      map['token'] = Variable<String>(token);
+    }
+    map['settings_json'] = Variable<String>(settingsJson);
+    if (!nullToAbsent || reliabilityScore != null) {
+      map['reliability_score'] = Variable<double>(reliabilityScore);
+    }
+    map['privacy_class'] = Variable<String>(privacyClass);
+    map['is_enabled'] = Variable<bool>(isEnabled);
+    map['created_at'] = Variable<int>(createdAt);
+    map['updated_at'] = Variable<int>(updatedAt);
+    return map;
+  }
+
+  ActivationWaypointsCompanion toCompanion(bool nullToAbsent) {
+    return ActivationWaypointsCompanion(
+      id: Value(id),
+      profileId: Value(profileId),
+      name: Value(name),
+      waypointType: Value(waypointType),
+      zoneId: zoneId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(zoneId),
+      equipmentId: equipmentId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(equipmentId),
+      token: token == null && nullToAbsent
+          ? const Value.absent()
+          : Value(token),
+      settingsJson: Value(settingsJson),
+      reliabilityScore: reliabilityScore == null && nullToAbsent
+          ? const Value.absent()
+          : Value(reliabilityScore),
+      privacyClass: Value(privacyClass),
+      isEnabled: Value(isEnabled),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+    );
+  }
+
+  factory ActivationWaypointRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return ActivationWaypointRow(
+      id: serializer.fromJson<String>(json['id']),
+      profileId: serializer.fromJson<String>(json['profileId']),
+      name: serializer.fromJson<String>(json['name']),
+      waypointType: serializer.fromJson<String>(json['waypointType']),
+      zoneId: serializer.fromJson<String?>(json['zoneId']),
+      equipmentId: serializer.fromJson<String?>(json['equipmentId']),
+      token: serializer.fromJson<String?>(json['token']),
+      settingsJson: serializer.fromJson<String>(json['settingsJson']),
+      reliabilityScore: serializer.fromJson<double?>(json['reliabilityScore']),
+      privacyClass: serializer.fromJson<String>(json['privacyClass']),
+      isEnabled: serializer.fromJson<bool>(json['isEnabled']),
+      createdAt: serializer.fromJson<int>(json['createdAt']),
+      updatedAt: serializer.fromJson<int>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'profileId': serializer.toJson<String>(profileId),
+      'name': serializer.toJson<String>(name),
+      'waypointType': serializer.toJson<String>(waypointType),
+      'zoneId': serializer.toJson<String?>(zoneId),
+      'equipmentId': serializer.toJson<String?>(equipmentId),
+      'token': serializer.toJson<String?>(token),
+      'settingsJson': serializer.toJson<String>(settingsJson),
+      'reliabilityScore': serializer.toJson<double?>(reliabilityScore),
+      'privacyClass': serializer.toJson<String>(privacyClass),
+      'isEnabled': serializer.toJson<bool>(isEnabled),
+      'createdAt': serializer.toJson<int>(createdAt),
+      'updatedAt': serializer.toJson<int>(updatedAt),
+    };
+  }
+
+  ActivationWaypointRow copyWith({
+    String? id,
+    String? profileId,
+    String? name,
+    String? waypointType,
+    Value<String?> zoneId = const Value.absent(),
+    Value<String?> equipmentId = const Value.absent(),
+    Value<String?> token = const Value.absent(),
+    String? settingsJson,
+    Value<double?> reliabilityScore = const Value.absent(),
+    String? privacyClass,
+    bool? isEnabled,
+    int? createdAt,
+    int? updatedAt,
+  }) => ActivationWaypointRow(
+    id: id ?? this.id,
+    profileId: profileId ?? this.profileId,
+    name: name ?? this.name,
+    waypointType: waypointType ?? this.waypointType,
+    zoneId: zoneId.present ? zoneId.value : this.zoneId,
+    equipmentId: equipmentId.present ? equipmentId.value : this.equipmentId,
+    token: token.present ? token.value : this.token,
+    settingsJson: settingsJson ?? this.settingsJson,
+    reliabilityScore: reliabilityScore.present
+        ? reliabilityScore.value
+        : this.reliabilityScore,
+    privacyClass: privacyClass ?? this.privacyClass,
+    isEnabled: isEnabled ?? this.isEnabled,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+  );
+  ActivationWaypointRow copyWithCompanion(ActivationWaypointsCompanion data) {
+    return ActivationWaypointRow(
+      id: data.id.present ? data.id.value : this.id,
+      profileId: data.profileId.present ? data.profileId.value : this.profileId,
+      name: data.name.present ? data.name.value : this.name,
+      waypointType: data.waypointType.present
+          ? data.waypointType.value
+          : this.waypointType,
+      zoneId: data.zoneId.present ? data.zoneId.value : this.zoneId,
+      equipmentId: data.equipmentId.present
+          ? data.equipmentId.value
+          : this.equipmentId,
+      token: data.token.present ? data.token.value : this.token,
+      settingsJson: data.settingsJson.present
+          ? data.settingsJson.value
+          : this.settingsJson,
+      reliabilityScore: data.reliabilityScore.present
+          ? data.reliabilityScore.value
+          : this.reliabilityScore,
+      privacyClass: data.privacyClass.present
+          ? data.privacyClass.value
+          : this.privacyClass,
+      isEnabled: data.isEnabled.present ? data.isEnabled.value : this.isEnabled,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ActivationWaypointRow(')
+          ..write('id: $id, ')
+          ..write('profileId: $profileId, ')
+          ..write('name: $name, ')
+          ..write('waypointType: $waypointType, ')
+          ..write('zoneId: $zoneId, ')
+          ..write('equipmentId: $equipmentId, ')
+          ..write('token: $token, ')
+          ..write('settingsJson: $settingsJson, ')
+          ..write('reliabilityScore: $reliabilityScore, ')
+          ..write('privacyClass: $privacyClass, ')
+          ..write('isEnabled: $isEnabled, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    profileId,
+    name,
+    waypointType,
+    zoneId,
+    equipmentId,
+    token,
+    settingsJson,
+    reliabilityScore,
+    privacyClass,
+    isEnabled,
+    createdAt,
+    updatedAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is ActivationWaypointRow &&
+          other.id == this.id &&
+          other.profileId == this.profileId &&
+          other.name == this.name &&
+          other.waypointType == this.waypointType &&
+          other.zoneId == this.zoneId &&
+          other.equipmentId == this.equipmentId &&
+          other.token == this.token &&
+          other.settingsJson == this.settingsJson &&
+          other.reliabilityScore == this.reliabilityScore &&
+          other.privacyClass == this.privacyClass &&
+          other.isEnabled == this.isEnabled &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt);
+}
+
+class ActivationWaypointsCompanion
+    extends UpdateCompanion<ActivationWaypointRow> {
+  final Value<String> id;
+  final Value<String> profileId;
+  final Value<String> name;
+  final Value<String> waypointType;
+  final Value<String?> zoneId;
+  final Value<String?> equipmentId;
+  final Value<String?> token;
+  final Value<String> settingsJson;
+  final Value<double?> reliabilityScore;
+  final Value<String> privacyClass;
+  final Value<bool> isEnabled;
+  final Value<int> createdAt;
+  final Value<int> updatedAt;
+  final Value<int> rowid;
+  const ActivationWaypointsCompanion({
+    this.id = const Value.absent(),
+    this.profileId = const Value.absent(),
+    this.name = const Value.absent(),
+    this.waypointType = const Value.absent(),
+    this.zoneId = const Value.absent(),
+    this.equipmentId = const Value.absent(),
+    this.token = const Value.absent(),
+    this.settingsJson = const Value.absent(),
+    this.reliabilityScore = const Value.absent(),
+    this.privacyClass = const Value.absent(),
+    this.isEnabled = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  ActivationWaypointsCompanion.insert({
+    required String id,
+    required String profileId,
+    required String name,
+    required String waypointType,
+    this.zoneId = const Value.absent(),
+    this.equipmentId = const Value.absent(),
+    this.token = const Value.absent(),
+    this.settingsJson = const Value.absent(),
+    this.reliabilityScore = const Value.absent(),
+    required String privacyClass,
+    this.isEnabled = const Value.absent(),
+    required int createdAt,
+    required int updatedAt,
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       profileId = Value(profileId),
+       name = Value(name),
+       waypointType = Value(waypointType),
+       privacyClass = Value(privacyClass),
+       createdAt = Value(createdAt),
+       updatedAt = Value(updatedAt);
+  static Insertable<ActivationWaypointRow> custom({
+    Expression<String>? id,
+    Expression<String>? profileId,
+    Expression<String>? name,
+    Expression<String>? waypointType,
+    Expression<String>? zoneId,
+    Expression<String>? equipmentId,
+    Expression<String>? token,
+    Expression<String>? settingsJson,
+    Expression<double>? reliabilityScore,
+    Expression<String>? privacyClass,
+    Expression<bool>? isEnabled,
+    Expression<int>? createdAt,
+    Expression<int>? updatedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (profileId != null) 'profile_id': profileId,
+      if (name != null) 'name': name,
+      if (waypointType != null) 'waypoint_type': waypointType,
+      if (zoneId != null) 'zone_id': zoneId,
+      if (equipmentId != null) 'equipment_id': equipmentId,
+      if (token != null) 'token': token,
+      if (settingsJson != null) 'settings_json': settingsJson,
+      if (reliabilityScore != null) 'reliability_score': reliabilityScore,
+      if (privacyClass != null) 'privacy_class': privacyClass,
+      if (isEnabled != null) 'is_enabled': isEnabled,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  ActivationWaypointsCompanion copyWith({
+    Value<String>? id,
+    Value<String>? profileId,
+    Value<String>? name,
+    Value<String>? waypointType,
+    Value<String?>? zoneId,
+    Value<String?>? equipmentId,
+    Value<String?>? token,
+    Value<String>? settingsJson,
+    Value<double?>? reliabilityScore,
+    Value<String>? privacyClass,
+    Value<bool>? isEnabled,
+    Value<int>? createdAt,
+    Value<int>? updatedAt,
+    Value<int>? rowid,
+  }) {
+    return ActivationWaypointsCompanion(
+      id: id ?? this.id,
+      profileId: profileId ?? this.profileId,
+      name: name ?? this.name,
+      waypointType: waypointType ?? this.waypointType,
+      zoneId: zoneId ?? this.zoneId,
+      equipmentId: equipmentId ?? this.equipmentId,
+      token: token ?? this.token,
+      settingsJson: settingsJson ?? this.settingsJson,
+      reliabilityScore: reliabilityScore ?? this.reliabilityScore,
+      privacyClass: privacyClass ?? this.privacyClass,
+      isEnabled: isEnabled ?? this.isEnabled,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (profileId.present) {
+      map['profile_id'] = Variable<String>(profileId.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (waypointType.present) {
+      map['waypoint_type'] = Variable<String>(waypointType.value);
+    }
+    if (zoneId.present) {
+      map['zone_id'] = Variable<String>(zoneId.value);
+    }
+    if (equipmentId.present) {
+      map['equipment_id'] = Variable<String>(equipmentId.value);
+    }
+    if (token.present) {
+      map['token'] = Variable<String>(token.value);
+    }
+    if (settingsJson.present) {
+      map['settings_json'] = Variable<String>(settingsJson.value);
+    }
+    if (reliabilityScore.present) {
+      map['reliability_score'] = Variable<double>(reliabilityScore.value);
+    }
+    if (privacyClass.present) {
+      map['privacy_class'] = Variable<String>(privacyClass.value);
+    }
+    if (isEnabled.present) {
+      map['is_enabled'] = Variable<bool>(isEnabled.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<int>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<int>(updatedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ActivationWaypointsCompanion(')
+          ..write('id: $id, ')
+          ..write('profileId: $profileId, ')
+          ..write('name: $name, ')
+          ..write('waypointType: $waypointType, ')
+          ..write('zoneId: $zoneId, ')
+          ..write('equipmentId: $equipmentId, ')
+          ..write('token: $token, ')
+          ..write('settingsJson: $settingsJson, ')
+          ..write('reliabilityScore: $reliabilityScore, ')
+          ..write('privacyClass: $privacyClass, ')
+          ..write('isEnabled: $isEnabled, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $WaypointObservationsTable extends WaypointObservations
+    with TableInfo<$WaypointObservationsTable, WaypointObservationRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $WaypointObservationsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _waypointIdMeta = const VerificationMeta(
+    'waypointId',
+  );
+  @override
+  late final GeneratedColumn<String> waypointId = GeneratedColumn<String>(
+    'waypoint_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES activation_waypoints (id)',
+    ),
+  );
+  static const VerificationMeta _episodeIdMeta = const VerificationMeta(
+    'episodeId',
+  );
+  @override
+  late final GeneratedColumn<String> episodeId = GeneratedColumn<String>(
+    'episode_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _observedAtMeta = const VerificationMeta(
+    'observedAt',
+  );
+  @override
+  late final GeneratedColumn<int> observedAt = GeneratedColumn<int>(
+    'observed_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _stateMeta = const VerificationMeta('state');
+  @override
+  late final GeneratedColumn<String> state = GeneratedColumn<String>(
+    'state',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _latencyMsMeta = const VerificationMeta(
+    'latencyMs',
+  );
+  @override
+  late final GeneratedColumn<int> latencyMs = GeneratedColumn<int>(
+    'latency_ms',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _sourceMeta = const VerificationMeta('source');
+  @override
+  late final GeneratedColumn<String> source = GeneratedColumn<String>(
+    'source',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('manual'),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    waypointId,
+    episodeId,
+    observedAt,
+    state,
+    latencyMs,
+    source,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'waypoint_observations';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<WaypointObservationRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('waypoint_id')) {
+      context.handle(
+        _waypointIdMeta,
+        waypointId.isAcceptableOrUnknown(data['waypoint_id']!, _waypointIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_waypointIdMeta);
+    }
+    if (data.containsKey('episode_id')) {
+      context.handle(
+        _episodeIdMeta,
+        episodeId.isAcceptableOrUnknown(data['episode_id']!, _episodeIdMeta),
+      );
+    }
+    if (data.containsKey('observed_at')) {
+      context.handle(
+        _observedAtMeta,
+        observedAt.isAcceptableOrUnknown(data['observed_at']!, _observedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_observedAtMeta);
+    }
+    if (data.containsKey('state')) {
+      context.handle(
+        _stateMeta,
+        state.isAcceptableOrUnknown(data['state']!, _stateMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_stateMeta);
+    }
+    if (data.containsKey('latency_ms')) {
+      context.handle(
+        _latencyMsMeta,
+        latencyMs.isAcceptableOrUnknown(data['latency_ms']!, _latencyMsMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_latencyMsMeta);
+    }
+    if (data.containsKey('source')) {
+      context.handle(
+        _sourceMeta,
+        source.isAcceptableOrUnknown(data['source']!, _sourceMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  WaypointObservationRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return WaypointObservationRow(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      waypointId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}waypoint_id'],
+      )!,
+      episodeId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}episode_id'],
+      ),
+      observedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}observed_at'],
+      )!,
+      state: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}state'],
+      )!,
+      latencyMs: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}latency_ms'],
+      )!,
+      source: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}source'],
+      )!,
+    );
+  }
+
+  @override
+  $WaypointObservationsTable createAlias(String alias) {
+    return $WaypointObservationsTable(attachedDatabase, alias);
+  }
+}
+
+class WaypointObservationRow extends DataClass
+    implements Insertable<WaypointObservationRow> {
+  final String id;
+  final String waypointId;
+  final String? episodeId;
+  final int observedAt;
+  final String state;
+  final int latencyMs;
+  final String source;
+  const WaypointObservationRow({
+    required this.id,
+    required this.waypointId,
+    this.episodeId,
+    required this.observedAt,
+    required this.state,
+    required this.latencyMs,
+    required this.source,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['waypoint_id'] = Variable<String>(waypointId);
+    if (!nullToAbsent || episodeId != null) {
+      map['episode_id'] = Variable<String>(episodeId);
+    }
+    map['observed_at'] = Variable<int>(observedAt);
+    map['state'] = Variable<String>(state);
+    map['latency_ms'] = Variable<int>(latencyMs);
+    map['source'] = Variable<String>(source);
+    return map;
+  }
+
+  WaypointObservationsCompanion toCompanion(bool nullToAbsent) {
+    return WaypointObservationsCompanion(
+      id: Value(id),
+      waypointId: Value(waypointId),
+      episodeId: episodeId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(episodeId),
+      observedAt: Value(observedAt),
+      state: Value(state),
+      latencyMs: Value(latencyMs),
+      source: Value(source),
+    );
+  }
+
+  factory WaypointObservationRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return WaypointObservationRow(
+      id: serializer.fromJson<String>(json['id']),
+      waypointId: serializer.fromJson<String>(json['waypointId']),
+      episodeId: serializer.fromJson<String?>(json['episodeId']),
+      observedAt: serializer.fromJson<int>(json['observedAt']),
+      state: serializer.fromJson<String>(json['state']),
+      latencyMs: serializer.fromJson<int>(json['latencyMs']),
+      source: serializer.fromJson<String>(json['source']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'waypointId': serializer.toJson<String>(waypointId),
+      'episodeId': serializer.toJson<String?>(episodeId),
+      'observedAt': serializer.toJson<int>(observedAt),
+      'state': serializer.toJson<String>(state),
+      'latencyMs': serializer.toJson<int>(latencyMs),
+      'source': serializer.toJson<String>(source),
+    };
+  }
+
+  WaypointObservationRow copyWith({
+    String? id,
+    String? waypointId,
+    Value<String?> episodeId = const Value.absent(),
+    int? observedAt,
+    String? state,
+    int? latencyMs,
+    String? source,
+  }) => WaypointObservationRow(
+    id: id ?? this.id,
+    waypointId: waypointId ?? this.waypointId,
+    episodeId: episodeId.present ? episodeId.value : this.episodeId,
+    observedAt: observedAt ?? this.observedAt,
+    state: state ?? this.state,
+    latencyMs: latencyMs ?? this.latencyMs,
+    source: source ?? this.source,
+  );
+  WaypointObservationRow copyWithCompanion(WaypointObservationsCompanion data) {
+    return WaypointObservationRow(
+      id: data.id.present ? data.id.value : this.id,
+      waypointId: data.waypointId.present
+          ? data.waypointId.value
+          : this.waypointId,
+      episodeId: data.episodeId.present ? data.episodeId.value : this.episodeId,
+      observedAt: data.observedAt.present
+          ? data.observedAt.value
+          : this.observedAt,
+      state: data.state.present ? data.state.value : this.state,
+      latencyMs: data.latencyMs.present ? data.latencyMs.value : this.latencyMs,
+      source: data.source.present ? data.source.value : this.source,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('WaypointObservationRow(')
+          ..write('id: $id, ')
+          ..write('waypointId: $waypointId, ')
+          ..write('episodeId: $episodeId, ')
+          ..write('observedAt: $observedAt, ')
+          ..write('state: $state, ')
+          ..write('latencyMs: $latencyMs, ')
+          ..write('source: $source')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    waypointId,
+    episodeId,
+    observedAt,
+    state,
+    latencyMs,
+    source,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is WaypointObservationRow &&
+          other.id == this.id &&
+          other.waypointId == this.waypointId &&
+          other.episodeId == this.episodeId &&
+          other.observedAt == this.observedAt &&
+          other.state == this.state &&
+          other.latencyMs == this.latencyMs &&
+          other.source == this.source);
+}
+
+class WaypointObservationsCompanion
+    extends UpdateCompanion<WaypointObservationRow> {
+  final Value<String> id;
+  final Value<String> waypointId;
+  final Value<String?> episodeId;
+  final Value<int> observedAt;
+  final Value<String> state;
+  final Value<int> latencyMs;
+  final Value<String> source;
+  final Value<int> rowid;
+  const WaypointObservationsCompanion({
+    this.id = const Value.absent(),
+    this.waypointId = const Value.absent(),
+    this.episodeId = const Value.absent(),
+    this.observedAt = const Value.absent(),
+    this.state = const Value.absent(),
+    this.latencyMs = const Value.absent(),
+    this.source = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  WaypointObservationsCompanion.insert({
+    required String id,
+    required String waypointId,
+    this.episodeId = const Value.absent(),
+    required int observedAt,
+    required String state,
+    required int latencyMs,
+    this.source = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       waypointId = Value(waypointId),
+       observedAt = Value(observedAt),
+       state = Value(state),
+       latencyMs = Value(latencyMs);
+  static Insertable<WaypointObservationRow> custom({
+    Expression<String>? id,
+    Expression<String>? waypointId,
+    Expression<String>? episodeId,
+    Expression<int>? observedAt,
+    Expression<String>? state,
+    Expression<int>? latencyMs,
+    Expression<String>? source,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (waypointId != null) 'waypoint_id': waypointId,
+      if (episodeId != null) 'episode_id': episodeId,
+      if (observedAt != null) 'observed_at': observedAt,
+      if (state != null) 'state': state,
+      if (latencyMs != null) 'latency_ms': latencyMs,
+      if (source != null) 'source': source,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  WaypointObservationsCompanion copyWith({
+    Value<String>? id,
+    Value<String>? waypointId,
+    Value<String?>? episodeId,
+    Value<int>? observedAt,
+    Value<String>? state,
+    Value<int>? latencyMs,
+    Value<String>? source,
+    Value<int>? rowid,
+  }) {
+    return WaypointObservationsCompanion(
+      id: id ?? this.id,
+      waypointId: waypointId ?? this.waypointId,
+      episodeId: episodeId ?? this.episodeId,
+      observedAt: observedAt ?? this.observedAt,
+      state: state ?? this.state,
+      latencyMs: latencyMs ?? this.latencyMs,
+      source: source ?? this.source,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (waypointId.present) {
+      map['waypoint_id'] = Variable<String>(waypointId.value);
+    }
+    if (episodeId.present) {
+      map['episode_id'] = Variable<String>(episodeId.value);
+    }
+    if (observedAt.present) {
+      map['observed_at'] = Variable<int>(observedAt.value);
+    }
+    if (state.present) {
+      map['state'] = Variable<String>(state.value);
+    }
+    if (latencyMs.present) {
+      map['latency_ms'] = Variable<int>(latencyMs.value);
+    }
+    if (source.present) {
+      map['source'] = Variable<String>(source.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('WaypointObservationsCompanion(')
+          ..write('id: $id, ')
+          ..write('waypointId: $waypointId, ')
+          ..write('episodeId: $episodeId, ')
+          ..write('observedAt: $observedAt, ')
+          ..write('state: $state, ')
+          ..write('latencyMs: $latencyMs, ')
+          ..write('source: $source, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $InertiaSignalsTable extends InertiaSignals
+    with TableInfo<$InertiaSignalsTable, InertiaSignalRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $InertiaSignalsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _episodeIdMeta = const VerificationMeta(
+    'episodeId',
+  );
+  @override
+  late final GeneratedColumn<String> episodeId = GeneratedColumn<String>(
+    'episode_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _signalTypeMeta = const VerificationMeta(
+    'signalType',
+  );
+  @override
+  late final GeneratedColumn<String> signalType = GeneratedColumn<String>(
+    'signal_type',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _observedAtMeta = const VerificationMeta(
+    'observedAt',
+  );
+  @override
+  late final GeneratedColumn<int> observedAt = GeneratedColumn<int>(
+    'observed_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _valueJsonMeta = const VerificationMeta(
+    'valueJson',
+  );
+  @override
+  late final GeneratedColumn<String> valueJson = GeneratedColumn<String>(
+    'value_json',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('{}'),
+  );
+  static const VerificationMeta _sourceMeta = const VerificationMeta('source');
+  @override
+  late final GeneratedColumn<String> source = GeneratedColumn<String>(
+    'source',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _confidenceMeta = const VerificationMeta(
+    'confidence',
+  );
+  @override
+  late final GeneratedColumn<double> confidence = GeneratedColumn<double>(
+    'confidence',
+    aliasedName,
+    false,
+    type: DriftSqlType.double,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _expiresAtMeta = const VerificationMeta(
+    'expiresAt',
+  );
+  @override
+  late final GeneratedColumn<int> expiresAt = GeneratedColumn<int>(
+    'expires_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _privacyClassMeta = const VerificationMeta(
+    'privacyClass',
+  );
+  @override
+  late final GeneratedColumn<String> privacyClass = GeneratedColumn<String>(
+    'privacy_class',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    episodeId,
+    signalType,
+    observedAt,
+    valueJson,
+    source,
+    confidence,
+    expiresAt,
+    privacyClass,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'inertia_signals';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<InertiaSignalRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('episode_id')) {
+      context.handle(
+        _episodeIdMeta,
+        episodeId.isAcceptableOrUnknown(data['episode_id']!, _episodeIdMeta),
+      );
+    }
+    if (data.containsKey('signal_type')) {
+      context.handle(
+        _signalTypeMeta,
+        signalType.isAcceptableOrUnknown(data['signal_type']!, _signalTypeMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_signalTypeMeta);
+    }
+    if (data.containsKey('observed_at')) {
+      context.handle(
+        _observedAtMeta,
+        observedAt.isAcceptableOrUnknown(data['observed_at']!, _observedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_observedAtMeta);
+    }
+    if (data.containsKey('value_json')) {
+      context.handle(
+        _valueJsonMeta,
+        valueJson.isAcceptableOrUnknown(data['value_json']!, _valueJsonMeta),
+      );
+    }
+    if (data.containsKey('source')) {
+      context.handle(
+        _sourceMeta,
+        source.isAcceptableOrUnknown(data['source']!, _sourceMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_sourceMeta);
+    }
+    if (data.containsKey('confidence')) {
+      context.handle(
+        _confidenceMeta,
+        confidence.isAcceptableOrUnknown(data['confidence']!, _confidenceMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_confidenceMeta);
+    }
+    if (data.containsKey('expires_at')) {
+      context.handle(
+        _expiresAtMeta,
+        expiresAt.isAcceptableOrUnknown(data['expires_at']!, _expiresAtMeta),
+      );
+    }
+    if (data.containsKey('privacy_class')) {
+      context.handle(
+        _privacyClassMeta,
+        privacyClass.isAcceptableOrUnknown(
+          data['privacy_class']!,
+          _privacyClassMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_privacyClassMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  InertiaSignalRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return InertiaSignalRow(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      episodeId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}episode_id'],
+      ),
+      signalType: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}signal_type'],
+      )!,
+      observedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}observed_at'],
+      )!,
+      valueJson: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}value_json'],
+      )!,
+      source: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}source'],
+      )!,
+      confidence: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}confidence'],
+      )!,
+      expiresAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}expires_at'],
+      ),
+      privacyClass: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}privacy_class'],
+      )!,
+    );
+  }
+
+  @override
+  $InertiaSignalsTable createAlias(String alias) {
+    return $InertiaSignalsTable(attachedDatabase, alias);
+  }
+}
+
+class InertiaSignalRow extends DataClass
+    implements Insertable<InertiaSignalRow> {
+  final String id;
+  final String? episodeId;
+  final String signalType;
+  final int observedAt;
+  final String valueJson;
+  final String source;
+  final double confidence;
+  final int? expiresAt;
+  final String privacyClass;
+  const InertiaSignalRow({
+    required this.id,
+    this.episodeId,
+    required this.signalType,
+    required this.observedAt,
+    required this.valueJson,
+    required this.source,
+    required this.confidence,
+    this.expiresAt,
+    required this.privacyClass,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    if (!nullToAbsent || episodeId != null) {
+      map['episode_id'] = Variable<String>(episodeId);
+    }
+    map['signal_type'] = Variable<String>(signalType);
+    map['observed_at'] = Variable<int>(observedAt);
+    map['value_json'] = Variable<String>(valueJson);
+    map['source'] = Variable<String>(source);
+    map['confidence'] = Variable<double>(confidence);
+    if (!nullToAbsent || expiresAt != null) {
+      map['expires_at'] = Variable<int>(expiresAt);
+    }
+    map['privacy_class'] = Variable<String>(privacyClass);
+    return map;
+  }
+
+  InertiaSignalsCompanion toCompanion(bool nullToAbsent) {
+    return InertiaSignalsCompanion(
+      id: Value(id),
+      episodeId: episodeId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(episodeId),
+      signalType: Value(signalType),
+      observedAt: Value(observedAt),
+      valueJson: Value(valueJson),
+      source: Value(source),
+      confidence: Value(confidence),
+      expiresAt: expiresAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(expiresAt),
+      privacyClass: Value(privacyClass),
+    );
+  }
+
+  factory InertiaSignalRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return InertiaSignalRow(
+      id: serializer.fromJson<String>(json['id']),
+      episodeId: serializer.fromJson<String?>(json['episodeId']),
+      signalType: serializer.fromJson<String>(json['signalType']),
+      observedAt: serializer.fromJson<int>(json['observedAt']),
+      valueJson: serializer.fromJson<String>(json['valueJson']),
+      source: serializer.fromJson<String>(json['source']),
+      confidence: serializer.fromJson<double>(json['confidence']),
+      expiresAt: serializer.fromJson<int?>(json['expiresAt']),
+      privacyClass: serializer.fromJson<String>(json['privacyClass']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'episodeId': serializer.toJson<String?>(episodeId),
+      'signalType': serializer.toJson<String>(signalType),
+      'observedAt': serializer.toJson<int>(observedAt),
+      'valueJson': serializer.toJson<String>(valueJson),
+      'source': serializer.toJson<String>(source),
+      'confidence': serializer.toJson<double>(confidence),
+      'expiresAt': serializer.toJson<int?>(expiresAt),
+      'privacyClass': serializer.toJson<String>(privacyClass),
+    };
+  }
+
+  InertiaSignalRow copyWith({
+    String? id,
+    Value<String?> episodeId = const Value.absent(),
+    String? signalType,
+    int? observedAt,
+    String? valueJson,
+    String? source,
+    double? confidence,
+    Value<int?> expiresAt = const Value.absent(),
+    String? privacyClass,
+  }) => InertiaSignalRow(
+    id: id ?? this.id,
+    episodeId: episodeId.present ? episodeId.value : this.episodeId,
+    signalType: signalType ?? this.signalType,
+    observedAt: observedAt ?? this.observedAt,
+    valueJson: valueJson ?? this.valueJson,
+    source: source ?? this.source,
+    confidence: confidence ?? this.confidence,
+    expiresAt: expiresAt.present ? expiresAt.value : this.expiresAt,
+    privacyClass: privacyClass ?? this.privacyClass,
+  );
+  InertiaSignalRow copyWithCompanion(InertiaSignalsCompanion data) {
+    return InertiaSignalRow(
+      id: data.id.present ? data.id.value : this.id,
+      episodeId: data.episodeId.present ? data.episodeId.value : this.episodeId,
+      signalType: data.signalType.present
+          ? data.signalType.value
+          : this.signalType,
+      observedAt: data.observedAt.present
+          ? data.observedAt.value
+          : this.observedAt,
+      valueJson: data.valueJson.present ? data.valueJson.value : this.valueJson,
+      source: data.source.present ? data.source.value : this.source,
+      confidence: data.confidence.present
+          ? data.confidence.value
+          : this.confidence,
+      expiresAt: data.expiresAt.present ? data.expiresAt.value : this.expiresAt,
+      privacyClass: data.privacyClass.present
+          ? data.privacyClass.value
+          : this.privacyClass,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('InertiaSignalRow(')
+          ..write('id: $id, ')
+          ..write('episodeId: $episodeId, ')
+          ..write('signalType: $signalType, ')
+          ..write('observedAt: $observedAt, ')
+          ..write('valueJson: $valueJson, ')
+          ..write('source: $source, ')
+          ..write('confidence: $confidence, ')
+          ..write('expiresAt: $expiresAt, ')
+          ..write('privacyClass: $privacyClass')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    episodeId,
+    signalType,
+    observedAt,
+    valueJson,
+    source,
+    confidence,
+    expiresAt,
+    privacyClass,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is InertiaSignalRow &&
+          other.id == this.id &&
+          other.episodeId == this.episodeId &&
+          other.signalType == this.signalType &&
+          other.observedAt == this.observedAt &&
+          other.valueJson == this.valueJson &&
+          other.source == this.source &&
+          other.confidence == this.confidence &&
+          other.expiresAt == this.expiresAt &&
+          other.privacyClass == this.privacyClass);
+}
+
+class InertiaSignalsCompanion extends UpdateCompanion<InertiaSignalRow> {
+  final Value<String> id;
+  final Value<String?> episodeId;
+  final Value<String> signalType;
+  final Value<int> observedAt;
+  final Value<String> valueJson;
+  final Value<String> source;
+  final Value<double> confidence;
+  final Value<int?> expiresAt;
+  final Value<String> privacyClass;
+  final Value<int> rowid;
+  const InertiaSignalsCompanion({
+    this.id = const Value.absent(),
+    this.episodeId = const Value.absent(),
+    this.signalType = const Value.absent(),
+    this.observedAt = const Value.absent(),
+    this.valueJson = const Value.absent(),
+    this.source = const Value.absent(),
+    this.confidence = const Value.absent(),
+    this.expiresAt = const Value.absent(),
+    this.privacyClass = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  InertiaSignalsCompanion.insert({
+    required String id,
+    this.episodeId = const Value.absent(),
+    required String signalType,
+    required int observedAt,
+    this.valueJson = const Value.absent(),
+    required String source,
+    required double confidence,
+    this.expiresAt = const Value.absent(),
+    required String privacyClass,
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       signalType = Value(signalType),
+       observedAt = Value(observedAt),
+       source = Value(source),
+       confidence = Value(confidence),
+       privacyClass = Value(privacyClass);
+  static Insertable<InertiaSignalRow> custom({
+    Expression<String>? id,
+    Expression<String>? episodeId,
+    Expression<String>? signalType,
+    Expression<int>? observedAt,
+    Expression<String>? valueJson,
+    Expression<String>? source,
+    Expression<double>? confidence,
+    Expression<int>? expiresAt,
+    Expression<String>? privacyClass,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (episodeId != null) 'episode_id': episodeId,
+      if (signalType != null) 'signal_type': signalType,
+      if (observedAt != null) 'observed_at': observedAt,
+      if (valueJson != null) 'value_json': valueJson,
+      if (source != null) 'source': source,
+      if (confidence != null) 'confidence': confidence,
+      if (expiresAt != null) 'expires_at': expiresAt,
+      if (privacyClass != null) 'privacy_class': privacyClass,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  InertiaSignalsCompanion copyWith({
+    Value<String>? id,
+    Value<String?>? episodeId,
+    Value<String>? signalType,
+    Value<int>? observedAt,
+    Value<String>? valueJson,
+    Value<String>? source,
+    Value<double>? confidence,
+    Value<int?>? expiresAt,
+    Value<String>? privacyClass,
+    Value<int>? rowid,
+  }) {
+    return InertiaSignalsCompanion(
+      id: id ?? this.id,
+      episodeId: episodeId ?? this.episodeId,
+      signalType: signalType ?? this.signalType,
+      observedAt: observedAt ?? this.observedAt,
+      valueJson: valueJson ?? this.valueJson,
+      source: source ?? this.source,
+      confidence: confidence ?? this.confidence,
+      expiresAt: expiresAt ?? this.expiresAt,
+      privacyClass: privacyClass ?? this.privacyClass,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (episodeId.present) {
+      map['episode_id'] = Variable<String>(episodeId.value);
+    }
+    if (signalType.present) {
+      map['signal_type'] = Variable<String>(signalType.value);
+    }
+    if (observedAt.present) {
+      map['observed_at'] = Variable<int>(observedAt.value);
+    }
+    if (valueJson.present) {
+      map['value_json'] = Variable<String>(valueJson.value);
+    }
+    if (source.present) {
+      map['source'] = Variable<String>(source.value);
+    }
+    if (confidence.present) {
+      map['confidence'] = Variable<double>(confidence.value);
+    }
+    if (expiresAt.present) {
+      map['expires_at'] = Variable<int>(expiresAt.value);
+    }
+    if (privacyClass.present) {
+      map['privacy_class'] = Variable<String>(privacyClass.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('InertiaSignalsCompanion(')
+          ..write('id: $id, ')
+          ..write('episodeId: $episodeId, ')
+          ..write('signalType: $signalType, ')
+          ..write('observedAt: $observedAt, ')
+          ..write('valueJson: $valueJson, ')
+          ..write('source: $source, ')
+          ..write('confidence: $confidence, ')
+          ..write('expiresAt: $expiresAt, ')
+          ..write('privacyClass: $privacyClass, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $FrictionShieldProfilesTable extends FrictionShieldProfiles
+    with TableInfo<$FrictionShieldProfilesTable, FrictionShieldProfileRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $FrictionShieldProfilesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _profileIdMeta = const VerificationMeta(
+    'profileId',
+  );
+  @override
+  late final GeneratedColumn<String> profileId = GeneratedColumn<String>(
+    'profile_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES profiles (id)',
+    ),
+  );
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+    'name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _platformModeMeta = const VerificationMeta(
+    'platformMode',
+  );
+  @override
+  late final GeneratedColumn<String> platformMode = GeneratedColumn<String>(
+    'platform_mode',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _protectedCategoriesJsonMeta =
+      const VerificationMeta('protectedCategoriesJson');
+  @override
+  late final GeneratedColumn<String> protectedCategoriesJson =
+      GeneratedColumn<String>(
+        'protected_categories_json',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+        defaultValue: const Constant('[]'),
+      );
+  static const VerificationMeta _allowlistCategoriesJsonMeta =
+      const VerificationMeta('allowlistCategoriesJson');
+  @override
+  late final GeneratedColumn<String> allowlistCategoriesJson =
+      GeneratedColumn<String>(
+        'allowlist_categories_json',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+        defaultValue: const Constant('["emergency","auth","maps","medical"]'),
+      );
+  static const VerificationMeta _escapePolicyJsonMeta = const VerificationMeta(
+    'escapePolicyJson',
+  );
+  @override
+  late final GeneratedColumn<String> escapePolicyJson = GeneratedColumn<String>(
+    'escape_policy_json',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _isEnabledMeta = const VerificationMeta(
+    'isEnabled',
+  );
+  @override
+  late final GeneratedColumn<bool> isEnabled = GeneratedColumn<bool>(
+    'is_enabled',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("is_enabled" IN (0, 1))',
+    ),
+    defaultValue: const Constant(true),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    profileId,
+    name,
+    platformMode,
+    protectedCategoriesJson,
+    allowlistCategoriesJson,
+    escapePolicyJson,
+    isEnabled,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'friction_shield_profiles';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<FrictionShieldProfileRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('profile_id')) {
+      context.handle(
+        _profileIdMeta,
+        profileId.isAcceptableOrUnknown(data['profile_id']!, _profileIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_profileIdMeta);
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    if (data.containsKey('platform_mode')) {
+      context.handle(
+        _platformModeMeta,
+        platformMode.isAcceptableOrUnknown(
+          data['platform_mode']!,
+          _platformModeMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_platformModeMeta);
+    }
+    if (data.containsKey('protected_categories_json')) {
+      context.handle(
+        _protectedCategoriesJsonMeta,
+        protectedCategoriesJson.isAcceptableOrUnknown(
+          data['protected_categories_json']!,
+          _protectedCategoriesJsonMeta,
+        ),
+      );
+    }
+    if (data.containsKey('allowlist_categories_json')) {
+      context.handle(
+        _allowlistCategoriesJsonMeta,
+        allowlistCategoriesJson.isAcceptableOrUnknown(
+          data['allowlist_categories_json']!,
+          _allowlistCategoriesJsonMeta,
+        ),
+      );
+    }
+    if (data.containsKey('escape_policy_json')) {
+      context.handle(
+        _escapePolicyJsonMeta,
+        escapePolicyJson.isAcceptableOrUnknown(
+          data['escape_policy_json']!,
+          _escapePolicyJsonMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_escapePolicyJsonMeta);
+    }
+    if (data.containsKey('is_enabled')) {
+      context.handle(
+        _isEnabledMeta,
+        isEnabled.isAcceptableOrUnknown(data['is_enabled']!, _isEnabledMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  FrictionShieldProfileRow map(
+    Map<String, dynamic> data, {
+    String? tablePrefix,
+  }) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return FrictionShieldProfileRow(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      profileId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}profile_id'],
+      )!,
+      name: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      )!,
+      platformMode: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}platform_mode'],
+      )!,
+      protectedCategoriesJson: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}protected_categories_json'],
+      )!,
+      allowlistCategoriesJson: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}allowlist_categories_json'],
+      )!,
+      escapePolicyJson: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}escape_policy_json'],
+      )!,
+      isEnabled: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}is_enabled'],
+      )!,
+    );
+  }
+
+  @override
+  $FrictionShieldProfilesTable createAlias(String alias) {
+    return $FrictionShieldProfilesTable(attachedDatabase, alias);
+  }
+}
+
+class FrictionShieldProfileRow extends DataClass
+    implements Insertable<FrictionShieldProfileRow> {
+  final String id;
+  final String profileId;
+  final String name;
+  final String platformMode;
+  final String protectedCategoriesJson;
+  final String allowlistCategoriesJson;
+  final String escapePolicyJson;
+  final bool isEnabled;
+  const FrictionShieldProfileRow({
+    required this.id,
+    required this.profileId,
+    required this.name,
+    required this.platformMode,
+    required this.protectedCategoriesJson,
+    required this.allowlistCategoriesJson,
+    required this.escapePolicyJson,
+    required this.isEnabled,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['profile_id'] = Variable<String>(profileId);
+    map['name'] = Variable<String>(name);
+    map['platform_mode'] = Variable<String>(platformMode);
+    map['protected_categories_json'] = Variable<String>(
+      protectedCategoriesJson,
+    );
+    map['allowlist_categories_json'] = Variable<String>(
+      allowlistCategoriesJson,
+    );
+    map['escape_policy_json'] = Variable<String>(escapePolicyJson);
+    map['is_enabled'] = Variable<bool>(isEnabled);
+    return map;
+  }
+
+  FrictionShieldProfilesCompanion toCompanion(bool nullToAbsent) {
+    return FrictionShieldProfilesCompanion(
+      id: Value(id),
+      profileId: Value(profileId),
+      name: Value(name),
+      platformMode: Value(platformMode),
+      protectedCategoriesJson: Value(protectedCategoriesJson),
+      allowlistCategoriesJson: Value(allowlistCategoriesJson),
+      escapePolicyJson: Value(escapePolicyJson),
+      isEnabled: Value(isEnabled),
+    );
+  }
+
+  factory FrictionShieldProfileRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return FrictionShieldProfileRow(
+      id: serializer.fromJson<String>(json['id']),
+      profileId: serializer.fromJson<String>(json['profileId']),
+      name: serializer.fromJson<String>(json['name']),
+      platformMode: serializer.fromJson<String>(json['platformMode']),
+      protectedCategoriesJson: serializer.fromJson<String>(
+        json['protectedCategoriesJson'],
+      ),
+      allowlistCategoriesJson: serializer.fromJson<String>(
+        json['allowlistCategoriesJson'],
+      ),
+      escapePolicyJson: serializer.fromJson<String>(json['escapePolicyJson']),
+      isEnabled: serializer.fromJson<bool>(json['isEnabled']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'profileId': serializer.toJson<String>(profileId),
+      'name': serializer.toJson<String>(name),
+      'platformMode': serializer.toJson<String>(platformMode),
+      'protectedCategoriesJson': serializer.toJson<String>(
+        protectedCategoriesJson,
+      ),
+      'allowlistCategoriesJson': serializer.toJson<String>(
+        allowlistCategoriesJson,
+      ),
+      'escapePolicyJson': serializer.toJson<String>(escapePolicyJson),
+      'isEnabled': serializer.toJson<bool>(isEnabled),
+    };
+  }
+
+  FrictionShieldProfileRow copyWith({
+    String? id,
+    String? profileId,
+    String? name,
+    String? platformMode,
+    String? protectedCategoriesJson,
+    String? allowlistCategoriesJson,
+    String? escapePolicyJson,
+    bool? isEnabled,
+  }) => FrictionShieldProfileRow(
+    id: id ?? this.id,
+    profileId: profileId ?? this.profileId,
+    name: name ?? this.name,
+    platformMode: platformMode ?? this.platformMode,
+    protectedCategoriesJson:
+        protectedCategoriesJson ?? this.protectedCategoriesJson,
+    allowlistCategoriesJson:
+        allowlistCategoriesJson ?? this.allowlistCategoriesJson,
+    escapePolicyJson: escapePolicyJson ?? this.escapePolicyJson,
+    isEnabled: isEnabled ?? this.isEnabled,
+  );
+  FrictionShieldProfileRow copyWithCompanion(
+    FrictionShieldProfilesCompanion data,
+  ) {
+    return FrictionShieldProfileRow(
+      id: data.id.present ? data.id.value : this.id,
+      profileId: data.profileId.present ? data.profileId.value : this.profileId,
+      name: data.name.present ? data.name.value : this.name,
+      platformMode: data.platformMode.present
+          ? data.platformMode.value
+          : this.platformMode,
+      protectedCategoriesJson: data.protectedCategoriesJson.present
+          ? data.protectedCategoriesJson.value
+          : this.protectedCategoriesJson,
+      allowlistCategoriesJson: data.allowlistCategoriesJson.present
+          ? data.allowlistCategoriesJson.value
+          : this.allowlistCategoriesJson,
+      escapePolicyJson: data.escapePolicyJson.present
+          ? data.escapePolicyJson.value
+          : this.escapePolicyJson,
+      isEnabled: data.isEnabled.present ? data.isEnabled.value : this.isEnabled,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('FrictionShieldProfileRow(')
+          ..write('id: $id, ')
+          ..write('profileId: $profileId, ')
+          ..write('name: $name, ')
+          ..write('platformMode: $platformMode, ')
+          ..write('protectedCategoriesJson: $protectedCategoriesJson, ')
+          ..write('allowlistCategoriesJson: $allowlistCategoriesJson, ')
+          ..write('escapePolicyJson: $escapePolicyJson, ')
+          ..write('isEnabled: $isEnabled')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    profileId,
+    name,
+    platformMode,
+    protectedCategoriesJson,
+    allowlistCategoriesJson,
+    escapePolicyJson,
+    isEnabled,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is FrictionShieldProfileRow &&
+          other.id == this.id &&
+          other.profileId == this.profileId &&
+          other.name == this.name &&
+          other.platformMode == this.platformMode &&
+          other.protectedCategoriesJson == this.protectedCategoriesJson &&
+          other.allowlistCategoriesJson == this.allowlistCategoriesJson &&
+          other.escapePolicyJson == this.escapePolicyJson &&
+          other.isEnabled == this.isEnabled);
+}
+
+class FrictionShieldProfilesCompanion
+    extends UpdateCompanion<FrictionShieldProfileRow> {
+  final Value<String> id;
+  final Value<String> profileId;
+  final Value<String> name;
+  final Value<String> platformMode;
+  final Value<String> protectedCategoriesJson;
+  final Value<String> allowlistCategoriesJson;
+  final Value<String> escapePolicyJson;
+  final Value<bool> isEnabled;
+  final Value<int> rowid;
+  const FrictionShieldProfilesCompanion({
+    this.id = const Value.absent(),
+    this.profileId = const Value.absent(),
+    this.name = const Value.absent(),
+    this.platformMode = const Value.absent(),
+    this.protectedCategoriesJson = const Value.absent(),
+    this.allowlistCategoriesJson = const Value.absent(),
+    this.escapePolicyJson = const Value.absent(),
+    this.isEnabled = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  FrictionShieldProfilesCompanion.insert({
+    required String id,
+    required String profileId,
+    required String name,
+    required String platformMode,
+    this.protectedCategoriesJson = const Value.absent(),
+    this.allowlistCategoriesJson = const Value.absent(),
+    required String escapePolicyJson,
+    this.isEnabled = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       profileId = Value(profileId),
+       name = Value(name),
+       platformMode = Value(platformMode),
+       escapePolicyJson = Value(escapePolicyJson);
+  static Insertable<FrictionShieldProfileRow> custom({
+    Expression<String>? id,
+    Expression<String>? profileId,
+    Expression<String>? name,
+    Expression<String>? platformMode,
+    Expression<String>? protectedCategoriesJson,
+    Expression<String>? allowlistCategoriesJson,
+    Expression<String>? escapePolicyJson,
+    Expression<bool>? isEnabled,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (profileId != null) 'profile_id': profileId,
+      if (name != null) 'name': name,
+      if (platformMode != null) 'platform_mode': platformMode,
+      if (protectedCategoriesJson != null)
+        'protected_categories_json': protectedCategoriesJson,
+      if (allowlistCategoriesJson != null)
+        'allowlist_categories_json': allowlistCategoriesJson,
+      if (escapePolicyJson != null) 'escape_policy_json': escapePolicyJson,
+      if (isEnabled != null) 'is_enabled': isEnabled,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  FrictionShieldProfilesCompanion copyWith({
+    Value<String>? id,
+    Value<String>? profileId,
+    Value<String>? name,
+    Value<String>? platformMode,
+    Value<String>? protectedCategoriesJson,
+    Value<String>? allowlistCategoriesJson,
+    Value<String>? escapePolicyJson,
+    Value<bool>? isEnabled,
+    Value<int>? rowid,
+  }) {
+    return FrictionShieldProfilesCompanion(
+      id: id ?? this.id,
+      profileId: profileId ?? this.profileId,
+      name: name ?? this.name,
+      platformMode: platformMode ?? this.platformMode,
+      protectedCategoriesJson:
+          protectedCategoriesJson ?? this.protectedCategoriesJson,
+      allowlistCategoriesJson:
+          allowlistCategoriesJson ?? this.allowlistCategoriesJson,
+      escapePolicyJson: escapePolicyJson ?? this.escapePolicyJson,
+      isEnabled: isEnabled ?? this.isEnabled,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (profileId.present) {
+      map['profile_id'] = Variable<String>(profileId.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (platformMode.present) {
+      map['platform_mode'] = Variable<String>(platformMode.value);
+    }
+    if (protectedCategoriesJson.present) {
+      map['protected_categories_json'] = Variable<String>(
+        protectedCategoriesJson.value,
+      );
+    }
+    if (allowlistCategoriesJson.present) {
+      map['allowlist_categories_json'] = Variable<String>(
+        allowlistCategoriesJson.value,
+      );
+    }
+    if (escapePolicyJson.present) {
+      map['escape_policy_json'] = Variable<String>(escapePolicyJson.value);
+    }
+    if (isEnabled.present) {
+      map['is_enabled'] = Variable<bool>(isEnabled.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('FrictionShieldProfilesCompanion(')
+          ..write('id: $id, ')
+          ..write('profileId: $profileId, ')
+          ..write('name: $name, ')
+          ..write('platformMode: $platformMode, ')
+          ..write('protectedCategoriesJson: $protectedCategoriesJson, ')
+          ..write('allowlistCategoriesJson: $allowlistCategoriesJson, ')
+          ..write('escapePolicyJson: $escapePolicyJson, ')
+          ..write('isEnabled: $isEnabled, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $FrictionShieldSessionsTable extends FrictionShieldSessions
+    with TableInfo<$FrictionShieldSessionsTable, FrictionShieldSessionRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $FrictionShieldSessionsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _profileIdMeta = const VerificationMeta(
+    'profileId',
+  );
+  @override
+  late final GeneratedColumn<String> profileId = GeneratedColumn<String>(
+    'profile_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES profiles (id)',
+    ),
+  );
+  static const VerificationMeta _shieldProfileIdMeta = const VerificationMeta(
+    'shieldProfileId',
+  );
+  @override
+  late final GeneratedColumn<String> shieldProfileId = GeneratedColumn<String>(
+    'shield_profile_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES friction_shield_profiles (id)',
+    ),
+  );
+  static const VerificationMeta _episodeIdMeta = const VerificationMeta(
+    'episodeId',
+  );
+  @override
+  late final GeneratedColumn<String> episodeId = GeneratedColumn<String>(
+    'episode_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _stateMeta = const VerificationMeta('state');
+  @override
+  late final GeneratedColumn<String> state = GeneratedColumn<String>(
+    'state',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _startedAtMeta = const VerificationMeta(
+    'startedAt',
+  );
+  @override
+  late final GeneratedColumn<int> startedAt = GeneratedColumn<int>(
+    'started_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _endedAtMeta = const VerificationMeta(
+    'endedAt',
+  );
+  @override
+  late final GeneratedColumn<int> endedAt = GeneratedColumn<int>(
+    'ended_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _escapeCountMeta = const VerificationMeta(
+    'escapeCount',
+  );
+  @override
+  late final GeneratedColumn<int> escapeCount = GeneratedColumn<int>(
+    'escape_count',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    profileId,
+    shieldProfileId,
+    episodeId,
+    state,
+    startedAt,
+    endedAt,
+    escapeCount,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'friction_shield_sessions';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<FrictionShieldSessionRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('profile_id')) {
+      context.handle(
+        _profileIdMeta,
+        profileId.isAcceptableOrUnknown(data['profile_id']!, _profileIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_profileIdMeta);
+    }
+    if (data.containsKey('shield_profile_id')) {
+      context.handle(
+        _shieldProfileIdMeta,
+        shieldProfileId.isAcceptableOrUnknown(
+          data['shield_profile_id']!,
+          _shieldProfileIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_shieldProfileIdMeta);
+    }
+    if (data.containsKey('episode_id')) {
+      context.handle(
+        _episodeIdMeta,
+        episodeId.isAcceptableOrUnknown(data['episode_id']!, _episodeIdMeta),
+      );
+    }
+    if (data.containsKey('state')) {
+      context.handle(
+        _stateMeta,
+        state.isAcceptableOrUnknown(data['state']!, _stateMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_stateMeta);
+    }
+    if (data.containsKey('started_at')) {
+      context.handle(
+        _startedAtMeta,
+        startedAt.isAcceptableOrUnknown(data['started_at']!, _startedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_startedAtMeta);
+    }
+    if (data.containsKey('ended_at')) {
+      context.handle(
+        _endedAtMeta,
+        endedAt.isAcceptableOrUnknown(data['ended_at']!, _endedAtMeta),
+      );
+    }
+    if (data.containsKey('escape_count')) {
+      context.handle(
+        _escapeCountMeta,
+        escapeCount.isAcceptableOrUnknown(
+          data['escape_count']!,
+          _escapeCountMeta,
+        ),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  FrictionShieldSessionRow map(
+    Map<String, dynamic> data, {
+    String? tablePrefix,
+  }) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return FrictionShieldSessionRow(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      profileId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}profile_id'],
+      )!,
+      shieldProfileId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}shield_profile_id'],
+      )!,
+      episodeId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}episode_id'],
+      ),
+      state: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}state'],
+      )!,
+      startedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}started_at'],
+      )!,
+      endedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}ended_at'],
+      ),
+      escapeCount: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}escape_count'],
+      )!,
+    );
+  }
+
+  @override
+  $FrictionShieldSessionsTable createAlias(String alias) {
+    return $FrictionShieldSessionsTable(attachedDatabase, alias);
+  }
+}
+
+class FrictionShieldSessionRow extends DataClass
+    implements Insertable<FrictionShieldSessionRow> {
+  final String id;
+  final String profileId;
+  final String shieldProfileId;
+  final String? episodeId;
+  final String state;
+  final int startedAt;
+  final int? endedAt;
+  final int escapeCount;
+  const FrictionShieldSessionRow({
+    required this.id,
+    required this.profileId,
+    required this.shieldProfileId,
+    this.episodeId,
+    required this.state,
+    required this.startedAt,
+    this.endedAt,
+    required this.escapeCount,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['profile_id'] = Variable<String>(profileId);
+    map['shield_profile_id'] = Variable<String>(shieldProfileId);
+    if (!nullToAbsent || episodeId != null) {
+      map['episode_id'] = Variable<String>(episodeId);
+    }
+    map['state'] = Variable<String>(state);
+    map['started_at'] = Variable<int>(startedAt);
+    if (!nullToAbsent || endedAt != null) {
+      map['ended_at'] = Variable<int>(endedAt);
+    }
+    map['escape_count'] = Variable<int>(escapeCount);
+    return map;
+  }
+
+  FrictionShieldSessionsCompanion toCompanion(bool nullToAbsent) {
+    return FrictionShieldSessionsCompanion(
+      id: Value(id),
+      profileId: Value(profileId),
+      shieldProfileId: Value(shieldProfileId),
+      episodeId: episodeId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(episodeId),
+      state: Value(state),
+      startedAt: Value(startedAt),
+      endedAt: endedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(endedAt),
+      escapeCount: Value(escapeCount),
+    );
+  }
+
+  factory FrictionShieldSessionRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return FrictionShieldSessionRow(
+      id: serializer.fromJson<String>(json['id']),
+      profileId: serializer.fromJson<String>(json['profileId']),
+      shieldProfileId: serializer.fromJson<String>(json['shieldProfileId']),
+      episodeId: serializer.fromJson<String?>(json['episodeId']),
+      state: serializer.fromJson<String>(json['state']),
+      startedAt: serializer.fromJson<int>(json['startedAt']),
+      endedAt: serializer.fromJson<int?>(json['endedAt']),
+      escapeCount: serializer.fromJson<int>(json['escapeCount']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'profileId': serializer.toJson<String>(profileId),
+      'shieldProfileId': serializer.toJson<String>(shieldProfileId),
+      'episodeId': serializer.toJson<String?>(episodeId),
+      'state': serializer.toJson<String>(state),
+      'startedAt': serializer.toJson<int>(startedAt),
+      'endedAt': serializer.toJson<int?>(endedAt),
+      'escapeCount': serializer.toJson<int>(escapeCount),
+    };
+  }
+
+  FrictionShieldSessionRow copyWith({
+    String? id,
+    String? profileId,
+    String? shieldProfileId,
+    Value<String?> episodeId = const Value.absent(),
+    String? state,
+    int? startedAt,
+    Value<int?> endedAt = const Value.absent(),
+    int? escapeCount,
+  }) => FrictionShieldSessionRow(
+    id: id ?? this.id,
+    profileId: profileId ?? this.profileId,
+    shieldProfileId: shieldProfileId ?? this.shieldProfileId,
+    episodeId: episodeId.present ? episodeId.value : this.episodeId,
+    state: state ?? this.state,
+    startedAt: startedAt ?? this.startedAt,
+    endedAt: endedAt.present ? endedAt.value : this.endedAt,
+    escapeCount: escapeCount ?? this.escapeCount,
+  );
+  FrictionShieldSessionRow copyWithCompanion(
+    FrictionShieldSessionsCompanion data,
+  ) {
+    return FrictionShieldSessionRow(
+      id: data.id.present ? data.id.value : this.id,
+      profileId: data.profileId.present ? data.profileId.value : this.profileId,
+      shieldProfileId: data.shieldProfileId.present
+          ? data.shieldProfileId.value
+          : this.shieldProfileId,
+      episodeId: data.episodeId.present ? data.episodeId.value : this.episodeId,
+      state: data.state.present ? data.state.value : this.state,
+      startedAt: data.startedAt.present ? data.startedAt.value : this.startedAt,
+      endedAt: data.endedAt.present ? data.endedAt.value : this.endedAt,
+      escapeCount: data.escapeCount.present
+          ? data.escapeCount.value
+          : this.escapeCount,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('FrictionShieldSessionRow(')
+          ..write('id: $id, ')
+          ..write('profileId: $profileId, ')
+          ..write('shieldProfileId: $shieldProfileId, ')
+          ..write('episodeId: $episodeId, ')
+          ..write('state: $state, ')
+          ..write('startedAt: $startedAt, ')
+          ..write('endedAt: $endedAt, ')
+          ..write('escapeCount: $escapeCount')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    profileId,
+    shieldProfileId,
+    episodeId,
+    state,
+    startedAt,
+    endedAt,
+    escapeCount,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is FrictionShieldSessionRow &&
+          other.id == this.id &&
+          other.profileId == this.profileId &&
+          other.shieldProfileId == this.shieldProfileId &&
+          other.episodeId == this.episodeId &&
+          other.state == this.state &&
+          other.startedAt == this.startedAt &&
+          other.endedAt == this.endedAt &&
+          other.escapeCount == this.escapeCount);
+}
+
+class FrictionShieldSessionsCompanion
+    extends UpdateCompanion<FrictionShieldSessionRow> {
+  final Value<String> id;
+  final Value<String> profileId;
+  final Value<String> shieldProfileId;
+  final Value<String?> episodeId;
+  final Value<String> state;
+  final Value<int> startedAt;
+  final Value<int?> endedAt;
+  final Value<int> escapeCount;
+  final Value<int> rowid;
+  const FrictionShieldSessionsCompanion({
+    this.id = const Value.absent(),
+    this.profileId = const Value.absent(),
+    this.shieldProfileId = const Value.absent(),
+    this.episodeId = const Value.absent(),
+    this.state = const Value.absent(),
+    this.startedAt = const Value.absent(),
+    this.endedAt = const Value.absent(),
+    this.escapeCount = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  FrictionShieldSessionsCompanion.insert({
+    required String id,
+    required String profileId,
+    required String shieldProfileId,
+    this.episodeId = const Value.absent(),
+    required String state,
+    required int startedAt,
+    this.endedAt = const Value.absent(),
+    this.escapeCount = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       profileId = Value(profileId),
+       shieldProfileId = Value(shieldProfileId),
+       state = Value(state),
+       startedAt = Value(startedAt);
+  static Insertable<FrictionShieldSessionRow> custom({
+    Expression<String>? id,
+    Expression<String>? profileId,
+    Expression<String>? shieldProfileId,
+    Expression<String>? episodeId,
+    Expression<String>? state,
+    Expression<int>? startedAt,
+    Expression<int>? endedAt,
+    Expression<int>? escapeCount,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (profileId != null) 'profile_id': profileId,
+      if (shieldProfileId != null) 'shield_profile_id': shieldProfileId,
+      if (episodeId != null) 'episode_id': episodeId,
+      if (state != null) 'state': state,
+      if (startedAt != null) 'started_at': startedAt,
+      if (endedAt != null) 'ended_at': endedAt,
+      if (escapeCount != null) 'escape_count': escapeCount,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  FrictionShieldSessionsCompanion copyWith({
+    Value<String>? id,
+    Value<String>? profileId,
+    Value<String>? shieldProfileId,
+    Value<String?>? episodeId,
+    Value<String>? state,
+    Value<int>? startedAt,
+    Value<int?>? endedAt,
+    Value<int>? escapeCount,
+    Value<int>? rowid,
+  }) {
+    return FrictionShieldSessionsCompanion(
+      id: id ?? this.id,
+      profileId: profileId ?? this.profileId,
+      shieldProfileId: shieldProfileId ?? this.shieldProfileId,
+      episodeId: episodeId ?? this.episodeId,
+      state: state ?? this.state,
+      startedAt: startedAt ?? this.startedAt,
+      endedAt: endedAt ?? this.endedAt,
+      escapeCount: escapeCount ?? this.escapeCount,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (profileId.present) {
+      map['profile_id'] = Variable<String>(profileId.value);
+    }
+    if (shieldProfileId.present) {
+      map['shield_profile_id'] = Variable<String>(shieldProfileId.value);
+    }
+    if (episodeId.present) {
+      map['episode_id'] = Variable<String>(episodeId.value);
+    }
+    if (state.present) {
+      map['state'] = Variable<String>(state.value);
+    }
+    if (startedAt.present) {
+      map['started_at'] = Variable<int>(startedAt.value);
+    }
+    if (endedAt.present) {
+      map['ended_at'] = Variable<int>(endedAt.value);
+    }
+    if (escapeCount.present) {
+      map['escape_count'] = Variable<int>(escapeCount.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('FrictionShieldSessionsCompanion(')
+          ..write('id: $id, ')
+          ..write('profileId: $profileId, ')
+          ..write('shieldProfileId: $shieldProfileId, ')
+          ..write('episodeId: $episodeId, ')
+          ..write('state: $state, ')
+          ..write('startedAt: $startedAt, ')
+          ..write('endedAt: $endedAt, ')
+          ..write('escapeCount: $escapeCount, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $TemptationBundlesTable extends TemptationBundles
+    with TableInfo<$TemptationBundlesTable, TemptationBundleRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $TemptationBundlesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _profileIdMeta = const VerificationMeta(
+    'profileId',
+  );
+  @override
+  late final GeneratedColumn<String> profileId = GeneratedColumn<String>(
+    'profile_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES profiles (id)',
+    ),
+  );
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+    'name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _pleasureLabelMeta = const VerificationMeta(
+    'pleasureLabel',
+  );
+  @override
+  late final GeneratedColumn<String> pleasureLabel = GeneratedColumn<String>(
+    'pleasure_label',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _requiredTransitionMeta =
+      const VerificationMeta('requiredTransition');
+  @override
+  late final GeneratedColumn<String> requiredTransition =
+      GeneratedColumn<String>(
+        'required_transition',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: true,
+      );
+  static const VerificationMeta _audioHintMeta = const VerificationMeta(
+    'audioHint',
+  );
+  @override
+  late final GeneratedColumn<String> audioHint = GeneratedColumn<String>(
+    'audio_hint',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _isEnabledMeta = const VerificationMeta(
+    'isEnabled',
+  );
+  @override
+  late final GeneratedColumn<bool> isEnabled = GeneratedColumn<bool>(
+    'is_enabled',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("is_enabled" IN (0, 1))',
+    ),
+    defaultValue: const Constant(true),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    profileId,
+    name,
+    pleasureLabel,
+    requiredTransition,
+    audioHint,
+    isEnabled,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'temptation_bundles';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<TemptationBundleRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('profile_id')) {
+      context.handle(
+        _profileIdMeta,
+        profileId.isAcceptableOrUnknown(data['profile_id']!, _profileIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_profileIdMeta);
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    if (data.containsKey('pleasure_label')) {
+      context.handle(
+        _pleasureLabelMeta,
+        pleasureLabel.isAcceptableOrUnknown(
+          data['pleasure_label']!,
+          _pleasureLabelMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_pleasureLabelMeta);
+    }
+    if (data.containsKey('required_transition')) {
+      context.handle(
+        _requiredTransitionMeta,
+        requiredTransition.isAcceptableOrUnknown(
+          data['required_transition']!,
+          _requiredTransitionMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_requiredTransitionMeta);
+    }
+    if (data.containsKey('audio_hint')) {
+      context.handle(
+        _audioHintMeta,
+        audioHint.isAcceptableOrUnknown(data['audio_hint']!, _audioHintMeta),
+      );
+    }
+    if (data.containsKey('is_enabled')) {
+      context.handle(
+        _isEnabledMeta,
+        isEnabled.isAcceptableOrUnknown(data['is_enabled']!, _isEnabledMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  TemptationBundleRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return TemptationBundleRow(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      profileId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}profile_id'],
+      )!,
+      name: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      )!,
+      pleasureLabel: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}pleasure_label'],
+      )!,
+      requiredTransition: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}required_transition'],
+      )!,
+      audioHint: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}audio_hint'],
+      ),
+      isEnabled: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}is_enabled'],
+      )!,
+    );
+  }
+
+  @override
+  $TemptationBundlesTable createAlias(String alias) {
+    return $TemptationBundlesTable(attachedDatabase, alias);
+  }
+}
+
+class TemptationBundleRow extends DataClass
+    implements Insertable<TemptationBundleRow> {
+  final String id;
+  final String profileId;
+  final String name;
+  final String pleasureLabel;
+  final String requiredTransition;
+  final String? audioHint;
+  final bool isEnabled;
+  const TemptationBundleRow({
+    required this.id,
+    required this.profileId,
+    required this.name,
+    required this.pleasureLabel,
+    required this.requiredTransition,
+    this.audioHint,
+    required this.isEnabled,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['profile_id'] = Variable<String>(profileId);
+    map['name'] = Variable<String>(name);
+    map['pleasure_label'] = Variable<String>(pleasureLabel);
+    map['required_transition'] = Variable<String>(requiredTransition);
+    if (!nullToAbsent || audioHint != null) {
+      map['audio_hint'] = Variable<String>(audioHint);
+    }
+    map['is_enabled'] = Variable<bool>(isEnabled);
+    return map;
+  }
+
+  TemptationBundlesCompanion toCompanion(bool nullToAbsent) {
+    return TemptationBundlesCompanion(
+      id: Value(id),
+      profileId: Value(profileId),
+      name: Value(name),
+      pleasureLabel: Value(pleasureLabel),
+      requiredTransition: Value(requiredTransition),
+      audioHint: audioHint == null && nullToAbsent
+          ? const Value.absent()
+          : Value(audioHint),
+      isEnabled: Value(isEnabled),
+    );
+  }
+
+  factory TemptationBundleRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return TemptationBundleRow(
+      id: serializer.fromJson<String>(json['id']),
+      profileId: serializer.fromJson<String>(json['profileId']),
+      name: serializer.fromJson<String>(json['name']),
+      pleasureLabel: serializer.fromJson<String>(json['pleasureLabel']),
+      requiredTransition: serializer.fromJson<String>(
+        json['requiredTransition'],
+      ),
+      audioHint: serializer.fromJson<String?>(json['audioHint']),
+      isEnabled: serializer.fromJson<bool>(json['isEnabled']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'profileId': serializer.toJson<String>(profileId),
+      'name': serializer.toJson<String>(name),
+      'pleasureLabel': serializer.toJson<String>(pleasureLabel),
+      'requiredTransition': serializer.toJson<String>(requiredTransition),
+      'audioHint': serializer.toJson<String?>(audioHint),
+      'isEnabled': serializer.toJson<bool>(isEnabled),
+    };
+  }
+
+  TemptationBundleRow copyWith({
+    String? id,
+    String? profileId,
+    String? name,
+    String? pleasureLabel,
+    String? requiredTransition,
+    Value<String?> audioHint = const Value.absent(),
+    bool? isEnabled,
+  }) => TemptationBundleRow(
+    id: id ?? this.id,
+    profileId: profileId ?? this.profileId,
+    name: name ?? this.name,
+    pleasureLabel: pleasureLabel ?? this.pleasureLabel,
+    requiredTransition: requiredTransition ?? this.requiredTransition,
+    audioHint: audioHint.present ? audioHint.value : this.audioHint,
+    isEnabled: isEnabled ?? this.isEnabled,
+  );
+  TemptationBundleRow copyWithCompanion(TemptationBundlesCompanion data) {
+    return TemptationBundleRow(
+      id: data.id.present ? data.id.value : this.id,
+      profileId: data.profileId.present ? data.profileId.value : this.profileId,
+      name: data.name.present ? data.name.value : this.name,
+      pleasureLabel: data.pleasureLabel.present
+          ? data.pleasureLabel.value
+          : this.pleasureLabel,
+      requiredTransition: data.requiredTransition.present
+          ? data.requiredTransition.value
+          : this.requiredTransition,
+      audioHint: data.audioHint.present ? data.audioHint.value : this.audioHint,
+      isEnabled: data.isEnabled.present ? data.isEnabled.value : this.isEnabled,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('TemptationBundleRow(')
+          ..write('id: $id, ')
+          ..write('profileId: $profileId, ')
+          ..write('name: $name, ')
+          ..write('pleasureLabel: $pleasureLabel, ')
+          ..write('requiredTransition: $requiredTransition, ')
+          ..write('audioHint: $audioHint, ')
+          ..write('isEnabled: $isEnabled')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    profileId,
+    name,
+    pleasureLabel,
+    requiredTransition,
+    audioHint,
+    isEnabled,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is TemptationBundleRow &&
+          other.id == this.id &&
+          other.profileId == this.profileId &&
+          other.name == this.name &&
+          other.pleasureLabel == this.pleasureLabel &&
+          other.requiredTransition == this.requiredTransition &&
+          other.audioHint == this.audioHint &&
+          other.isEnabled == this.isEnabled);
+}
+
+class TemptationBundlesCompanion extends UpdateCompanion<TemptationBundleRow> {
+  final Value<String> id;
+  final Value<String> profileId;
+  final Value<String> name;
+  final Value<String> pleasureLabel;
+  final Value<String> requiredTransition;
+  final Value<String?> audioHint;
+  final Value<bool> isEnabled;
+  final Value<int> rowid;
+  const TemptationBundlesCompanion({
+    this.id = const Value.absent(),
+    this.profileId = const Value.absent(),
+    this.name = const Value.absent(),
+    this.pleasureLabel = const Value.absent(),
+    this.requiredTransition = const Value.absent(),
+    this.audioHint = const Value.absent(),
+    this.isEnabled = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  TemptationBundlesCompanion.insert({
+    required String id,
+    required String profileId,
+    required String name,
+    required String pleasureLabel,
+    required String requiredTransition,
+    this.audioHint = const Value.absent(),
+    this.isEnabled = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       profileId = Value(profileId),
+       name = Value(name),
+       pleasureLabel = Value(pleasureLabel),
+       requiredTransition = Value(requiredTransition);
+  static Insertable<TemptationBundleRow> custom({
+    Expression<String>? id,
+    Expression<String>? profileId,
+    Expression<String>? name,
+    Expression<String>? pleasureLabel,
+    Expression<String>? requiredTransition,
+    Expression<String>? audioHint,
+    Expression<bool>? isEnabled,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (profileId != null) 'profile_id': profileId,
+      if (name != null) 'name': name,
+      if (pleasureLabel != null) 'pleasure_label': pleasureLabel,
+      if (requiredTransition != null) 'required_transition': requiredTransition,
+      if (audioHint != null) 'audio_hint': audioHint,
+      if (isEnabled != null) 'is_enabled': isEnabled,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  TemptationBundlesCompanion copyWith({
+    Value<String>? id,
+    Value<String>? profileId,
+    Value<String>? name,
+    Value<String>? pleasureLabel,
+    Value<String>? requiredTransition,
+    Value<String?>? audioHint,
+    Value<bool>? isEnabled,
+    Value<int>? rowid,
+  }) {
+    return TemptationBundlesCompanion(
+      id: id ?? this.id,
+      profileId: profileId ?? this.profileId,
+      name: name ?? this.name,
+      pleasureLabel: pleasureLabel ?? this.pleasureLabel,
+      requiredTransition: requiredTransition ?? this.requiredTransition,
+      audioHint: audioHint ?? this.audioHint,
+      isEnabled: isEnabled ?? this.isEnabled,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (profileId.present) {
+      map['profile_id'] = Variable<String>(profileId.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (pleasureLabel.present) {
+      map['pleasure_label'] = Variable<String>(pleasureLabel.value);
+    }
+    if (requiredTransition.present) {
+      map['required_transition'] = Variable<String>(requiredTransition.value);
+    }
+    if (audioHint.present) {
+      map['audio_hint'] = Variable<String>(audioHint.value);
+    }
+    if (isEnabled.present) {
+      map['is_enabled'] = Variable<bool>(isEnabled.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('TemptationBundlesCompanion(')
+          ..write('id: $id, ')
+          ..write('profileId: $profileId, ')
+          ..write('name: $name, ')
+          ..write('pleasureLabel: $pleasureLabel, ')
+          ..write('requiredTransition: $requiredTransition, ')
+          ..write('audioHint: $audioHint, ')
+          ..write('isEnabled: $isEnabled, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $ActivationScenesTable extends ActivationScenes
+    with TableInfo<$ActivationScenesTable, ActivationSceneRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $ActivationScenesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _profileIdMeta = const VerificationMeta(
+    'profileId',
+  );
+  @override
+  late final GeneratedColumn<String> profileId = GeneratedColumn<String>(
+    'profile_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES profiles (id)',
+    ),
+  );
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+    'name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _kindMeta = const VerificationMeta('kind');
+  @override
+  late final GeneratedColumn<String> kind = GeneratedColumn<String>(
+    'kind',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _payloadJsonMeta = const VerificationMeta(
+    'payloadJson',
+  );
+  @override
+  late final GeneratedColumn<String> payloadJson = GeneratedColumn<String>(
+    'payload_json',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('{}'),
+  );
+  static const VerificationMeta _isEnabledMeta = const VerificationMeta(
+    'isEnabled',
+  );
+  @override
+  late final GeneratedColumn<bool> isEnabled = GeneratedColumn<bool>(
+    'is_enabled',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("is_enabled" IN (0, 1))',
+    ),
+    defaultValue: const Constant(true),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    profileId,
+    name,
+    kind,
+    payloadJson,
+    isEnabled,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'activation_scenes';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<ActivationSceneRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('profile_id')) {
+      context.handle(
+        _profileIdMeta,
+        profileId.isAcceptableOrUnknown(data['profile_id']!, _profileIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_profileIdMeta);
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    if (data.containsKey('kind')) {
+      context.handle(
+        _kindMeta,
+        kind.isAcceptableOrUnknown(data['kind']!, _kindMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_kindMeta);
+    }
+    if (data.containsKey('payload_json')) {
+      context.handle(
+        _payloadJsonMeta,
+        payloadJson.isAcceptableOrUnknown(
+          data['payload_json']!,
+          _payloadJsonMeta,
+        ),
+      );
+    }
+    if (data.containsKey('is_enabled')) {
+      context.handle(
+        _isEnabledMeta,
+        isEnabled.isAcceptableOrUnknown(data['is_enabled']!, _isEnabledMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  ActivationSceneRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return ActivationSceneRow(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      profileId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}profile_id'],
+      )!,
+      name: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      )!,
+      kind: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}kind'],
+      )!,
+      payloadJson: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}payload_json'],
+      )!,
+      isEnabled: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}is_enabled'],
+      )!,
+    );
+  }
+
+  @override
+  $ActivationScenesTable createAlias(String alias) {
+    return $ActivationScenesTable(attachedDatabase, alias);
+  }
+}
+
+class ActivationSceneRow extends DataClass
+    implements Insertable<ActivationSceneRow> {
+  final String id;
+  final String profileId;
+  final String name;
+  final String kind;
+  final String payloadJson;
+  final bool isEnabled;
+  const ActivationSceneRow({
+    required this.id,
+    required this.profileId,
+    required this.name,
+    required this.kind,
+    required this.payloadJson,
+    required this.isEnabled,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['profile_id'] = Variable<String>(profileId);
+    map['name'] = Variable<String>(name);
+    map['kind'] = Variable<String>(kind);
+    map['payload_json'] = Variable<String>(payloadJson);
+    map['is_enabled'] = Variable<bool>(isEnabled);
+    return map;
+  }
+
+  ActivationScenesCompanion toCompanion(bool nullToAbsent) {
+    return ActivationScenesCompanion(
+      id: Value(id),
+      profileId: Value(profileId),
+      name: Value(name),
+      kind: Value(kind),
+      payloadJson: Value(payloadJson),
+      isEnabled: Value(isEnabled),
+    );
+  }
+
+  factory ActivationSceneRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return ActivationSceneRow(
+      id: serializer.fromJson<String>(json['id']),
+      profileId: serializer.fromJson<String>(json['profileId']),
+      name: serializer.fromJson<String>(json['name']),
+      kind: serializer.fromJson<String>(json['kind']),
+      payloadJson: serializer.fromJson<String>(json['payloadJson']),
+      isEnabled: serializer.fromJson<bool>(json['isEnabled']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'profileId': serializer.toJson<String>(profileId),
+      'name': serializer.toJson<String>(name),
+      'kind': serializer.toJson<String>(kind),
+      'payloadJson': serializer.toJson<String>(payloadJson),
+      'isEnabled': serializer.toJson<bool>(isEnabled),
+    };
+  }
+
+  ActivationSceneRow copyWith({
+    String? id,
+    String? profileId,
+    String? name,
+    String? kind,
+    String? payloadJson,
+    bool? isEnabled,
+  }) => ActivationSceneRow(
+    id: id ?? this.id,
+    profileId: profileId ?? this.profileId,
+    name: name ?? this.name,
+    kind: kind ?? this.kind,
+    payloadJson: payloadJson ?? this.payloadJson,
+    isEnabled: isEnabled ?? this.isEnabled,
+  );
+  ActivationSceneRow copyWithCompanion(ActivationScenesCompanion data) {
+    return ActivationSceneRow(
+      id: data.id.present ? data.id.value : this.id,
+      profileId: data.profileId.present ? data.profileId.value : this.profileId,
+      name: data.name.present ? data.name.value : this.name,
+      kind: data.kind.present ? data.kind.value : this.kind,
+      payloadJson: data.payloadJson.present
+          ? data.payloadJson.value
+          : this.payloadJson,
+      isEnabled: data.isEnabled.present ? data.isEnabled.value : this.isEnabled,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ActivationSceneRow(')
+          ..write('id: $id, ')
+          ..write('profileId: $profileId, ')
+          ..write('name: $name, ')
+          ..write('kind: $kind, ')
+          ..write('payloadJson: $payloadJson, ')
+          ..write('isEnabled: $isEnabled')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(id, profileId, name, kind, payloadJson, isEnabled);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is ActivationSceneRow &&
+          other.id == this.id &&
+          other.profileId == this.profileId &&
+          other.name == this.name &&
+          other.kind == this.kind &&
+          other.payloadJson == this.payloadJson &&
+          other.isEnabled == this.isEnabled);
+}
+
+class ActivationScenesCompanion extends UpdateCompanion<ActivationSceneRow> {
+  final Value<String> id;
+  final Value<String> profileId;
+  final Value<String> name;
+  final Value<String> kind;
+  final Value<String> payloadJson;
+  final Value<bool> isEnabled;
+  final Value<int> rowid;
+  const ActivationScenesCompanion({
+    this.id = const Value.absent(),
+    this.profileId = const Value.absent(),
+    this.name = const Value.absent(),
+    this.kind = const Value.absent(),
+    this.payloadJson = const Value.absent(),
+    this.isEnabled = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  ActivationScenesCompanion.insert({
+    required String id,
+    required String profileId,
+    required String name,
+    required String kind,
+    this.payloadJson = const Value.absent(),
+    this.isEnabled = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       profileId = Value(profileId),
+       name = Value(name),
+       kind = Value(kind);
+  static Insertable<ActivationSceneRow> custom({
+    Expression<String>? id,
+    Expression<String>? profileId,
+    Expression<String>? name,
+    Expression<String>? kind,
+    Expression<String>? payloadJson,
+    Expression<bool>? isEnabled,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (profileId != null) 'profile_id': profileId,
+      if (name != null) 'name': name,
+      if (kind != null) 'kind': kind,
+      if (payloadJson != null) 'payload_json': payloadJson,
+      if (isEnabled != null) 'is_enabled': isEnabled,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  ActivationScenesCompanion copyWith({
+    Value<String>? id,
+    Value<String>? profileId,
+    Value<String>? name,
+    Value<String>? kind,
+    Value<String>? payloadJson,
+    Value<bool>? isEnabled,
+    Value<int>? rowid,
+  }) {
+    return ActivationScenesCompanion(
+      id: id ?? this.id,
+      profileId: profileId ?? this.profileId,
+      name: name ?? this.name,
+      kind: kind ?? this.kind,
+      payloadJson: payloadJson ?? this.payloadJson,
+      isEnabled: isEnabled ?? this.isEnabled,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (profileId.present) {
+      map['profile_id'] = Variable<String>(profileId.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (kind.present) {
+      map['kind'] = Variable<String>(kind.value);
+    }
+    if (payloadJson.present) {
+      map['payload_json'] = Variable<String>(payloadJson.value);
+    }
+    if (isEnabled.present) {
+      map['is_enabled'] = Variable<bool>(isEnabled.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ActivationScenesCompanion(')
+          ..write('id: $id, ')
+          ..write('profileId: $profileId, ')
+          ..write('name: $name, ')
+          ..write('kind: $kind, ')
+          ..write('payloadJson: $payloadJson, ')
+          ..write('isEnabled: $isEnabled, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $RescueContractsTable extends RescueContracts
+    with TableInfo<$RescueContractsTable, RescueContractRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $RescueContractsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _profileIdMeta = const VerificationMeta(
+    'profileId',
+  );
+  @override
+  late final GeneratedColumn<String> profileId = GeneratedColumn<String>(
+    'profile_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES profiles (id)',
+    ),
+  );
+  static const VerificationMeta _contactLabelMeta = const VerificationMeta(
+    'contactLabel',
+  );
+  @override
+  late final GeneratedColumn<String> contactLabel = GeneratedColumn<String>(
+    'contact_label',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _messageTemplateMeta = const VerificationMeta(
+    'messageTemplate',
+  );
+  @override
+  late final GeneratedColumn<String> messageTemplate = GeneratedColumn<String>(
+    'message_template',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _statusMeta = const VerificationMeta('status');
+  @override
+  late final GeneratedColumn<String> status = GeneratedColumn<String>(
+    'status',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _personIdMeta = const VerificationMeta(
+    'personId',
+  );
+  @override
+  late final GeneratedColumn<String> personId = GeneratedColumn<String>(
+    'person_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _requiresConfirmationMeta =
+      const VerificationMeta('requiresConfirmation');
+  @override
+  late final GeneratedColumn<bool> requiresConfirmation = GeneratedColumn<bool>(
+    'requires_confirmation',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("requires_confirmation" IN (0, 1))',
+    ),
+    defaultValue: const Constant(true),
+  );
+  static const VerificationMeta _lastConfirmedAtMeta = const VerificationMeta(
+    'lastConfirmedAt',
+  );
+  @override
+  late final GeneratedColumn<int> lastConfirmedAt = GeneratedColumn<int>(
+    'last_confirmed_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    profileId,
+    contactLabel,
+    messageTemplate,
+    status,
+    personId,
+    requiresConfirmation,
+    lastConfirmedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'rescue_contracts';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<RescueContractRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('profile_id')) {
+      context.handle(
+        _profileIdMeta,
+        profileId.isAcceptableOrUnknown(data['profile_id']!, _profileIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_profileIdMeta);
+    }
+    if (data.containsKey('contact_label')) {
+      context.handle(
+        _contactLabelMeta,
+        contactLabel.isAcceptableOrUnknown(
+          data['contact_label']!,
+          _contactLabelMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_contactLabelMeta);
+    }
+    if (data.containsKey('message_template')) {
+      context.handle(
+        _messageTemplateMeta,
+        messageTemplate.isAcceptableOrUnknown(
+          data['message_template']!,
+          _messageTemplateMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_messageTemplateMeta);
+    }
+    if (data.containsKey('status')) {
+      context.handle(
+        _statusMeta,
+        status.isAcceptableOrUnknown(data['status']!, _statusMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_statusMeta);
+    }
+    if (data.containsKey('person_id')) {
+      context.handle(
+        _personIdMeta,
+        personId.isAcceptableOrUnknown(data['person_id']!, _personIdMeta),
+      );
+    }
+    if (data.containsKey('requires_confirmation')) {
+      context.handle(
+        _requiresConfirmationMeta,
+        requiresConfirmation.isAcceptableOrUnknown(
+          data['requires_confirmation']!,
+          _requiresConfirmationMeta,
+        ),
+      );
+    }
+    if (data.containsKey('last_confirmed_at')) {
+      context.handle(
+        _lastConfirmedAtMeta,
+        lastConfirmedAt.isAcceptableOrUnknown(
+          data['last_confirmed_at']!,
+          _lastConfirmedAtMeta,
+        ),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  RescueContractRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return RescueContractRow(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      profileId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}profile_id'],
+      )!,
+      contactLabel: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}contact_label'],
+      )!,
+      messageTemplate: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}message_template'],
+      )!,
+      status: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}status'],
+      )!,
+      personId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}person_id'],
+      ),
+      requiresConfirmation: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}requires_confirmation'],
+      )!,
+      lastConfirmedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}last_confirmed_at'],
+      ),
+    );
+  }
+
+  @override
+  $RescueContractsTable createAlias(String alias) {
+    return $RescueContractsTable(attachedDatabase, alias);
+  }
+}
+
+class RescueContractRow extends DataClass
+    implements Insertable<RescueContractRow> {
+  final String id;
+  final String profileId;
+  final String contactLabel;
+  final String messageTemplate;
+  final String status;
+  final String? personId;
+  final bool requiresConfirmation;
+  final int? lastConfirmedAt;
+  const RescueContractRow({
+    required this.id,
+    required this.profileId,
+    required this.contactLabel,
+    required this.messageTemplate,
+    required this.status,
+    this.personId,
+    required this.requiresConfirmation,
+    this.lastConfirmedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['profile_id'] = Variable<String>(profileId);
+    map['contact_label'] = Variable<String>(contactLabel);
+    map['message_template'] = Variable<String>(messageTemplate);
+    map['status'] = Variable<String>(status);
+    if (!nullToAbsent || personId != null) {
+      map['person_id'] = Variable<String>(personId);
+    }
+    map['requires_confirmation'] = Variable<bool>(requiresConfirmation);
+    if (!nullToAbsent || lastConfirmedAt != null) {
+      map['last_confirmed_at'] = Variable<int>(lastConfirmedAt);
+    }
+    return map;
+  }
+
+  RescueContractsCompanion toCompanion(bool nullToAbsent) {
+    return RescueContractsCompanion(
+      id: Value(id),
+      profileId: Value(profileId),
+      contactLabel: Value(contactLabel),
+      messageTemplate: Value(messageTemplate),
+      status: Value(status),
+      personId: personId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(personId),
+      requiresConfirmation: Value(requiresConfirmation),
+      lastConfirmedAt: lastConfirmedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(lastConfirmedAt),
+    );
+  }
+
+  factory RescueContractRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return RescueContractRow(
+      id: serializer.fromJson<String>(json['id']),
+      profileId: serializer.fromJson<String>(json['profileId']),
+      contactLabel: serializer.fromJson<String>(json['contactLabel']),
+      messageTemplate: serializer.fromJson<String>(json['messageTemplate']),
+      status: serializer.fromJson<String>(json['status']),
+      personId: serializer.fromJson<String?>(json['personId']),
+      requiresConfirmation: serializer.fromJson<bool>(
+        json['requiresConfirmation'],
+      ),
+      lastConfirmedAt: serializer.fromJson<int?>(json['lastConfirmedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'profileId': serializer.toJson<String>(profileId),
+      'contactLabel': serializer.toJson<String>(contactLabel),
+      'messageTemplate': serializer.toJson<String>(messageTemplate),
+      'status': serializer.toJson<String>(status),
+      'personId': serializer.toJson<String?>(personId),
+      'requiresConfirmation': serializer.toJson<bool>(requiresConfirmation),
+      'lastConfirmedAt': serializer.toJson<int?>(lastConfirmedAt),
+    };
+  }
+
+  RescueContractRow copyWith({
+    String? id,
+    String? profileId,
+    String? contactLabel,
+    String? messageTemplate,
+    String? status,
+    Value<String?> personId = const Value.absent(),
+    bool? requiresConfirmation,
+    Value<int?> lastConfirmedAt = const Value.absent(),
+  }) => RescueContractRow(
+    id: id ?? this.id,
+    profileId: profileId ?? this.profileId,
+    contactLabel: contactLabel ?? this.contactLabel,
+    messageTemplate: messageTemplate ?? this.messageTemplate,
+    status: status ?? this.status,
+    personId: personId.present ? personId.value : this.personId,
+    requiresConfirmation: requiresConfirmation ?? this.requiresConfirmation,
+    lastConfirmedAt: lastConfirmedAt.present
+        ? lastConfirmedAt.value
+        : this.lastConfirmedAt,
+  );
+  RescueContractRow copyWithCompanion(RescueContractsCompanion data) {
+    return RescueContractRow(
+      id: data.id.present ? data.id.value : this.id,
+      profileId: data.profileId.present ? data.profileId.value : this.profileId,
+      contactLabel: data.contactLabel.present
+          ? data.contactLabel.value
+          : this.contactLabel,
+      messageTemplate: data.messageTemplate.present
+          ? data.messageTemplate.value
+          : this.messageTemplate,
+      status: data.status.present ? data.status.value : this.status,
+      personId: data.personId.present ? data.personId.value : this.personId,
+      requiresConfirmation: data.requiresConfirmation.present
+          ? data.requiresConfirmation.value
+          : this.requiresConfirmation,
+      lastConfirmedAt: data.lastConfirmedAt.present
+          ? data.lastConfirmedAt.value
+          : this.lastConfirmedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('RescueContractRow(')
+          ..write('id: $id, ')
+          ..write('profileId: $profileId, ')
+          ..write('contactLabel: $contactLabel, ')
+          ..write('messageTemplate: $messageTemplate, ')
+          ..write('status: $status, ')
+          ..write('personId: $personId, ')
+          ..write('requiresConfirmation: $requiresConfirmation, ')
+          ..write('lastConfirmedAt: $lastConfirmedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    profileId,
+    contactLabel,
+    messageTemplate,
+    status,
+    personId,
+    requiresConfirmation,
+    lastConfirmedAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is RescueContractRow &&
+          other.id == this.id &&
+          other.profileId == this.profileId &&
+          other.contactLabel == this.contactLabel &&
+          other.messageTemplate == this.messageTemplate &&
+          other.status == this.status &&
+          other.personId == this.personId &&
+          other.requiresConfirmation == this.requiresConfirmation &&
+          other.lastConfirmedAt == this.lastConfirmedAt);
+}
+
+class RescueContractsCompanion extends UpdateCompanion<RescueContractRow> {
+  final Value<String> id;
+  final Value<String> profileId;
+  final Value<String> contactLabel;
+  final Value<String> messageTemplate;
+  final Value<String> status;
+  final Value<String?> personId;
+  final Value<bool> requiresConfirmation;
+  final Value<int?> lastConfirmedAt;
+  final Value<int> rowid;
+  const RescueContractsCompanion({
+    this.id = const Value.absent(),
+    this.profileId = const Value.absent(),
+    this.contactLabel = const Value.absent(),
+    this.messageTemplate = const Value.absent(),
+    this.status = const Value.absent(),
+    this.personId = const Value.absent(),
+    this.requiresConfirmation = const Value.absent(),
+    this.lastConfirmedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  RescueContractsCompanion.insert({
+    required String id,
+    required String profileId,
+    required String contactLabel,
+    required String messageTemplate,
+    required String status,
+    this.personId = const Value.absent(),
+    this.requiresConfirmation = const Value.absent(),
+    this.lastConfirmedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       profileId = Value(profileId),
+       contactLabel = Value(contactLabel),
+       messageTemplate = Value(messageTemplate),
+       status = Value(status);
+  static Insertable<RescueContractRow> custom({
+    Expression<String>? id,
+    Expression<String>? profileId,
+    Expression<String>? contactLabel,
+    Expression<String>? messageTemplate,
+    Expression<String>? status,
+    Expression<String>? personId,
+    Expression<bool>? requiresConfirmation,
+    Expression<int>? lastConfirmedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (profileId != null) 'profile_id': profileId,
+      if (contactLabel != null) 'contact_label': contactLabel,
+      if (messageTemplate != null) 'message_template': messageTemplate,
+      if (status != null) 'status': status,
+      if (personId != null) 'person_id': personId,
+      if (requiresConfirmation != null)
+        'requires_confirmation': requiresConfirmation,
+      if (lastConfirmedAt != null) 'last_confirmed_at': lastConfirmedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  RescueContractsCompanion copyWith({
+    Value<String>? id,
+    Value<String>? profileId,
+    Value<String>? contactLabel,
+    Value<String>? messageTemplate,
+    Value<String>? status,
+    Value<String?>? personId,
+    Value<bool>? requiresConfirmation,
+    Value<int?>? lastConfirmedAt,
+    Value<int>? rowid,
+  }) {
+    return RescueContractsCompanion(
+      id: id ?? this.id,
+      profileId: profileId ?? this.profileId,
+      contactLabel: contactLabel ?? this.contactLabel,
+      messageTemplate: messageTemplate ?? this.messageTemplate,
+      status: status ?? this.status,
+      personId: personId ?? this.personId,
+      requiresConfirmation: requiresConfirmation ?? this.requiresConfirmation,
+      lastConfirmedAt: lastConfirmedAt ?? this.lastConfirmedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (profileId.present) {
+      map['profile_id'] = Variable<String>(profileId.value);
+    }
+    if (contactLabel.present) {
+      map['contact_label'] = Variable<String>(contactLabel.value);
+    }
+    if (messageTemplate.present) {
+      map['message_template'] = Variable<String>(messageTemplate.value);
+    }
+    if (status.present) {
+      map['status'] = Variable<String>(status.value);
+    }
+    if (personId.present) {
+      map['person_id'] = Variable<String>(personId.value);
+    }
+    if (requiresConfirmation.present) {
+      map['requires_confirmation'] = Variable<bool>(requiresConfirmation.value);
+    }
+    if (lastConfirmedAt.present) {
+      map['last_confirmed_at'] = Variable<int>(lastConfirmedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('RescueContractsCompanion(')
+          ..write('id: $id, ')
+          ..write('profileId: $profileId, ')
+          ..write('contactLabel: $contactLabel, ')
+          ..write('messageTemplate: $messageTemplate, ')
+          ..write('status: $status, ')
+          ..write('personId: $personId, ')
+          ..write('requiresConfirmation: $requiresConfirmation, ')
+          ..write('lastConfirmedAt: $lastConfirmedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $ActivationExperimentsTable extends ActivationExperiments
+    with TableInfo<$ActivationExperimentsTable, ActivationExperimentRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $ActivationExperimentsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _profileIdMeta = const VerificationMeta(
+    'profileId',
+  );
+  @override
+  late final GeneratedColumn<String> profileId = GeneratedColumn<String>(
+    'profile_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES profiles (id)',
+    ),
+  );
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+    'name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _hypothesisMeta = const VerificationMeta(
+    'hypothesis',
+  );
+  @override
+  late final GeneratedColumn<String> hypothesis = GeneratedColumn<String>(
+    'hypothesis',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _variableKeyMeta = const VerificationMeta(
+    'variableKey',
+  );
+  @override
+  late final GeneratedColumn<String> variableKey = GeneratedColumn<String>(
+    'variable_key',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _variantsJsonMeta = const VerificationMeta(
+    'variantsJson',
+  );
+  @override
+  late final GeneratedColumn<String> variantsJson = GeneratedColumn<String>(
+    'variants_json',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _contextFilterJsonMeta = const VerificationMeta(
+    'contextFilterJson',
+  );
+  @override
+  late final GeneratedColumn<String> contextFilterJson =
+      GeneratedColumn<String>(
+        'context_filter_json',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+        defaultValue: const Constant('{}'),
+      );
+  static const VerificationMeta _minimumSamplesMeta = const VerificationMeta(
+    'minimumSamples',
+  );
+  @override
+  late final GeneratedColumn<int> minimumSamples = GeneratedColumn<int>(
+    'minimum_samples',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(6),
+  );
+  static const VerificationMeta _statusMeta = const VerificationMeta('status');
+  @override
+  late final GeneratedColumn<String> status = GeneratedColumn<String>(
+    'status',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _startedAtMeta = const VerificationMeta(
+    'startedAt',
+  );
+  @override
+  late final GeneratedColumn<int> startedAt = GeneratedColumn<int>(
+    'started_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _endedAtMeta = const VerificationMeta(
+    'endedAt',
+  );
+  @override
+  late final GeneratedColumn<int> endedAt = GeneratedColumn<int>(
+    'ended_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _resultJsonMeta = const VerificationMeta(
+    'resultJson',
+  );
+  @override
+  late final GeneratedColumn<String> resultJson = GeneratedColumn<String>(
+    'result_json',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    profileId,
+    name,
+    hypothesis,
+    variableKey,
+    variantsJson,
+    contextFilterJson,
+    minimumSamples,
+    status,
+    startedAt,
+    endedAt,
+    resultJson,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'activation_experiments';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<ActivationExperimentRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('profile_id')) {
+      context.handle(
+        _profileIdMeta,
+        profileId.isAcceptableOrUnknown(data['profile_id']!, _profileIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_profileIdMeta);
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    if (data.containsKey('hypothesis')) {
+      context.handle(
+        _hypothesisMeta,
+        hypothesis.isAcceptableOrUnknown(data['hypothesis']!, _hypothesisMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_hypothesisMeta);
+    }
+    if (data.containsKey('variable_key')) {
+      context.handle(
+        _variableKeyMeta,
+        variableKey.isAcceptableOrUnknown(
+          data['variable_key']!,
+          _variableKeyMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_variableKeyMeta);
+    }
+    if (data.containsKey('variants_json')) {
+      context.handle(
+        _variantsJsonMeta,
+        variantsJson.isAcceptableOrUnknown(
+          data['variants_json']!,
+          _variantsJsonMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_variantsJsonMeta);
+    }
+    if (data.containsKey('context_filter_json')) {
+      context.handle(
+        _contextFilterJsonMeta,
+        contextFilterJson.isAcceptableOrUnknown(
+          data['context_filter_json']!,
+          _contextFilterJsonMeta,
+        ),
+      );
+    }
+    if (data.containsKey('minimum_samples')) {
+      context.handle(
+        _minimumSamplesMeta,
+        minimumSamples.isAcceptableOrUnknown(
+          data['minimum_samples']!,
+          _minimumSamplesMeta,
+        ),
+      );
+    }
+    if (data.containsKey('status')) {
+      context.handle(
+        _statusMeta,
+        status.isAcceptableOrUnknown(data['status']!, _statusMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_statusMeta);
+    }
+    if (data.containsKey('started_at')) {
+      context.handle(
+        _startedAtMeta,
+        startedAt.isAcceptableOrUnknown(data['started_at']!, _startedAtMeta),
+      );
+    }
+    if (data.containsKey('ended_at')) {
+      context.handle(
+        _endedAtMeta,
+        endedAt.isAcceptableOrUnknown(data['ended_at']!, _endedAtMeta),
+      );
+    }
+    if (data.containsKey('result_json')) {
+      context.handle(
+        _resultJsonMeta,
+        resultJson.isAcceptableOrUnknown(data['result_json']!, _resultJsonMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  ActivationExperimentRow map(
+    Map<String, dynamic> data, {
+    String? tablePrefix,
+  }) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return ActivationExperimentRow(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      profileId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}profile_id'],
+      )!,
+      name: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      )!,
+      hypothesis: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}hypothesis'],
+      )!,
+      variableKey: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}variable_key'],
+      )!,
+      variantsJson: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}variants_json'],
+      )!,
+      contextFilterJson: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}context_filter_json'],
+      )!,
+      minimumSamples: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}minimum_samples'],
+      )!,
+      status: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}status'],
+      )!,
+      startedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}started_at'],
+      ),
+      endedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}ended_at'],
+      ),
+      resultJson: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}result_json'],
+      ),
+    );
+  }
+
+  @override
+  $ActivationExperimentsTable createAlias(String alias) {
+    return $ActivationExperimentsTable(attachedDatabase, alias);
+  }
+}
+
+class ActivationExperimentRow extends DataClass
+    implements Insertable<ActivationExperimentRow> {
+  final String id;
+  final String profileId;
+  final String name;
+  final String hypothesis;
+  final String variableKey;
+  final String variantsJson;
+  final String contextFilterJson;
+  final int minimumSamples;
+  final String status;
+  final int? startedAt;
+  final int? endedAt;
+  final String? resultJson;
+  const ActivationExperimentRow({
+    required this.id,
+    required this.profileId,
+    required this.name,
+    required this.hypothesis,
+    required this.variableKey,
+    required this.variantsJson,
+    required this.contextFilterJson,
+    required this.minimumSamples,
+    required this.status,
+    this.startedAt,
+    this.endedAt,
+    this.resultJson,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['profile_id'] = Variable<String>(profileId);
+    map['name'] = Variable<String>(name);
+    map['hypothesis'] = Variable<String>(hypothesis);
+    map['variable_key'] = Variable<String>(variableKey);
+    map['variants_json'] = Variable<String>(variantsJson);
+    map['context_filter_json'] = Variable<String>(contextFilterJson);
+    map['minimum_samples'] = Variable<int>(minimumSamples);
+    map['status'] = Variable<String>(status);
+    if (!nullToAbsent || startedAt != null) {
+      map['started_at'] = Variable<int>(startedAt);
+    }
+    if (!nullToAbsent || endedAt != null) {
+      map['ended_at'] = Variable<int>(endedAt);
+    }
+    if (!nullToAbsent || resultJson != null) {
+      map['result_json'] = Variable<String>(resultJson);
+    }
+    return map;
+  }
+
+  ActivationExperimentsCompanion toCompanion(bool nullToAbsent) {
+    return ActivationExperimentsCompanion(
+      id: Value(id),
+      profileId: Value(profileId),
+      name: Value(name),
+      hypothesis: Value(hypothesis),
+      variableKey: Value(variableKey),
+      variantsJson: Value(variantsJson),
+      contextFilterJson: Value(contextFilterJson),
+      minimumSamples: Value(minimumSamples),
+      status: Value(status),
+      startedAt: startedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(startedAt),
+      endedAt: endedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(endedAt),
+      resultJson: resultJson == null && nullToAbsent
+          ? const Value.absent()
+          : Value(resultJson),
+    );
+  }
+
+  factory ActivationExperimentRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return ActivationExperimentRow(
+      id: serializer.fromJson<String>(json['id']),
+      profileId: serializer.fromJson<String>(json['profileId']),
+      name: serializer.fromJson<String>(json['name']),
+      hypothesis: serializer.fromJson<String>(json['hypothesis']),
+      variableKey: serializer.fromJson<String>(json['variableKey']),
+      variantsJson: serializer.fromJson<String>(json['variantsJson']),
+      contextFilterJson: serializer.fromJson<String>(json['contextFilterJson']),
+      minimumSamples: serializer.fromJson<int>(json['minimumSamples']),
+      status: serializer.fromJson<String>(json['status']),
+      startedAt: serializer.fromJson<int?>(json['startedAt']),
+      endedAt: serializer.fromJson<int?>(json['endedAt']),
+      resultJson: serializer.fromJson<String?>(json['resultJson']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'profileId': serializer.toJson<String>(profileId),
+      'name': serializer.toJson<String>(name),
+      'hypothesis': serializer.toJson<String>(hypothesis),
+      'variableKey': serializer.toJson<String>(variableKey),
+      'variantsJson': serializer.toJson<String>(variantsJson),
+      'contextFilterJson': serializer.toJson<String>(contextFilterJson),
+      'minimumSamples': serializer.toJson<int>(minimumSamples),
+      'status': serializer.toJson<String>(status),
+      'startedAt': serializer.toJson<int?>(startedAt),
+      'endedAt': serializer.toJson<int?>(endedAt),
+      'resultJson': serializer.toJson<String?>(resultJson),
+    };
+  }
+
+  ActivationExperimentRow copyWith({
+    String? id,
+    String? profileId,
+    String? name,
+    String? hypothesis,
+    String? variableKey,
+    String? variantsJson,
+    String? contextFilterJson,
+    int? minimumSamples,
+    String? status,
+    Value<int?> startedAt = const Value.absent(),
+    Value<int?> endedAt = const Value.absent(),
+    Value<String?> resultJson = const Value.absent(),
+  }) => ActivationExperimentRow(
+    id: id ?? this.id,
+    profileId: profileId ?? this.profileId,
+    name: name ?? this.name,
+    hypothesis: hypothesis ?? this.hypothesis,
+    variableKey: variableKey ?? this.variableKey,
+    variantsJson: variantsJson ?? this.variantsJson,
+    contextFilterJson: contextFilterJson ?? this.contextFilterJson,
+    minimumSamples: minimumSamples ?? this.minimumSamples,
+    status: status ?? this.status,
+    startedAt: startedAt.present ? startedAt.value : this.startedAt,
+    endedAt: endedAt.present ? endedAt.value : this.endedAt,
+    resultJson: resultJson.present ? resultJson.value : this.resultJson,
+  );
+  ActivationExperimentRow copyWithCompanion(
+    ActivationExperimentsCompanion data,
+  ) {
+    return ActivationExperimentRow(
+      id: data.id.present ? data.id.value : this.id,
+      profileId: data.profileId.present ? data.profileId.value : this.profileId,
+      name: data.name.present ? data.name.value : this.name,
+      hypothesis: data.hypothesis.present
+          ? data.hypothesis.value
+          : this.hypothesis,
+      variableKey: data.variableKey.present
+          ? data.variableKey.value
+          : this.variableKey,
+      variantsJson: data.variantsJson.present
+          ? data.variantsJson.value
+          : this.variantsJson,
+      contextFilterJson: data.contextFilterJson.present
+          ? data.contextFilterJson.value
+          : this.contextFilterJson,
+      minimumSamples: data.minimumSamples.present
+          ? data.minimumSamples.value
+          : this.minimumSamples,
+      status: data.status.present ? data.status.value : this.status,
+      startedAt: data.startedAt.present ? data.startedAt.value : this.startedAt,
+      endedAt: data.endedAt.present ? data.endedAt.value : this.endedAt,
+      resultJson: data.resultJson.present
+          ? data.resultJson.value
+          : this.resultJson,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ActivationExperimentRow(')
+          ..write('id: $id, ')
+          ..write('profileId: $profileId, ')
+          ..write('name: $name, ')
+          ..write('hypothesis: $hypothesis, ')
+          ..write('variableKey: $variableKey, ')
+          ..write('variantsJson: $variantsJson, ')
+          ..write('contextFilterJson: $contextFilterJson, ')
+          ..write('minimumSamples: $minimumSamples, ')
+          ..write('status: $status, ')
+          ..write('startedAt: $startedAt, ')
+          ..write('endedAt: $endedAt, ')
+          ..write('resultJson: $resultJson')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    profileId,
+    name,
+    hypothesis,
+    variableKey,
+    variantsJson,
+    contextFilterJson,
+    minimumSamples,
+    status,
+    startedAt,
+    endedAt,
+    resultJson,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is ActivationExperimentRow &&
+          other.id == this.id &&
+          other.profileId == this.profileId &&
+          other.name == this.name &&
+          other.hypothesis == this.hypothesis &&
+          other.variableKey == this.variableKey &&
+          other.variantsJson == this.variantsJson &&
+          other.contextFilterJson == this.contextFilterJson &&
+          other.minimumSamples == this.minimumSamples &&
+          other.status == this.status &&
+          other.startedAt == this.startedAt &&
+          other.endedAt == this.endedAt &&
+          other.resultJson == this.resultJson);
+}
+
+class ActivationExperimentsCompanion
+    extends UpdateCompanion<ActivationExperimentRow> {
+  final Value<String> id;
+  final Value<String> profileId;
+  final Value<String> name;
+  final Value<String> hypothesis;
+  final Value<String> variableKey;
+  final Value<String> variantsJson;
+  final Value<String> contextFilterJson;
+  final Value<int> minimumSamples;
+  final Value<String> status;
+  final Value<int?> startedAt;
+  final Value<int?> endedAt;
+  final Value<String?> resultJson;
+  final Value<int> rowid;
+  const ActivationExperimentsCompanion({
+    this.id = const Value.absent(),
+    this.profileId = const Value.absent(),
+    this.name = const Value.absent(),
+    this.hypothesis = const Value.absent(),
+    this.variableKey = const Value.absent(),
+    this.variantsJson = const Value.absent(),
+    this.contextFilterJson = const Value.absent(),
+    this.minimumSamples = const Value.absent(),
+    this.status = const Value.absent(),
+    this.startedAt = const Value.absent(),
+    this.endedAt = const Value.absent(),
+    this.resultJson = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  ActivationExperimentsCompanion.insert({
+    required String id,
+    required String profileId,
+    required String name,
+    required String hypothesis,
+    required String variableKey,
+    required String variantsJson,
+    this.contextFilterJson = const Value.absent(),
+    this.minimumSamples = const Value.absent(),
+    required String status,
+    this.startedAt = const Value.absent(),
+    this.endedAt = const Value.absent(),
+    this.resultJson = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       profileId = Value(profileId),
+       name = Value(name),
+       hypothesis = Value(hypothesis),
+       variableKey = Value(variableKey),
+       variantsJson = Value(variantsJson),
+       status = Value(status);
+  static Insertable<ActivationExperimentRow> custom({
+    Expression<String>? id,
+    Expression<String>? profileId,
+    Expression<String>? name,
+    Expression<String>? hypothesis,
+    Expression<String>? variableKey,
+    Expression<String>? variantsJson,
+    Expression<String>? contextFilterJson,
+    Expression<int>? minimumSamples,
+    Expression<String>? status,
+    Expression<int>? startedAt,
+    Expression<int>? endedAt,
+    Expression<String>? resultJson,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (profileId != null) 'profile_id': profileId,
+      if (name != null) 'name': name,
+      if (hypothesis != null) 'hypothesis': hypothesis,
+      if (variableKey != null) 'variable_key': variableKey,
+      if (variantsJson != null) 'variants_json': variantsJson,
+      if (contextFilterJson != null) 'context_filter_json': contextFilterJson,
+      if (minimumSamples != null) 'minimum_samples': minimumSamples,
+      if (status != null) 'status': status,
+      if (startedAt != null) 'started_at': startedAt,
+      if (endedAt != null) 'ended_at': endedAt,
+      if (resultJson != null) 'result_json': resultJson,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  ActivationExperimentsCompanion copyWith({
+    Value<String>? id,
+    Value<String>? profileId,
+    Value<String>? name,
+    Value<String>? hypothesis,
+    Value<String>? variableKey,
+    Value<String>? variantsJson,
+    Value<String>? contextFilterJson,
+    Value<int>? minimumSamples,
+    Value<String>? status,
+    Value<int?>? startedAt,
+    Value<int?>? endedAt,
+    Value<String?>? resultJson,
+    Value<int>? rowid,
+  }) {
+    return ActivationExperimentsCompanion(
+      id: id ?? this.id,
+      profileId: profileId ?? this.profileId,
+      name: name ?? this.name,
+      hypothesis: hypothesis ?? this.hypothesis,
+      variableKey: variableKey ?? this.variableKey,
+      variantsJson: variantsJson ?? this.variantsJson,
+      contextFilterJson: contextFilterJson ?? this.contextFilterJson,
+      minimumSamples: minimumSamples ?? this.minimumSamples,
+      status: status ?? this.status,
+      startedAt: startedAt ?? this.startedAt,
+      endedAt: endedAt ?? this.endedAt,
+      resultJson: resultJson ?? this.resultJson,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (profileId.present) {
+      map['profile_id'] = Variable<String>(profileId.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (hypothesis.present) {
+      map['hypothesis'] = Variable<String>(hypothesis.value);
+    }
+    if (variableKey.present) {
+      map['variable_key'] = Variable<String>(variableKey.value);
+    }
+    if (variantsJson.present) {
+      map['variants_json'] = Variable<String>(variantsJson.value);
+    }
+    if (contextFilterJson.present) {
+      map['context_filter_json'] = Variable<String>(contextFilterJson.value);
+    }
+    if (minimumSamples.present) {
+      map['minimum_samples'] = Variable<int>(minimumSamples.value);
+    }
+    if (status.present) {
+      map['status'] = Variable<String>(status.value);
+    }
+    if (startedAt.present) {
+      map['started_at'] = Variable<int>(startedAt.value);
+    }
+    if (endedAt.present) {
+      map['ended_at'] = Variable<int>(endedAt.value);
+    }
+    if (resultJson.present) {
+      map['result_json'] = Variable<String>(resultJson.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ActivationExperimentsCompanion(')
+          ..write('id: $id, ')
+          ..write('profileId: $profileId, ')
+          ..write('name: $name, ')
+          ..write('hypothesis: $hypothesis, ')
+          ..write('variableKey: $variableKey, ')
+          ..write('variantsJson: $variantsJson, ')
+          ..write('contextFilterJson: $contextFilterJson, ')
+          ..write('minimumSamples: $minimumSamples, ')
+          ..write('status: $status, ')
+          ..write('startedAt: $startedAt, ')
+          ..write('endedAt: $endedAt, ')
+          ..write('resultJson: $resultJson, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $ActivationExperimentAssignmentsTable
+    extends ActivationExperimentAssignments
+    with
+        TableInfo<
+          $ActivationExperimentAssignmentsTable,
+          ActivationExperimentAssignmentRow
+        > {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $ActivationExperimentAssignmentsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _experimentIdMeta = const VerificationMeta(
+    'experimentId',
+  );
+  @override
+  late final GeneratedColumn<String> experimentId = GeneratedColumn<String>(
+    'experiment_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES activation_experiments (id)',
+    ),
+  );
+  static const VerificationMeta _episodeIdMeta = const VerificationMeta(
+    'episodeId',
+  );
+  @override
+  late final GeneratedColumn<String> episodeId = GeneratedColumn<String>(
+    'episode_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES activation_episodes (id)',
+    ),
+  );
+  static const VerificationMeta _variantMeta = const VerificationMeta(
+    'variant',
+  );
+  @override
+  late final GeneratedColumn<String> variant = GeneratedColumn<String>(
+    'variant',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _assignedAtMeta = const VerificationMeta(
+    'assignedAt',
+  );
+  @override
+  late final GeneratedColumn<int> assignedAt = GeneratedColumn<int>(
+    'assigned_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    experimentId,
+    episodeId,
+    variant,
+    assignedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'activation_experiment_assignments';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<ActivationExperimentAssignmentRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('experiment_id')) {
+      context.handle(
+        _experimentIdMeta,
+        experimentId.isAcceptableOrUnknown(
+          data['experiment_id']!,
+          _experimentIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_experimentIdMeta);
+    }
+    if (data.containsKey('episode_id')) {
+      context.handle(
+        _episodeIdMeta,
+        episodeId.isAcceptableOrUnknown(data['episode_id']!, _episodeIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_episodeIdMeta);
+    }
+    if (data.containsKey('variant')) {
+      context.handle(
+        _variantMeta,
+        variant.isAcceptableOrUnknown(data['variant']!, _variantMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_variantMeta);
+    }
+    if (data.containsKey('assigned_at')) {
+      context.handle(
+        _assignedAtMeta,
+        assignedAt.isAcceptableOrUnknown(data['assigned_at']!, _assignedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_assignedAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  ActivationExperimentAssignmentRow map(
+    Map<String, dynamic> data, {
+    String? tablePrefix,
+  }) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return ActivationExperimentAssignmentRow(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      experimentId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}experiment_id'],
+      )!,
+      episodeId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}episode_id'],
+      )!,
+      variant: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}variant'],
+      )!,
+      assignedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}assigned_at'],
+      )!,
+    );
+  }
+
+  @override
+  $ActivationExperimentAssignmentsTable createAlias(String alias) {
+    return $ActivationExperimentAssignmentsTable(attachedDatabase, alias);
+  }
+}
+
+class ActivationExperimentAssignmentRow extends DataClass
+    implements Insertable<ActivationExperimentAssignmentRow> {
+  final String id;
+  final String experimentId;
+  final String episodeId;
+  final String variant;
+  final int assignedAt;
+  const ActivationExperimentAssignmentRow({
+    required this.id,
+    required this.experimentId,
+    required this.episodeId,
+    required this.variant,
+    required this.assignedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['experiment_id'] = Variable<String>(experimentId);
+    map['episode_id'] = Variable<String>(episodeId);
+    map['variant'] = Variable<String>(variant);
+    map['assigned_at'] = Variable<int>(assignedAt);
+    return map;
+  }
+
+  ActivationExperimentAssignmentsCompanion toCompanion(bool nullToAbsent) {
+    return ActivationExperimentAssignmentsCompanion(
+      id: Value(id),
+      experimentId: Value(experimentId),
+      episodeId: Value(episodeId),
+      variant: Value(variant),
+      assignedAt: Value(assignedAt),
+    );
+  }
+
+  factory ActivationExperimentAssignmentRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return ActivationExperimentAssignmentRow(
+      id: serializer.fromJson<String>(json['id']),
+      experimentId: serializer.fromJson<String>(json['experimentId']),
+      episodeId: serializer.fromJson<String>(json['episodeId']),
+      variant: serializer.fromJson<String>(json['variant']),
+      assignedAt: serializer.fromJson<int>(json['assignedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'experimentId': serializer.toJson<String>(experimentId),
+      'episodeId': serializer.toJson<String>(episodeId),
+      'variant': serializer.toJson<String>(variant),
+      'assignedAt': serializer.toJson<int>(assignedAt),
+    };
+  }
+
+  ActivationExperimentAssignmentRow copyWith({
+    String? id,
+    String? experimentId,
+    String? episodeId,
+    String? variant,
+    int? assignedAt,
+  }) => ActivationExperimentAssignmentRow(
+    id: id ?? this.id,
+    experimentId: experimentId ?? this.experimentId,
+    episodeId: episodeId ?? this.episodeId,
+    variant: variant ?? this.variant,
+    assignedAt: assignedAt ?? this.assignedAt,
+  );
+  ActivationExperimentAssignmentRow copyWithCompanion(
+    ActivationExperimentAssignmentsCompanion data,
+  ) {
+    return ActivationExperimentAssignmentRow(
+      id: data.id.present ? data.id.value : this.id,
+      experimentId: data.experimentId.present
+          ? data.experimentId.value
+          : this.experimentId,
+      episodeId: data.episodeId.present ? data.episodeId.value : this.episodeId,
+      variant: data.variant.present ? data.variant.value : this.variant,
+      assignedAt: data.assignedAt.present
+          ? data.assignedAt.value
+          : this.assignedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ActivationExperimentAssignmentRow(')
+          ..write('id: $id, ')
+          ..write('experimentId: $experimentId, ')
+          ..write('episodeId: $episodeId, ')
+          ..write('variant: $variant, ')
+          ..write('assignedAt: $assignedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(id, experimentId, episodeId, variant, assignedAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is ActivationExperimentAssignmentRow &&
+          other.id == this.id &&
+          other.experimentId == this.experimentId &&
+          other.episodeId == this.episodeId &&
+          other.variant == this.variant &&
+          other.assignedAt == this.assignedAt);
+}
+
+class ActivationExperimentAssignmentsCompanion
+    extends UpdateCompanion<ActivationExperimentAssignmentRow> {
+  final Value<String> id;
+  final Value<String> experimentId;
+  final Value<String> episodeId;
+  final Value<String> variant;
+  final Value<int> assignedAt;
+  final Value<int> rowid;
+  const ActivationExperimentAssignmentsCompanion({
+    this.id = const Value.absent(),
+    this.experimentId = const Value.absent(),
+    this.episodeId = const Value.absent(),
+    this.variant = const Value.absent(),
+    this.assignedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  ActivationExperimentAssignmentsCompanion.insert({
+    required String id,
+    required String experimentId,
+    required String episodeId,
+    required String variant,
+    required int assignedAt,
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       experimentId = Value(experimentId),
+       episodeId = Value(episodeId),
+       variant = Value(variant),
+       assignedAt = Value(assignedAt);
+  static Insertable<ActivationExperimentAssignmentRow> custom({
+    Expression<String>? id,
+    Expression<String>? experimentId,
+    Expression<String>? episodeId,
+    Expression<String>? variant,
+    Expression<int>? assignedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (experimentId != null) 'experiment_id': experimentId,
+      if (episodeId != null) 'episode_id': episodeId,
+      if (variant != null) 'variant': variant,
+      if (assignedAt != null) 'assigned_at': assignedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  ActivationExperimentAssignmentsCompanion copyWith({
+    Value<String>? id,
+    Value<String>? experimentId,
+    Value<String>? episodeId,
+    Value<String>? variant,
+    Value<int>? assignedAt,
+    Value<int>? rowid,
+  }) {
+    return ActivationExperimentAssignmentsCompanion(
+      id: id ?? this.id,
+      experimentId: experimentId ?? this.experimentId,
+      episodeId: episodeId ?? this.episodeId,
+      variant: variant ?? this.variant,
+      assignedAt: assignedAt ?? this.assignedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (experimentId.present) {
+      map['experiment_id'] = Variable<String>(experimentId.value);
+    }
+    if (episodeId.present) {
+      map['episode_id'] = Variable<String>(episodeId.value);
+    }
+    if (variant.present) {
+      map['variant'] = Variable<String>(variant.value);
+    }
+    if (assignedAt.present) {
+      map['assigned_at'] = Variable<int>(assignedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ActivationExperimentAssignmentsCompanion(')
+          ..write('id: $id, ')
+          ..write('experimentId: $experimentId, ')
+          ..write('episodeId: $episodeId, ')
+          ..write('variant: $variant, ')
+          ..write('assignedAt: $assignedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $ActivationInsightsTable extends ActivationInsights
+    with TableInfo<$ActivationInsightsTable, ActivationInsightRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $ActivationInsightsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _profileIdMeta = const VerificationMeta(
+    'profileId',
+  );
+  @override
+  late final GeneratedColumn<String> profileId = GeneratedColumn<String>(
+    'profile_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES profiles (id)',
+    ),
+  );
+  static const VerificationMeta _titleMeta = const VerificationMeta('title');
+  @override
+  late final GeneratedColumn<String> title = GeneratedColumn<String>(
+    'title',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _bodyMeta = const VerificationMeta('body');
+  @override
+  late final GeneratedColumn<String> body = GeneratedColumn<String>(
+    'body',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<int> createdAt = GeneratedColumn<int>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _sampleSizeMeta = const VerificationMeta(
+    'sampleSize',
+  );
+  @override
+  late final GeneratedColumn<int> sampleSize = GeneratedColumn<int>(
+    'sample_size',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _confidenceMeta = const VerificationMeta(
+    'confidence',
+  );
+  @override
+  late final GeneratedColumn<String> confidence = GeneratedColumn<String>(
+    'confidence',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('low'),
+  );
+  static const VerificationMeta _associativeOnlyMeta = const VerificationMeta(
+    'associativeOnly',
+  );
+  @override
+  late final GeneratedColumn<bool> associativeOnly = GeneratedColumn<bool>(
+    'associative_only',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("associative_only" IN (0, 1))',
+    ),
+    defaultValue: const Constant(true),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    profileId,
+    title,
+    body,
+    createdAt,
+    sampleSize,
+    confidence,
+    associativeOnly,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'activation_insights';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<ActivationInsightRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('profile_id')) {
+      context.handle(
+        _profileIdMeta,
+        profileId.isAcceptableOrUnknown(data['profile_id']!, _profileIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_profileIdMeta);
+    }
+    if (data.containsKey('title')) {
+      context.handle(
+        _titleMeta,
+        title.isAcceptableOrUnknown(data['title']!, _titleMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_titleMeta);
+    }
+    if (data.containsKey('body')) {
+      context.handle(
+        _bodyMeta,
+        body.isAcceptableOrUnknown(data['body']!, _bodyMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_bodyMeta);
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('sample_size')) {
+      context.handle(
+        _sampleSizeMeta,
+        sampleSize.isAcceptableOrUnknown(data['sample_size']!, _sampleSizeMeta),
+      );
+    }
+    if (data.containsKey('confidence')) {
+      context.handle(
+        _confidenceMeta,
+        confidence.isAcceptableOrUnknown(data['confidence']!, _confidenceMeta),
+      );
+    }
+    if (data.containsKey('associative_only')) {
+      context.handle(
+        _associativeOnlyMeta,
+        associativeOnly.isAcceptableOrUnknown(
+          data['associative_only']!,
+          _associativeOnlyMeta,
+        ),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  ActivationInsightRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return ActivationInsightRow(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      profileId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}profile_id'],
+      )!,
+      title: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}title'],
+      )!,
+      body: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}body'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}created_at'],
+      )!,
+      sampleSize: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}sample_size'],
+      )!,
+      confidence: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}confidence'],
+      )!,
+      associativeOnly: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}associative_only'],
+      )!,
+    );
+  }
+
+  @override
+  $ActivationInsightsTable createAlias(String alias) {
+    return $ActivationInsightsTable(attachedDatabase, alias);
+  }
+}
+
+class ActivationInsightRow extends DataClass
+    implements Insertable<ActivationInsightRow> {
+  final String id;
+  final String profileId;
+  final String title;
+  final String body;
+  final int createdAt;
+  final int sampleSize;
+  final String confidence;
+  final bool associativeOnly;
+  const ActivationInsightRow({
+    required this.id,
+    required this.profileId,
+    required this.title,
+    required this.body,
+    required this.createdAt,
+    required this.sampleSize,
+    required this.confidence,
+    required this.associativeOnly,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['profile_id'] = Variable<String>(profileId);
+    map['title'] = Variable<String>(title);
+    map['body'] = Variable<String>(body);
+    map['created_at'] = Variable<int>(createdAt);
+    map['sample_size'] = Variable<int>(sampleSize);
+    map['confidence'] = Variable<String>(confidence);
+    map['associative_only'] = Variable<bool>(associativeOnly);
+    return map;
+  }
+
+  ActivationInsightsCompanion toCompanion(bool nullToAbsent) {
+    return ActivationInsightsCompanion(
+      id: Value(id),
+      profileId: Value(profileId),
+      title: Value(title),
+      body: Value(body),
+      createdAt: Value(createdAt),
+      sampleSize: Value(sampleSize),
+      confidence: Value(confidence),
+      associativeOnly: Value(associativeOnly),
+    );
+  }
+
+  factory ActivationInsightRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return ActivationInsightRow(
+      id: serializer.fromJson<String>(json['id']),
+      profileId: serializer.fromJson<String>(json['profileId']),
+      title: serializer.fromJson<String>(json['title']),
+      body: serializer.fromJson<String>(json['body']),
+      createdAt: serializer.fromJson<int>(json['createdAt']),
+      sampleSize: serializer.fromJson<int>(json['sampleSize']),
+      confidence: serializer.fromJson<String>(json['confidence']),
+      associativeOnly: serializer.fromJson<bool>(json['associativeOnly']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'profileId': serializer.toJson<String>(profileId),
+      'title': serializer.toJson<String>(title),
+      'body': serializer.toJson<String>(body),
+      'createdAt': serializer.toJson<int>(createdAt),
+      'sampleSize': serializer.toJson<int>(sampleSize),
+      'confidence': serializer.toJson<String>(confidence),
+      'associativeOnly': serializer.toJson<bool>(associativeOnly),
+    };
+  }
+
+  ActivationInsightRow copyWith({
+    String? id,
+    String? profileId,
+    String? title,
+    String? body,
+    int? createdAt,
+    int? sampleSize,
+    String? confidence,
+    bool? associativeOnly,
+  }) => ActivationInsightRow(
+    id: id ?? this.id,
+    profileId: profileId ?? this.profileId,
+    title: title ?? this.title,
+    body: body ?? this.body,
+    createdAt: createdAt ?? this.createdAt,
+    sampleSize: sampleSize ?? this.sampleSize,
+    confidence: confidence ?? this.confidence,
+    associativeOnly: associativeOnly ?? this.associativeOnly,
+  );
+  ActivationInsightRow copyWithCompanion(ActivationInsightsCompanion data) {
+    return ActivationInsightRow(
+      id: data.id.present ? data.id.value : this.id,
+      profileId: data.profileId.present ? data.profileId.value : this.profileId,
+      title: data.title.present ? data.title.value : this.title,
+      body: data.body.present ? data.body.value : this.body,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      sampleSize: data.sampleSize.present
+          ? data.sampleSize.value
+          : this.sampleSize,
+      confidence: data.confidence.present
+          ? data.confidence.value
+          : this.confidence,
+      associativeOnly: data.associativeOnly.present
+          ? data.associativeOnly.value
+          : this.associativeOnly,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ActivationInsightRow(')
+          ..write('id: $id, ')
+          ..write('profileId: $profileId, ')
+          ..write('title: $title, ')
+          ..write('body: $body, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('sampleSize: $sampleSize, ')
+          ..write('confidence: $confidence, ')
+          ..write('associativeOnly: $associativeOnly')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    profileId,
+    title,
+    body,
+    createdAt,
+    sampleSize,
+    confidence,
+    associativeOnly,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is ActivationInsightRow &&
+          other.id == this.id &&
+          other.profileId == this.profileId &&
+          other.title == this.title &&
+          other.body == this.body &&
+          other.createdAt == this.createdAt &&
+          other.sampleSize == this.sampleSize &&
+          other.confidence == this.confidence &&
+          other.associativeOnly == this.associativeOnly);
+}
+
+class ActivationInsightsCompanion
+    extends UpdateCompanion<ActivationInsightRow> {
+  final Value<String> id;
+  final Value<String> profileId;
+  final Value<String> title;
+  final Value<String> body;
+  final Value<int> createdAt;
+  final Value<int> sampleSize;
+  final Value<String> confidence;
+  final Value<bool> associativeOnly;
+  final Value<int> rowid;
+  const ActivationInsightsCompanion({
+    this.id = const Value.absent(),
+    this.profileId = const Value.absent(),
+    this.title = const Value.absent(),
+    this.body = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.sampleSize = const Value.absent(),
+    this.confidence = const Value.absent(),
+    this.associativeOnly = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  ActivationInsightsCompanion.insert({
+    required String id,
+    required String profileId,
+    required String title,
+    required String body,
+    required int createdAt,
+    this.sampleSize = const Value.absent(),
+    this.confidence = const Value.absent(),
+    this.associativeOnly = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       profileId = Value(profileId),
+       title = Value(title),
+       body = Value(body),
+       createdAt = Value(createdAt);
+  static Insertable<ActivationInsightRow> custom({
+    Expression<String>? id,
+    Expression<String>? profileId,
+    Expression<String>? title,
+    Expression<String>? body,
+    Expression<int>? createdAt,
+    Expression<int>? sampleSize,
+    Expression<String>? confidence,
+    Expression<bool>? associativeOnly,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (profileId != null) 'profile_id': profileId,
+      if (title != null) 'title': title,
+      if (body != null) 'body': body,
+      if (createdAt != null) 'created_at': createdAt,
+      if (sampleSize != null) 'sample_size': sampleSize,
+      if (confidence != null) 'confidence': confidence,
+      if (associativeOnly != null) 'associative_only': associativeOnly,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  ActivationInsightsCompanion copyWith({
+    Value<String>? id,
+    Value<String>? profileId,
+    Value<String>? title,
+    Value<String>? body,
+    Value<int>? createdAt,
+    Value<int>? sampleSize,
+    Value<String>? confidence,
+    Value<bool>? associativeOnly,
+    Value<int>? rowid,
+  }) {
+    return ActivationInsightsCompanion(
+      id: id ?? this.id,
+      profileId: profileId ?? this.profileId,
+      title: title ?? this.title,
+      body: body ?? this.body,
+      createdAt: createdAt ?? this.createdAt,
+      sampleSize: sampleSize ?? this.sampleSize,
+      confidence: confidence ?? this.confidence,
+      associativeOnly: associativeOnly ?? this.associativeOnly,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (profileId.present) {
+      map['profile_id'] = Variable<String>(profileId.value);
+    }
+    if (title.present) {
+      map['title'] = Variable<String>(title.value);
+    }
+    if (body.present) {
+      map['body'] = Variable<String>(body.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<int>(createdAt.value);
+    }
+    if (sampleSize.present) {
+      map['sample_size'] = Variable<int>(sampleSize.value);
+    }
+    if (confidence.present) {
+      map['confidence'] = Variable<String>(confidence.value);
+    }
+    if (associativeOnly.present) {
+      map['associative_only'] = Variable<bool>(associativeOnly.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ActivationInsightsCompanion(')
+          ..write('id: $id, ')
+          ..write('profileId: $profileId, ')
+          ..write('title: $title, ')
+          ..write('body: $body, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('sampleSize: $sampleSize, ')
+          ..write('confidence: $confidence, ')
+          ..write('associativeOnly: $associativeOnly, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$ColonyDatabase extends GeneratedDatabase {
   _$ColonyDatabase(QueryExecutor e) : super(e);
   $ColonyDatabaseManager get managers => $ColonyDatabaseManager(this);
@@ -41605,6 +53339,42 @@ abstract class _$ColonyDatabase extends GeneratedDatabase {
       $FriendshipCirclesTable(this);
   late final $FriendshipCircleMembershipsTable friendshipCircleMemberships =
       $FriendshipCircleMembershipsTable(this);
+  late final $ActivationProtocolsTable activationProtocols =
+      $ActivationProtocolsTable(this);
+  late final $ActivationProtocolVersionsTable activationProtocolVersions =
+      $ActivationProtocolVersionsTable(this);
+  late final $ActivationCommandTemplatesTable activationCommandTemplates =
+      $ActivationCommandTemplatesTable(this);
+  late final $ActivationEpisodesTable activationEpisodes =
+      $ActivationEpisodesTable(this);
+  late final $ActivationCommandRunsTable activationCommandRuns =
+      $ActivationCommandRunsTable(this);
+  late final $ActivationProofsTable activationProofs = $ActivationProofsTable(
+    this,
+  );
+  late final $ActivationWaypointsTable activationWaypoints =
+      $ActivationWaypointsTable(this);
+  late final $WaypointObservationsTable waypointObservations =
+      $WaypointObservationsTable(this);
+  late final $InertiaSignalsTable inertiaSignals = $InertiaSignalsTable(this);
+  late final $FrictionShieldProfilesTable frictionShieldProfiles =
+      $FrictionShieldProfilesTable(this);
+  late final $FrictionShieldSessionsTable frictionShieldSessions =
+      $FrictionShieldSessionsTable(this);
+  late final $TemptationBundlesTable temptationBundles =
+      $TemptationBundlesTable(this);
+  late final $ActivationScenesTable activationScenes = $ActivationScenesTable(
+    this,
+  );
+  late final $RescueContractsTable rescueContracts = $RescueContractsTable(
+    this,
+  );
+  late final $ActivationExperimentsTable activationExperiments =
+      $ActivationExperimentsTable(this);
+  late final $ActivationExperimentAssignmentsTable
+  activationExperimentAssignments = $ActivationExperimentAssignmentsTable(this);
+  late final $ActivationInsightsTable activationInsights =
+      $ActivationInsightsTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -41681,6 +53451,23 @@ abstract class _$ColonyDatabase extends GeneratedDatabase {
     friendships,
     friendshipCircles,
     friendshipCircleMemberships,
+    activationProtocols,
+    activationProtocolVersions,
+    activationCommandTemplates,
+    activationEpisodes,
+    activationCommandRuns,
+    activationProofs,
+    activationWaypoints,
+    waypointObservations,
+    inertiaSignals,
+    frictionShieldProfiles,
+    frictionShieldSessions,
+    temptationBundles,
+    activationScenes,
+    rescueContracts,
+    activationExperiments,
+    activationExperimentAssignments,
+    activationInsights,
   ];
 }
 
@@ -42734,6 +54521,270 @@ final class $$ProfilesTableReferences
 
     final cache = $_typedResult.readTableOrNull(
       _friendshipCirclesRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<
+    $ActivationProtocolsTable,
+    List<ActivationProtocolRow>
+  >
+  _activationProtocolsRefsTable(_$ColonyDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.activationProtocols,
+        aliasName: $_aliasNameGenerator(
+          db.profiles.id,
+          db.activationProtocols.profileId,
+        ),
+      );
+
+  $$ActivationProtocolsTableProcessedTableManager get activationProtocolsRefs {
+    final manager = $$ActivationProtocolsTableTableManager(
+      $_db,
+      $_db.activationProtocols,
+    ).filter((f) => f.profileId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _activationProtocolsRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<
+    $ActivationEpisodesTable,
+    List<ActivationEpisodeRow>
+  >
+  _activationEpisodesRefsTable(_$ColonyDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.activationEpisodes,
+        aliasName: $_aliasNameGenerator(
+          db.profiles.id,
+          db.activationEpisodes.profileId,
+        ),
+      );
+
+  $$ActivationEpisodesTableProcessedTableManager get activationEpisodesRefs {
+    final manager = $$ActivationEpisodesTableTableManager(
+      $_db,
+      $_db.activationEpisodes,
+    ).filter((f) => f.profileId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _activationEpisodesRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<
+    $ActivationWaypointsTable,
+    List<ActivationWaypointRow>
+  >
+  _activationWaypointsRefsTable(_$ColonyDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.activationWaypoints,
+        aliasName: $_aliasNameGenerator(
+          db.profiles.id,
+          db.activationWaypoints.profileId,
+        ),
+      );
+
+  $$ActivationWaypointsTableProcessedTableManager get activationWaypointsRefs {
+    final manager = $$ActivationWaypointsTableTableManager(
+      $_db,
+      $_db.activationWaypoints,
+    ).filter((f) => f.profileId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _activationWaypointsRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<
+    $FrictionShieldProfilesTable,
+    List<FrictionShieldProfileRow>
+  >
+  _frictionShieldProfilesRefsTable(_$ColonyDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.frictionShieldProfiles,
+        aliasName: $_aliasNameGenerator(
+          db.profiles.id,
+          db.frictionShieldProfiles.profileId,
+        ),
+      );
+
+  $$FrictionShieldProfilesTableProcessedTableManager
+  get frictionShieldProfilesRefs {
+    final manager = $$FrictionShieldProfilesTableTableManager(
+      $_db,
+      $_db.frictionShieldProfiles,
+    ).filter((f) => f.profileId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _frictionShieldProfilesRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<
+    $FrictionShieldSessionsTable,
+    List<FrictionShieldSessionRow>
+  >
+  _frictionShieldSessionsRefsTable(_$ColonyDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.frictionShieldSessions,
+        aliasName: $_aliasNameGenerator(
+          db.profiles.id,
+          db.frictionShieldSessions.profileId,
+        ),
+      );
+
+  $$FrictionShieldSessionsTableProcessedTableManager
+  get frictionShieldSessionsRefs {
+    final manager = $$FrictionShieldSessionsTableTableManager(
+      $_db,
+      $_db.frictionShieldSessions,
+    ).filter((f) => f.profileId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _frictionShieldSessionsRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$TemptationBundlesTable, List<TemptationBundleRow>>
+  _temptationBundlesRefsTable(_$ColonyDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.temptationBundles,
+        aliasName: $_aliasNameGenerator(
+          db.profiles.id,
+          db.temptationBundles.profileId,
+        ),
+      );
+
+  $$TemptationBundlesTableProcessedTableManager get temptationBundlesRefs {
+    final manager = $$TemptationBundlesTableTableManager(
+      $_db,
+      $_db.temptationBundles,
+    ).filter((f) => f.profileId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _temptationBundlesRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$ActivationScenesTable, List<ActivationSceneRow>>
+  _activationScenesRefsTable(_$ColonyDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.activationScenes,
+        aliasName: $_aliasNameGenerator(
+          db.profiles.id,
+          db.activationScenes.profileId,
+        ),
+      );
+
+  $$ActivationScenesTableProcessedTableManager get activationScenesRefs {
+    final manager = $$ActivationScenesTableTableManager(
+      $_db,
+      $_db.activationScenes,
+    ).filter((f) => f.profileId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _activationScenesRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$RescueContractsTable, List<RescueContractRow>>
+  _rescueContractsRefsTable(_$ColonyDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.rescueContracts,
+        aliasName: $_aliasNameGenerator(
+          db.profiles.id,
+          db.rescueContracts.profileId,
+        ),
+      );
+
+  $$RescueContractsTableProcessedTableManager get rescueContractsRefs {
+    final manager = $$RescueContractsTableTableManager(
+      $_db,
+      $_db.rescueContracts,
+    ).filter((f) => f.profileId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _rescueContractsRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<
+    $ActivationExperimentsTable,
+    List<ActivationExperimentRow>
+  >
+  _activationExperimentsRefsTable(_$ColonyDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.activationExperiments,
+        aliasName: $_aliasNameGenerator(
+          db.profiles.id,
+          db.activationExperiments.profileId,
+        ),
+      );
+
+  $$ActivationExperimentsTableProcessedTableManager
+  get activationExperimentsRefs {
+    final manager = $$ActivationExperimentsTableTableManager(
+      $_db,
+      $_db.activationExperiments,
+    ).filter((f) => f.profileId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _activationExperimentsRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<
+    $ActivationInsightsTable,
+    List<ActivationInsightRow>
+  >
+  _activationInsightsRefsTable(_$ColonyDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.activationInsights,
+        aliasName: $_aliasNameGenerator(
+          db.profiles.id,
+          db.activationInsights.profileId,
+        ),
+      );
+
+  $$ActivationInsightsTableProcessedTableManager get activationInsightsRefs {
+    final manager = $$ActivationInsightsTableTableManager(
+      $_db,
+      $_db.activationInsights,
+    ).filter((f) => f.profileId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _activationInsightsRefsTable($_db),
     );
     return ProcessedTableManager(
       manager.$state.copyWith(prefetchedData: cache),
@@ -43924,6 +55975,259 @@ class $$ProfilesTableFilterComposer
           }) => $$FriendshipCirclesTableFilterComposer(
             $db: $db,
             $table: $db.friendshipCircles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> activationProtocolsRefs(
+    Expression<bool> Function($$ActivationProtocolsTableFilterComposer f) f,
+  ) {
+    final $$ActivationProtocolsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.activationProtocols,
+      getReferencedColumn: (t) => t.profileId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ActivationProtocolsTableFilterComposer(
+            $db: $db,
+            $table: $db.activationProtocols,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> activationEpisodesRefs(
+    Expression<bool> Function($$ActivationEpisodesTableFilterComposer f) f,
+  ) {
+    final $$ActivationEpisodesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.activationEpisodes,
+      getReferencedColumn: (t) => t.profileId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ActivationEpisodesTableFilterComposer(
+            $db: $db,
+            $table: $db.activationEpisodes,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> activationWaypointsRefs(
+    Expression<bool> Function($$ActivationWaypointsTableFilterComposer f) f,
+  ) {
+    final $$ActivationWaypointsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.activationWaypoints,
+      getReferencedColumn: (t) => t.profileId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ActivationWaypointsTableFilterComposer(
+            $db: $db,
+            $table: $db.activationWaypoints,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> frictionShieldProfilesRefs(
+    Expression<bool> Function($$FrictionShieldProfilesTableFilterComposer f) f,
+  ) {
+    final $$FrictionShieldProfilesTableFilterComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.frictionShieldProfiles,
+          getReferencedColumn: (t) => t.profileId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$FrictionShieldProfilesTableFilterComposer(
+                $db: $db,
+                $table: $db.frictionShieldProfiles,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+
+  Expression<bool> frictionShieldSessionsRefs(
+    Expression<bool> Function($$FrictionShieldSessionsTableFilterComposer f) f,
+  ) {
+    final $$FrictionShieldSessionsTableFilterComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.frictionShieldSessions,
+          getReferencedColumn: (t) => t.profileId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$FrictionShieldSessionsTableFilterComposer(
+                $db: $db,
+                $table: $db.frictionShieldSessions,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+
+  Expression<bool> temptationBundlesRefs(
+    Expression<bool> Function($$TemptationBundlesTableFilterComposer f) f,
+  ) {
+    final $$TemptationBundlesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.temptationBundles,
+      getReferencedColumn: (t) => t.profileId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$TemptationBundlesTableFilterComposer(
+            $db: $db,
+            $table: $db.temptationBundles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> activationScenesRefs(
+    Expression<bool> Function($$ActivationScenesTableFilterComposer f) f,
+  ) {
+    final $$ActivationScenesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.activationScenes,
+      getReferencedColumn: (t) => t.profileId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ActivationScenesTableFilterComposer(
+            $db: $db,
+            $table: $db.activationScenes,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> rescueContractsRefs(
+    Expression<bool> Function($$RescueContractsTableFilterComposer f) f,
+  ) {
+    final $$RescueContractsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.rescueContracts,
+      getReferencedColumn: (t) => t.profileId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$RescueContractsTableFilterComposer(
+            $db: $db,
+            $table: $db.rescueContracts,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> activationExperimentsRefs(
+    Expression<bool> Function($$ActivationExperimentsTableFilterComposer f) f,
+  ) {
+    final $$ActivationExperimentsTableFilterComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.activationExperiments,
+          getReferencedColumn: (t) => t.profileId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$ActivationExperimentsTableFilterComposer(
+                $db: $db,
+                $table: $db.activationExperiments,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+
+  Expression<bool> activationInsightsRefs(
+    Expression<bool> Function($$ActivationInsightsTableFilterComposer f) f,
+  ) {
+    final $$ActivationInsightsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.activationInsights,
+      getReferencedColumn: (t) => t.profileId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ActivationInsightsTableFilterComposer(
+            $db: $db,
+            $table: $db.activationInsights,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -45180,6 +57484,264 @@ class $$ProfilesTableAnnotationComposer
         );
     return f(composer);
   }
+
+  Expression<T> activationProtocolsRefs<T extends Object>(
+    Expression<T> Function($$ActivationProtocolsTableAnnotationComposer a) f,
+  ) {
+    final $$ActivationProtocolsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.activationProtocols,
+          getReferencedColumn: (t) => t.profileId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$ActivationProtocolsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.activationProtocols,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+
+  Expression<T> activationEpisodesRefs<T extends Object>(
+    Expression<T> Function($$ActivationEpisodesTableAnnotationComposer a) f,
+  ) {
+    final $$ActivationEpisodesTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.activationEpisodes,
+          getReferencedColumn: (t) => t.profileId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$ActivationEpisodesTableAnnotationComposer(
+                $db: $db,
+                $table: $db.activationEpisodes,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+
+  Expression<T> activationWaypointsRefs<T extends Object>(
+    Expression<T> Function($$ActivationWaypointsTableAnnotationComposer a) f,
+  ) {
+    final $$ActivationWaypointsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.activationWaypoints,
+          getReferencedColumn: (t) => t.profileId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$ActivationWaypointsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.activationWaypoints,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+
+  Expression<T> frictionShieldProfilesRefs<T extends Object>(
+    Expression<T> Function($$FrictionShieldProfilesTableAnnotationComposer a) f,
+  ) {
+    final $$FrictionShieldProfilesTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.frictionShieldProfiles,
+          getReferencedColumn: (t) => t.profileId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$FrictionShieldProfilesTableAnnotationComposer(
+                $db: $db,
+                $table: $db.frictionShieldProfiles,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+
+  Expression<T> frictionShieldSessionsRefs<T extends Object>(
+    Expression<T> Function($$FrictionShieldSessionsTableAnnotationComposer a) f,
+  ) {
+    final $$FrictionShieldSessionsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.frictionShieldSessions,
+          getReferencedColumn: (t) => t.profileId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$FrictionShieldSessionsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.frictionShieldSessions,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+
+  Expression<T> temptationBundlesRefs<T extends Object>(
+    Expression<T> Function($$TemptationBundlesTableAnnotationComposer a) f,
+  ) {
+    final $$TemptationBundlesTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.temptationBundles,
+          getReferencedColumn: (t) => t.profileId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$TemptationBundlesTableAnnotationComposer(
+                $db: $db,
+                $table: $db.temptationBundles,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+
+  Expression<T> activationScenesRefs<T extends Object>(
+    Expression<T> Function($$ActivationScenesTableAnnotationComposer a) f,
+  ) {
+    final $$ActivationScenesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.activationScenes,
+      getReferencedColumn: (t) => t.profileId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ActivationScenesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.activationScenes,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<T> rescueContractsRefs<T extends Object>(
+    Expression<T> Function($$RescueContractsTableAnnotationComposer a) f,
+  ) {
+    final $$RescueContractsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.rescueContracts,
+      getReferencedColumn: (t) => t.profileId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$RescueContractsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.rescueContracts,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<T> activationExperimentsRefs<T extends Object>(
+    Expression<T> Function($$ActivationExperimentsTableAnnotationComposer a) f,
+  ) {
+    final $$ActivationExperimentsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.activationExperiments,
+          getReferencedColumn: (t) => t.profileId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$ActivationExperimentsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.activationExperiments,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+
+  Expression<T> activationInsightsRefs<T extends Object>(
+    Expression<T> Function($$ActivationInsightsTableAnnotationComposer a) f,
+  ) {
+    final $$ActivationInsightsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.activationInsights,
+          getReferencedColumn: (t) => t.profileId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$ActivationInsightsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.activationInsights,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
 }
 
 class $$ProfilesTableTableManager
@@ -45241,6 +57803,16 @@ class $$ProfilesTableTableManager
             bool musicSpotifySyncStatesRefs,
             bool friendshipsRefs,
             bool friendshipCirclesRefs,
+            bool activationProtocolsRefs,
+            bool activationEpisodesRefs,
+            bool activationWaypointsRefs,
+            bool frictionShieldProfilesRefs,
+            bool frictionShieldSessionsRefs,
+            bool temptationBundlesRefs,
+            bool activationScenesRefs,
+            bool rescueContractsRefs,
+            bool activationExperimentsRefs,
+            bool activationInsightsRefs,
           })
         > {
   $$ProfilesTableTableManager(_$ColonyDatabase db, $ProfilesTable table)
@@ -45361,6 +57933,16 @@ class $$ProfilesTableTableManager
                 musicSpotifySyncStatesRefs = false,
                 friendshipsRefs = false,
                 friendshipCirclesRefs = false,
+                activationProtocolsRefs = false,
+                activationEpisodesRefs = false,
+                activationWaypointsRefs = false,
+                frictionShieldProfilesRefs = false,
+                frictionShieldSessionsRefs = false,
+                temptationBundlesRefs = false,
+                activationScenesRefs = false,
+                rescueContractsRefs = false,
+                activationExperimentsRefs = false,
+                activationInsightsRefs = false,
               }) {
                 return PrefetchHooks(
                   db: db,
@@ -45411,6 +57993,16 @@ class $$ProfilesTableTableManager
                     if (musicSpotifySyncStatesRefs) db.musicSpotifySyncStates,
                     if (friendshipsRefs) db.friendships,
                     if (friendshipCirclesRefs) db.friendshipCircles,
+                    if (activationProtocolsRefs) db.activationProtocols,
+                    if (activationEpisodesRefs) db.activationEpisodes,
+                    if (activationWaypointsRefs) db.activationWaypoints,
+                    if (frictionShieldProfilesRefs) db.frictionShieldProfiles,
+                    if (frictionShieldSessionsRefs) db.frictionShieldSessions,
+                    if (temptationBundlesRefs) db.temptationBundles,
+                    if (activationScenesRefs) db.activationScenes,
+                    if (rescueContractsRefs) db.rescueContracts,
+                    if (activationExperimentsRefs) db.activationExperiments,
+                    if (activationInsightsRefs) db.activationInsights,
                   ],
                   addJoins: null,
                   getPrefetchedDataCallback: (items) async {
@@ -46360,6 +58952,216 @@ class $$ProfilesTableTableManager
                               ),
                           typedResults: items,
                         ),
+                      if (activationProtocolsRefs)
+                        await $_getPrefetchedData<
+                          Profile,
+                          $ProfilesTable,
+                          ActivationProtocolRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$ProfilesTableReferences
+                              ._activationProtocolsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$ProfilesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).activationProtocolsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.profileId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (activationEpisodesRefs)
+                        await $_getPrefetchedData<
+                          Profile,
+                          $ProfilesTable,
+                          ActivationEpisodeRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$ProfilesTableReferences
+                              ._activationEpisodesRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$ProfilesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).activationEpisodesRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.profileId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (activationWaypointsRefs)
+                        await $_getPrefetchedData<
+                          Profile,
+                          $ProfilesTable,
+                          ActivationWaypointRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$ProfilesTableReferences
+                              ._activationWaypointsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$ProfilesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).activationWaypointsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.profileId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (frictionShieldProfilesRefs)
+                        await $_getPrefetchedData<
+                          Profile,
+                          $ProfilesTable,
+                          FrictionShieldProfileRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$ProfilesTableReferences
+                              ._frictionShieldProfilesRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$ProfilesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).frictionShieldProfilesRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.profileId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (frictionShieldSessionsRefs)
+                        await $_getPrefetchedData<
+                          Profile,
+                          $ProfilesTable,
+                          FrictionShieldSessionRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$ProfilesTableReferences
+                              ._frictionShieldSessionsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$ProfilesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).frictionShieldSessionsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.profileId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (temptationBundlesRefs)
+                        await $_getPrefetchedData<
+                          Profile,
+                          $ProfilesTable,
+                          TemptationBundleRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$ProfilesTableReferences
+                              ._temptationBundlesRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$ProfilesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).temptationBundlesRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.profileId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (activationScenesRefs)
+                        await $_getPrefetchedData<
+                          Profile,
+                          $ProfilesTable,
+                          ActivationSceneRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$ProfilesTableReferences
+                              ._activationScenesRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$ProfilesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).activationScenesRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.profileId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (rescueContractsRefs)
+                        await $_getPrefetchedData<
+                          Profile,
+                          $ProfilesTable,
+                          RescueContractRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$ProfilesTableReferences
+                              ._rescueContractsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$ProfilesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).rescueContractsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.profileId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (activationExperimentsRefs)
+                        await $_getPrefetchedData<
+                          Profile,
+                          $ProfilesTable,
+                          ActivationExperimentRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$ProfilesTableReferences
+                              ._activationExperimentsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$ProfilesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).activationExperimentsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.profileId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (activationInsightsRefs)
+                        await $_getPrefetchedData<
+                          Profile,
+                          $ProfilesTable,
+                          ActivationInsightRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$ProfilesTableReferences
+                              ._activationInsightsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$ProfilesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).activationInsightsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.profileId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
                     ];
                   },
                 );
@@ -46426,6 +59228,16 @@ typedef $$ProfilesTableProcessedTableManager =
         bool musicSpotifySyncStatesRefs,
         bool friendshipsRefs,
         bool friendshipCirclesRefs,
+        bool activationProtocolsRefs,
+        bool activationEpisodesRefs,
+        bool activationWaypointsRefs,
+        bool frictionShieldProfilesRefs,
+        bool frictionShieldSessionsRefs,
+        bool temptationBundlesRefs,
+        bool activationScenesRefs,
+        bool rescueContractsRefs,
+        bool activationExperimentsRefs,
+        bool activationInsightsRefs,
       })
     >;
 typedef $$DomainEventsTableCreateCompanionBuilder =
@@ -82115,6 +94927,8613 @@ typedef $$FriendshipCircleMembershipsTableProcessedTableManager =
       FriendshipCircleMembershipRow,
       PrefetchHooks Function({bool personId, bool circleId})
     >;
+typedef $$ActivationProtocolsTableCreateCompanionBuilder =
+    ActivationProtocolsCompanion Function({
+      required String id,
+      required String profileId,
+      required String name,
+      Value<String?> description,
+      required String protocolType,
+      required String originStateJson,
+      required String targetStateJson,
+      Value<int> activeVersion,
+      Value<bool> isEnabled,
+      Value<String?> seedKey,
+      Value<String?> linkedTaskId,
+      Value<String> maturity,
+      required int createdAt,
+      required int updatedAt,
+      Value<int> rowid,
+    });
+typedef $$ActivationProtocolsTableUpdateCompanionBuilder =
+    ActivationProtocolsCompanion Function({
+      Value<String> id,
+      Value<String> profileId,
+      Value<String> name,
+      Value<String?> description,
+      Value<String> protocolType,
+      Value<String> originStateJson,
+      Value<String> targetStateJson,
+      Value<int> activeVersion,
+      Value<bool> isEnabled,
+      Value<String?> seedKey,
+      Value<String?> linkedTaskId,
+      Value<String> maturity,
+      Value<int> createdAt,
+      Value<int> updatedAt,
+      Value<int> rowid,
+    });
+
+final class $$ActivationProtocolsTableReferences
+    extends
+        BaseReferences<
+          _$ColonyDatabase,
+          $ActivationProtocolsTable,
+          ActivationProtocolRow
+        > {
+  $$ActivationProtocolsTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $ProfilesTable _profileIdTable(_$ColonyDatabase db) =>
+      db.profiles.createAlias(
+        $_aliasNameGenerator(db.activationProtocols.profileId, db.profiles.id),
+      );
+
+  $$ProfilesTableProcessedTableManager get profileId {
+    final $_column = $_itemColumn<String>('profile_id')!;
+
+    final manager = $$ProfilesTableTableManager(
+      $_db,
+      $_db.profiles,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_profileIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static MultiTypedResultKey<
+    $ActivationProtocolVersionsTable,
+    List<ActivationProtocolVersionRow>
+  >
+  _activationProtocolVersionsRefsTable(_$ColonyDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.activationProtocolVersions,
+        aliasName: $_aliasNameGenerator(
+          db.activationProtocols.id,
+          db.activationProtocolVersions.protocolId,
+        ),
+      );
+
+  $$ActivationProtocolVersionsTableProcessedTableManager
+  get activationProtocolVersionsRefs {
+    final manager = $$ActivationProtocolVersionsTableTableManager(
+      $_db,
+      $_db.activationProtocolVersions,
+    ).filter((f) => f.protocolId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _activationProtocolVersionsRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+}
+
+class $$ActivationProtocolsTableFilterComposer
+    extends Composer<_$ColonyDatabase, $ActivationProtocolsTable> {
+  $$ActivationProtocolsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get description => $composableBuilder(
+    column: $table.description,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get protocolType => $composableBuilder(
+    column: $table.protocolType,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get originStateJson => $composableBuilder(
+    column: $table.originStateJson,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get targetStateJson => $composableBuilder(
+    column: $table.targetStateJson,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get activeVersion => $composableBuilder(
+    column: $table.activeVersion,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get isEnabled => $composableBuilder(
+    column: $table.isEnabled,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get seedKey => $composableBuilder(
+    column: $table.seedKey,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get linkedTaskId => $composableBuilder(
+    column: $table.linkedTaskId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get maturity => $composableBuilder(
+    column: $table.maturity,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$ProfilesTableFilterComposer get profileId {
+    final $$ProfilesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.profileId,
+      referencedTable: $db.profiles,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProfilesTableFilterComposer(
+            $db: $db,
+            $table: $db.profiles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  Expression<bool> activationProtocolVersionsRefs(
+    Expression<bool> Function($$ActivationProtocolVersionsTableFilterComposer f)
+    f,
+  ) {
+    final $$ActivationProtocolVersionsTableFilterComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.activationProtocolVersions,
+          getReferencedColumn: (t) => t.protocolId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$ActivationProtocolVersionsTableFilterComposer(
+                $db: $db,
+                $table: $db.activationProtocolVersions,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+}
+
+class $$ActivationProtocolsTableOrderingComposer
+    extends Composer<_$ColonyDatabase, $ActivationProtocolsTable> {
+  $$ActivationProtocolsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get description => $composableBuilder(
+    column: $table.description,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get protocolType => $composableBuilder(
+    column: $table.protocolType,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get originStateJson => $composableBuilder(
+    column: $table.originStateJson,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get targetStateJson => $composableBuilder(
+    column: $table.targetStateJson,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get activeVersion => $composableBuilder(
+    column: $table.activeVersion,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get isEnabled => $composableBuilder(
+    column: $table.isEnabled,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get seedKey => $composableBuilder(
+    column: $table.seedKey,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get linkedTaskId => $composableBuilder(
+    column: $table.linkedTaskId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get maturity => $composableBuilder(
+    column: $table.maturity,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$ProfilesTableOrderingComposer get profileId {
+    final $$ProfilesTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.profileId,
+      referencedTable: $db.profiles,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProfilesTableOrderingComposer(
+            $db: $db,
+            $table: $db.profiles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$ActivationProtocolsTableAnnotationComposer
+    extends Composer<_$ColonyDatabase, $ActivationProtocolsTable> {
+  $$ActivationProtocolsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<String> get description => $composableBuilder(
+    column: $table.description,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get protocolType => $composableBuilder(
+    column: $table.protocolType,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get originStateJson => $composableBuilder(
+    column: $table.originStateJson,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get targetStateJson => $composableBuilder(
+    column: $table.targetStateJson,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get activeVersion => $composableBuilder(
+    column: $table.activeVersion,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get isEnabled =>
+      $composableBuilder(column: $table.isEnabled, builder: (column) => column);
+
+  GeneratedColumn<String> get seedKey =>
+      $composableBuilder(column: $table.seedKey, builder: (column) => column);
+
+  GeneratedColumn<String> get linkedTaskId => $composableBuilder(
+    column: $table.linkedTaskId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get maturity =>
+      $composableBuilder(column: $table.maturity, builder: (column) => column);
+
+  GeneratedColumn<int> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<int> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  $$ProfilesTableAnnotationComposer get profileId {
+    final $$ProfilesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.profileId,
+      referencedTable: $db.profiles,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProfilesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.profiles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  Expression<T> activationProtocolVersionsRefs<T extends Object>(
+    Expression<T> Function(
+      $$ActivationProtocolVersionsTableAnnotationComposer a,
+    )
+    f,
+  ) {
+    final $$ActivationProtocolVersionsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.activationProtocolVersions,
+          getReferencedColumn: (t) => t.protocolId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$ActivationProtocolVersionsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.activationProtocolVersions,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+}
+
+class $$ActivationProtocolsTableTableManager
+    extends
+        RootTableManager<
+          _$ColonyDatabase,
+          $ActivationProtocolsTable,
+          ActivationProtocolRow,
+          $$ActivationProtocolsTableFilterComposer,
+          $$ActivationProtocolsTableOrderingComposer,
+          $$ActivationProtocolsTableAnnotationComposer,
+          $$ActivationProtocolsTableCreateCompanionBuilder,
+          $$ActivationProtocolsTableUpdateCompanionBuilder,
+          (ActivationProtocolRow, $$ActivationProtocolsTableReferences),
+          ActivationProtocolRow,
+          PrefetchHooks Function({
+            bool profileId,
+            bool activationProtocolVersionsRefs,
+          })
+        > {
+  $$ActivationProtocolsTableTableManager(
+    _$ColonyDatabase db,
+    $ActivationProtocolsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$ActivationProtocolsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$ActivationProtocolsTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$ActivationProtocolsTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> profileId = const Value.absent(),
+                Value<String> name = const Value.absent(),
+                Value<String?> description = const Value.absent(),
+                Value<String> protocolType = const Value.absent(),
+                Value<String> originStateJson = const Value.absent(),
+                Value<String> targetStateJson = const Value.absent(),
+                Value<int> activeVersion = const Value.absent(),
+                Value<bool> isEnabled = const Value.absent(),
+                Value<String?> seedKey = const Value.absent(),
+                Value<String?> linkedTaskId = const Value.absent(),
+                Value<String> maturity = const Value.absent(),
+                Value<int> createdAt = const Value.absent(),
+                Value<int> updatedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => ActivationProtocolsCompanion(
+                id: id,
+                profileId: profileId,
+                name: name,
+                description: description,
+                protocolType: protocolType,
+                originStateJson: originStateJson,
+                targetStateJson: targetStateJson,
+                activeVersion: activeVersion,
+                isEnabled: isEnabled,
+                seedKey: seedKey,
+                linkedTaskId: linkedTaskId,
+                maturity: maturity,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String profileId,
+                required String name,
+                Value<String?> description = const Value.absent(),
+                required String protocolType,
+                required String originStateJson,
+                required String targetStateJson,
+                Value<int> activeVersion = const Value.absent(),
+                Value<bool> isEnabled = const Value.absent(),
+                Value<String?> seedKey = const Value.absent(),
+                Value<String?> linkedTaskId = const Value.absent(),
+                Value<String> maturity = const Value.absent(),
+                required int createdAt,
+                required int updatedAt,
+                Value<int> rowid = const Value.absent(),
+              }) => ActivationProtocolsCompanion.insert(
+                id: id,
+                profileId: profileId,
+                name: name,
+                description: description,
+                protocolType: protocolType,
+                originStateJson: originStateJson,
+                targetStateJson: targetStateJson,
+                activeVersion: activeVersion,
+                isEnabled: isEnabled,
+                seedKey: seedKey,
+                linkedTaskId: linkedTaskId,
+                maturity: maturity,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$ActivationProtocolsTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback:
+              ({profileId = false, activationProtocolVersionsRefs = false}) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [
+                    if (activationProtocolVersionsRefs)
+                      db.activationProtocolVersions,
+                  ],
+                  addJoins:
+                      <
+                        T extends TableManagerState<
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic
+                        >
+                      >(state) {
+                        if (profileId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.profileId,
+                                    referencedTable:
+                                        $$ActivationProtocolsTableReferences
+                                            ._profileIdTable(db),
+                                    referencedColumn:
+                                        $$ActivationProtocolsTableReferences
+                                            ._profileIdTable(db)
+                                            .id,
+                                  )
+                                  as T;
+                        }
+
+                        return state;
+                      },
+                  getPrefetchedDataCallback: (items) async {
+                    return [
+                      if (activationProtocolVersionsRefs)
+                        await $_getPrefetchedData<
+                          ActivationProtocolRow,
+                          $ActivationProtocolsTable,
+                          ActivationProtocolVersionRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$ActivationProtocolsTableReferences
+                              ._activationProtocolVersionsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$ActivationProtocolsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).activationProtocolVersionsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.protocolId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                    ];
+                  },
+                );
+              },
+        ),
+      );
+}
+
+typedef $$ActivationProtocolsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$ColonyDatabase,
+      $ActivationProtocolsTable,
+      ActivationProtocolRow,
+      $$ActivationProtocolsTableFilterComposer,
+      $$ActivationProtocolsTableOrderingComposer,
+      $$ActivationProtocolsTableAnnotationComposer,
+      $$ActivationProtocolsTableCreateCompanionBuilder,
+      $$ActivationProtocolsTableUpdateCompanionBuilder,
+      (ActivationProtocolRow, $$ActivationProtocolsTableReferences),
+      ActivationProtocolRow,
+      PrefetchHooks Function({
+        bool profileId,
+        bool activationProtocolVersionsRefs,
+      })
+    >;
+typedef $$ActivationProtocolVersionsTableCreateCompanionBuilder =
+    ActivationProtocolVersionsCompanion Function({
+      required String protocolId,
+      required int version,
+      required String triggerRulesJson,
+      required String releaseConditionsJson,
+      Value<String> applicableContextsJson,
+      Value<String?> shieldProfileId,
+      Value<String?> temptationBundleId,
+      Value<String?> sensorySceneId,
+      Value<String?> fallbackProtocolId,
+      required int createdAt,
+      Value<int> rowid,
+    });
+typedef $$ActivationProtocolVersionsTableUpdateCompanionBuilder =
+    ActivationProtocolVersionsCompanion Function({
+      Value<String> protocolId,
+      Value<int> version,
+      Value<String> triggerRulesJson,
+      Value<String> releaseConditionsJson,
+      Value<String> applicableContextsJson,
+      Value<String?> shieldProfileId,
+      Value<String?> temptationBundleId,
+      Value<String?> sensorySceneId,
+      Value<String?> fallbackProtocolId,
+      Value<int> createdAt,
+      Value<int> rowid,
+    });
+
+final class $$ActivationProtocolVersionsTableReferences
+    extends
+        BaseReferences<
+          _$ColonyDatabase,
+          $ActivationProtocolVersionsTable,
+          ActivationProtocolVersionRow
+        > {
+  $$ActivationProtocolVersionsTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $ActivationProtocolsTable _protocolIdTable(_$ColonyDatabase db) =>
+      db.activationProtocols.createAlias(
+        $_aliasNameGenerator(
+          db.activationProtocolVersions.protocolId,
+          db.activationProtocols.id,
+        ),
+      );
+
+  $$ActivationProtocolsTableProcessedTableManager get protocolId {
+    final $_column = $_itemColumn<String>('protocol_id')!;
+
+    final manager = $$ActivationProtocolsTableTableManager(
+      $_db,
+      $_db.activationProtocols,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_protocolIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$ActivationProtocolVersionsTableFilterComposer
+    extends Composer<_$ColonyDatabase, $ActivationProtocolVersionsTable> {
+  $$ActivationProtocolVersionsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get version => $composableBuilder(
+    column: $table.version,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get triggerRulesJson => $composableBuilder(
+    column: $table.triggerRulesJson,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get releaseConditionsJson => $composableBuilder(
+    column: $table.releaseConditionsJson,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get applicableContextsJson => $composableBuilder(
+    column: $table.applicableContextsJson,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get shieldProfileId => $composableBuilder(
+    column: $table.shieldProfileId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get temptationBundleId => $composableBuilder(
+    column: $table.temptationBundleId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get sensorySceneId => $composableBuilder(
+    column: $table.sensorySceneId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get fallbackProtocolId => $composableBuilder(
+    column: $table.fallbackProtocolId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$ActivationProtocolsTableFilterComposer get protocolId {
+    final $$ActivationProtocolsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.protocolId,
+      referencedTable: $db.activationProtocols,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ActivationProtocolsTableFilterComposer(
+            $db: $db,
+            $table: $db.activationProtocols,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$ActivationProtocolVersionsTableOrderingComposer
+    extends Composer<_$ColonyDatabase, $ActivationProtocolVersionsTable> {
+  $$ActivationProtocolVersionsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get version => $composableBuilder(
+    column: $table.version,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get triggerRulesJson => $composableBuilder(
+    column: $table.triggerRulesJson,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get releaseConditionsJson => $composableBuilder(
+    column: $table.releaseConditionsJson,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get applicableContextsJson => $composableBuilder(
+    column: $table.applicableContextsJson,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get shieldProfileId => $composableBuilder(
+    column: $table.shieldProfileId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get temptationBundleId => $composableBuilder(
+    column: $table.temptationBundleId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get sensorySceneId => $composableBuilder(
+    column: $table.sensorySceneId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get fallbackProtocolId => $composableBuilder(
+    column: $table.fallbackProtocolId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$ActivationProtocolsTableOrderingComposer get protocolId {
+    final $$ActivationProtocolsTableOrderingComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.protocolId,
+          referencedTable: $db.activationProtocols,
+          getReferencedColumn: (t) => t.id,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$ActivationProtocolsTableOrderingComposer(
+                $db: $db,
+                $table: $db.activationProtocols,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return composer;
+  }
+}
+
+class $$ActivationProtocolVersionsTableAnnotationComposer
+    extends Composer<_$ColonyDatabase, $ActivationProtocolVersionsTable> {
+  $$ActivationProtocolVersionsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get version =>
+      $composableBuilder(column: $table.version, builder: (column) => column);
+
+  GeneratedColumn<String> get triggerRulesJson => $composableBuilder(
+    column: $table.triggerRulesJson,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get releaseConditionsJson => $composableBuilder(
+    column: $table.releaseConditionsJson,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get applicableContextsJson => $composableBuilder(
+    column: $table.applicableContextsJson,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get shieldProfileId => $composableBuilder(
+    column: $table.shieldProfileId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get temptationBundleId => $composableBuilder(
+    column: $table.temptationBundleId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get sensorySceneId => $composableBuilder(
+    column: $table.sensorySceneId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get fallbackProtocolId => $composableBuilder(
+    column: $table.fallbackProtocolId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  $$ActivationProtocolsTableAnnotationComposer get protocolId {
+    final $$ActivationProtocolsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.protocolId,
+          referencedTable: $db.activationProtocols,
+          getReferencedColumn: (t) => t.id,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$ActivationProtocolsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.activationProtocols,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return composer;
+  }
+}
+
+class $$ActivationProtocolVersionsTableTableManager
+    extends
+        RootTableManager<
+          _$ColonyDatabase,
+          $ActivationProtocolVersionsTable,
+          ActivationProtocolVersionRow,
+          $$ActivationProtocolVersionsTableFilterComposer,
+          $$ActivationProtocolVersionsTableOrderingComposer,
+          $$ActivationProtocolVersionsTableAnnotationComposer,
+          $$ActivationProtocolVersionsTableCreateCompanionBuilder,
+          $$ActivationProtocolVersionsTableUpdateCompanionBuilder,
+          (
+            ActivationProtocolVersionRow,
+            $$ActivationProtocolVersionsTableReferences,
+          ),
+          ActivationProtocolVersionRow,
+          PrefetchHooks Function({bool protocolId})
+        > {
+  $$ActivationProtocolVersionsTableTableManager(
+    _$ColonyDatabase db,
+    $ActivationProtocolVersionsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$ActivationProtocolVersionsTableFilterComposer(
+                $db: db,
+                $table: table,
+              ),
+          createOrderingComposer: () =>
+              $$ActivationProtocolVersionsTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$ActivationProtocolVersionsTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> protocolId = const Value.absent(),
+                Value<int> version = const Value.absent(),
+                Value<String> triggerRulesJson = const Value.absent(),
+                Value<String> releaseConditionsJson = const Value.absent(),
+                Value<String> applicableContextsJson = const Value.absent(),
+                Value<String?> shieldProfileId = const Value.absent(),
+                Value<String?> temptationBundleId = const Value.absent(),
+                Value<String?> sensorySceneId = const Value.absent(),
+                Value<String?> fallbackProtocolId = const Value.absent(),
+                Value<int> createdAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => ActivationProtocolVersionsCompanion(
+                protocolId: protocolId,
+                version: version,
+                triggerRulesJson: triggerRulesJson,
+                releaseConditionsJson: releaseConditionsJson,
+                applicableContextsJson: applicableContextsJson,
+                shieldProfileId: shieldProfileId,
+                temptationBundleId: temptationBundleId,
+                sensorySceneId: sensorySceneId,
+                fallbackProtocolId: fallbackProtocolId,
+                createdAt: createdAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String protocolId,
+                required int version,
+                required String triggerRulesJson,
+                required String releaseConditionsJson,
+                Value<String> applicableContextsJson = const Value.absent(),
+                Value<String?> shieldProfileId = const Value.absent(),
+                Value<String?> temptationBundleId = const Value.absent(),
+                Value<String?> sensorySceneId = const Value.absent(),
+                Value<String?> fallbackProtocolId = const Value.absent(),
+                required int createdAt,
+                Value<int> rowid = const Value.absent(),
+              }) => ActivationProtocolVersionsCompanion.insert(
+                protocolId: protocolId,
+                version: version,
+                triggerRulesJson: triggerRulesJson,
+                releaseConditionsJson: releaseConditionsJson,
+                applicableContextsJson: applicableContextsJson,
+                shieldProfileId: shieldProfileId,
+                temptationBundleId: temptationBundleId,
+                sensorySceneId: sensorySceneId,
+                fallbackProtocolId: fallbackProtocolId,
+                createdAt: createdAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$ActivationProtocolVersionsTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({protocolId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (protocolId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.protocolId,
+                                referencedTable:
+                                    $$ActivationProtocolVersionsTableReferences
+                                        ._protocolIdTable(db),
+                                referencedColumn:
+                                    $$ActivationProtocolVersionsTableReferences
+                                        ._protocolIdTable(db)
+                                        .id,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$ActivationProtocolVersionsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$ColonyDatabase,
+      $ActivationProtocolVersionsTable,
+      ActivationProtocolVersionRow,
+      $$ActivationProtocolVersionsTableFilterComposer,
+      $$ActivationProtocolVersionsTableOrderingComposer,
+      $$ActivationProtocolVersionsTableAnnotationComposer,
+      $$ActivationProtocolVersionsTableCreateCompanionBuilder,
+      $$ActivationProtocolVersionsTableUpdateCompanionBuilder,
+      (
+        ActivationProtocolVersionRow,
+        $$ActivationProtocolVersionsTableReferences,
+      ),
+      ActivationProtocolVersionRow,
+      PrefetchHooks Function({bool protocolId})
+    >;
+typedef $$ActivationCommandTemplatesTableCreateCompanionBuilder =
+    ActivationCommandTemplatesCompanion Function({
+      required String id,
+      required String protocolId,
+      required int protocolVersion,
+      required String sequenceKey,
+      required String instruction,
+      required String actionVerb,
+      Value<String?> objectRef,
+      Value<String?> destinationRef,
+      Value<String> preconditionsJson,
+      required String proofPolicyJson,
+      required String timeoutPolicyJson,
+      required String fallbackJson,
+      Value<bool> skippable,
+      Value<int?> estimatedSeconds,
+      Value<String?> waypointId,
+      Value<String?> opensTaskId,
+      Value<String?> deepLink,
+      Value<bool> isFirstMeaningfulAction,
+      Value<bool> releasesOnConfirm,
+      Value<int> rowid,
+    });
+typedef $$ActivationCommandTemplatesTableUpdateCompanionBuilder =
+    ActivationCommandTemplatesCompanion Function({
+      Value<String> id,
+      Value<String> protocolId,
+      Value<int> protocolVersion,
+      Value<String> sequenceKey,
+      Value<String> instruction,
+      Value<String> actionVerb,
+      Value<String?> objectRef,
+      Value<String?> destinationRef,
+      Value<String> preconditionsJson,
+      Value<String> proofPolicyJson,
+      Value<String> timeoutPolicyJson,
+      Value<String> fallbackJson,
+      Value<bool> skippable,
+      Value<int?> estimatedSeconds,
+      Value<String?> waypointId,
+      Value<String?> opensTaskId,
+      Value<String?> deepLink,
+      Value<bool> isFirstMeaningfulAction,
+      Value<bool> releasesOnConfirm,
+      Value<int> rowid,
+    });
+
+class $$ActivationCommandTemplatesTableFilterComposer
+    extends Composer<_$ColonyDatabase, $ActivationCommandTemplatesTable> {
+  $$ActivationCommandTemplatesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get protocolId => $composableBuilder(
+    column: $table.protocolId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get protocolVersion => $composableBuilder(
+    column: $table.protocolVersion,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get sequenceKey => $composableBuilder(
+    column: $table.sequenceKey,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get instruction => $composableBuilder(
+    column: $table.instruction,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get actionVerb => $composableBuilder(
+    column: $table.actionVerb,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get objectRef => $composableBuilder(
+    column: $table.objectRef,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get destinationRef => $composableBuilder(
+    column: $table.destinationRef,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get preconditionsJson => $composableBuilder(
+    column: $table.preconditionsJson,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get proofPolicyJson => $composableBuilder(
+    column: $table.proofPolicyJson,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get timeoutPolicyJson => $composableBuilder(
+    column: $table.timeoutPolicyJson,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get fallbackJson => $composableBuilder(
+    column: $table.fallbackJson,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get skippable => $composableBuilder(
+    column: $table.skippable,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get estimatedSeconds => $composableBuilder(
+    column: $table.estimatedSeconds,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get waypointId => $composableBuilder(
+    column: $table.waypointId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get opensTaskId => $composableBuilder(
+    column: $table.opensTaskId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get deepLink => $composableBuilder(
+    column: $table.deepLink,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get isFirstMeaningfulAction => $composableBuilder(
+    column: $table.isFirstMeaningfulAction,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get releasesOnConfirm => $composableBuilder(
+    column: $table.releasesOnConfirm,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$ActivationCommandTemplatesTableOrderingComposer
+    extends Composer<_$ColonyDatabase, $ActivationCommandTemplatesTable> {
+  $$ActivationCommandTemplatesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get protocolId => $composableBuilder(
+    column: $table.protocolId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get protocolVersion => $composableBuilder(
+    column: $table.protocolVersion,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get sequenceKey => $composableBuilder(
+    column: $table.sequenceKey,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get instruction => $composableBuilder(
+    column: $table.instruction,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get actionVerb => $composableBuilder(
+    column: $table.actionVerb,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get objectRef => $composableBuilder(
+    column: $table.objectRef,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get destinationRef => $composableBuilder(
+    column: $table.destinationRef,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get preconditionsJson => $composableBuilder(
+    column: $table.preconditionsJson,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get proofPolicyJson => $composableBuilder(
+    column: $table.proofPolicyJson,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get timeoutPolicyJson => $composableBuilder(
+    column: $table.timeoutPolicyJson,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get fallbackJson => $composableBuilder(
+    column: $table.fallbackJson,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get skippable => $composableBuilder(
+    column: $table.skippable,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get estimatedSeconds => $composableBuilder(
+    column: $table.estimatedSeconds,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get waypointId => $composableBuilder(
+    column: $table.waypointId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get opensTaskId => $composableBuilder(
+    column: $table.opensTaskId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get deepLink => $composableBuilder(
+    column: $table.deepLink,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get isFirstMeaningfulAction => $composableBuilder(
+    column: $table.isFirstMeaningfulAction,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get releasesOnConfirm => $composableBuilder(
+    column: $table.releasesOnConfirm,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$ActivationCommandTemplatesTableAnnotationComposer
+    extends Composer<_$ColonyDatabase, $ActivationCommandTemplatesTable> {
+  $$ActivationCommandTemplatesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get protocolId => $composableBuilder(
+    column: $table.protocolId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get protocolVersion => $composableBuilder(
+    column: $table.protocolVersion,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get sequenceKey => $composableBuilder(
+    column: $table.sequenceKey,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get instruction => $composableBuilder(
+    column: $table.instruction,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get actionVerb => $composableBuilder(
+    column: $table.actionVerb,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get objectRef =>
+      $composableBuilder(column: $table.objectRef, builder: (column) => column);
+
+  GeneratedColumn<String> get destinationRef => $composableBuilder(
+    column: $table.destinationRef,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get preconditionsJson => $composableBuilder(
+    column: $table.preconditionsJson,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get proofPolicyJson => $composableBuilder(
+    column: $table.proofPolicyJson,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get timeoutPolicyJson => $composableBuilder(
+    column: $table.timeoutPolicyJson,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get fallbackJson => $composableBuilder(
+    column: $table.fallbackJson,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get skippable =>
+      $composableBuilder(column: $table.skippable, builder: (column) => column);
+
+  GeneratedColumn<int> get estimatedSeconds => $composableBuilder(
+    column: $table.estimatedSeconds,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get waypointId => $composableBuilder(
+    column: $table.waypointId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get opensTaskId => $composableBuilder(
+    column: $table.opensTaskId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get deepLink =>
+      $composableBuilder(column: $table.deepLink, builder: (column) => column);
+
+  GeneratedColumn<bool> get isFirstMeaningfulAction => $composableBuilder(
+    column: $table.isFirstMeaningfulAction,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get releasesOnConfirm => $composableBuilder(
+    column: $table.releasesOnConfirm,
+    builder: (column) => column,
+  );
+}
+
+class $$ActivationCommandTemplatesTableTableManager
+    extends
+        RootTableManager<
+          _$ColonyDatabase,
+          $ActivationCommandTemplatesTable,
+          ActivationCommandTemplateRow,
+          $$ActivationCommandTemplatesTableFilterComposer,
+          $$ActivationCommandTemplatesTableOrderingComposer,
+          $$ActivationCommandTemplatesTableAnnotationComposer,
+          $$ActivationCommandTemplatesTableCreateCompanionBuilder,
+          $$ActivationCommandTemplatesTableUpdateCompanionBuilder,
+          (
+            ActivationCommandTemplateRow,
+            BaseReferences<
+              _$ColonyDatabase,
+              $ActivationCommandTemplatesTable,
+              ActivationCommandTemplateRow
+            >,
+          ),
+          ActivationCommandTemplateRow,
+          PrefetchHooks Function()
+        > {
+  $$ActivationCommandTemplatesTableTableManager(
+    _$ColonyDatabase db,
+    $ActivationCommandTemplatesTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$ActivationCommandTemplatesTableFilterComposer(
+                $db: db,
+                $table: table,
+              ),
+          createOrderingComposer: () =>
+              $$ActivationCommandTemplatesTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$ActivationCommandTemplatesTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> protocolId = const Value.absent(),
+                Value<int> protocolVersion = const Value.absent(),
+                Value<String> sequenceKey = const Value.absent(),
+                Value<String> instruction = const Value.absent(),
+                Value<String> actionVerb = const Value.absent(),
+                Value<String?> objectRef = const Value.absent(),
+                Value<String?> destinationRef = const Value.absent(),
+                Value<String> preconditionsJson = const Value.absent(),
+                Value<String> proofPolicyJson = const Value.absent(),
+                Value<String> timeoutPolicyJson = const Value.absent(),
+                Value<String> fallbackJson = const Value.absent(),
+                Value<bool> skippable = const Value.absent(),
+                Value<int?> estimatedSeconds = const Value.absent(),
+                Value<String?> waypointId = const Value.absent(),
+                Value<String?> opensTaskId = const Value.absent(),
+                Value<String?> deepLink = const Value.absent(),
+                Value<bool> isFirstMeaningfulAction = const Value.absent(),
+                Value<bool> releasesOnConfirm = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => ActivationCommandTemplatesCompanion(
+                id: id,
+                protocolId: protocolId,
+                protocolVersion: protocolVersion,
+                sequenceKey: sequenceKey,
+                instruction: instruction,
+                actionVerb: actionVerb,
+                objectRef: objectRef,
+                destinationRef: destinationRef,
+                preconditionsJson: preconditionsJson,
+                proofPolicyJson: proofPolicyJson,
+                timeoutPolicyJson: timeoutPolicyJson,
+                fallbackJson: fallbackJson,
+                skippable: skippable,
+                estimatedSeconds: estimatedSeconds,
+                waypointId: waypointId,
+                opensTaskId: opensTaskId,
+                deepLink: deepLink,
+                isFirstMeaningfulAction: isFirstMeaningfulAction,
+                releasesOnConfirm: releasesOnConfirm,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String protocolId,
+                required int protocolVersion,
+                required String sequenceKey,
+                required String instruction,
+                required String actionVerb,
+                Value<String?> objectRef = const Value.absent(),
+                Value<String?> destinationRef = const Value.absent(),
+                Value<String> preconditionsJson = const Value.absent(),
+                required String proofPolicyJson,
+                required String timeoutPolicyJson,
+                required String fallbackJson,
+                Value<bool> skippable = const Value.absent(),
+                Value<int?> estimatedSeconds = const Value.absent(),
+                Value<String?> waypointId = const Value.absent(),
+                Value<String?> opensTaskId = const Value.absent(),
+                Value<String?> deepLink = const Value.absent(),
+                Value<bool> isFirstMeaningfulAction = const Value.absent(),
+                Value<bool> releasesOnConfirm = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => ActivationCommandTemplatesCompanion.insert(
+                id: id,
+                protocolId: protocolId,
+                protocolVersion: protocolVersion,
+                sequenceKey: sequenceKey,
+                instruction: instruction,
+                actionVerb: actionVerb,
+                objectRef: objectRef,
+                destinationRef: destinationRef,
+                preconditionsJson: preconditionsJson,
+                proofPolicyJson: proofPolicyJson,
+                timeoutPolicyJson: timeoutPolicyJson,
+                fallbackJson: fallbackJson,
+                skippable: skippable,
+                estimatedSeconds: estimatedSeconds,
+                waypointId: waypointId,
+                opensTaskId: opensTaskId,
+                deepLink: deepLink,
+                isFirstMeaningfulAction: isFirstMeaningfulAction,
+                releasesOnConfirm: releasesOnConfirm,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$ActivationCommandTemplatesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$ColonyDatabase,
+      $ActivationCommandTemplatesTable,
+      ActivationCommandTemplateRow,
+      $$ActivationCommandTemplatesTableFilterComposer,
+      $$ActivationCommandTemplatesTableOrderingComposer,
+      $$ActivationCommandTemplatesTableAnnotationComposer,
+      $$ActivationCommandTemplatesTableCreateCompanionBuilder,
+      $$ActivationCommandTemplatesTableUpdateCompanionBuilder,
+      (
+        ActivationCommandTemplateRow,
+        BaseReferences<
+          _$ColonyDatabase,
+          $ActivationCommandTemplatesTable,
+          ActivationCommandTemplateRow
+        >,
+      ),
+      ActivationCommandTemplateRow,
+      PrefetchHooks Function()
+    >;
+typedef $$ActivationEpisodesTableCreateCompanionBuilder =
+    ActivationEpisodesCompanion Function({
+      required String id,
+      required String profileId,
+      Value<String?> protocolId,
+      Value<int?> protocolVersion,
+      required String triggerType,
+      Value<String?> hypothesisType,
+      Value<double?> hypothesisConfidence,
+      required String capacityMode,
+      required String initialStateJson,
+      required String targetStateJson,
+      required String status,
+      required int startedAt,
+      Value<int?> firstMotionAt,
+      Value<int?> releasedAt,
+      Value<int?> endedAt,
+      Value<int> interventionLevelMax,
+      Value<bool> shieldUsed,
+      Value<bool> bundleUsed,
+      Value<bool> escapeUsed,
+      Value<String?> userCorrection,
+      Value<String?> linkedTaskId,
+      Value<String?> experimentAssignmentId,
+      required String provenanceJson,
+      Value<int> rowid,
+    });
+typedef $$ActivationEpisodesTableUpdateCompanionBuilder =
+    ActivationEpisodesCompanion Function({
+      Value<String> id,
+      Value<String> profileId,
+      Value<String?> protocolId,
+      Value<int?> protocolVersion,
+      Value<String> triggerType,
+      Value<String?> hypothesisType,
+      Value<double?> hypothesisConfidence,
+      Value<String> capacityMode,
+      Value<String> initialStateJson,
+      Value<String> targetStateJson,
+      Value<String> status,
+      Value<int> startedAt,
+      Value<int?> firstMotionAt,
+      Value<int?> releasedAt,
+      Value<int?> endedAt,
+      Value<int> interventionLevelMax,
+      Value<bool> shieldUsed,
+      Value<bool> bundleUsed,
+      Value<bool> escapeUsed,
+      Value<String?> userCorrection,
+      Value<String?> linkedTaskId,
+      Value<String?> experimentAssignmentId,
+      Value<String> provenanceJson,
+      Value<int> rowid,
+    });
+
+final class $$ActivationEpisodesTableReferences
+    extends
+        BaseReferences<
+          _$ColonyDatabase,
+          $ActivationEpisodesTable,
+          ActivationEpisodeRow
+        > {
+  $$ActivationEpisodesTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $ProfilesTable _profileIdTable(_$ColonyDatabase db) =>
+      db.profiles.createAlias(
+        $_aliasNameGenerator(db.activationEpisodes.profileId, db.profiles.id),
+      );
+
+  $$ProfilesTableProcessedTableManager get profileId {
+    final $_column = $_itemColumn<String>('profile_id')!;
+
+    final manager = $$ProfilesTableTableManager(
+      $_db,
+      $_db.profiles,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_profileIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static MultiTypedResultKey<
+    $ActivationCommandRunsTable,
+    List<ActivationCommandRunRow>
+  >
+  _activationCommandRunsRefsTable(_$ColonyDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.activationCommandRuns,
+        aliasName: $_aliasNameGenerator(
+          db.activationEpisodes.id,
+          db.activationCommandRuns.episodeId,
+        ),
+      );
+
+  $$ActivationCommandRunsTableProcessedTableManager
+  get activationCommandRunsRefs {
+    final manager = $$ActivationCommandRunsTableTableManager(
+      $_db,
+      $_db.activationCommandRuns,
+    ).filter((f) => f.episodeId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _activationCommandRunsRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$ActivationProofsTable, List<ActivationProofRow>>
+  _activationProofsRefsTable(_$ColonyDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.activationProofs,
+        aliasName: $_aliasNameGenerator(
+          db.activationEpisodes.id,
+          db.activationProofs.episodeId,
+        ),
+      );
+
+  $$ActivationProofsTableProcessedTableManager get activationProofsRefs {
+    final manager = $$ActivationProofsTableTableManager(
+      $_db,
+      $_db.activationProofs,
+    ).filter((f) => f.episodeId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _activationProofsRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<
+    $ActivationExperimentAssignmentsTable,
+    List<ActivationExperimentAssignmentRow>
+  >
+  _activationExperimentAssignmentsRefsTable(_$ColonyDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.activationExperimentAssignments,
+        aliasName: $_aliasNameGenerator(
+          db.activationEpisodes.id,
+          db.activationExperimentAssignments.episodeId,
+        ),
+      );
+
+  $$ActivationExperimentAssignmentsTableProcessedTableManager
+  get activationExperimentAssignmentsRefs {
+    final manager = $$ActivationExperimentAssignmentsTableTableManager(
+      $_db,
+      $_db.activationExperimentAssignments,
+    ).filter((f) => f.episodeId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _activationExperimentAssignmentsRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+}
+
+class $$ActivationEpisodesTableFilterComposer
+    extends Composer<_$ColonyDatabase, $ActivationEpisodesTable> {
+  $$ActivationEpisodesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get protocolId => $composableBuilder(
+    column: $table.protocolId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get protocolVersion => $composableBuilder(
+    column: $table.protocolVersion,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get triggerType => $composableBuilder(
+    column: $table.triggerType,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get hypothesisType => $composableBuilder(
+    column: $table.hypothesisType,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get hypothesisConfidence => $composableBuilder(
+    column: $table.hypothesisConfidence,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get capacityMode => $composableBuilder(
+    column: $table.capacityMode,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get initialStateJson => $composableBuilder(
+    column: $table.initialStateJson,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get targetStateJson => $composableBuilder(
+    column: $table.targetStateJson,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get status => $composableBuilder(
+    column: $table.status,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get startedAt => $composableBuilder(
+    column: $table.startedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get firstMotionAt => $composableBuilder(
+    column: $table.firstMotionAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get releasedAt => $composableBuilder(
+    column: $table.releasedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get endedAt => $composableBuilder(
+    column: $table.endedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get interventionLevelMax => $composableBuilder(
+    column: $table.interventionLevelMax,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get shieldUsed => $composableBuilder(
+    column: $table.shieldUsed,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get bundleUsed => $composableBuilder(
+    column: $table.bundleUsed,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get escapeUsed => $composableBuilder(
+    column: $table.escapeUsed,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get userCorrection => $composableBuilder(
+    column: $table.userCorrection,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get linkedTaskId => $composableBuilder(
+    column: $table.linkedTaskId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get experimentAssignmentId => $composableBuilder(
+    column: $table.experimentAssignmentId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get provenanceJson => $composableBuilder(
+    column: $table.provenanceJson,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$ProfilesTableFilterComposer get profileId {
+    final $$ProfilesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.profileId,
+      referencedTable: $db.profiles,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProfilesTableFilterComposer(
+            $db: $db,
+            $table: $db.profiles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  Expression<bool> activationCommandRunsRefs(
+    Expression<bool> Function($$ActivationCommandRunsTableFilterComposer f) f,
+  ) {
+    final $$ActivationCommandRunsTableFilterComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.activationCommandRuns,
+          getReferencedColumn: (t) => t.episodeId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$ActivationCommandRunsTableFilterComposer(
+                $db: $db,
+                $table: $db.activationCommandRuns,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+
+  Expression<bool> activationProofsRefs(
+    Expression<bool> Function($$ActivationProofsTableFilterComposer f) f,
+  ) {
+    final $$ActivationProofsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.activationProofs,
+      getReferencedColumn: (t) => t.episodeId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ActivationProofsTableFilterComposer(
+            $db: $db,
+            $table: $db.activationProofs,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> activationExperimentAssignmentsRefs(
+    Expression<bool> Function(
+      $$ActivationExperimentAssignmentsTableFilterComposer f,
+    )
+    f,
+  ) {
+    final $$ActivationExperimentAssignmentsTableFilterComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.activationExperimentAssignments,
+          getReferencedColumn: (t) => t.episodeId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$ActivationExperimentAssignmentsTableFilterComposer(
+                $db: $db,
+                $table: $db.activationExperimentAssignments,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+}
+
+class $$ActivationEpisodesTableOrderingComposer
+    extends Composer<_$ColonyDatabase, $ActivationEpisodesTable> {
+  $$ActivationEpisodesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get protocolId => $composableBuilder(
+    column: $table.protocolId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get protocolVersion => $composableBuilder(
+    column: $table.protocolVersion,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get triggerType => $composableBuilder(
+    column: $table.triggerType,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get hypothesisType => $composableBuilder(
+    column: $table.hypothesisType,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get hypothesisConfidence => $composableBuilder(
+    column: $table.hypothesisConfidence,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get capacityMode => $composableBuilder(
+    column: $table.capacityMode,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get initialStateJson => $composableBuilder(
+    column: $table.initialStateJson,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get targetStateJson => $composableBuilder(
+    column: $table.targetStateJson,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get status => $composableBuilder(
+    column: $table.status,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get startedAt => $composableBuilder(
+    column: $table.startedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get firstMotionAt => $composableBuilder(
+    column: $table.firstMotionAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get releasedAt => $composableBuilder(
+    column: $table.releasedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get endedAt => $composableBuilder(
+    column: $table.endedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get interventionLevelMax => $composableBuilder(
+    column: $table.interventionLevelMax,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get shieldUsed => $composableBuilder(
+    column: $table.shieldUsed,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get bundleUsed => $composableBuilder(
+    column: $table.bundleUsed,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get escapeUsed => $composableBuilder(
+    column: $table.escapeUsed,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get userCorrection => $composableBuilder(
+    column: $table.userCorrection,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get linkedTaskId => $composableBuilder(
+    column: $table.linkedTaskId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get experimentAssignmentId => $composableBuilder(
+    column: $table.experimentAssignmentId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get provenanceJson => $composableBuilder(
+    column: $table.provenanceJson,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$ProfilesTableOrderingComposer get profileId {
+    final $$ProfilesTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.profileId,
+      referencedTable: $db.profiles,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProfilesTableOrderingComposer(
+            $db: $db,
+            $table: $db.profiles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$ActivationEpisodesTableAnnotationComposer
+    extends Composer<_$ColonyDatabase, $ActivationEpisodesTable> {
+  $$ActivationEpisodesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get protocolId => $composableBuilder(
+    column: $table.protocolId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get protocolVersion => $composableBuilder(
+    column: $table.protocolVersion,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get triggerType => $composableBuilder(
+    column: $table.triggerType,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get hypothesisType => $composableBuilder(
+    column: $table.hypothesisType,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<double> get hypothesisConfidence => $composableBuilder(
+    column: $table.hypothesisConfidence,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get capacityMode => $composableBuilder(
+    column: $table.capacityMode,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get initialStateJson => $composableBuilder(
+    column: $table.initialStateJson,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get targetStateJson => $composableBuilder(
+    column: $table.targetStateJson,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get status =>
+      $composableBuilder(column: $table.status, builder: (column) => column);
+
+  GeneratedColumn<int> get startedAt =>
+      $composableBuilder(column: $table.startedAt, builder: (column) => column);
+
+  GeneratedColumn<int> get firstMotionAt => $composableBuilder(
+    column: $table.firstMotionAt,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get releasedAt => $composableBuilder(
+    column: $table.releasedAt,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get endedAt =>
+      $composableBuilder(column: $table.endedAt, builder: (column) => column);
+
+  GeneratedColumn<int> get interventionLevelMax => $composableBuilder(
+    column: $table.interventionLevelMax,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get shieldUsed => $composableBuilder(
+    column: $table.shieldUsed,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get bundleUsed => $composableBuilder(
+    column: $table.bundleUsed,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get escapeUsed => $composableBuilder(
+    column: $table.escapeUsed,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get userCorrection => $composableBuilder(
+    column: $table.userCorrection,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get linkedTaskId => $composableBuilder(
+    column: $table.linkedTaskId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get experimentAssignmentId => $composableBuilder(
+    column: $table.experimentAssignmentId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get provenanceJson => $composableBuilder(
+    column: $table.provenanceJson,
+    builder: (column) => column,
+  );
+
+  $$ProfilesTableAnnotationComposer get profileId {
+    final $$ProfilesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.profileId,
+      referencedTable: $db.profiles,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProfilesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.profiles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  Expression<T> activationCommandRunsRefs<T extends Object>(
+    Expression<T> Function($$ActivationCommandRunsTableAnnotationComposer a) f,
+  ) {
+    final $$ActivationCommandRunsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.activationCommandRuns,
+          getReferencedColumn: (t) => t.episodeId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$ActivationCommandRunsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.activationCommandRuns,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+
+  Expression<T> activationProofsRefs<T extends Object>(
+    Expression<T> Function($$ActivationProofsTableAnnotationComposer a) f,
+  ) {
+    final $$ActivationProofsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.activationProofs,
+      getReferencedColumn: (t) => t.episodeId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ActivationProofsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.activationProofs,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<T> activationExperimentAssignmentsRefs<T extends Object>(
+    Expression<T> Function(
+      $$ActivationExperimentAssignmentsTableAnnotationComposer a,
+    )
+    f,
+  ) {
+    final $$ActivationExperimentAssignmentsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.activationExperimentAssignments,
+          getReferencedColumn: (t) => t.episodeId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$ActivationExperimentAssignmentsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.activationExperimentAssignments,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+}
+
+class $$ActivationEpisodesTableTableManager
+    extends
+        RootTableManager<
+          _$ColonyDatabase,
+          $ActivationEpisodesTable,
+          ActivationEpisodeRow,
+          $$ActivationEpisodesTableFilterComposer,
+          $$ActivationEpisodesTableOrderingComposer,
+          $$ActivationEpisodesTableAnnotationComposer,
+          $$ActivationEpisodesTableCreateCompanionBuilder,
+          $$ActivationEpisodesTableUpdateCompanionBuilder,
+          (ActivationEpisodeRow, $$ActivationEpisodesTableReferences),
+          ActivationEpisodeRow,
+          PrefetchHooks Function({
+            bool profileId,
+            bool activationCommandRunsRefs,
+            bool activationProofsRefs,
+            bool activationExperimentAssignmentsRefs,
+          })
+        > {
+  $$ActivationEpisodesTableTableManager(
+    _$ColonyDatabase db,
+    $ActivationEpisodesTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$ActivationEpisodesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$ActivationEpisodesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$ActivationEpisodesTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> profileId = const Value.absent(),
+                Value<String?> protocolId = const Value.absent(),
+                Value<int?> protocolVersion = const Value.absent(),
+                Value<String> triggerType = const Value.absent(),
+                Value<String?> hypothesisType = const Value.absent(),
+                Value<double?> hypothesisConfidence = const Value.absent(),
+                Value<String> capacityMode = const Value.absent(),
+                Value<String> initialStateJson = const Value.absent(),
+                Value<String> targetStateJson = const Value.absent(),
+                Value<String> status = const Value.absent(),
+                Value<int> startedAt = const Value.absent(),
+                Value<int?> firstMotionAt = const Value.absent(),
+                Value<int?> releasedAt = const Value.absent(),
+                Value<int?> endedAt = const Value.absent(),
+                Value<int> interventionLevelMax = const Value.absent(),
+                Value<bool> shieldUsed = const Value.absent(),
+                Value<bool> bundleUsed = const Value.absent(),
+                Value<bool> escapeUsed = const Value.absent(),
+                Value<String?> userCorrection = const Value.absent(),
+                Value<String?> linkedTaskId = const Value.absent(),
+                Value<String?> experimentAssignmentId = const Value.absent(),
+                Value<String> provenanceJson = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => ActivationEpisodesCompanion(
+                id: id,
+                profileId: profileId,
+                protocolId: protocolId,
+                protocolVersion: protocolVersion,
+                triggerType: triggerType,
+                hypothesisType: hypothesisType,
+                hypothesisConfidence: hypothesisConfidence,
+                capacityMode: capacityMode,
+                initialStateJson: initialStateJson,
+                targetStateJson: targetStateJson,
+                status: status,
+                startedAt: startedAt,
+                firstMotionAt: firstMotionAt,
+                releasedAt: releasedAt,
+                endedAt: endedAt,
+                interventionLevelMax: interventionLevelMax,
+                shieldUsed: shieldUsed,
+                bundleUsed: bundleUsed,
+                escapeUsed: escapeUsed,
+                userCorrection: userCorrection,
+                linkedTaskId: linkedTaskId,
+                experimentAssignmentId: experimentAssignmentId,
+                provenanceJson: provenanceJson,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String profileId,
+                Value<String?> protocolId = const Value.absent(),
+                Value<int?> protocolVersion = const Value.absent(),
+                required String triggerType,
+                Value<String?> hypothesisType = const Value.absent(),
+                Value<double?> hypothesisConfidence = const Value.absent(),
+                required String capacityMode,
+                required String initialStateJson,
+                required String targetStateJson,
+                required String status,
+                required int startedAt,
+                Value<int?> firstMotionAt = const Value.absent(),
+                Value<int?> releasedAt = const Value.absent(),
+                Value<int?> endedAt = const Value.absent(),
+                Value<int> interventionLevelMax = const Value.absent(),
+                Value<bool> shieldUsed = const Value.absent(),
+                Value<bool> bundleUsed = const Value.absent(),
+                Value<bool> escapeUsed = const Value.absent(),
+                Value<String?> userCorrection = const Value.absent(),
+                Value<String?> linkedTaskId = const Value.absent(),
+                Value<String?> experimentAssignmentId = const Value.absent(),
+                required String provenanceJson,
+                Value<int> rowid = const Value.absent(),
+              }) => ActivationEpisodesCompanion.insert(
+                id: id,
+                profileId: profileId,
+                protocolId: protocolId,
+                protocolVersion: protocolVersion,
+                triggerType: triggerType,
+                hypothesisType: hypothesisType,
+                hypothesisConfidence: hypothesisConfidence,
+                capacityMode: capacityMode,
+                initialStateJson: initialStateJson,
+                targetStateJson: targetStateJson,
+                status: status,
+                startedAt: startedAt,
+                firstMotionAt: firstMotionAt,
+                releasedAt: releasedAt,
+                endedAt: endedAt,
+                interventionLevelMax: interventionLevelMax,
+                shieldUsed: shieldUsed,
+                bundleUsed: bundleUsed,
+                escapeUsed: escapeUsed,
+                userCorrection: userCorrection,
+                linkedTaskId: linkedTaskId,
+                experimentAssignmentId: experimentAssignmentId,
+                provenanceJson: provenanceJson,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$ActivationEpisodesTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback:
+              ({
+                profileId = false,
+                activationCommandRunsRefs = false,
+                activationProofsRefs = false,
+                activationExperimentAssignmentsRefs = false,
+              }) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [
+                    if (activationCommandRunsRefs) db.activationCommandRuns,
+                    if (activationProofsRefs) db.activationProofs,
+                    if (activationExperimentAssignmentsRefs)
+                      db.activationExperimentAssignments,
+                  ],
+                  addJoins:
+                      <
+                        T extends TableManagerState<
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic
+                        >
+                      >(state) {
+                        if (profileId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.profileId,
+                                    referencedTable:
+                                        $$ActivationEpisodesTableReferences
+                                            ._profileIdTable(db),
+                                    referencedColumn:
+                                        $$ActivationEpisodesTableReferences
+                                            ._profileIdTable(db)
+                                            .id,
+                                  )
+                                  as T;
+                        }
+
+                        return state;
+                      },
+                  getPrefetchedDataCallback: (items) async {
+                    return [
+                      if (activationCommandRunsRefs)
+                        await $_getPrefetchedData<
+                          ActivationEpisodeRow,
+                          $ActivationEpisodesTable,
+                          ActivationCommandRunRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$ActivationEpisodesTableReferences
+                              ._activationCommandRunsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$ActivationEpisodesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).activationCommandRunsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.episodeId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (activationProofsRefs)
+                        await $_getPrefetchedData<
+                          ActivationEpisodeRow,
+                          $ActivationEpisodesTable,
+                          ActivationProofRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$ActivationEpisodesTableReferences
+                              ._activationProofsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$ActivationEpisodesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).activationProofsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.episodeId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (activationExperimentAssignmentsRefs)
+                        await $_getPrefetchedData<
+                          ActivationEpisodeRow,
+                          $ActivationEpisodesTable,
+                          ActivationExperimentAssignmentRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$ActivationEpisodesTableReferences
+                              ._activationExperimentAssignmentsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$ActivationEpisodesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).activationExperimentAssignmentsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.episodeId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                    ];
+                  },
+                );
+              },
+        ),
+      );
+}
+
+typedef $$ActivationEpisodesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$ColonyDatabase,
+      $ActivationEpisodesTable,
+      ActivationEpisodeRow,
+      $$ActivationEpisodesTableFilterComposer,
+      $$ActivationEpisodesTableOrderingComposer,
+      $$ActivationEpisodesTableAnnotationComposer,
+      $$ActivationEpisodesTableCreateCompanionBuilder,
+      $$ActivationEpisodesTableUpdateCompanionBuilder,
+      (ActivationEpisodeRow, $$ActivationEpisodesTableReferences),
+      ActivationEpisodeRow,
+      PrefetchHooks Function({
+        bool profileId,
+        bool activationCommandRunsRefs,
+        bool activationProofsRefs,
+        bool activationExperimentAssignmentsRefs,
+      })
+    >;
+typedef $$ActivationCommandRunsTableCreateCompanionBuilder =
+    ActivationCommandRunsCompanion Function({
+      required String id,
+      required String episodeId,
+      Value<String?> templateId,
+      required int sequenceIndex,
+      required String instructionRendered,
+      required String status,
+      required int presentedAt,
+      Value<int?> firstSignalAt,
+      Value<int?> confirmedAt,
+      Value<int?> skippedAt,
+      Value<int?> adaptedAt,
+      Value<String?> confirmationMode,
+      Value<double?> proofConfidence,
+      Value<String?> adaptationReason,
+      Value<bool> isFirstMeaningfulAction,
+      Value<String?> deepLink,
+      Value<String?> opensTaskId,
+      Value<int> rowid,
+    });
+typedef $$ActivationCommandRunsTableUpdateCompanionBuilder =
+    ActivationCommandRunsCompanion Function({
+      Value<String> id,
+      Value<String> episodeId,
+      Value<String?> templateId,
+      Value<int> sequenceIndex,
+      Value<String> instructionRendered,
+      Value<String> status,
+      Value<int> presentedAt,
+      Value<int?> firstSignalAt,
+      Value<int?> confirmedAt,
+      Value<int?> skippedAt,
+      Value<int?> adaptedAt,
+      Value<String?> confirmationMode,
+      Value<double?> proofConfidence,
+      Value<String?> adaptationReason,
+      Value<bool> isFirstMeaningfulAction,
+      Value<String?> deepLink,
+      Value<String?> opensTaskId,
+      Value<int> rowid,
+    });
+
+final class $$ActivationCommandRunsTableReferences
+    extends
+        BaseReferences<
+          _$ColonyDatabase,
+          $ActivationCommandRunsTable,
+          ActivationCommandRunRow
+        > {
+  $$ActivationCommandRunsTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $ActivationEpisodesTable _episodeIdTable(_$ColonyDatabase db) =>
+      db.activationEpisodes.createAlias(
+        $_aliasNameGenerator(
+          db.activationCommandRuns.episodeId,
+          db.activationEpisodes.id,
+        ),
+      );
+
+  $$ActivationEpisodesTableProcessedTableManager get episodeId {
+    final $_column = $_itemColumn<String>('episode_id')!;
+
+    final manager = $$ActivationEpisodesTableTableManager(
+      $_db,
+      $_db.activationEpisodes,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_episodeIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$ActivationCommandRunsTableFilterComposer
+    extends Composer<_$ColonyDatabase, $ActivationCommandRunsTable> {
+  $$ActivationCommandRunsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get templateId => $composableBuilder(
+    column: $table.templateId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get sequenceIndex => $composableBuilder(
+    column: $table.sequenceIndex,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get instructionRendered => $composableBuilder(
+    column: $table.instructionRendered,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get status => $composableBuilder(
+    column: $table.status,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get presentedAt => $composableBuilder(
+    column: $table.presentedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get firstSignalAt => $composableBuilder(
+    column: $table.firstSignalAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get confirmedAt => $composableBuilder(
+    column: $table.confirmedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get skippedAt => $composableBuilder(
+    column: $table.skippedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get adaptedAt => $composableBuilder(
+    column: $table.adaptedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get confirmationMode => $composableBuilder(
+    column: $table.confirmationMode,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get proofConfidence => $composableBuilder(
+    column: $table.proofConfidence,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get adaptationReason => $composableBuilder(
+    column: $table.adaptationReason,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get isFirstMeaningfulAction => $composableBuilder(
+    column: $table.isFirstMeaningfulAction,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get deepLink => $composableBuilder(
+    column: $table.deepLink,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get opensTaskId => $composableBuilder(
+    column: $table.opensTaskId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$ActivationEpisodesTableFilterComposer get episodeId {
+    final $$ActivationEpisodesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.episodeId,
+      referencedTable: $db.activationEpisodes,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ActivationEpisodesTableFilterComposer(
+            $db: $db,
+            $table: $db.activationEpisodes,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$ActivationCommandRunsTableOrderingComposer
+    extends Composer<_$ColonyDatabase, $ActivationCommandRunsTable> {
+  $$ActivationCommandRunsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get templateId => $composableBuilder(
+    column: $table.templateId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get sequenceIndex => $composableBuilder(
+    column: $table.sequenceIndex,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get instructionRendered => $composableBuilder(
+    column: $table.instructionRendered,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get status => $composableBuilder(
+    column: $table.status,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get presentedAt => $composableBuilder(
+    column: $table.presentedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get firstSignalAt => $composableBuilder(
+    column: $table.firstSignalAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get confirmedAt => $composableBuilder(
+    column: $table.confirmedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get skippedAt => $composableBuilder(
+    column: $table.skippedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get adaptedAt => $composableBuilder(
+    column: $table.adaptedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get confirmationMode => $composableBuilder(
+    column: $table.confirmationMode,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get proofConfidence => $composableBuilder(
+    column: $table.proofConfidence,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get adaptationReason => $composableBuilder(
+    column: $table.adaptationReason,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get isFirstMeaningfulAction => $composableBuilder(
+    column: $table.isFirstMeaningfulAction,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get deepLink => $composableBuilder(
+    column: $table.deepLink,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get opensTaskId => $composableBuilder(
+    column: $table.opensTaskId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$ActivationEpisodesTableOrderingComposer get episodeId {
+    final $$ActivationEpisodesTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.episodeId,
+      referencedTable: $db.activationEpisodes,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ActivationEpisodesTableOrderingComposer(
+            $db: $db,
+            $table: $db.activationEpisodes,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$ActivationCommandRunsTableAnnotationComposer
+    extends Composer<_$ColonyDatabase, $ActivationCommandRunsTable> {
+  $$ActivationCommandRunsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get templateId => $composableBuilder(
+    column: $table.templateId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get sequenceIndex => $composableBuilder(
+    column: $table.sequenceIndex,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get instructionRendered => $composableBuilder(
+    column: $table.instructionRendered,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get status =>
+      $composableBuilder(column: $table.status, builder: (column) => column);
+
+  GeneratedColumn<int> get presentedAt => $composableBuilder(
+    column: $table.presentedAt,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get firstSignalAt => $composableBuilder(
+    column: $table.firstSignalAt,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get confirmedAt => $composableBuilder(
+    column: $table.confirmedAt,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get skippedAt =>
+      $composableBuilder(column: $table.skippedAt, builder: (column) => column);
+
+  GeneratedColumn<int> get adaptedAt =>
+      $composableBuilder(column: $table.adaptedAt, builder: (column) => column);
+
+  GeneratedColumn<String> get confirmationMode => $composableBuilder(
+    column: $table.confirmationMode,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<double> get proofConfidence => $composableBuilder(
+    column: $table.proofConfidence,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get adaptationReason => $composableBuilder(
+    column: $table.adaptationReason,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get isFirstMeaningfulAction => $composableBuilder(
+    column: $table.isFirstMeaningfulAction,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get deepLink =>
+      $composableBuilder(column: $table.deepLink, builder: (column) => column);
+
+  GeneratedColumn<String> get opensTaskId => $composableBuilder(
+    column: $table.opensTaskId,
+    builder: (column) => column,
+  );
+
+  $$ActivationEpisodesTableAnnotationComposer get episodeId {
+    final $$ActivationEpisodesTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.episodeId,
+          referencedTable: $db.activationEpisodes,
+          getReferencedColumn: (t) => t.id,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$ActivationEpisodesTableAnnotationComposer(
+                $db: $db,
+                $table: $db.activationEpisodes,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return composer;
+  }
+}
+
+class $$ActivationCommandRunsTableTableManager
+    extends
+        RootTableManager<
+          _$ColonyDatabase,
+          $ActivationCommandRunsTable,
+          ActivationCommandRunRow,
+          $$ActivationCommandRunsTableFilterComposer,
+          $$ActivationCommandRunsTableOrderingComposer,
+          $$ActivationCommandRunsTableAnnotationComposer,
+          $$ActivationCommandRunsTableCreateCompanionBuilder,
+          $$ActivationCommandRunsTableUpdateCompanionBuilder,
+          (ActivationCommandRunRow, $$ActivationCommandRunsTableReferences),
+          ActivationCommandRunRow,
+          PrefetchHooks Function({bool episodeId})
+        > {
+  $$ActivationCommandRunsTableTableManager(
+    _$ColonyDatabase db,
+    $ActivationCommandRunsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$ActivationCommandRunsTableFilterComposer(
+                $db: db,
+                $table: table,
+              ),
+          createOrderingComposer: () =>
+              $$ActivationCommandRunsTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$ActivationCommandRunsTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> episodeId = const Value.absent(),
+                Value<String?> templateId = const Value.absent(),
+                Value<int> sequenceIndex = const Value.absent(),
+                Value<String> instructionRendered = const Value.absent(),
+                Value<String> status = const Value.absent(),
+                Value<int> presentedAt = const Value.absent(),
+                Value<int?> firstSignalAt = const Value.absent(),
+                Value<int?> confirmedAt = const Value.absent(),
+                Value<int?> skippedAt = const Value.absent(),
+                Value<int?> adaptedAt = const Value.absent(),
+                Value<String?> confirmationMode = const Value.absent(),
+                Value<double?> proofConfidence = const Value.absent(),
+                Value<String?> adaptationReason = const Value.absent(),
+                Value<bool> isFirstMeaningfulAction = const Value.absent(),
+                Value<String?> deepLink = const Value.absent(),
+                Value<String?> opensTaskId = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => ActivationCommandRunsCompanion(
+                id: id,
+                episodeId: episodeId,
+                templateId: templateId,
+                sequenceIndex: sequenceIndex,
+                instructionRendered: instructionRendered,
+                status: status,
+                presentedAt: presentedAt,
+                firstSignalAt: firstSignalAt,
+                confirmedAt: confirmedAt,
+                skippedAt: skippedAt,
+                adaptedAt: adaptedAt,
+                confirmationMode: confirmationMode,
+                proofConfidence: proofConfidence,
+                adaptationReason: adaptationReason,
+                isFirstMeaningfulAction: isFirstMeaningfulAction,
+                deepLink: deepLink,
+                opensTaskId: opensTaskId,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String episodeId,
+                Value<String?> templateId = const Value.absent(),
+                required int sequenceIndex,
+                required String instructionRendered,
+                required String status,
+                required int presentedAt,
+                Value<int?> firstSignalAt = const Value.absent(),
+                Value<int?> confirmedAt = const Value.absent(),
+                Value<int?> skippedAt = const Value.absent(),
+                Value<int?> adaptedAt = const Value.absent(),
+                Value<String?> confirmationMode = const Value.absent(),
+                Value<double?> proofConfidence = const Value.absent(),
+                Value<String?> adaptationReason = const Value.absent(),
+                Value<bool> isFirstMeaningfulAction = const Value.absent(),
+                Value<String?> deepLink = const Value.absent(),
+                Value<String?> opensTaskId = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => ActivationCommandRunsCompanion.insert(
+                id: id,
+                episodeId: episodeId,
+                templateId: templateId,
+                sequenceIndex: sequenceIndex,
+                instructionRendered: instructionRendered,
+                status: status,
+                presentedAt: presentedAt,
+                firstSignalAt: firstSignalAt,
+                confirmedAt: confirmedAt,
+                skippedAt: skippedAt,
+                adaptedAt: adaptedAt,
+                confirmationMode: confirmationMode,
+                proofConfidence: proofConfidence,
+                adaptationReason: adaptationReason,
+                isFirstMeaningfulAction: isFirstMeaningfulAction,
+                deepLink: deepLink,
+                opensTaskId: opensTaskId,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$ActivationCommandRunsTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({episodeId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (episodeId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.episodeId,
+                                referencedTable:
+                                    $$ActivationCommandRunsTableReferences
+                                        ._episodeIdTable(db),
+                                referencedColumn:
+                                    $$ActivationCommandRunsTableReferences
+                                        ._episodeIdTable(db)
+                                        .id,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$ActivationCommandRunsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$ColonyDatabase,
+      $ActivationCommandRunsTable,
+      ActivationCommandRunRow,
+      $$ActivationCommandRunsTableFilterComposer,
+      $$ActivationCommandRunsTableOrderingComposer,
+      $$ActivationCommandRunsTableAnnotationComposer,
+      $$ActivationCommandRunsTableCreateCompanionBuilder,
+      $$ActivationCommandRunsTableUpdateCompanionBuilder,
+      (ActivationCommandRunRow, $$ActivationCommandRunsTableReferences),
+      ActivationCommandRunRow,
+      PrefetchHooks Function({bool episodeId})
+    >;
+typedef $$ActivationProofsTableCreateCompanionBuilder =
+    ActivationProofsCompanion Function({
+      required String id,
+      required String episodeId,
+      Value<String?> commandRunId,
+      required String proofType,
+      required int observedAt,
+      required String source,
+      required double confidence,
+      required String privacyClass,
+      Value<String> interpretationJson,
+      Value<String?> rawReference,
+      Value<bool?> userConfirmed,
+      Value<int> rowid,
+    });
+typedef $$ActivationProofsTableUpdateCompanionBuilder =
+    ActivationProofsCompanion Function({
+      Value<String> id,
+      Value<String> episodeId,
+      Value<String?> commandRunId,
+      Value<String> proofType,
+      Value<int> observedAt,
+      Value<String> source,
+      Value<double> confidence,
+      Value<String> privacyClass,
+      Value<String> interpretationJson,
+      Value<String?> rawReference,
+      Value<bool?> userConfirmed,
+      Value<int> rowid,
+    });
+
+final class $$ActivationProofsTableReferences
+    extends
+        BaseReferences<
+          _$ColonyDatabase,
+          $ActivationProofsTable,
+          ActivationProofRow
+        > {
+  $$ActivationProofsTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $ActivationEpisodesTable _episodeIdTable(_$ColonyDatabase db) =>
+      db.activationEpisodes.createAlias(
+        $_aliasNameGenerator(
+          db.activationProofs.episodeId,
+          db.activationEpisodes.id,
+        ),
+      );
+
+  $$ActivationEpisodesTableProcessedTableManager get episodeId {
+    final $_column = $_itemColumn<String>('episode_id')!;
+
+    final manager = $$ActivationEpisodesTableTableManager(
+      $_db,
+      $_db.activationEpisodes,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_episodeIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$ActivationProofsTableFilterComposer
+    extends Composer<_$ColonyDatabase, $ActivationProofsTable> {
+  $$ActivationProofsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get commandRunId => $composableBuilder(
+    column: $table.commandRunId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get proofType => $composableBuilder(
+    column: $table.proofType,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get observedAt => $composableBuilder(
+    column: $table.observedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get source => $composableBuilder(
+    column: $table.source,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get confidence => $composableBuilder(
+    column: $table.confidence,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get privacyClass => $composableBuilder(
+    column: $table.privacyClass,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get interpretationJson => $composableBuilder(
+    column: $table.interpretationJson,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get rawReference => $composableBuilder(
+    column: $table.rawReference,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get userConfirmed => $composableBuilder(
+    column: $table.userConfirmed,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$ActivationEpisodesTableFilterComposer get episodeId {
+    final $$ActivationEpisodesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.episodeId,
+      referencedTable: $db.activationEpisodes,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ActivationEpisodesTableFilterComposer(
+            $db: $db,
+            $table: $db.activationEpisodes,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$ActivationProofsTableOrderingComposer
+    extends Composer<_$ColonyDatabase, $ActivationProofsTable> {
+  $$ActivationProofsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get commandRunId => $composableBuilder(
+    column: $table.commandRunId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get proofType => $composableBuilder(
+    column: $table.proofType,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get observedAt => $composableBuilder(
+    column: $table.observedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get source => $composableBuilder(
+    column: $table.source,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get confidence => $composableBuilder(
+    column: $table.confidence,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get privacyClass => $composableBuilder(
+    column: $table.privacyClass,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get interpretationJson => $composableBuilder(
+    column: $table.interpretationJson,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get rawReference => $composableBuilder(
+    column: $table.rawReference,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get userConfirmed => $composableBuilder(
+    column: $table.userConfirmed,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$ActivationEpisodesTableOrderingComposer get episodeId {
+    final $$ActivationEpisodesTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.episodeId,
+      referencedTable: $db.activationEpisodes,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ActivationEpisodesTableOrderingComposer(
+            $db: $db,
+            $table: $db.activationEpisodes,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$ActivationProofsTableAnnotationComposer
+    extends Composer<_$ColonyDatabase, $ActivationProofsTable> {
+  $$ActivationProofsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get commandRunId => $composableBuilder(
+    column: $table.commandRunId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get proofType =>
+      $composableBuilder(column: $table.proofType, builder: (column) => column);
+
+  GeneratedColumn<int> get observedAt => $composableBuilder(
+    column: $table.observedAt,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get source =>
+      $composableBuilder(column: $table.source, builder: (column) => column);
+
+  GeneratedColumn<double> get confidence => $composableBuilder(
+    column: $table.confidence,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get privacyClass => $composableBuilder(
+    column: $table.privacyClass,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get interpretationJson => $composableBuilder(
+    column: $table.interpretationJson,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get rawReference => $composableBuilder(
+    column: $table.rawReference,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get userConfirmed => $composableBuilder(
+    column: $table.userConfirmed,
+    builder: (column) => column,
+  );
+
+  $$ActivationEpisodesTableAnnotationComposer get episodeId {
+    final $$ActivationEpisodesTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.episodeId,
+          referencedTable: $db.activationEpisodes,
+          getReferencedColumn: (t) => t.id,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$ActivationEpisodesTableAnnotationComposer(
+                $db: $db,
+                $table: $db.activationEpisodes,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return composer;
+  }
+}
+
+class $$ActivationProofsTableTableManager
+    extends
+        RootTableManager<
+          _$ColonyDatabase,
+          $ActivationProofsTable,
+          ActivationProofRow,
+          $$ActivationProofsTableFilterComposer,
+          $$ActivationProofsTableOrderingComposer,
+          $$ActivationProofsTableAnnotationComposer,
+          $$ActivationProofsTableCreateCompanionBuilder,
+          $$ActivationProofsTableUpdateCompanionBuilder,
+          (ActivationProofRow, $$ActivationProofsTableReferences),
+          ActivationProofRow,
+          PrefetchHooks Function({bool episodeId})
+        > {
+  $$ActivationProofsTableTableManager(
+    _$ColonyDatabase db,
+    $ActivationProofsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$ActivationProofsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$ActivationProofsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$ActivationProofsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> episodeId = const Value.absent(),
+                Value<String?> commandRunId = const Value.absent(),
+                Value<String> proofType = const Value.absent(),
+                Value<int> observedAt = const Value.absent(),
+                Value<String> source = const Value.absent(),
+                Value<double> confidence = const Value.absent(),
+                Value<String> privacyClass = const Value.absent(),
+                Value<String> interpretationJson = const Value.absent(),
+                Value<String?> rawReference = const Value.absent(),
+                Value<bool?> userConfirmed = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => ActivationProofsCompanion(
+                id: id,
+                episodeId: episodeId,
+                commandRunId: commandRunId,
+                proofType: proofType,
+                observedAt: observedAt,
+                source: source,
+                confidence: confidence,
+                privacyClass: privacyClass,
+                interpretationJson: interpretationJson,
+                rawReference: rawReference,
+                userConfirmed: userConfirmed,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String episodeId,
+                Value<String?> commandRunId = const Value.absent(),
+                required String proofType,
+                required int observedAt,
+                required String source,
+                required double confidence,
+                required String privacyClass,
+                Value<String> interpretationJson = const Value.absent(),
+                Value<String?> rawReference = const Value.absent(),
+                Value<bool?> userConfirmed = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => ActivationProofsCompanion.insert(
+                id: id,
+                episodeId: episodeId,
+                commandRunId: commandRunId,
+                proofType: proofType,
+                observedAt: observedAt,
+                source: source,
+                confidence: confidence,
+                privacyClass: privacyClass,
+                interpretationJson: interpretationJson,
+                rawReference: rawReference,
+                userConfirmed: userConfirmed,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$ActivationProofsTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({episodeId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (episodeId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.episodeId,
+                                referencedTable:
+                                    $$ActivationProofsTableReferences
+                                        ._episodeIdTable(db),
+                                referencedColumn:
+                                    $$ActivationProofsTableReferences
+                                        ._episodeIdTable(db)
+                                        .id,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$ActivationProofsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$ColonyDatabase,
+      $ActivationProofsTable,
+      ActivationProofRow,
+      $$ActivationProofsTableFilterComposer,
+      $$ActivationProofsTableOrderingComposer,
+      $$ActivationProofsTableAnnotationComposer,
+      $$ActivationProofsTableCreateCompanionBuilder,
+      $$ActivationProofsTableUpdateCompanionBuilder,
+      (ActivationProofRow, $$ActivationProofsTableReferences),
+      ActivationProofRow,
+      PrefetchHooks Function({bool episodeId})
+    >;
+typedef $$ActivationWaypointsTableCreateCompanionBuilder =
+    ActivationWaypointsCompanion Function({
+      required String id,
+      required String profileId,
+      required String name,
+      required String waypointType,
+      Value<String?> zoneId,
+      Value<String?> equipmentId,
+      Value<String?> token,
+      Value<String> settingsJson,
+      Value<double?> reliabilityScore,
+      required String privacyClass,
+      Value<bool> isEnabled,
+      required int createdAt,
+      required int updatedAt,
+      Value<int> rowid,
+    });
+typedef $$ActivationWaypointsTableUpdateCompanionBuilder =
+    ActivationWaypointsCompanion Function({
+      Value<String> id,
+      Value<String> profileId,
+      Value<String> name,
+      Value<String> waypointType,
+      Value<String?> zoneId,
+      Value<String?> equipmentId,
+      Value<String?> token,
+      Value<String> settingsJson,
+      Value<double?> reliabilityScore,
+      Value<String> privacyClass,
+      Value<bool> isEnabled,
+      Value<int> createdAt,
+      Value<int> updatedAt,
+      Value<int> rowid,
+    });
+
+final class $$ActivationWaypointsTableReferences
+    extends
+        BaseReferences<
+          _$ColonyDatabase,
+          $ActivationWaypointsTable,
+          ActivationWaypointRow
+        > {
+  $$ActivationWaypointsTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $ProfilesTable _profileIdTable(_$ColonyDatabase db) =>
+      db.profiles.createAlias(
+        $_aliasNameGenerator(db.activationWaypoints.profileId, db.profiles.id),
+      );
+
+  $$ProfilesTableProcessedTableManager get profileId {
+    final $_column = $_itemColumn<String>('profile_id')!;
+
+    final manager = $$ProfilesTableTableManager(
+      $_db,
+      $_db.profiles,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_profileIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static MultiTypedResultKey<
+    $WaypointObservationsTable,
+    List<WaypointObservationRow>
+  >
+  _waypointObservationsRefsTable(_$ColonyDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.waypointObservations,
+        aliasName: $_aliasNameGenerator(
+          db.activationWaypoints.id,
+          db.waypointObservations.waypointId,
+        ),
+      );
+
+  $$WaypointObservationsTableProcessedTableManager
+  get waypointObservationsRefs {
+    final manager = $$WaypointObservationsTableTableManager(
+      $_db,
+      $_db.waypointObservations,
+    ).filter((f) => f.waypointId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _waypointObservationsRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+}
+
+class $$ActivationWaypointsTableFilterComposer
+    extends Composer<_$ColonyDatabase, $ActivationWaypointsTable> {
+  $$ActivationWaypointsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get waypointType => $composableBuilder(
+    column: $table.waypointType,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get zoneId => $composableBuilder(
+    column: $table.zoneId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get equipmentId => $composableBuilder(
+    column: $table.equipmentId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get token => $composableBuilder(
+    column: $table.token,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get settingsJson => $composableBuilder(
+    column: $table.settingsJson,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get reliabilityScore => $composableBuilder(
+    column: $table.reliabilityScore,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get privacyClass => $composableBuilder(
+    column: $table.privacyClass,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get isEnabled => $composableBuilder(
+    column: $table.isEnabled,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$ProfilesTableFilterComposer get profileId {
+    final $$ProfilesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.profileId,
+      referencedTable: $db.profiles,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProfilesTableFilterComposer(
+            $db: $db,
+            $table: $db.profiles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  Expression<bool> waypointObservationsRefs(
+    Expression<bool> Function($$WaypointObservationsTableFilterComposer f) f,
+  ) {
+    final $$WaypointObservationsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.waypointObservations,
+      getReferencedColumn: (t) => t.waypointId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$WaypointObservationsTableFilterComposer(
+            $db: $db,
+            $table: $db.waypointObservations,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $$ActivationWaypointsTableOrderingComposer
+    extends Composer<_$ColonyDatabase, $ActivationWaypointsTable> {
+  $$ActivationWaypointsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get waypointType => $composableBuilder(
+    column: $table.waypointType,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get zoneId => $composableBuilder(
+    column: $table.zoneId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get equipmentId => $composableBuilder(
+    column: $table.equipmentId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get token => $composableBuilder(
+    column: $table.token,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get settingsJson => $composableBuilder(
+    column: $table.settingsJson,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get reliabilityScore => $composableBuilder(
+    column: $table.reliabilityScore,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get privacyClass => $composableBuilder(
+    column: $table.privacyClass,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get isEnabled => $composableBuilder(
+    column: $table.isEnabled,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$ProfilesTableOrderingComposer get profileId {
+    final $$ProfilesTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.profileId,
+      referencedTable: $db.profiles,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProfilesTableOrderingComposer(
+            $db: $db,
+            $table: $db.profiles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$ActivationWaypointsTableAnnotationComposer
+    extends Composer<_$ColonyDatabase, $ActivationWaypointsTable> {
+  $$ActivationWaypointsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<String> get waypointType => $composableBuilder(
+    column: $table.waypointType,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get zoneId =>
+      $composableBuilder(column: $table.zoneId, builder: (column) => column);
+
+  GeneratedColumn<String> get equipmentId => $composableBuilder(
+    column: $table.equipmentId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get token =>
+      $composableBuilder(column: $table.token, builder: (column) => column);
+
+  GeneratedColumn<String> get settingsJson => $composableBuilder(
+    column: $table.settingsJson,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<double> get reliabilityScore => $composableBuilder(
+    column: $table.reliabilityScore,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get privacyClass => $composableBuilder(
+    column: $table.privacyClass,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get isEnabled =>
+      $composableBuilder(column: $table.isEnabled, builder: (column) => column);
+
+  GeneratedColumn<int> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<int> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  $$ProfilesTableAnnotationComposer get profileId {
+    final $$ProfilesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.profileId,
+      referencedTable: $db.profiles,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProfilesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.profiles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  Expression<T> waypointObservationsRefs<T extends Object>(
+    Expression<T> Function($$WaypointObservationsTableAnnotationComposer a) f,
+  ) {
+    final $$WaypointObservationsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.waypointObservations,
+          getReferencedColumn: (t) => t.waypointId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$WaypointObservationsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.waypointObservations,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+}
+
+class $$ActivationWaypointsTableTableManager
+    extends
+        RootTableManager<
+          _$ColonyDatabase,
+          $ActivationWaypointsTable,
+          ActivationWaypointRow,
+          $$ActivationWaypointsTableFilterComposer,
+          $$ActivationWaypointsTableOrderingComposer,
+          $$ActivationWaypointsTableAnnotationComposer,
+          $$ActivationWaypointsTableCreateCompanionBuilder,
+          $$ActivationWaypointsTableUpdateCompanionBuilder,
+          (ActivationWaypointRow, $$ActivationWaypointsTableReferences),
+          ActivationWaypointRow,
+          PrefetchHooks Function({
+            bool profileId,
+            bool waypointObservationsRefs,
+          })
+        > {
+  $$ActivationWaypointsTableTableManager(
+    _$ColonyDatabase db,
+    $ActivationWaypointsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$ActivationWaypointsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$ActivationWaypointsTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$ActivationWaypointsTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> profileId = const Value.absent(),
+                Value<String> name = const Value.absent(),
+                Value<String> waypointType = const Value.absent(),
+                Value<String?> zoneId = const Value.absent(),
+                Value<String?> equipmentId = const Value.absent(),
+                Value<String?> token = const Value.absent(),
+                Value<String> settingsJson = const Value.absent(),
+                Value<double?> reliabilityScore = const Value.absent(),
+                Value<String> privacyClass = const Value.absent(),
+                Value<bool> isEnabled = const Value.absent(),
+                Value<int> createdAt = const Value.absent(),
+                Value<int> updatedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => ActivationWaypointsCompanion(
+                id: id,
+                profileId: profileId,
+                name: name,
+                waypointType: waypointType,
+                zoneId: zoneId,
+                equipmentId: equipmentId,
+                token: token,
+                settingsJson: settingsJson,
+                reliabilityScore: reliabilityScore,
+                privacyClass: privacyClass,
+                isEnabled: isEnabled,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String profileId,
+                required String name,
+                required String waypointType,
+                Value<String?> zoneId = const Value.absent(),
+                Value<String?> equipmentId = const Value.absent(),
+                Value<String?> token = const Value.absent(),
+                Value<String> settingsJson = const Value.absent(),
+                Value<double?> reliabilityScore = const Value.absent(),
+                required String privacyClass,
+                Value<bool> isEnabled = const Value.absent(),
+                required int createdAt,
+                required int updatedAt,
+                Value<int> rowid = const Value.absent(),
+              }) => ActivationWaypointsCompanion.insert(
+                id: id,
+                profileId: profileId,
+                name: name,
+                waypointType: waypointType,
+                zoneId: zoneId,
+                equipmentId: equipmentId,
+                token: token,
+                settingsJson: settingsJson,
+                reliabilityScore: reliabilityScore,
+                privacyClass: privacyClass,
+                isEnabled: isEnabled,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$ActivationWaypointsTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback:
+              ({profileId = false, waypointObservationsRefs = false}) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [
+                    if (waypointObservationsRefs) db.waypointObservations,
+                  ],
+                  addJoins:
+                      <
+                        T extends TableManagerState<
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic
+                        >
+                      >(state) {
+                        if (profileId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.profileId,
+                                    referencedTable:
+                                        $$ActivationWaypointsTableReferences
+                                            ._profileIdTable(db),
+                                    referencedColumn:
+                                        $$ActivationWaypointsTableReferences
+                                            ._profileIdTable(db)
+                                            .id,
+                                  )
+                                  as T;
+                        }
+
+                        return state;
+                      },
+                  getPrefetchedDataCallback: (items) async {
+                    return [
+                      if (waypointObservationsRefs)
+                        await $_getPrefetchedData<
+                          ActivationWaypointRow,
+                          $ActivationWaypointsTable,
+                          WaypointObservationRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$ActivationWaypointsTableReferences
+                              ._waypointObservationsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$ActivationWaypointsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).waypointObservationsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.waypointId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                    ];
+                  },
+                );
+              },
+        ),
+      );
+}
+
+typedef $$ActivationWaypointsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$ColonyDatabase,
+      $ActivationWaypointsTable,
+      ActivationWaypointRow,
+      $$ActivationWaypointsTableFilterComposer,
+      $$ActivationWaypointsTableOrderingComposer,
+      $$ActivationWaypointsTableAnnotationComposer,
+      $$ActivationWaypointsTableCreateCompanionBuilder,
+      $$ActivationWaypointsTableUpdateCompanionBuilder,
+      (ActivationWaypointRow, $$ActivationWaypointsTableReferences),
+      ActivationWaypointRow,
+      PrefetchHooks Function({bool profileId, bool waypointObservationsRefs})
+    >;
+typedef $$WaypointObservationsTableCreateCompanionBuilder =
+    WaypointObservationsCompanion Function({
+      required String id,
+      required String waypointId,
+      Value<String?> episodeId,
+      required int observedAt,
+      required String state,
+      required int latencyMs,
+      Value<String> source,
+      Value<int> rowid,
+    });
+typedef $$WaypointObservationsTableUpdateCompanionBuilder =
+    WaypointObservationsCompanion Function({
+      Value<String> id,
+      Value<String> waypointId,
+      Value<String?> episodeId,
+      Value<int> observedAt,
+      Value<String> state,
+      Value<int> latencyMs,
+      Value<String> source,
+      Value<int> rowid,
+    });
+
+final class $$WaypointObservationsTableReferences
+    extends
+        BaseReferences<
+          _$ColonyDatabase,
+          $WaypointObservationsTable,
+          WaypointObservationRow
+        > {
+  $$WaypointObservationsTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $ActivationWaypointsTable _waypointIdTable(_$ColonyDatabase db) =>
+      db.activationWaypoints.createAlias(
+        $_aliasNameGenerator(
+          db.waypointObservations.waypointId,
+          db.activationWaypoints.id,
+        ),
+      );
+
+  $$ActivationWaypointsTableProcessedTableManager get waypointId {
+    final $_column = $_itemColumn<String>('waypoint_id')!;
+
+    final manager = $$ActivationWaypointsTableTableManager(
+      $_db,
+      $_db.activationWaypoints,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_waypointIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$WaypointObservationsTableFilterComposer
+    extends Composer<_$ColonyDatabase, $WaypointObservationsTable> {
+  $$WaypointObservationsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get episodeId => $composableBuilder(
+    column: $table.episodeId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get observedAt => $composableBuilder(
+    column: $table.observedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get state => $composableBuilder(
+    column: $table.state,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get latencyMs => $composableBuilder(
+    column: $table.latencyMs,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get source => $composableBuilder(
+    column: $table.source,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$ActivationWaypointsTableFilterComposer get waypointId {
+    final $$ActivationWaypointsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.waypointId,
+      referencedTable: $db.activationWaypoints,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ActivationWaypointsTableFilterComposer(
+            $db: $db,
+            $table: $db.activationWaypoints,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$WaypointObservationsTableOrderingComposer
+    extends Composer<_$ColonyDatabase, $WaypointObservationsTable> {
+  $$WaypointObservationsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get episodeId => $composableBuilder(
+    column: $table.episodeId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get observedAt => $composableBuilder(
+    column: $table.observedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get state => $composableBuilder(
+    column: $table.state,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get latencyMs => $composableBuilder(
+    column: $table.latencyMs,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get source => $composableBuilder(
+    column: $table.source,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$ActivationWaypointsTableOrderingComposer get waypointId {
+    final $$ActivationWaypointsTableOrderingComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.waypointId,
+          referencedTable: $db.activationWaypoints,
+          getReferencedColumn: (t) => t.id,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$ActivationWaypointsTableOrderingComposer(
+                $db: $db,
+                $table: $db.activationWaypoints,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return composer;
+  }
+}
+
+class $$WaypointObservationsTableAnnotationComposer
+    extends Composer<_$ColonyDatabase, $WaypointObservationsTable> {
+  $$WaypointObservationsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get episodeId =>
+      $composableBuilder(column: $table.episodeId, builder: (column) => column);
+
+  GeneratedColumn<int> get observedAt => $composableBuilder(
+    column: $table.observedAt,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get state =>
+      $composableBuilder(column: $table.state, builder: (column) => column);
+
+  GeneratedColumn<int> get latencyMs =>
+      $composableBuilder(column: $table.latencyMs, builder: (column) => column);
+
+  GeneratedColumn<String> get source =>
+      $composableBuilder(column: $table.source, builder: (column) => column);
+
+  $$ActivationWaypointsTableAnnotationComposer get waypointId {
+    final $$ActivationWaypointsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.waypointId,
+          referencedTable: $db.activationWaypoints,
+          getReferencedColumn: (t) => t.id,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$ActivationWaypointsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.activationWaypoints,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return composer;
+  }
+}
+
+class $$WaypointObservationsTableTableManager
+    extends
+        RootTableManager<
+          _$ColonyDatabase,
+          $WaypointObservationsTable,
+          WaypointObservationRow,
+          $$WaypointObservationsTableFilterComposer,
+          $$WaypointObservationsTableOrderingComposer,
+          $$WaypointObservationsTableAnnotationComposer,
+          $$WaypointObservationsTableCreateCompanionBuilder,
+          $$WaypointObservationsTableUpdateCompanionBuilder,
+          (WaypointObservationRow, $$WaypointObservationsTableReferences),
+          WaypointObservationRow,
+          PrefetchHooks Function({bool waypointId})
+        > {
+  $$WaypointObservationsTableTableManager(
+    _$ColonyDatabase db,
+    $WaypointObservationsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$WaypointObservationsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$WaypointObservationsTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$WaypointObservationsTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> waypointId = const Value.absent(),
+                Value<String?> episodeId = const Value.absent(),
+                Value<int> observedAt = const Value.absent(),
+                Value<String> state = const Value.absent(),
+                Value<int> latencyMs = const Value.absent(),
+                Value<String> source = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => WaypointObservationsCompanion(
+                id: id,
+                waypointId: waypointId,
+                episodeId: episodeId,
+                observedAt: observedAt,
+                state: state,
+                latencyMs: latencyMs,
+                source: source,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String waypointId,
+                Value<String?> episodeId = const Value.absent(),
+                required int observedAt,
+                required String state,
+                required int latencyMs,
+                Value<String> source = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => WaypointObservationsCompanion.insert(
+                id: id,
+                waypointId: waypointId,
+                episodeId: episodeId,
+                observedAt: observedAt,
+                state: state,
+                latencyMs: latencyMs,
+                source: source,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$WaypointObservationsTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({waypointId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (waypointId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.waypointId,
+                                referencedTable:
+                                    $$WaypointObservationsTableReferences
+                                        ._waypointIdTable(db),
+                                referencedColumn:
+                                    $$WaypointObservationsTableReferences
+                                        ._waypointIdTable(db)
+                                        .id,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$WaypointObservationsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$ColonyDatabase,
+      $WaypointObservationsTable,
+      WaypointObservationRow,
+      $$WaypointObservationsTableFilterComposer,
+      $$WaypointObservationsTableOrderingComposer,
+      $$WaypointObservationsTableAnnotationComposer,
+      $$WaypointObservationsTableCreateCompanionBuilder,
+      $$WaypointObservationsTableUpdateCompanionBuilder,
+      (WaypointObservationRow, $$WaypointObservationsTableReferences),
+      WaypointObservationRow,
+      PrefetchHooks Function({bool waypointId})
+    >;
+typedef $$InertiaSignalsTableCreateCompanionBuilder =
+    InertiaSignalsCompanion Function({
+      required String id,
+      Value<String?> episodeId,
+      required String signalType,
+      required int observedAt,
+      Value<String> valueJson,
+      required String source,
+      required double confidence,
+      Value<int?> expiresAt,
+      required String privacyClass,
+      Value<int> rowid,
+    });
+typedef $$InertiaSignalsTableUpdateCompanionBuilder =
+    InertiaSignalsCompanion Function({
+      Value<String> id,
+      Value<String?> episodeId,
+      Value<String> signalType,
+      Value<int> observedAt,
+      Value<String> valueJson,
+      Value<String> source,
+      Value<double> confidence,
+      Value<int?> expiresAt,
+      Value<String> privacyClass,
+      Value<int> rowid,
+    });
+
+class $$InertiaSignalsTableFilterComposer
+    extends Composer<_$ColonyDatabase, $InertiaSignalsTable> {
+  $$InertiaSignalsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get episodeId => $composableBuilder(
+    column: $table.episodeId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get signalType => $composableBuilder(
+    column: $table.signalType,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get observedAt => $composableBuilder(
+    column: $table.observedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get valueJson => $composableBuilder(
+    column: $table.valueJson,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get source => $composableBuilder(
+    column: $table.source,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get confidence => $composableBuilder(
+    column: $table.confidence,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get expiresAt => $composableBuilder(
+    column: $table.expiresAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get privacyClass => $composableBuilder(
+    column: $table.privacyClass,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$InertiaSignalsTableOrderingComposer
+    extends Composer<_$ColonyDatabase, $InertiaSignalsTable> {
+  $$InertiaSignalsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get episodeId => $composableBuilder(
+    column: $table.episodeId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get signalType => $composableBuilder(
+    column: $table.signalType,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get observedAt => $composableBuilder(
+    column: $table.observedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get valueJson => $composableBuilder(
+    column: $table.valueJson,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get source => $composableBuilder(
+    column: $table.source,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get confidence => $composableBuilder(
+    column: $table.confidence,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get expiresAt => $composableBuilder(
+    column: $table.expiresAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get privacyClass => $composableBuilder(
+    column: $table.privacyClass,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$InertiaSignalsTableAnnotationComposer
+    extends Composer<_$ColonyDatabase, $InertiaSignalsTable> {
+  $$InertiaSignalsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get episodeId =>
+      $composableBuilder(column: $table.episodeId, builder: (column) => column);
+
+  GeneratedColumn<String> get signalType => $composableBuilder(
+    column: $table.signalType,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get observedAt => $composableBuilder(
+    column: $table.observedAt,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get valueJson =>
+      $composableBuilder(column: $table.valueJson, builder: (column) => column);
+
+  GeneratedColumn<String> get source =>
+      $composableBuilder(column: $table.source, builder: (column) => column);
+
+  GeneratedColumn<double> get confidence => $composableBuilder(
+    column: $table.confidence,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get expiresAt =>
+      $composableBuilder(column: $table.expiresAt, builder: (column) => column);
+
+  GeneratedColumn<String> get privacyClass => $composableBuilder(
+    column: $table.privacyClass,
+    builder: (column) => column,
+  );
+}
+
+class $$InertiaSignalsTableTableManager
+    extends
+        RootTableManager<
+          _$ColonyDatabase,
+          $InertiaSignalsTable,
+          InertiaSignalRow,
+          $$InertiaSignalsTableFilterComposer,
+          $$InertiaSignalsTableOrderingComposer,
+          $$InertiaSignalsTableAnnotationComposer,
+          $$InertiaSignalsTableCreateCompanionBuilder,
+          $$InertiaSignalsTableUpdateCompanionBuilder,
+          (
+            InertiaSignalRow,
+            BaseReferences<
+              _$ColonyDatabase,
+              $InertiaSignalsTable,
+              InertiaSignalRow
+            >,
+          ),
+          InertiaSignalRow,
+          PrefetchHooks Function()
+        > {
+  $$InertiaSignalsTableTableManager(
+    _$ColonyDatabase db,
+    $InertiaSignalsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$InertiaSignalsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$InertiaSignalsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$InertiaSignalsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String?> episodeId = const Value.absent(),
+                Value<String> signalType = const Value.absent(),
+                Value<int> observedAt = const Value.absent(),
+                Value<String> valueJson = const Value.absent(),
+                Value<String> source = const Value.absent(),
+                Value<double> confidence = const Value.absent(),
+                Value<int?> expiresAt = const Value.absent(),
+                Value<String> privacyClass = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => InertiaSignalsCompanion(
+                id: id,
+                episodeId: episodeId,
+                signalType: signalType,
+                observedAt: observedAt,
+                valueJson: valueJson,
+                source: source,
+                confidence: confidence,
+                expiresAt: expiresAt,
+                privacyClass: privacyClass,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                Value<String?> episodeId = const Value.absent(),
+                required String signalType,
+                required int observedAt,
+                Value<String> valueJson = const Value.absent(),
+                required String source,
+                required double confidence,
+                Value<int?> expiresAt = const Value.absent(),
+                required String privacyClass,
+                Value<int> rowid = const Value.absent(),
+              }) => InertiaSignalsCompanion.insert(
+                id: id,
+                episodeId: episodeId,
+                signalType: signalType,
+                observedAt: observedAt,
+                valueJson: valueJson,
+                source: source,
+                confidence: confidence,
+                expiresAt: expiresAt,
+                privacyClass: privacyClass,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$InertiaSignalsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$ColonyDatabase,
+      $InertiaSignalsTable,
+      InertiaSignalRow,
+      $$InertiaSignalsTableFilterComposer,
+      $$InertiaSignalsTableOrderingComposer,
+      $$InertiaSignalsTableAnnotationComposer,
+      $$InertiaSignalsTableCreateCompanionBuilder,
+      $$InertiaSignalsTableUpdateCompanionBuilder,
+      (
+        InertiaSignalRow,
+        BaseReferences<
+          _$ColonyDatabase,
+          $InertiaSignalsTable,
+          InertiaSignalRow
+        >,
+      ),
+      InertiaSignalRow,
+      PrefetchHooks Function()
+    >;
+typedef $$FrictionShieldProfilesTableCreateCompanionBuilder =
+    FrictionShieldProfilesCompanion Function({
+      required String id,
+      required String profileId,
+      required String name,
+      required String platformMode,
+      Value<String> protectedCategoriesJson,
+      Value<String> allowlistCategoriesJson,
+      required String escapePolicyJson,
+      Value<bool> isEnabled,
+      Value<int> rowid,
+    });
+typedef $$FrictionShieldProfilesTableUpdateCompanionBuilder =
+    FrictionShieldProfilesCompanion Function({
+      Value<String> id,
+      Value<String> profileId,
+      Value<String> name,
+      Value<String> platformMode,
+      Value<String> protectedCategoriesJson,
+      Value<String> allowlistCategoriesJson,
+      Value<String> escapePolicyJson,
+      Value<bool> isEnabled,
+      Value<int> rowid,
+    });
+
+final class $$FrictionShieldProfilesTableReferences
+    extends
+        BaseReferences<
+          _$ColonyDatabase,
+          $FrictionShieldProfilesTable,
+          FrictionShieldProfileRow
+        > {
+  $$FrictionShieldProfilesTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $ProfilesTable _profileIdTable(_$ColonyDatabase db) =>
+      db.profiles.createAlias(
+        $_aliasNameGenerator(
+          db.frictionShieldProfiles.profileId,
+          db.profiles.id,
+        ),
+      );
+
+  $$ProfilesTableProcessedTableManager get profileId {
+    final $_column = $_itemColumn<String>('profile_id')!;
+
+    final manager = $$ProfilesTableTableManager(
+      $_db,
+      $_db.profiles,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_profileIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static MultiTypedResultKey<
+    $FrictionShieldSessionsTable,
+    List<FrictionShieldSessionRow>
+  >
+  _frictionShieldSessionsRefsTable(_$ColonyDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.frictionShieldSessions,
+        aliasName: $_aliasNameGenerator(
+          db.frictionShieldProfiles.id,
+          db.frictionShieldSessions.shieldProfileId,
+        ),
+      );
+
+  $$FrictionShieldSessionsTableProcessedTableManager
+  get frictionShieldSessionsRefs {
+    final manager =
+        $$FrictionShieldSessionsTableTableManager(
+          $_db,
+          $_db.frictionShieldSessions,
+        ).filter(
+          (f) => f.shieldProfileId.id.sqlEquals($_itemColumn<String>('id')!),
+        );
+
+    final cache = $_typedResult.readTableOrNull(
+      _frictionShieldSessionsRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+}
+
+class $$FrictionShieldProfilesTableFilterComposer
+    extends Composer<_$ColonyDatabase, $FrictionShieldProfilesTable> {
+  $$FrictionShieldProfilesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get platformMode => $composableBuilder(
+    column: $table.platformMode,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get protectedCategoriesJson => $composableBuilder(
+    column: $table.protectedCategoriesJson,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get allowlistCategoriesJson => $composableBuilder(
+    column: $table.allowlistCategoriesJson,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get escapePolicyJson => $composableBuilder(
+    column: $table.escapePolicyJson,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get isEnabled => $composableBuilder(
+    column: $table.isEnabled,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$ProfilesTableFilterComposer get profileId {
+    final $$ProfilesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.profileId,
+      referencedTable: $db.profiles,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProfilesTableFilterComposer(
+            $db: $db,
+            $table: $db.profiles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  Expression<bool> frictionShieldSessionsRefs(
+    Expression<bool> Function($$FrictionShieldSessionsTableFilterComposer f) f,
+  ) {
+    final $$FrictionShieldSessionsTableFilterComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.frictionShieldSessions,
+          getReferencedColumn: (t) => t.shieldProfileId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$FrictionShieldSessionsTableFilterComposer(
+                $db: $db,
+                $table: $db.frictionShieldSessions,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+}
+
+class $$FrictionShieldProfilesTableOrderingComposer
+    extends Composer<_$ColonyDatabase, $FrictionShieldProfilesTable> {
+  $$FrictionShieldProfilesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get platformMode => $composableBuilder(
+    column: $table.platformMode,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get protectedCategoriesJson => $composableBuilder(
+    column: $table.protectedCategoriesJson,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get allowlistCategoriesJson => $composableBuilder(
+    column: $table.allowlistCategoriesJson,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get escapePolicyJson => $composableBuilder(
+    column: $table.escapePolicyJson,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get isEnabled => $composableBuilder(
+    column: $table.isEnabled,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$ProfilesTableOrderingComposer get profileId {
+    final $$ProfilesTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.profileId,
+      referencedTable: $db.profiles,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProfilesTableOrderingComposer(
+            $db: $db,
+            $table: $db.profiles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$FrictionShieldProfilesTableAnnotationComposer
+    extends Composer<_$ColonyDatabase, $FrictionShieldProfilesTable> {
+  $$FrictionShieldProfilesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<String> get platformMode => $composableBuilder(
+    column: $table.platformMode,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get protectedCategoriesJson => $composableBuilder(
+    column: $table.protectedCategoriesJson,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get allowlistCategoriesJson => $composableBuilder(
+    column: $table.allowlistCategoriesJson,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get escapePolicyJson => $composableBuilder(
+    column: $table.escapePolicyJson,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get isEnabled =>
+      $composableBuilder(column: $table.isEnabled, builder: (column) => column);
+
+  $$ProfilesTableAnnotationComposer get profileId {
+    final $$ProfilesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.profileId,
+      referencedTable: $db.profiles,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProfilesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.profiles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  Expression<T> frictionShieldSessionsRefs<T extends Object>(
+    Expression<T> Function($$FrictionShieldSessionsTableAnnotationComposer a) f,
+  ) {
+    final $$FrictionShieldSessionsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.frictionShieldSessions,
+          getReferencedColumn: (t) => t.shieldProfileId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$FrictionShieldSessionsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.frictionShieldSessions,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+}
+
+class $$FrictionShieldProfilesTableTableManager
+    extends
+        RootTableManager<
+          _$ColonyDatabase,
+          $FrictionShieldProfilesTable,
+          FrictionShieldProfileRow,
+          $$FrictionShieldProfilesTableFilterComposer,
+          $$FrictionShieldProfilesTableOrderingComposer,
+          $$FrictionShieldProfilesTableAnnotationComposer,
+          $$FrictionShieldProfilesTableCreateCompanionBuilder,
+          $$FrictionShieldProfilesTableUpdateCompanionBuilder,
+          (FrictionShieldProfileRow, $$FrictionShieldProfilesTableReferences),
+          FrictionShieldProfileRow,
+          PrefetchHooks Function({
+            bool profileId,
+            bool frictionShieldSessionsRefs,
+          })
+        > {
+  $$FrictionShieldProfilesTableTableManager(
+    _$ColonyDatabase db,
+    $FrictionShieldProfilesTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$FrictionShieldProfilesTableFilterComposer(
+                $db: db,
+                $table: table,
+              ),
+          createOrderingComposer: () =>
+              $$FrictionShieldProfilesTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$FrictionShieldProfilesTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> profileId = const Value.absent(),
+                Value<String> name = const Value.absent(),
+                Value<String> platformMode = const Value.absent(),
+                Value<String> protectedCategoriesJson = const Value.absent(),
+                Value<String> allowlistCategoriesJson = const Value.absent(),
+                Value<String> escapePolicyJson = const Value.absent(),
+                Value<bool> isEnabled = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => FrictionShieldProfilesCompanion(
+                id: id,
+                profileId: profileId,
+                name: name,
+                platformMode: platformMode,
+                protectedCategoriesJson: protectedCategoriesJson,
+                allowlistCategoriesJson: allowlistCategoriesJson,
+                escapePolicyJson: escapePolicyJson,
+                isEnabled: isEnabled,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String profileId,
+                required String name,
+                required String platformMode,
+                Value<String> protectedCategoriesJson = const Value.absent(),
+                Value<String> allowlistCategoriesJson = const Value.absent(),
+                required String escapePolicyJson,
+                Value<bool> isEnabled = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => FrictionShieldProfilesCompanion.insert(
+                id: id,
+                profileId: profileId,
+                name: name,
+                platformMode: platformMode,
+                protectedCategoriesJson: protectedCategoriesJson,
+                allowlistCategoriesJson: allowlistCategoriesJson,
+                escapePolicyJson: escapePolicyJson,
+                isEnabled: isEnabled,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$FrictionShieldProfilesTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback:
+              ({profileId = false, frictionShieldSessionsRefs = false}) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [
+                    if (frictionShieldSessionsRefs) db.frictionShieldSessions,
+                  ],
+                  addJoins:
+                      <
+                        T extends TableManagerState<
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic
+                        >
+                      >(state) {
+                        if (profileId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.profileId,
+                                    referencedTable:
+                                        $$FrictionShieldProfilesTableReferences
+                                            ._profileIdTable(db),
+                                    referencedColumn:
+                                        $$FrictionShieldProfilesTableReferences
+                                            ._profileIdTable(db)
+                                            .id,
+                                  )
+                                  as T;
+                        }
+
+                        return state;
+                      },
+                  getPrefetchedDataCallback: (items) async {
+                    return [
+                      if (frictionShieldSessionsRefs)
+                        await $_getPrefetchedData<
+                          FrictionShieldProfileRow,
+                          $FrictionShieldProfilesTable,
+                          FrictionShieldSessionRow
+                        >(
+                          currentTable: table,
+                          referencedTable:
+                              $$FrictionShieldProfilesTableReferences
+                                  ._frictionShieldSessionsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$FrictionShieldProfilesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).frictionShieldSessionsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.shieldProfileId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                    ];
+                  },
+                );
+              },
+        ),
+      );
+}
+
+typedef $$FrictionShieldProfilesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$ColonyDatabase,
+      $FrictionShieldProfilesTable,
+      FrictionShieldProfileRow,
+      $$FrictionShieldProfilesTableFilterComposer,
+      $$FrictionShieldProfilesTableOrderingComposer,
+      $$FrictionShieldProfilesTableAnnotationComposer,
+      $$FrictionShieldProfilesTableCreateCompanionBuilder,
+      $$FrictionShieldProfilesTableUpdateCompanionBuilder,
+      (FrictionShieldProfileRow, $$FrictionShieldProfilesTableReferences),
+      FrictionShieldProfileRow,
+      PrefetchHooks Function({bool profileId, bool frictionShieldSessionsRefs})
+    >;
+typedef $$FrictionShieldSessionsTableCreateCompanionBuilder =
+    FrictionShieldSessionsCompanion Function({
+      required String id,
+      required String profileId,
+      required String shieldProfileId,
+      Value<String?> episodeId,
+      required String state,
+      required int startedAt,
+      Value<int?> endedAt,
+      Value<int> escapeCount,
+      Value<int> rowid,
+    });
+typedef $$FrictionShieldSessionsTableUpdateCompanionBuilder =
+    FrictionShieldSessionsCompanion Function({
+      Value<String> id,
+      Value<String> profileId,
+      Value<String> shieldProfileId,
+      Value<String?> episodeId,
+      Value<String> state,
+      Value<int> startedAt,
+      Value<int?> endedAt,
+      Value<int> escapeCount,
+      Value<int> rowid,
+    });
+
+final class $$FrictionShieldSessionsTableReferences
+    extends
+        BaseReferences<
+          _$ColonyDatabase,
+          $FrictionShieldSessionsTable,
+          FrictionShieldSessionRow
+        > {
+  $$FrictionShieldSessionsTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $ProfilesTable _profileIdTable(_$ColonyDatabase db) =>
+      db.profiles.createAlias(
+        $_aliasNameGenerator(
+          db.frictionShieldSessions.profileId,
+          db.profiles.id,
+        ),
+      );
+
+  $$ProfilesTableProcessedTableManager get profileId {
+    final $_column = $_itemColumn<String>('profile_id')!;
+
+    final manager = $$ProfilesTableTableManager(
+      $_db,
+      $_db.profiles,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_profileIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $FrictionShieldProfilesTable _shieldProfileIdTable(
+    _$ColonyDatabase db,
+  ) => db.frictionShieldProfiles.createAlias(
+    $_aliasNameGenerator(
+      db.frictionShieldSessions.shieldProfileId,
+      db.frictionShieldProfiles.id,
+    ),
+  );
+
+  $$FrictionShieldProfilesTableProcessedTableManager get shieldProfileId {
+    final $_column = $_itemColumn<String>('shield_profile_id')!;
+
+    final manager = $$FrictionShieldProfilesTableTableManager(
+      $_db,
+      $_db.frictionShieldProfiles,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_shieldProfileIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$FrictionShieldSessionsTableFilterComposer
+    extends Composer<_$ColonyDatabase, $FrictionShieldSessionsTable> {
+  $$FrictionShieldSessionsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get episodeId => $composableBuilder(
+    column: $table.episodeId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get state => $composableBuilder(
+    column: $table.state,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get startedAt => $composableBuilder(
+    column: $table.startedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get endedAt => $composableBuilder(
+    column: $table.endedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get escapeCount => $composableBuilder(
+    column: $table.escapeCount,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$ProfilesTableFilterComposer get profileId {
+    final $$ProfilesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.profileId,
+      referencedTable: $db.profiles,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProfilesTableFilterComposer(
+            $db: $db,
+            $table: $db.profiles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$FrictionShieldProfilesTableFilterComposer get shieldProfileId {
+    final $$FrictionShieldProfilesTableFilterComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.shieldProfileId,
+          referencedTable: $db.frictionShieldProfiles,
+          getReferencedColumn: (t) => t.id,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$FrictionShieldProfilesTableFilterComposer(
+                $db: $db,
+                $table: $db.frictionShieldProfiles,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return composer;
+  }
+}
+
+class $$FrictionShieldSessionsTableOrderingComposer
+    extends Composer<_$ColonyDatabase, $FrictionShieldSessionsTable> {
+  $$FrictionShieldSessionsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get episodeId => $composableBuilder(
+    column: $table.episodeId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get state => $composableBuilder(
+    column: $table.state,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get startedAt => $composableBuilder(
+    column: $table.startedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get endedAt => $composableBuilder(
+    column: $table.endedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get escapeCount => $composableBuilder(
+    column: $table.escapeCount,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$ProfilesTableOrderingComposer get profileId {
+    final $$ProfilesTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.profileId,
+      referencedTable: $db.profiles,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProfilesTableOrderingComposer(
+            $db: $db,
+            $table: $db.profiles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$FrictionShieldProfilesTableOrderingComposer get shieldProfileId {
+    final $$FrictionShieldProfilesTableOrderingComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.shieldProfileId,
+          referencedTable: $db.frictionShieldProfiles,
+          getReferencedColumn: (t) => t.id,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$FrictionShieldProfilesTableOrderingComposer(
+                $db: $db,
+                $table: $db.frictionShieldProfiles,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return composer;
+  }
+}
+
+class $$FrictionShieldSessionsTableAnnotationComposer
+    extends Composer<_$ColonyDatabase, $FrictionShieldSessionsTable> {
+  $$FrictionShieldSessionsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get episodeId =>
+      $composableBuilder(column: $table.episodeId, builder: (column) => column);
+
+  GeneratedColumn<String> get state =>
+      $composableBuilder(column: $table.state, builder: (column) => column);
+
+  GeneratedColumn<int> get startedAt =>
+      $composableBuilder(column: $table.startedAt, builder: (column) => column);
+
+  GeneratedColumn<int> get endedAt =>
+      $composableBuilder(column: $table.endedAt, builder: (column) => column);
+
+  GeneratedColumn<int> get escapeCount => $composableBuilder(
+    column: $table.escapeCount,
+    builder: (column) => column,
+  );
+
+  $$ProfilesTableAnnotationComposer get profileId {
+    final $$ProfilesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.profileId,
+      referencedTable: $db.profiles,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProfilesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.profiles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$FrictionShieldProfilesTableAnnotationComposer get shieldProfileId {
+    final $$FrictionShieldProfilesTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.shieldProfileId,
+          referencedTable: $db.frictionShieldProfiles,
+          getReferencedColumn: (t) => t.id,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$FrictionShieldProfilesTableAnnotationComposer(
+                $db: $db,
+                $table: $db.frictionShieldProfiles,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return composer;
+  }
+}
+
+class $$FrictionShieldSessionsTableTableManager
+    extends
+        RootTableManager<
+          _$ColonyDatabase,
+          $FrictionShieldSessionsTable,
+          FrictionShieldSessionRow,
+          $$FrictionShieldSessionsTableFilterComposer,
+          $$FrictionShieldSessionsTableOrderingComposer,
+          $$FrictionShieldSessionsTableAnnotationComposer,
+          $$FrictionShieldSessionsTableCreateCompanionBuilder,
+          $$FrictionShieldSessionsTableUpdateCompanionBuilder,
+          (FrictionShieldSessionRow, $$FrictionShieldSessionsTableReferences),
+          FrictionShieldSessionRow,
+          PrefetchHooks Function({bool profileId, bool shieldProfileId})
+        > {
+  $$FrictionShieldSessionsTableTableManager(
+    _$ColonyDatabase db,
+    $FrictionShieldSessionsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$FrictionShieldSessionsTableFilterComposer(
+                $db: db,
+                $table: table,
+              ),
+          createOrderingComposer: () =>
+              $$FrictionShieldSessionsTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$FrictionShieldSessionsTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> profileId = const Value.absent(),
+                Value<String> shieldProfileId = const Value.absent(),
+                Value<String?> episodeId = const Value.absent(),
+                Value<String> state = const Value.absent(),
+                Value<int> startedAt = const Value.absent(),
+                Value<int?> endedAt = const Value.absent(),
+                Value<int> escapeCount = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => FrictionShieldSessionsCompanion(
+                id: id,
+                profileId: profileId,
+                shieldProfileId: shieldProfileId,
+                episodeId: episodeId,
+                state: state,
+                startedAt: startedAt,
+                endedAt: endedAt,
+                escapeCount: escapeCount,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String profileId,
+                required String shieldProfileId,
+                Value<String?> episodeId = const Value.absent(),
+                required String state,
+                required int startedAt,
+                Value<int?> endedAt = const Value.absent(),
+                Value<int> escapeCount = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => FrictionShieldSessionsCompanion.insert(
+                id: id,
+                profileId: profileId,
+                shieldProfileId: shieldProfileId,
+                episodeId: episodeId,
+                state: state,
+                startedAt: startedAt,
+                endedAt: endedAt,
+                escapeCount: escapeCount,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$FrictionShieldSessionsTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback:
+              ({profileId = false, shieldProfileId = false}) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [],
+                  addJoins:
+                      <
+                        T extends TableManagerState<
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic
+                        >
+                      >(state) {
+                        if (profileId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.profileId,
+                                    referencedTable:
+                                        $$FrictionShieldSessionsTableReferences
+                                            ._profileIdTable(db),
+                                    referencedColumn:
+                                        $$FrictionShieldSessionsTableReferences
+                                            ._profileIdTable(db)
+                                            .id,
+                                  )
+                                  as T;
+                        }
+                        if (shieldProfileId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.shieldProfileId,
+                                    referencedTable:
+                                        $$FrictionShieldSessionsTableReferences
+                                            ._shieldProfileIdTable(db),
+                                    referencedColumn:
+                                        $$FrictionShieldSessionsTableReferences
+                                            ._shieldProfileIdTable(db)
+                                            .id,
+                                  )
+                                  as T;
+                        }
+
+                        return state;
+                      },
+                  getPrefetchedDataCallback: (items) async {
+                    return [];
+                  },
+                );
+              },
+        ),
+      );
+}
+
+typedef $$FrictionShieldSessionsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$ColonyDatabase,
+      $FrictionShieldSessionsTable,
+      FrictionShieldSessionRow,
+      $$FrictionShieldSessionsTableFilterComposer,
+      $$FrictionShieldSessionsTableOrderingComposer,
+      $$FrictionShieldSessionsTableAnnotationComposer,
+      $$FrictionShieldSessionsTableCreateCompanionBuilder,
+      $$FrictionShieldSessionsTableUpdateCompanionBuilder,
+      (FrictionShieldSessionRow, $$FrictionShieldSessionsTableReferences),
+      FrictionShieldSessionRow,
+      PrefetchHooks Function({bool profileId, bool shieldProfileId})
+    >;
+typedef $$TemptationBundlesTableCreateCompanionBuilder =
+    TemptationBundlesCompanion Function({
+      required String id,
+      required String profileId,
+      required String name,
+      required String pleasureLabel,
+      required String requiredTransition,
+      Value<String?> audioHint,
+      Value<bool> isEnabled,
+      Value<int> rowid,
+    });
+typedef $$TemptationBundlesTableUpdateCompanionBuilder =
+    TemptationBundlesCompanion Function({
+      Value<String> id,
+      Value<String> profileId,
+      Value<String> name,
+      Value<String> pleasureLabel,
+      Value<String> requiredTransition,
+      Value<String?> audioHint,
+      Value<bool> isEnabled,
+      Value<int> rowid,
+    });
+
+final class $$TemptationBundlesTableReferences
+    extends
+        BaseReferences<
+          _$ColonyDatabase,
+          $TemptationBundlesTable,
+          TemptationBundleRow
+        > {
+  $$TemptationBundlesTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $ProfilesTable _profileIdTable(_$ColonyDatabase db) =>
+      db.profiles.createAlias(
+        $_aliasNameGenerator(db.temptationBundles.profileId, db.profiles.id),
+      );
+
+  $$ProfilesTableProcessedTableManager get profileId {
+    final $_column = $_itemColumn<String>('profile_id')!;
+
+    final manager = $$ProfilesTableTableManager(
+      $_db,
+      $_db.profiles,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_profileIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$TemptationBundlesTableFilterComposer
+    extends Composer<_$ColonyDatabase, $TemptationBundlesTable> {
+  $$TemptationBundlesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get pleasureLabel => $composableBuilder(
+    column: $table.pleasureLabel,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get requiredTransition => $composableBuilder(
+    column: $table.requiredTransition,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get audioHint => $composableBuilder(
+    column: $table.audioHint,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get isEnabled => $composableBuilder(
+    column: $table.isEnabled,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$ProfilesTableFilterComposer get profileId {
+    final $$ProfilesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.profileId,
+      referencedTable: $db.profiles,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProfilesTableFilterComposer(
+            $db: $db,
+            $table: $db.profiles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$TemptationBundlesTableOrderingComposer
+    extends Composer<_$ColonyDatabase, $TemptationBundlesTable> {
+  $$TemptationBundlesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get pleasureLabel => $composableBuilder(
+    column: $table.pleasureLabel,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get requiredTransition => $composableBuilder(
+    column: $table.requiredTransition,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get audioHint => $composableBuilder(
+    column: $table.audioHint,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get isEnabled => $composableBuilder(
+    column: $table.isEnabled,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$ProfilesTableOrderingComposer get profileId {
+    final $$ProfilesTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.profileId,
+      referencedTable: $db.profiles,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProfilesTableOrderingComposer(
+            $db: $db,
+            $table: $db.profiles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$TemptationBundlesTableAnnotationComposer
+    extends Composer<_$ColonyDatabase, $TemptationBundlesTable> {
+  $$TemptationBundlesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<String> get pleasureLabel => $composableBuilder(
+    column: $table.pleasureLabel,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get requiredTransition => $composableBuilder(
+    column: $table.requiredTransition,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get audioHint =>
+      $composableBuilder(column: $table.audioHint, builder: (column) => column);
+
+  GeneratedColumn<bool> get isEnabled =>
+      $composableBuilder(column: $table.isEnabled, builder: (column) => column);
+
+  $$ProfilesTableAnnotationComposer get profileId {
+    final $$ProfilesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.profileId,
+      referencedTable: $db.profiles,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProfilesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.profiles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$TemptationBundlesTableTableManager
+    extends
+        RootTableManager<
+          _$ColonyDatabase,
+          $TemptationBundlesTable,
+          TemptationBundleRow,
+          $$TemptationBundlesTableFilterComposer,
+          $$TemptationBundlesTableOrderingComposer,
+          $$TemptationBundlesTableAnnotationComposer,
+          $$TemptationBundlesTableCreateCompanionBuilder,
+          $$TemptationBundlesTableUpdateCompanionBuilder,
+          (TemptationBundleRow, $$TemptationBundlesTableReferences),
+          TemptationBundleRow,
+          PrefetchHooks Function({bool profileId})
+        > {
+  $$TemptationBundlesTableTableManager(
+    _$ColonyDatabase db,
+    $TemptationBundlesTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$TemptationBundlesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$TemptationBundlesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$TemptationBundlesTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> profileId = const Value.absent(),
+                Value<String> name = const Value.absent(),
+                Value<String> pleasureLabel = const Value.absent(),
+                Value<String> requiredTransition = const Value.absent(),
+                Value<String?> audioHint = const Value.absent(),
+                Value<bool> isEnabled = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => TemptationBundlesCompanion(
+                id: id,
+                profileId: profileId,
+                name: name,
+                pleasureLabel: pleasureLabel,
+                requiredTransition: requiredTransition,
+                audioHint: audioHint,
+                isEnabled: isEnabled,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String profileId,
+                required String name,
+                required String pleasureLabel,
+                required String requiredTransition,
+                Value<String?> audioHint = const Value.absent(),
+                Value<bool> isEnabled = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => TemptationBundlesCompanion.insert(
+                id: id,
+                profileId: profileId,
+                name: name,
+                pleasureLabel: pleasureLabel,
+                requiredTransition: requiredTransition,
+                audioHint: audioHint,
+                isEnabled: isEnabled,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$TemptationBundlesTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({profileId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (profileId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.profileId,
+                                referencedTable:
+                                    $$TemptationBundlesTableReferences
+                                        ._profileIdTable(db),
+                                referencedColumn:
+                                    $$TemptationBundlesTableReferences
+                                        ._profileIdTable(db)
+                                        .id,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$TemptationBundlesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$ColonyDatabase,
+      $TemptationBundlesTable,
+      TemptationBundleRow,
+      $$TemptationBundlesTableFilterComposer,
+      $$TemptationBundlesTableOrderingComposer,
+      $$TemptationBundlesTableAnnotationComposer,
+      $$TemptationBundlesTableCreateCompanionBuilder,
+      $$TemptationBundlesTableUpdateCompanionBuilder,
+      (TemptationBundleRow, $$TemptationBundlesTableReferences),
+      TemptationBundleRow,
+      PrefetchHooks Function({bool profileId})
+    >;
+typedef $$ActivationScenesTableCreateCompanionBuilder =
+    ActivationScenesCompanion Function({
+      required String id,
+      required String profileId,
+      required String name,
+      required String kind,
+      Value<String> payloadJson,
+      Value<bool> isEnabled,
+      Value<int> rowid,
+    });
+typedef $$ActivationScenesTableUpdateCompanionBuilder =
+    ActivationScenesCompanion Function({
+      Value<String> id,
+      Value<String> profileId,
+      Value<String> name,
+      Value<String> kind,
+      Value<String> payloadJson,
+      Value<bool> isEnabled,
+      Value<int> rowid,
+    });
+
+final class $$ActivationScenesTableReferences
+    extends
+        BaseReferences<
+          _$ColonyDatabase,
+          $ActivationScenesTable,
+          ActivationSceneRow
+        > {
+  $$ActivationScenesTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $ProfilesTable _profileIdTable(_$ColonyDatabase db) =>
+      db.profiles.createAlias(
+        $_aliasNameGenerator(db.activationScenes.profileId, db.profiles.id),
+      );
+
+  $$ProfilesTableProcessedTableManager get profileId {
+    final $_column = $_itemColumn<String>('profile_id')!;
+
+    final manager = $$ProfilesTableTableManager(
+      $_db,
+      $_db.profiles,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_profileIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$ActivationScenesTableFilterComposer
+    extends Composer<_$ColonyDatabase, $ActivationScenesTable> {
+  $$ActivationScenesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get kind => $composableBuilder(
+    column: $table.kind,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get payloadJson => $composableBuilder(
+    column: $table.payloadJson,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get isEnabled => $composableBuilder(
+    column: $table.isEnabled,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$ProfilesTableFilterComposer get profileId {
+    final $$ProfilesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.profileId,
+      referencedTable: $db.profiles,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProfilesTableFilterComposer(
+            $db: $db,
+            $table: $db.profiles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$ActivationScenesTableOrderingComposer
+    extends Composer<_$ColonyDatabase, $ActivationScenesTable> {
+  $$ActivationScenesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get kind => $composableBuilder(
+    column: $table.kind,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get payloadJson => $composableBuilder(
+    column: $table.payloadJson,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get isEnabled => $composableBuilder(
+    column: $table.isEnabled,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$ProfilesTableOrderingComposer get profileId {
+    final $$ProfilesTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.profileId,
+      referencedTable: $db.profiles,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProfilesTableOrderingComposer(
+            $db: $db,
+            $table: $db.profiles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$ActivationScenesTableAnnotationComposer
+    extends Composer<_$ColonyDatabase, $ActivationScenesTable> {
+  $$ActivationScenesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<String> get kind =>
+      $composableBuilder(column: $table.kind, builder: (column) => column);
+
+  GeneratedColumn<String> get payloadJson => $composableBuilder(
+    column: $table.payloadJson,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get isEnabled =>
+      $composableBuilder(column: $table.isEnabled, builder: (column) => column);
+
+  $$ProfilesTableAnnotationComposer get profileId {
+    final $$ProfilesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.profileId,
+      referencedTable: $db.profiles,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProfilesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.profiles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$ActivationScenesTableTableManager
+    extends
+        RootTableManager<
+          _$ColonyDatabase,
+          $ActivationScenesTable,
+          ActivationSceneRow,
+          $$ActivationScenesTableFilterComposer,
+          $$ActivationScenesTableOrderingComposer,
+          $$ActivationScenesTableAnnotationComposer,
+          $$ActivationScenesTableCreateCompanionBuilder,
+          $$ActivationScenesTableUpdateCompanionBuilder,
+          (ActivationSceneRow, $$ActivationScenesTableReferences),
+          ActivationSceneRow,
+          PrefetchHooks Function({bool profileId})
+        > {
+  $$ActivationScenesTableTableManager(
+    _$ColonyDatabase db,
+    $ActivationScenesTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$ActivationScenesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$ActivationScenesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$ActivationScenesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> profileId = const Value.absent(),
+                Value<String> name = const Value.absent(),
+                Value<String> kind = const Value.absent(),
+                Value<String> payloadJson = const Value.absent(),
+                Value<bool> isEnabled = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => ActivationScenesCompanion(
+                id: id,
+                profileId: profileId,
+                name: name,
+                kind: kind,
+                payloadJson: payloadJson,
+                isEnabled: isEnabled,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String profileId,
+                required String name,
+                required String kind,
+                Value<String> payloadJson = const Value.absent(),
+                Value<bool> isEnabled = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => ActivationScenesCompanion.insert(
+                id: id,
+                profileId: profileId,
+                name: name,
+                kind: kind,
+                payloadJson: payloadJson,
+                isEnabled: isEnabled,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$ActivationScenesTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({profileId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (profileId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.profileId,
+                                referencedTable:
+                                    $$ActivationScenesTableReferences
+                                        ._profileIdTable(db),
+                                referencedColumn:
+                                    $$ActivationScenesTableReferences
+                                        ._profileIdTable(db)
+                                        .id,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$ActivationScenesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$ColonyDatabase,
+      $ActivationScenesTable,
+      ActivationSceneRow,
+      $$ActivationScenesTableFilterComposer,
+      $$ActivationScenesTableOrderingComposer,
+      $$ActivationScenesTableAnnotationComposer,
+      $$ActivationScenesTableCreateCompanionBuilder,
+      $$ActivationScenesTableUpdateCompanionBuilder,
+      (ActivationSceneRow, $$ActivationScenesTableReferences),
+      ActivationSceneRow,
+      PrefetchHooks Function({bool profileId})
+    >;
+typedef $$RescueContractsTableCreateCompanionBuilder =
+    RescueContractsCompanion Function({
+      required String id,
+      required String profileId,
+      required String contactLabel,
+      required String messageTemplate,
+      required String status,
+      Value<String?> personId,
+      Value<bool> requiresConfirmation,
+      Value<int?> lastConfirmedAt,
+      Value<int> rowid,
+    });
+typedef $$RescueContractsTableUpdateCompanionBuilder =
+    RescueContractsCompanion Function({
+      Value<String> id,
+      Value<String> profileId,
+      Value<String> contactLabel,
+      Value<String> messageTemplate,
+      Value<String> status,
+      Value<String?> personId,
+      Value<bool> requiresConfirmation,
+      Value<int?> lastConfirmedAt,
+      Value<int> rowid,
+    });
+
+final class $$RescueContractsTableReferences
+    extends
+        BaseReferences<
+          _$ColonyDatabase,
+          $RescueContractsTable,
+          RescueContractRow
+        > {
+  $$RescueContractsTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $ProfilesTable _profileIdTable(_$ColonyDatabase db) =>
+      db.profiles.createAlias(
+        $_aliasNameGenerator(db.rescueContracts.profileId, db.profiles.id),
+      );
+
+  $$ProfilesTableProcessedTableManager get profileId {
+    final $_column = $_itemColumn<String>('profile_id')!;
+
+    final manager = $$ProfilesTableTableManager(
+      $_db,
+      $_db.profiles,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_profileIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$RescueContractsTableFilterComposer
+    extends Composer<_$ColonyDatabase, $RescueContractsTable> {
+  $$RescueContractsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get contactLabel => $composableBuilder(
+    column: $table.contactLabel,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get messageTemplate => $composableBuilder(
+    column: $table.messageTemplate,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get status => $composableBuilder(
+    column: $table.status,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get personId => $composableBuilder(
+    column: $table.personId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get requiresConfirmation => $composableBuilder(
+    column: $table.requiresConfirmation,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get lastConfirmedAt => $composableBuilder(
+    column: $table.lastConfirmedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$ProfilesTableFilterComposer get profileId {
+    final $$ProfilesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.profileId,
+      referencedTable: $db.profiles,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProfilesTableFilterComposer(
+            $db: $db,
+            $table: $db.profiles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$RescueContractsTableOrderingComposer
+    extends Composer<_$ColonyDatabase, $RescueContractsTable> {
+  $$RescueContractsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get contactLabel => $composableBuilder(
+    column: $table.contactLabel,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get messageTemplate => $composableBuilder(
+    column: $table.messageTemplate,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get status => $composableBuilder(
+    column: $table.status,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get personId => $composableBuilder(
+    column: $table.personId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get requiresConfirmation => $composableBuilder(
+    column: $table.requiresConfirmation,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get lastConfirmedAt => $composableBuilder(
+    column: $table.lastConfirmedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$ProfilesTableOrderingComposer get profileId {
+    final $$ProfilesTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.profileId,
+      referencedTable: $db.profiles,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProfilesTableOrderingComposer(
+            $db: $db,
+            $table: $db.profiles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$RescueContractsTableAnnotationComposer
+    extends Composer<_$ColonyDatabase, $RescueContractsTable> {
+  $$RescueContractsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get contactLabel => $composableBuilder(
+    column: $table.contactLabel,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get messageTemplate => $composableBuilder(
+    column: $table.messageTemplate,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get status =>
+      $composableBuilder(column: $table.status, builder: (column) => column);
+
+  GeneratedColumn<String> get personId =>
+      $composableBuilder(column: $table.personId, builder: (column) => column);
+
+  GeneratedColumn<bool> get requiresConfirmation => $composableBuilder(
+    column: $table.requiresConfirmation,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get lastConfirmedAt => $composableBuilder(
+    column: $table.lastConfirmedAt,
+    builder: (column) => column,
+  );
+
+  $$ProfilesTableAnnotationComposer get profileId {
+    final $$ProfilesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.profileId,
+      referencedTable: $db.profiles,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProfilesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.profiles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$RescueContractsTableTableManager
+    extends
+        RootTableManager<
+          _$ColonyDatabase,
+          $RescueContractsTable,
+          RescueContractRow,
+          $$RescueContractsTableFilterComposer,
+          $$RescueContractsTableOrderingComposer,
+          $$RescueContractsTableAnnotationComposer,
+          $$RescueContractsTableCreateCompanionBuilder,
+          $$RescueContractsTableUpdateCompanionBuilder,
+          (RescueContractRow, $$RescueContractsTableReferences),
+          RescueContractRow,
+          PrefetchHooks Function({bool profileId})
+        > {
+  $$RescueContractsTableTableManager(
+    _$ColonyDatabase db,
+    $RescueContractsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$RescueContractsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$RescueContractsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$RescueContractsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> profileId = const Value.absent(),
+                Value<String> contactLabel = const Value.absent(),
+                Value<String> messageTemplate = const Value.absent(),
+                Value<String> status = const Value.absent(),
+                Value<String?> personId = const Value.absent(),
+                Value<bool> requiresConfirmation = const Value.absent(),
+                Value<int?> lastConfirmedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => RescueContractsCompanion(
+                id: id,
+                profileId: profileId,
+                contactLabel: contactLabel,
+                messageTemplate: messageTemplate,
+                status: status,
+                personId: personId,
+                requiresConfirmation: requiresConfirmation,
+                lastConfirmedAt: lastConfirmedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String profileId,
+                required String contactLabel,
+                required String messageTemplate,
+                required String status,
+                Value<String?> personId = const Value.absent(),
+                Value<bool> requiresConfirmation = const Value.absent(),
+                Value<int?> lastConfirmedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => RescueContractsCompanion.insert(
+                id: id,
+                profileId: profileId,
+                contactLabel: contactLabel,
+                messageTemplate: messageTemplate,
+                status: status,
+                personId: personId,
+                requiresConfirmation: requiresConfirmation,
+                lastConfirmedAt: lastConfirmedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$RescueContractsTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({profileId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (profileId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.profileId,
+                                referencedTable:
+                                    $$RescueContractsTableReferences
+                                        ._profileIdTable(db),
+                                referencedColumn:
+                                    $$RescueContractsTableReferences
+                                        ._profileIdTable(db)
+                                        .id,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$RescueContractsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$ColonyDatabase,
+      $RescueContractsTable,
+      RescueContractRow,
+      $$RescueContractsTableFilterComposer,
+      $$RescueContractsTableOrderingComposer,
+      $$RescueContractsTableAnnotationComposer,
+      $$RescueContractsTableCreateCompanionBuilder,
+      $$RescueContractsTableUpdateCompanionBuilder,
+      (RescueContractRow, $$RescueContractsTableReferences),
+      RescueContractRow,
+      PrefetchHooks Function({bool profileId})
+    >;
+typedef $$ActivationExperimentsTableCreateCompanionBuilder =
+    ActivationExperimentsCompanion Function({
+      required String id,
+      required String profileId,
+      required String name,
+      required String hypothesis,
+      required String variableKey,
+      required String variantsJson,
+      Value<String> contextFilterJson,
+      Value<int> minimumSamples,
+      required String status,
+      Value<int?> startedAt,
+      Value<int?> endedAt,
+      Value<String?> resultJson,
+      Value<int> rowid,
+    });
+typedef $$ActivationExperimentsTableUpdateCompanionBuilder =
+    ActivationExperimentsCompanion Function({
+      Value<String> id,
+      Value<String> profileId,
+      Value<String> name,
+      Value<String> hypothesis,
+      Value<String> variableKey,
+      Value<String> variantsJson,
+      Value<String> contextFilterJson,
+      Value<int> minimumSamples,
+      Value<String> status,
+      Value<int?> startedAt,
+      Value<int?> endedAt,
+      Value<String?> resultJson,
+      Value<int> rowid,
+    });
+
+final class $$ActivationExperimentsTableReferences
+    extends
+        BaseReferences<
+          _$ColonyDatabase,
+          $ActivationExperimentsTable,
+          ActivationExperimentRow
+        > {
+  $$ActivationExperimentsTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $ProfilesTable _profileIdTable(_$ColonyDatabase db) =>
+      db.profiles.createAlias(
+        $_aliasNameGenerator(
+          db.activationExperiments.profileId,
+          db.profiles.id,
+        ),
+      );
+
+  $$ProfilesTableProcessedTableManager get profileId {
+    final $_column = $_itemColumn<String>('profile_id')!;
+
+    final manager = $$ProfilesTableTableManager(
+      $_db,
+      $_db.profiles,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_profileIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static MultiTypedResultKey<
+    $ActivationExperimentAssignmentsTable,
+    List<ActivationExperimentAssignmentRow>
+  >
+  _activationExperimentAssignmentsRefsTable(_$ColonyDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.activationExperimentAssignments,
+        aliasName: $_aliasNameGenerator(
+          db.activationExperiments.id,
+          db.activationExperimentAssignments.experimentId,
+        ),
+      );
+
+  $$ActivationExperimentAssignmentsTableProcessedTableManager
+  get activationExperimentAssignmentsRefs {
+    final manager = $$ActivationExperimentAssignmentsTableTableManager(
+      $_db,
+      $_db.activationExperimentAssignments,
+    ).filter((f) => f.experimentId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _activationExperimentAssignmentsRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+}
+
+class $$ActivationExperimentsTableFilterComposer
+    extends Composer<_$ColonyDatabase, $ActivationExperimentsTable> {
+  $$ActivationExperimentsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get hypothesis => $composableBuilder(
+    column: $table.hypothesis,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get variableKey => $composableBuilder(
+    column: $table.variableKey,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get variantsJson => $composableBuilder(
+    column: $table.variantsJson,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get contextFilterJson => $composableBuilder(
+    column: $table.contextFilterJson,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get minimumSamples => $composableBuilder(
+    column: $table.minimumSamples,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get status => $composableBuilder(
+    column: $table.status,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get startedAt => $composableBuilder(
+    column: $table.startedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get endedAt => $composableBuilder(
+    column: $table.endedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get resultJson => $composableBuilder(
+    column: $table.resultJson,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$ProfilesTableFilterComposer get profileId {
+    final $$ProfilesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.profileId,
+      referencedTable: $db.profiles,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProfilesTableFilterComposer(
+            $db: $db,
+            $table: $db.profiles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  Expression<bool> activationExperimentAssignmentsRefs(
+    Expression<bool> Function(
+      $$ActivationExperimentAssignmentsTableFilterComposer f,
+    )
+    f,
+  ) {
+    final $$ActivationExperimentAssignmentsTableFilterComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.activationExperimentAssignments,
+          getReferencedColumn: (t) => t.experimentId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$ActivationExperimentAssignmentsTableFilterComposer(
+                $db: $db,
+                $table: $db.activationExperimentAssignments,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+}
+
+class $$ActivationExperimentsTableOrderingComposer
+    extends Composer<_$ColonyDatabase, $ActivationExperimentsTable> {
+  $$ActivationExperimentsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get hypothesis => $composableBuilder(
+    column: $table.hypothesis,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get variableKey => $composableBuilder(
+    column: $table.variableKey,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get variantsJson => $composableBuilder(
+    column: $table.variantsJson,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get contextFilterJson => $composableBuilder(
+    column: $table.contextFilterJson,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get minimumSamples => $composableBuilder(
+    column: $table.minimumSamples,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get status => $composableBuilder(
+    column: $table.status,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get startedAt => $composableBuilder(
+    column: $table.startedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get endedAt => $composableBuilder(
+    column: $table.endedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get resultJson => $composableBuilder(
+    column: $table.resultJson,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$ProfilesTableOrderingComposer get profileId {
+    final $$ProfilesTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.profileId,
+      referencedTable: $db.profiles,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProfilesTableOrderingComposer(
+            $db: $db,
+            $table: $db.profiles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$ActivationExperimentsTableAnnotationComposer
+    extends Composer<_$ColonyDatabase, $ActivationExperimentsTable> {
+  $$ActivationExperimentsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<String> get hypothesis => $composableBuilder(
+    column: $table.hypothesis,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get variableKey => $composableBuilder(
+    column: $table.variableKey,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get variantsJson => $composableBuilder(
+    column: $table.variantsJson,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get contextFilterJson => $composableBuilder(
+    column: $table.contextFilterJson,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get minimumSamples => $composableBuilder(
+    column: $table.minimumSamples,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get status =>
+      $composableBuilder(column: $table.status, builder: (column) => column);
+
+  GeneratedColumn<int> get startedAt =>
+      $composableBuilder(column: $table.startedAt, builder: (column) => column);
+
+  GeneratedColumn<int> get endedAt =>
+      $composableBuilder(column: $table.endedAt, builder: (column) => column);
+
+  GeneratedColumn<String> get resultJson => $composableBuilder(
+    column: $table.resultJson,
+    builder: (column) => column,
+  );
+
+  $$ProfilesTableAnnotationComposer get profileId {
+    final $$ProfilesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.profileId,
+      referencedTable: $db.profiles,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProfilesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.profiles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  Expression<T> activationExperimentAssignmentsRefs<T extends Object>(
+    Expression<T> Function(
+      $$ActivationExperimentAssignmentsTableAnnotationComposer a,
+    )
+    f,
+  ) {
+    final $$ActivationExperimentAssignmentsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.activationExperimentAssignments,
+          getReferencedColumn: (t) => t.experimentId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$ActivationExperimentAssignmentsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.activationExperimentAssignments,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+}
+
+class $$ActivationExperimentsTableTableManager
+    extends
+        RootTableManager<
+          _$ColonyDatabase,
+          $ActivationExperimentsTable,
+          ActivationExperimentRow,
+          $$ActivationExperimentsTableFilterComposer,
+          $$ActivationExperimentsTableOrderingComposer,
+          $$ActivationExperimentsTableAnnotationComposer,
+          $$ActivationExperimentsTableCreateCompanionBuilder,
+          $$ActivationExperimentsTableUpdateCompanionBuilder,
+          (ActivationExperimentRow, $$ActivationExperimentsTableReferences),
+          ActivationExperimentRow,
+          PrefetchHooks Function({
+            bool profileId,
+            bool activationExperimentAssignmentsRefs,
+          })
+        > {
+  $$ActivationExperimentsTableTableManager(
+    _$ColonyDatabase db,
+    $ActivationExperimentsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$ActivationExperimentsTableFilterComposer(
+                $db: db,
+                $table: table,
+              ),
+          createOrderingComposer: () =>
+              $$ActivationExperimentsTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$ActivationExperimentsTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> profileId = const Value.absent(),
+                Value<String> name = const Value.absent(),
+                Value<String> hypothesis = const Value.absent(),
+                Value<String> variableKey = const Value.absent(),
+                Value<String> variantsJson = const Value.absent(),
+                Value<String> contextFilterJson = const Value.absent(),
+                Value<int> minimumSamples = const Value.absent(),
+                Value<String> status = const Value.absent(),
+                Value<int?> startedAt = const Value.absent(),
+                Value<int?> endedAt = const Value.absent(),
+                Value<String?> resultJson = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => ActivationExperimentsCompanion(
+                id: id,
+                profileId: profileId,
+                name: name,
+                hypothesis: hypothesis,
+                variableKey: variableKey,
+                variantsJson: variantsJson,
+                contextFilterJson: contextFilterJson,
+                minimumSamples: minimumSamples,
+                status: status,
+                startedAt: startedAt,
+                endedAt: endedAt,
+                resultJson: resultJson,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String profileId,
+                required String name,
+                required String hypothesis,
+                required String variableKey,
+                required String variantsJson,
+                Value<String> contextFilterJson = const Value.absent(),
+                Value<int> minimumSamples = const Value.absent(),
+                required String status,
+                Value<int?> startedAt = const Value.absent(),
+                Value<int?> endedAt = const Value.absent(),
+                Value<String?> resultJson = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => ActivationExperimentsCompanion.insert(
+                id: id,
+                profileId: profileId,
+                name: name,
+                hypothesis: hypothesis,
+                variableKey: variableKey,
+                variantsJson: variantsJson,
+                contextFilterJson: contextFilterJson,
+                minimumSamples: minimumSamples,
+                status: status,
+                startedAt: startedAt,
+                endedAt: endedAt,
+                resultJson: resultJson,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$ActivationExperimentsTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback:
+              ({
+                profileId = false,
+                activationExperimentAssignmentsRefs = false,
+              }) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [
+                    if (activationExperimentAssignmentsRefs)
+                      db.activationExperimentAssignments,
+                  ],
+                  addJoins:
+                      <
+                        T extends TableManagerState<
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic
+                        >
+                      >(state) {
+                        if (profileId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.profileId,
+                                    referencedTable:
+                                        $$ActivationExperimentsTableReferences
+                                            ._profileIdTable(db),
+                                    referencedColumn:
+                                        $$ActivationExperimentsTableReferences
+                                            ._profileIdTable(db)
+                                            .id,
+                                  )
+                                  as T;
+                        }
+
+                        return state;
+                      },
+                  getPrefetchedDataCallback: (items) async {
+                    return [
+                      if (activationExperimentAssignmentsRefs)
+                        await $_getPrefetchedData<
+                          ActivationExperimentRow,
+                          $ActivationExperimentsTable,
+                          ActivationExperimentAssignmentRow
+                        >(
+                          currentTable: table,
+                          referencedTable:
+                              $$ActivationExperimentsTableReferences
+                                  ._activationExperimentAssignmentsRefsTable(
+                                    db,
+                                  ),
+                          managerFromTypedResult: (p0) =>
+                              $$ActivationExperimentsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).activationExperimentAssignmentsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.experimentId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                    ];
+                  },
+                );
+              },
+        ),
+      );
+}
+
+typedef $$ActivationExperimentsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$ColonyDatabase,
+      $ActivationExperimentsTable,
+      ActivationExperimentRow,
+      $$ActivationExperimentsTableFilterComposer,
+      $$ActivationExperimentsTableOrderingComposer,
+      $$ActivationExperimentsTableAnnotationComposer,
+      $$ActivationExperimentsTableCreateCompanionBuilder,
+      $$ActivationExperimentsTableUpdateCompanionBuilder,
+      (ActivationExperimentRow, $$ActivationExperimentsTableReferences),
+      ActivationExperimentRow,
+      PrefetchHooks Function({
+        bool profileId,
+        bool activationExperimentAssignmentsRefs,
+      })
+    >;
+typedef $$ActivationExperimentAssignmentsTableCreateCompanionBuilder =
+    ActivationExperimentAssignmentsCompanion Function({
+      required String id,
+      required String experimentId,
+      required String episodeId,
+      required String variant,
+      required int assignedAt,
+      Value<int> rowid,
+    });
+typedef $$ActivationExperimentAssignmentsTableUpdateCompanionBuilder =
+    ActivationExperimentAssignmentsCompanion Function({
+      Value<String> id,
+      Value<String> experimentId,
+      Value<String> episodeId,
+      Value<String> variant,
+      Value<int> assignedAt,
+      Value<int> rowid,
+    });
+
+final class $$ActivationExperimentAssignmentsTableReferences
+    extends
+        BaseReferences<
+          _$ColonyDatabase,
+          $ActivationExperimentAssignmentsTable,
+          ActivationExperimentAssignmentRow
+        > {
+  $$ActivationExperimentAssignmentsTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $ActivationExperimentsTable _experimentIdTable(_$ColonyDatabase db) =>
+      db.activationExperiments.createAlias(
+        $_aliasNameGenerator(
+          db.activationExperimentAssignments.experimentId,
+          db.activationExperiments.id,
+        ),
+      );
+
+  $$ActivationExperimentsTableProcessedTableManager get experimentId {
+    final $_column = $_itemColumn<String>('experiment_id')!;
+
+    final manager = $$ActivationExperimentsTableTableManager(
+      $_db,
+      $_db.activationExperiments,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_experimentIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $ActivationEpisodesTable _episodeIdTable(_$ColonyDatabase db) =>
+      db.activationEpisodes.createAlias(
+        $_aliasNameGenerator(
+          db.activationExperimentAssignments.episodeId,
+          db.activationEpisodes.id,
+        ),
+      );
+
+  $$ActivationEpisodesTableProcessedTableManager get episodeId {
+    final $_column = $_itemColumn<String>('episode_id')!;
+
+    final manager = $$ActivationEpisodesTableTableManager(
+      $_db,
+      $_db.activationEpisodes,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_episodeIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$ActivationExperimentAssignmentsTableFilterComposer
+    extends Composer<_$ColonyDatabase, $ActivationExperimentAssignmentsTable> {
+  $$ActivationExperimentAssignmentsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get variant => $composableBuilder(
+    column: $table.variant,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get assignedAt => $composableBuilder(
+    column: $table.assignedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$ActivationExperimentsTableFilterComposer get experimentId {
+    final $$ActivationExperimentsTableFilterComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.experimentId,
+          referencedTable: $db.activationExperiments,
+          getReferencedColumn: (t) => t.id,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$ActivationExperimentsTableFilterComposer(
+                $db: $db,
+                $table: $db.activationExperiments,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return composer;
+  }
+
+  $$ActivationEpisodesTableFilterComposer get episodeId {
+    final $$ActivationEpisodesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.episodeId,
+      referencedTable: $db.activationEpisodes,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ActivationEpisodesTableFilterComposer(
+            $db: $db,
+            $table: $db.activationEpisodes,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$ActivationExperimentAssignmentsTableOrderingComposer
+    extends Composer<_$ColonyDatabase, $ActivationExperimentAssignmentsTable> {
+  $$ActivationExperimentAssignmentsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get variant => $composableBuilder(
+    column: $table.variant,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get assignedAt => $composableBuilder(
+    column: $table.assignedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$ActivationExperimentsTableOrderingComposer get experimentId {
+    final $$ActivationExperimentsTableOrderingComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.experimentId,
+          referencedTable: $db.activationExperiments,
+          getReferencedColumn: (t) => t.id,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$ActivationExperimentsTableOrderingComposer(
+                $db: $db,
+                $table: $db.activationExperiments,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return composer;
+  }
+
+  $$ActivationEpisodesTableOrderingComposer get episodeId {
+    final $$ActivationEpisodesTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.episodeId,
+      referencedTable: $db.activationEpisodes,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ActivationEpisodesTableOrderingComposer(
+            $db: $db,
+            $table: $db.activationEpisodes,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$ActivationExperimentAssignmentsTableAnnotationComposer
+    extends Composer<_$ColonyDatabase, $ActivationExperimentAssignmentsTable> {
+  $$ActivationExperimentAssignmentsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get variant =>
+      $composableBuilder(column: $table.variant, builder: (column) => column);
+
+  GeneratedColumn<int> get assignedAt => $composableBuilder(
+    column: $table.assignedAt,
+    builder: (column) => column,
+  );
+
+  $$ActivationExperimentsTableAnnotationComposer get experimentId {
+    final $$ActivationExperimentsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.experimentId,
+          referencedTable: $db.activationExperiments,
+          getReferencedColumn: (t) => t.id,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$ActivationExperimentsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.activationExperiments,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return composer;
+  }
+
+  $$ActivationEpisodesTableAnnotationComposer get episodeId {
+    final $$ActivationEpisodesTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.episodeId,
+          referencedTable: $db.activationEpisodes,
+          getReferencedColumn: (t) => t.id,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$ActivationEpisodesTableAnnotationComposer(
+                $db: $db,
+                $table: $db.activationEpisodes,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return composer;
+  }
+}
+
+class $$ActivationExperimentAssignmentsTableTableManager
+    extends
+        RootTableManager<
+          _$ColonyDatabase,
+          $ActivationExperimentAssignmentsTable,
+          ActivationExperimentAssignmentRow,
+          $$ActivationExperimentAssignmentsTableFilterComposer,
+          $$ActivationExperimentAssignmentsTableOrderingComposer,
+          $$ActivationExperimentAssignmentsTableAnnotationComposer,
+          $$ActivationExperimentAssignmentsTableCreateCompanionBuilder,
+          $$ActivationExperimentAssignmentsTableUpdateCompanionBuilder,
+          (
+            ActivationExperimentAssignmentRow,
+            $$ActivationExperimentAssignmentsTableReferences,
+          ),
+          ActivationExperimentAssignmentRow,
+          PrefetchHooks Function({bool experimentId, bool episodeId})
+        > {
+  $$ActivationExperimentAssignmentsTableTableManager(
+    _$ColonyDatabase db,
+    $ActivationExperimentAssignmentsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$ActivationExperimentAssignmentsTableFilterComposer(
+                $db: db,
+                $table: table,
+              ),
+          createOrderingComposer: () =>
+              $$ActivationExperimentAssignmentsTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$ActivationExperimentAssignmentsTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> experimentId = const Value.absent(),
+                Value<String> episodeId = const Value.absent(),
+                Value<String> variant = const Value.absent(),
+                Value<int> assignedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => ActivationExperimentAssignmentsCompanion(
+                id: id,
+                experimentId: experimentId,
+                episodeId: episodeId,
+                variant: variant,
+                assignedAt: assignedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String experimentId,
+                required String episodeId,
+                required String variant,
+                required int assignedAt,
+                Value<int> rowid = const Value.absent(),
+              }) => ActivationExperimentAssignmentsCompanion.insert(
+                id: id,
+                experimentId: experimentId,
+                episodeId: episodeId,
+                variant: variant,
+                assignedAt: assignedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$ActivationExperimentAssignmentsTableReferences(
+                    db,
+                    table,
+                    e,
+                  ),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({experimentId = false, episodeId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (experimentId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.experimentId,
+                                referencedTable:
+                                    $$ActivationExperimentAssignmentsTableReferences
+                                        ._experimentIdTable(db),
+                                referencedColumn:
+                                    $$ActivationExperimentAssignmentsTableReferences
+                                        ._experimentIdTable(db)
+                                        .id,
+                              )
+                              as T;
+                    }
+                    if (episodeId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.episodeId,
+                                referencedTable:
+                                    $$ActivationExperimentAssignmentsTableReferences
+                                        ._episodeIdTable(db),
+                                referencedColumn:
+                                    $$ActivationExperimentAssignmentsTableReferences
+                                        ._episodeIdTable(db)
+                                        .id,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$ActivationExperimentAssignmentsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$ColonyDatabase,
+      $ActivationExperimentAssignmentsTable,
+      ActivationExperimentAssignmentRow,
+      $$ActivationExperimentAssignmentsTableFilterComposer,
+      $$ActivationExperimentAssignmentsTableOrderingComposer,
+      $$ActivationExperimentAssignmentsTableAnnotationComposer,
+      $$ActivationExperimentAssignmentsTableCreateCompanionBuilder,
+      $$ActivationExperimentAssignmentsTableUpdateCompanionBuilder,
+      (
+        ActivationExperimentAssignmentRow,
+        $$ActivationExperimentAssignmentsTableReferences,
+      ),
+      ActivationExperimentAssignmentRow,
+      PrefetchHooks Function({bool experimentId, bool episodeId})
+    >;
+typedef $$ActivationInsightsTableCreateCompanionBuilder =
+    ActivationInsightsCompanion Function({
+      required String id,
+      required String profileId,
+      required String title,
+      required String body,
+      required int createdAt,
+      Value<int> sampleSize,
+      Value<String> confidence,
+      Value<bool> associativeOnly,
+      Value<int> rowid,
+    });
+typedef $$ActivationInsightsTableUpdateCompanionBuilder =
+    ActivationInsightsCompanion Function({
+      Value<String> id,
+      Value<String> profileId,
+      Value<String> title,
+      Value<String> body,
+      Value<int> createdAt,
+      Value<int> sampleSize,
+      Value<String> confidence,
+      Value<bool> associativeOnly,
+      Value<int> rowid,
+    });
+
+final class $$ActivationInsightsTableReferences
+    extends
+        BaseReferences<
+          _$ColonyDatabase,
+          $ActivationInsightsTable,
+          ActivationInsightRow
+        > {
+  $$ActivationInsightsTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $ProfilesTable _profileIdTable(_$ColonyDatabase db) =>
+      db.profiles.createAlias(
+        $_aliasNameGenerator(db.activationInsights.profileId, db.profiles.id),
+      );
+
+  $$ProfilesTableProcessedTableManager get profileId {
+    final $_column = $_itemColumn<String>('profile_id')!;
+
+    final manager = $$ProfilesTableTableManager(
+      $_db,
+      $_db.profiles,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_profileIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$ActivationInsightsTableFilterComposer
+    extends Composer<_$ColonyDatabase, $ActivationInsightsTable> {
+  $$ActivationInsightsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get title => $composableBuilder(
+    column: $table.title,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get body => $composableBuilder(
+    column: $table.body,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get sampleSize => $composableBuilder(
+    column: $table.sampleSize,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get confidence => $composableBuilder(
+    column: $table.confidence,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get associativeOnly => $composableBuilder(
+    column: $table.associativeOnly,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$ProfilesTableFilterComposer get profileId {
+    final $$ProfilesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.profileId,
+      referencedTable: $db.profiles,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProfilesTableFilterComposer(
+            $db: $db,
+            $table: $db.profiles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$ActivationInsightsTableOrderingComposer
+    extends Composer<_$ColonyDatabase, $ActivationInsightsTable> {
+  $$ActivationInsightsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get title => $composableBuilder(
+    column: $table.title,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get body => $composableBuilder(
+    column: $table.body,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get sampleSize => $composableBuilder(
+    column: $table.sampleSize,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get confidence => $composableBuilder(
+    column: $table.confidence,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get associativeOnly => $composableBuilder(
+    column: $table.associativeOnly,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$ProfilesTableOrderingComposer get profileId {
+    final $$ProfilesTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.profileId,
+      referencedTable: $db.profiles,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProfilesTableOrderingComposer(
+            $db: $db,
+            $table: $db.profiles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$ActivationInsightsTableAnnotationComposer
+    extends Composer<_$ColonyDatabase, $ActivationInsightsTable> {
+  $$ActivationInsightsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get title =>
+      $composableBuilder(column: $table.title, builder: (column) => column);
+
+  GeneratedColumn<String> get body =>
+      $composableBuilder(column: $table.body, builder: (column) => column);
+
+  GeneratedColumn<int> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<int> get sampleSize => $composableBuilder(
+    column: $table.sampleSize,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get confidence => $composableBuilder(
+    column: $table.confidence,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get associativeOnly => $composableBuilder(
+    column: $table.associativeOnly,
+    builder: (column) => column,
+  );
+
+  $$ProfilesTableAnnotationComposer get profileId {
+    final $$ProfilesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.profileId,
+      referencedTable: $db.profiles,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProfilesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.profiles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$ActivationInsightsTableTableManager
+    extends
+        RootTableManager<
+          _$ColonyDatabase,
+          $ActivationInsightsTable,
+          ActivationInsightRow,
+          $$ActivationInsightsTableFilterComposer,
+          $$ActivationInsightsTableOrderingComposer,
+          $$ActivationInsightsTableAnnotationComposer,
+          $$ActivationInsightsTableCreateCompanionBuilder,
+          $$ActivationInsightsTableUpdateCompanionBuilder,
+          (ActivationInsightRow, $$ActivationInsightsTableReferences),
+          ActivationInsightRow,
+          PrefetchHooks Function({bool profileId})
+        > {
+  $$ActivationInsightsTableTableManager(
+    _$ColonyDatabase db,
+    $ActivationInsightsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$ActivationInsightsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$ActivationInsightsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$ActivationInsightsTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> profileId = const Value.absent(),
+                Value<String> title = const Value.absent(),
+                Value<String> body = const Value.absent(),
+                Value<int> createdAt = const Value.absent(),
+                Value<int> sampleSize = const Value.absent(),
+                Value<String> confidence = const Value.absent(),
+                Value<bool> associativeOnly = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => ActivationInsightsCompanion(
+                id: id,
+                profileId: profileId,
+                title: title,
+                body: body,
+                createdAt: createdAt,
+                sampleSize: sampleSize,
+                confidence: confidence,
+                associativeOnly: associativeOnly,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String profileId,
+                required String title,
+                required String body,
+                required int createdAt,
+                Value<int> sampleSize = const Value.absent(),
+                Value<String> confidence = const Value.absent(),
+                Value<bool> associativeOnly = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => ActivationInsightsCompanion.insert(
+                id: id,
+                profileId: profileId,
+                title: title,
+                body: body,
+                createdAt: createdAt,
+                sampleSize: sampleSize,
+                confidence: confidence,
+                associativeOnly: associativeOnly,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$ActivationInsightsTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({profileId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (profileId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.profileId,
+                                referencedTable:
+                                    $$ActivationInsightsTableReferences
+                                        ._profileIdTable(db),
+                                referencedColumn:
+                                    $$ActivationInsightsTableReferences
+                                        ._profileIdTable(db)
+                                        .id,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$ActivationInsightsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$ColonyDatabase,
+      $ActivationInsightsTable,
+      ActivationInsightRow,
+      $$ActivationInsightsTableFilterComposer,
+      $$ActivationInsightsTableOrderingComposer,
+      $$ActivationInsightsTableAnnotationComposer,
+      $$ActivationInsightsTableCreateCompanionBuilder,
+      $$ActivationInsightsTableUpdateCompanionBuilder,
+      (ActivationInsightRow, $$ActivationInsightsTableReferences),
+      ActivationInsightRow,
+      PrefetchHooks Function({bool profileId})
+    >;
 
 class $ColonyDatabaseManager {
   final _$ColonyDatabase _db;
@@ -82286,4 +103705,56 @@ class $ColonyDatabaseManager {
         _db,
         _db.friendshipCircleMemberships,
       );
+  $$ActivationProtocolsTableTableManager get activationProtocols =>
+      $$ActivationProtocolsTableTableManager(_db, _db.activationProtocols);
+  $$ActivationProtocolVersionsTableTableManager
+  get activationProtocolVersions =>
+      $$ActivationProtocolVersionsTableTableManager(
+        _db,
+        _db.activationProtocolVersions,
+      );
+  $$ActivationCommandTemplatesTableTableManager
+  get activationCommandTemplates =>
+      $$ActivationCommandTemplatesTableTableManager(
+        _db,
+        _db.activationCommandTemplates,
+      );
+  $$ActivationEpisodesTableTableManager get activationEpisodes =>
+      $$ActivationEpisodesTableTableManager(_db, _db.activationEpisodes);
+  $$ActivationCommandRunsTableTableManager get activationCommandRuns =>
+      $$ActivationCommandRunsTableTableManager(_db, _db.activationCommandRuns);
+  $$ActivationProofsTableTableManager get activationProofs =>
+      $$ActivationProofsTableTableManager(_db, _db.activationProofs);
+  $$ActivationWaypointsTableTableManager get activationWaypoints =>
+      $$ActivationWaypointsTableTableManager(_db, _db.activationWaypoints);
+  $$WaypointObservationsTableTableManager get waypointObservations =>
+      $$WaypointObservationsTableTableManager(_db, _db.waypointObservations);
+  $$InertiaSignalsTableTableManager get inertiaSignals =>
+      $$InertiaSignalsTableTableManager(_db, _db.inertiaSignals);
+  $$FrictionShieldProfilesTableTableManager get frictionShieldProfiles =>
+      $$FrictionShieldProfilesTableTableManager(
+        _db,
+        _db.frictionShieldProfiles,
+      );
+  $$FrictionShieldSessionsTableTableManager get frictionShieldSessions =>
+      $$FrictionShieldSessionsTableTableManager(
+        _db,
+        _db.frictionShieldSessions,
+      );
+  $$TemptationBundlesTableTableManager get temptationBundles =>
+      $$TemptationBundlesTableTableManager(_db, _db.temptationBundles);
+  $$ActivationScenesTableTableManager get activationScenes =>
+      $$ActivationScenesTableTableManager(_db, _db.activationScenes);
+  $$RescueContractsTableTableManager get rescueContracts =>
+      $$RescueContractsTableTableManager(_db, _db.rescueContracts);
+  $$ActivationExperimentsTableTableManager get activationExperiments =>
+      $$ActivationExperimentsTableTableManager(_db, _db.activationExperiments);
+  $$ActivationExperimentAssignmentsTableTableManager
+  get activationExperimentAssignments =>
+      $$ActivationExperimentAssignmentsTableTableManager(
+        _db,
+        _db.activationExperimentAssignments,
+      );
+  $$ActivationInsightsTableTableManager get activationInsights =>
+      $$ActivationInsightsTableTableManager(_db, _db.activationInsights);
 }

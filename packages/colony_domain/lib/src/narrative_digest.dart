@@ -277,6 +277,24 @@ abstract final class NarrativeDigestRules {
       );
     }
 
+    final activationEvents = inWindow
+        .where(
+          (e) =>
+              e.eventType == EventType.activationEpisodeStarted ||
+              e.eventType == EventType.activationEpisodeReleased ||
+              e.eventType == EventType.activationEpisodeConvertedToRecovery,
+        )
+        .toList();
+    if (activationEvents.isNotEmpty) {
+      bullets.add(
+        NarrativeDigestBullet(
+          templateId: 'activation_activity',
+          params: {'count': activationEvents.length},
+          evidenceEventIds: activationEvents.take(3).map((e) => e.id).toList(),
+        ),
+      );
+    }
+
     final inventoryEvents = inWindow
         .where(
           (e) =>
@@ -353,6 +371,7 @@ abstract final class NarrativeDigestRules {
         'finance_activity' => 65,
         'research_activity' => 60,
         'music_atlas_activity' => 58,
+        'activation_activity' => 62,
         'commitment_activity' => 55,
         'trip_activity' => 50,
         'task_activity' => 45,

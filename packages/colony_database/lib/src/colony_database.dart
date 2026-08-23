@@ -83,6 +83,23 @@ part 'colony_database.g.dart';
   Friendships,
   FriendshipCircles,
   FriendshipCircleMemberships,
+  ActivationProtocols,
+  ActivationProtocolVersions,
+  ActivationCommandTemplates,
+  ActivationEpisodes,
+  ActivationCommandRuns,
+  ActivationProofs,
+  ActivationWaypoints,
+  WaypointObservations,
+  InertiaSignals,
+  FrictionShieldProfiles,
+  FrictionShieldSessions,
+  TemptationBundles,
+  ActivationScenes,
+  RescueContracts,
+  ActivationExperiments,
+  ActivationExperimentAssignments,
+  ActivationInsights,
 ])
 class ColonyDatabase extends _$ColonyDatabase {
   ColonyDatabase(super.e, {this.dataDirectory});
@@ -91,7 +108,7 @@ class ColonyDatabase extends _$ColonyDatabase {
   final String? dataDirectory;
 
   @override
-  int get schemaVersion => 41;
+  int get schemaVersion => 42;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -350,6 +367,91 @@ class ColonyDatabase extends _$ColonyDatabase {
             m,
             'friendship_circle_memberships',
             () => m.createTable(friendshipCircleMemberships),
+          );
+          await _createTableIfAbsent(
+            m,
+            'activation_protocols',
+            () => m.createTable(activationProtocols),
+          );
+          await _createTableIfAbsent(
+            m,
+            'activation_protocol_versions',
+            () => m.createTable(activationProtocolVersions),
+          );
+          await _createTableIfAbsent(
+            m,
+            'activation_command_templates',
+            () => m.createTable(activationCommandTemplates),
+          );
+          await _createTableIfAbsent(
+            m,
+            'activation_episodes',
+            () => m.createTable(activationEpisodes),
+          );
+          await _createTableIfAbsent(
+            m,
+            'activation_command_runs',
+            () => m.createTable(activationCommandRuns),
+          );
+          await _createTableIfAbsent(
+            m,
+            'activation_proofs',
+            () => m.createTable(activationProofs),
+          );
+          await _createTableIfAbsent(
+            m,
+            'activation_waypoints',
+            () => m.createTable(activationWaypoints),
+          );
+          await _createTableIfAbsent(
+            m,
+            'waypoint_observations',
+            () => m.createTable(waypointObservations),
+          );
+          await _createTableIfAbsent(
+            m,
+            'inertia_signals',
+            () => m.createTable(inertiaSignals),
+          );
+          await _createTableIfAbsent(
+            m,
+            'friction_shield_profiles',
+            () => m.createTable(frictionShieldProfiles),
+          );
+          await _createTableIfAbsent(
+            m,
+            'friction_shield_sessions',
+            () => m.createTable(frictionShieldSessions),
+          );
+          await _createTableIfAbsent(
+            m,
+            'temptation_bundles',
+            () => m.createTable(temptationBundles),
+          );
+          await _createTableIfAbsent(
+            m,
+            'activation_scenes',
+            () => m.createTable(activationScenes),
+          );
+          await _createTableIfAbsent(
+            m,
+            'rescue_contracts',
+            () => m.createTable(rescueContracts),
+          );
+          await _createTableIfAbsent(
+            m,
+            'activation_experiments',
+            () => m.createTable(activationExperiments),
+          );
+          await _createTableIfAbsent(
+            m,
+            'activation_experiment_assignments',
+            () => m.createTable(activationExperimentAssignments),
+          );
+          await _createTableIfAbsent(
+            m,
+            'activation_insights',
+            () => m.createTable(activationInsights),
           );
         },
       );

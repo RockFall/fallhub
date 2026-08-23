@@ -128,6 +128,14 @@ abstract final class ColonyMiniApps {
       pinned: true,
     ),
     ColonyMiniApp(
+      id: 'activation',
+      label: AppStrings.activationTitle,
+      route: '/activation',
+      icon: Icons.directions_walk_outlined,
+      color: ColonyMiniAppColors.activation,
+      pinned: true,
+    ),
+    ColonyMiniApp(
       id: 'inbox',
       label: AppStrings.inbox,
       route: '/inbox',

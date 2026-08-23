@@ -118,6 +118,10 @@ enum AggregateType {
   musicEncounter,
   musicExpedition,
   musicImportRun,
+  activationEpisode,
+  activationProtocol,
+  activationWaypoint,
+  activationExperiment,
   domainEvent,
 }
 
@@ -248,6 +252,26 @@ enum EventType {
   spotifyNowPlayingCaptured,
   spotifyCapabilityDegraded,
   spotifyHistoryImported,
+  activationEpisodeStarted,
+  activationCommandPresented,
+  activationProofObserved,
+  activationCommandConfirmed,
+  activationCommandSkipped,
+  activationRouteAdapted,
+  frictionShieldApplied,
+  frictionShieldEscaped,
+  waypointReached,
+  capacityModeChanged,
+  activationEpisodeReleased,
+  activationEpisodeAborted,
+  activationEpisodeConvertedToRecovery,
+  activationFalsePositiveReported,
+  activationProtocolCompressed,
+  activationProtocolInternalized,
+  activationExperimentStarted,
+  activationInsightGenerated,
+  activationEpisodePaused,
+  activationEpisodeRestored,
 }
 
 enum UndoActionType {

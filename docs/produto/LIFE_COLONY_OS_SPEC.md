@@ -93,6 +93,7 @@
 - [76. Cenários end-to-end de validação](#76-cenarios-end-to-end-de-validacao)
 - [77. Checklist de release 1.0](#77-checklist-de-release-10)
 - [78. Princípio final de implementação](#78-principio-final-de-implementacao)
+- [Anexo B — Motor de Ignição](#anexo-b--motor-de-ignicao)
 
 ---
 
@@ -335,6 +336,10 @@ Combina:
 | Storyteller | Motor de narrativa | Curadoria de eventos, revisões e desafios, nunca gerador aleatório de crise |
 | Crônica | History | Linha do tempo auditável da vida |
 | Save | Snapshot | Backup versionado, exportável e restaurável |
+| Mobilização | Draft mode pessoal | Direção explícita temporária do Pawn: uma ordem física por vez |
+| Protocolo de Ignição | Rota de transição | Sequência versionada entre um estado inicial e um estado operacional |
+| Waypoint | Marco físico | QR, NFC, zona ou dock que confirma avanço sem formulário |
+| Escudo de Fricção | Restrição temporária | Política local de distração com allowlist essencial e escape |
 
 ---
 
@@ -425,6 +430,10 @@ A captura pode permanecer na `Caixa de Entrada` para classificação posterior.
 - apagar todos os dados: autenticação + frase de confirmação + exportação sugerida;
 - enviar dados a IA externa: consentimento por sessão ou regra explícita.
 
+## 5.8 Ação antes de input
+
+O sistema deve ajudar a executar o próximo movimento físico antes de pedir registro. Habit trackers invertem essa ordem. O Motor de Ignição não cria streak, score de disciplina ou relatório obrigatório.
+
 ---
 
 # 6. Arquitetura de informação e navegação
@@ -484,7 +493,8 @@ Comandos:
 - abrir revisão;
 - sincronizar;
 - exportar;
-- executar ação contextual permitida.
+- executar ação contextual permitida;
+- atalho global `Estou travado agora`.
 
 A busca deve tolerar acentos, aliases e erros pequenos.
 
@@ -829,7 +839,9 @@ Não mostrar score único. Exibir matriz:
 - atividade atual;
 - tempo decorrido;
 - próxima transição;
-- ações: pausar, concluir, registrar bloqueio, mudar plano.
+- ações: pausar, concluir, registrar bloqueio, mudar plano;
+- estado `em mobilização` quando há episódio aberto;
+- widget de transição com uma ordem ou “Mobilização disponível”.
 
 ### Próximas 24 horas
 
@@ -889,7 +901,8 @@ Exemplos: perda de documento em viagem, prazo financeiro, ida a atendimento de s
 8. Equipamento;
 9. Social;
 10. Bio;
-11. Histórico.
+11. Histórico;
+12. Mobilização — gargalos, rotas, maturidade contextual e episódios recentes. Sem score moral.
 
 ## 10.3 Resumo
 
@@ -978,7 +991,8 @@ Direita:
 - sem meta calórica automática sem configuração consciente;
 - sem inferir transtorno, depressão, ansiedade ou doença;
 - permitir ocultar qualquer necessidade;
-- dados subjetivos prevalecem sobre inferências quando conflitantes.
+- dados subjetivos prevalecem sobre inferências quando conflitantes;
+- necessidades podem reduzir ou substituir protocolos de ignição; nunca são usadas para penalizar inércia.
 
 ---
 
@@ -1183,6 +1197,8 @@ Prontidão para treino intenso
 ```
 
 A fórmula é editável, versionada e explicável. Para atividades sensíveis, a decisão final é sempre do usuário ou profissional.
+
+O Motor de Ignição usa `CapacityMode` local da rota (`standard`, `lowCapacity`, `emergencyMinimum`, `highEnergy`). Isso comprime ou simplifica a próxima ordem. Não é um índice de caráter.
 
 ---
 
@@ -1471,6 +1487,8 @@ Exibir:
 - tarefa aguardando outra pessoa;
 - excesso de work in progress.
 
+O motor de prioridades escolhe o trabalho; o Motor de Ignição conduz apenas a transição inicial até a primeira ação significativa.
+
 ---
 
 # 19. Agenda
@@ -1525,6 +1543,8 @@ A agenda mostra orçamento de:
 - deslocamento.
 
 Não bloquear agendamento; apenas explicar riscos.
+
+Hooks de transição: um bloco de sono/recuperação bloqueia auto-start de ignição. Um bloco de foco nas próximas horas favorece rotas `workStart`/`studyStart`. O usuário pode declarar “Estou descansando” sem detalhar.
 
 ---
 
@@ -1590,6 +1610,8 @@ Todo projeto ativo deve ter ao menos uma próxima ação ou um motivo explícito
 - bloqueado;
 - sem decisão;
 - concluído.
+
+A primeira ação significativa de uma Task pode ser referenciada por um protocolo (`opens_task_id`, `deep_link`, `restart_note` no comando). Não adicionar score de ativação à Task. O protocolo versionado é a fonte da rota; a Task permanece a ordem de trabalho.
 
 ---
 
@@ -2028,6 +2050,8 @@ O app pode lembrar compromissos, sem calcular “qualidade da amizade”.
 
 # 25. Casa, locais e zonas
 
+Zonas funcionais podem hospedar waypoints de ignição (banheiro, dock, mesa) sem exigir coordenada exata. O marco confirma avanço; o raw RSSI/GPS não é persistido.
+
 ## 25.1 Local
 
 - casa;
@@ -2188,6 +2212,8 @@ Métrica principal: itens com significado e próxima ação claros, não inbox z
 
 # 28. Crônica e histórico
 
+Eventos resumidos de mobilização entram na timeline: início, comando apresentado/confirmado, liberação, aborto, correção de falso positivo, waypoint e insight associativo. Sem streak.
+
 ## 28.1 Event sourcing pragmático
 
 Não é necessário reconstruir toda a aplicação apenas por eventos, mas toda mudança relevante deve gerar um `DomainEvent` auditável.
@@ -2277,6 +2303,8 @@ A IA pode produzir resumos semanais/mensais a partir de eventos selecionados, ma
 
 # 29. Alertas, cartas e atenção
 
+Intervenções de transição têm orçamento próprio (máximo 6 propostas automáticas/dia). Descanso planejado e falso positivo recente reduzem, nunca aumentam, a pressão.
+
 ## 29.1 Categorias
 
 - crítico;
@@ -2333,6 +2361,8 @@ Todo alerta automático responde:
 
 # 30. Storyteller pessoal
 
+Cartas de mobilização descrevem rotas e latência associativa. Nunca narram falha moral nem celebram acordar cedo após sono insuficiente.
+
 ## 30.1 Objetivo
 
 O Storyteller é um curador de ritmo e reflexão, não um gerador de caos. Ele seleciona momentos adequados para:
@@ -2376,6 +2406,8 @@ Não usar nomes de storytellers do jogo.
 ---
 
 # 31. Assistente de IA
+
+Tools de mobilização: compilar intenção em ordens concretas, validar gramática, adaptar rota e explicar evidência. Sem LLM no núcleo. Sem diagnóstico.
 
 ## 31.1 Funções permitidas
 
@@ -2462,6 +2494,8 @@ O assistente não recebe todo o banco. Pipeline:
 ---
 
 # 32. Modelo de dados transversal
+
+O Motor de Ignição persiste protocolos versionados, comandos, episódios, runs, provas, waypoints, sinais com expiração, escudo, cenas, contratos de resgate, experimentos N-of-1 e insights associativos. Sinais brutos, tokens e `raw_reference` não entram no export padrão.
 
 ## 32.1 Convenções
 
@@ -3324,6 +3358,15 @@ Este é o primeiro produto utilizável.
 - dependencies;
 - decision log;
 - weekly review.
+
+## Fase 4A — Motor de Ignição
+
+- protocolos locais;
+- Morning Launch;
+- uma ordem por vez;
+- waypoints;
+- Crônica.
+- Fricção de plataforma, wearables, HA e LLM ficam depois das integrações nativas.
 
 ## Fase 5 — Pesquisa e skills
 
@@ -4353,6 +4396,17 @@ Subtelas:
 - diagnósticos.
 
 Esta tela deve tornar o sistema inspecionável por um usuário técnico.
+
+## 60.12 Motor de Ignição
+
+- Activation Home;
+- Draft Mode (uma ordem);
+- Protocol Editor;
+- Waypoint Editor;
+- Shield Settings;
+- Episode Inspect;
+- Experiment Inspect;
+- Environment / rescue (capacidade real, sem envio).
 
 ---
 
@@ -5485,3 +5539,13 @@ O teste decisivo para cada feature é:
 > Ela ajuda o usuário a perceber melhor a situação, preservar informação, tomar uma decisão ou executar uma ação — ou apenas aumenta a sensação de controle?
 
 Se for apenas sensação de controle, a feature deve ser removida, simplificada ou transformada em reflexão explícita.
+
+---
+
+# Anexo B — Motor de Ignição
+
+Fonte: `docs/produto/03-LIFE_COLONY_OS_IGNITION_ENGINE_SPEC.md`
+
+O documento pai permanece a fonte de verdade do produto. O spec 03 preserva a profundidade do módulo: episódio como unidade de valor, uma ordem por vez, confirmação manual suficiente, sensores opcionais, escudo por capacidade real, sem diagnóstico e sem score de disciplina.
+
+ADRs: `docs/adr/ADR-ACT-001` … `ADR-ACT-015`. Threat model: `docs/dev/ACTIVATION_THREAT_MODEL.md`.

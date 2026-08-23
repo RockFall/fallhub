@@ -14,6 +14,8 @@ import '../../../pawn/presentation/widgets/check_in_sheet.dart';
 import '../../../quests/application/quest_providers.dart';
 import '../../../storyteller/presentation/narrative_digest_sheet.dart';
 import '../../../work/application/work_providers.dart';
+import '../../../activation/application/activation_controllers.dart';
+import '../../../activation/presentation/widgets/agora_readiness_card.dart';
 
 class ColonyHomeDigest extends ConsumerWidget {
   const ColonyHomeDigest({super.key});
@@ -24,6 +26,8 @@ class ColonyHomeDigest extends ConsumerWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         const _NowCard(),
+        const SizedBox(height: ColonySpacing.lg),
+        const AgoraReadinessCard(),
         const SizedBox(height: ColonySpacing.lg),
         const _StudyStrip(),
         const SizedBox(height: ColonySpacing.lg),
@@ -389,6 +393,17 @@ class _NextActionsCard extends ConsumerWidget {
                   dense: true,
                   title: Text(task.title),
                   subtitle: Text(AppStrings.taskStatusLabel(task.status)),
+                  trailing: IconButton(
+                    tooltip: AppStrings.activationMobilizeTask,
+                    icon: const Icon(Icons.directions_walk_outlined),
+                    onPressed: () async {
+                      final episode = await ref
+                          .read(activationControllerProvider.notifier)
+                          .startForTask(taskId: task.id);
+                      if (!context.mounted || episode == null) return;
+                      context.go('/activation/episodes/${episode.id.value}');
+                    },
+                  ),
                   onTap: () => context.go('/tasks/${task.id.value}'),
                 ),
             ],

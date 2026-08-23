@@ -58,6 +58,15 @@ import '../../features/home/presentation/home_maintenance_screen.dart';
 import '../../features/sync/presentation/sync_status_screen.dart';
 import '../../features/integrations/presentation/integrations_screen.dart';
 import '../../features/zones/presentation/zones_screen.dart';
+import '../../features/activation/presentation/activation_home_screen.dart';
+import '../../features/activation/presentation/episode_inspect_screen.dart';
+import '../../features/activation/presentation/experiment_inspect_screen.dart';
+import '../../features/activation/presentation/mobilization_screen.dart';
+import '../../features/activation/presentation/protocol_editor_screen.dart';
+import '../../features/activation/presentation/protocol_list_screen.dart';
+import '../../features/activation/presentation/environment_screen.dart';
+import '../../features/activation/presentation/shield_settings_screen.dart';
+import '../../features/activation/presentation/waypoint_editor_screen.dart';
 import '../../core/widgets/command_palette.dart';
 
 class _GoRouterRefresh extends ChangeNotifier {
@@ -388,6 +397,72 @@ final routerProvider = Provider<GoRouter>((ref) {
               taskId: state.pathParameters['id']!,
             ),
           ),
+          GoRoute(
+            path: '/activation',
+            builder: (context, state) => const ActivationHomeScreen(),
+            routes: [
+              GoRoute(
+                path: 'start',
+                builder: (context, state) => MobilizationScreen(
+                  episodeId: null,
+                  protocolId: state.uri.queryParameters['protocol'],
+                ),
+              ),
+              GoRoute(
+                path: 'episodes/:episodeId',
+                builder: (context, state) {
+                  final inspect = state.uri.queryParameters['inspect'] == '1';
+                  final id = state.pathParameters['episodeId']!;
+                  if (inspect) {
+                    return EpisodeInspectScreen(episodeId: id);
+                  }
+                  return MobilizationScreen(episodeId: id);
+                },
+              ),
+              GoRoute(
+                path: 'protocols',
+                builder: (context, state) => const ProtocolListScreen(),
+                routes: [
+                  GoRoute(
+                    path: ':protocolId',
+                    builder: (context, state) => ProtocolEditorScreen(
+                      protocolId: state.pathParameters['protocolId']!,
+                    ),
+                  ),
+                ],
+              ),
+              GoRoute(
+                path: 'waypoints',
+                builder: (context, state) => WaypointEditorScreen(
+                  initialToken: state.uri.queryParameters['token'],
+                ),
+                routes: [
+                  GoRoute(
+                    path: 'reach',
+                    builder: (context, state) => WaypointEditorScreen(
+                      initialToken: state.uri.queryParameters['token'],
+                    ),
+                  ),
+                ],
+              ),
+              GoRoute(
+                path: 'shield',
+                builder: (context, state) => const ShieldSettingsScreen(),
+              ),
+              GoRoute(
+                path: 'experiments',
+                builder: (context, state) => const ExperimentInspectScreen(),
+              ),
+              GoRoute(
+                path: 'environment',
+                builder: (context, state) => const EnvironmentScreen(),
+              ),
+            ],
+          ),
+          GoRoute(
+            path: '/pawn/me/activation',
+            builder: (context, state) => const ActivationHomeScreen(),
+          ),
         ],
       ),
     ],
@@ -525,6 +600,11 @@ class _AppShellState extends ConsumerState<AppShell> {
           onSelected: () => context.go('/colony/pawn-create'),
         ),
         ColonyFloatMenuItem(
+          icon: Icons.directions_walk_outlined,
+          label: AppStrings.activationTitle,
+          onSelected: () => context.go('/activation'),
+        ),
+        ColonyFloatMenuItem(
           icon: Icons.inbox_outlined,
           label: AppStrings.inbox,
           onSelected: () => context.go('/inbox'),
@@ -654,6 +734,7 @@ class _AppShellState extends ConsumerState<AppShell> {
     }
     // Secondary destinations highlight "More" in the main tab strip.
     if (location.startsWith('/inbox') ||
+        location.startsWith('/activation') ||
         location.startsWith('/chronicle') ||
         location.startsWith('/projects') ||
         location.startsWith('/decisions') ||

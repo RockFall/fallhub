@@ -1144,13 +1144,14 @@ void main() {
     expect(snapshot.friendships, isEmpty);
   });
 
-  test('parses export version 36 with empty friendship collections', () {
+  test('parses export version 36 with empty friendship and activation collections', () {
     final json = Map<String, dynamic>.from(baseJson)..['version'] = 36;
     final snapshot = ExportSnapshot.fromJson(json);
     expect(snapshot.version, 36);
     expect(snapshot.friendships, isEmpty);
     expect(snapshot.friendshipCircles, isEmpty);
     expect(snapshot.friendshipCircleMemberships, isEmpty);
+    expect(snapshot.activation.protocols, isEmpty);
   });
 
   test('rejects unsupported version 37', () {

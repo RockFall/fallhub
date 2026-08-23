@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:equatable/equatable.dart';
 
+import 'activation.dart';
 import 'bill.dart';
 import 'check_in.dart';
 import 'colony_profile.dart';
@@ -133,6 +134,7 @@ class ExportSnapshot extends Equatable {
     this.friendships = const [],
     this.friendshipCircles = const [],
     this.friendshipCircleMemberships = const [],
+    this.activation = const ActivationExportBundle(),
   });
 
   final DateTime exportedAt;
@@ -204,6 +206,7 @@ class ExportSnapshot extends Equatable {
   final List<Friendship> friendships;
   final List<FriendshipCircle> friendshipCircles;
   final List<FriendshipCircleMembership> friendshipCircleMemberships;
+  final ActivationExportBundle activation;
 
   Map<String, int> get entityCounts => {
         'tasks': tasks.length,
@@ -264,6 +267,7 @@ class ExportSnapshot extends Equatable {
         'friendships': friendships.length,
         'friendship_circles': friendshipCircles.length,
         'friendship_circle_memberships': friendshipCircleMemberships.length,
+        ...activation.counts,
       };
 
   static ExportSnapshot fromJsonString(String source) {
@@ -558,6 +562,9 @@ class ExportSnapshot extends Equatable {
               _parseFriendshipCircleMembership,
             )
           : const [],
+      activation: version >= 36
+          ? _parseActivationBundle(json)
+          : const ActivationExportBundle(),
     );
   }
 
@@ -1968,6 +1975,30 @@ class ExportSnapshot extends Equatable {
         'friendship_circle_memberships': friendshipCircleMemberships
             .map(_friendshipCircleMembershipJson)
             .toList(),
+        'activation_protocols':
+            activation.protocols.map((e) => e.toJson()).toList(),
+        'activation_protocol_versions':
+            activation.versions.map((e) => e.toJson()).toList(),
+        'activation_command_templates':
+            activation.commands.map((e) => e.toJson()).toList(),
+        'activation_episodes':
+            activation.episodes.map((e) => e.toJson()).toList(),
+        'activation_command_runs':
+            activation.commandRuns.map((e) => e.toJson()).toList(),
+        'activation_proofs': activation.proofs.map((e) => e.toJson()).toList(),
+        'activation_waypoints':
+            activation.waypoints.map((e) => e.toJson()).toList(),
+        'friction_shield_profiles':
+            activation.shieldProfiles.map((e) => e.toJson()).toList(),
+        'temptation_bundles':
+            activation.bundles.map((e) => e.toJson()).toList(),
+        'activation_scenes': activation.scenes.map((e) => e.toJson()).toList(),
+        'activation_experiments':
+            activation.experiments.map((e) => e.toJson()).toList(),
+        'activation_experiment_assignments':
+            activation.assignments.map((e) => e.toJson()).toList(),
+        'activation_insights':
+            activation.insights.map((e) => e.toJson()).toList(),
       },
     };
   }
@@ -2850,5 +2881,56 @@ class ExportSnapshot extends Equatable {
         friendships,
         friendshipCircles,
         friendshipCircleMemberships,
+        activation,
       ];
+
+  static ActivationExportBundle _parseActivationBundle(
+    Map<String, dynamic> json,
+  ) {
+    Map<String, Object?> box(Map<String, dynamic> item) =>
+        Map<String, Object?>.from(item);
+
+    List<T> parse<T>(String key, T Function(Map<String, Object?>) fromJson) {
+      final raw = json[key];
+      if (raw is! List) return const [];
+      return [
+        for (final item in raw)
+          if (item is Map<String, dynamic>) fromJson(box(item)),
+      ];
+    }
+
+    return ActivationExportBundle(
+      protocols: parse('activation_protocols', ActivationProtocol.fromJson),
+      versions: parse(
+        'activation_protocol_versions',
+        ActivationProtocolVersion.fromJson,
+      ),
+      commands: parse(
+        'activation_command_templates',
+        ActivationCommandTemplate.fromJson,
+      ),
+      episodes: parse('activation_episodes', ActivationEpisode.fromJson),
+      commandRuns: parse(
+        'activation_command_runs',
+        ActivationCommandRun.fromJson,
+      ),
+      proofs: parse('activation_proofs', ActivationProof.fromJson),
+      waypoints: parse('activation_waypoints', ActivationWaypoint.fromJson),
+      shieldProfiles: parse(
+        'friction_shield_profiles',
+        FrictionShieldProfile.fromJson,
+      ),
+      bundles: parse('temptation_bundles', TemptationBundle.fromJson),
+      scenes: parse('activation_scenes', ActivationScene.fromJson),
+      experiments: parse(
+        'activation_experiments',
+        ActivationExperiment.fromJson,
+      ),
+      assignments: parse(
+        'activation_experiment_assignments',
+        ActivationExperimentAssignment.fromJson,
+      ),
+      insights: parse('activation_insights', ActivationInsight.fromJson),
+    );
+  }
 }
