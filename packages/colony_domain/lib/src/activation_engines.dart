@@ -316,7 +316,12 @@ class ActivationProtocolSelector {
         seed.contains('minimal') || seed.contains('reset') ? 0.5 : 0.1,
       ActivationCapacityMode.highEnergy =>
         seed.contains('standard') || seed.contains('code') ? 0.4 : 0.2,
-      ActivationCapacityMode.standard => 0.3,
+      ActivationCapacityMode.standard =>
+        seed.contains('standard')
+            ? 0.5
+            : seed.contains('minimal')
+                ? 0.15
+                : 0.3,
     };
   }
 }

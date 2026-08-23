@@ -234,6 +234,19 @@ void main() {
       );
       expect(chosen?.protocol.seedKey, 'morning_launch_standard');
     });
+
+    test('standard capacity prefers the standard morning route', () {
+      const selector = ActivationProtocolSelector();
+      final chosen = selector.select(
+        candidates: [
+          _bundle('morning_launch_minimal'),
+          _bundle('morning_launch_standard'),
+        ],
+        capacity: ActivationCapacityMode.standard,
+        preferredType: ActivationProtocolType.wakeUp,
+      );
+      expect(chosen?.protocol.seedKey, 'morning_launch_standard');
+    });
   });
 
   group('ActivationProtocolSeeds', () {

@@ -59,8 +59,9 @@ void main() {
 
     expect(find.text(AppStrings.activationTitle), findsWidgets);
     expect(find.text(AppStrings.activationStuckNow), findsOneWidget);
-    expect(find.textContaining('streak'), findsNothing);
-    expect(find.textContaining('disciplina'), findsNothing);
+    expect(find.text(AppStrings.activationNoMoralScore), findsWidgets);
+    expect(find.textContaining('dias seguidos'), findsNothing);
+    expect(find.textContaining('score moral'), findsNothing);
 
     await _drainTimers(tester);
     await db.close();
