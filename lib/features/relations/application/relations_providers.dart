@@ -125,7 +125,7 @@ final friendshipOverviewsProvider = Provider<AsyncValue<List<FriendshipOverview>
 
 final friendshipForPersonProvider =
     Provider.family<Friendship?, EntityId>((ref, personId) {
-  final friendships = ref.watch(friendshipsProvider).valueOrNull ?? const [];
+  final friendships = ref.watch(friendshipsProvider).value ?? const [];
   for (final friendship in friendships) {
     if (friendship.personId == personId && !friendship.isArchived) {
       return friendship;

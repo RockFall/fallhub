@@ -67,7 +67,7 @@ class _PeopleScreenState extends ConsumerState<PeopleScreen> {
   @override
   Widget build(BuildContext context) {
     final peopleAsync = ref.watch(peopleProvider);
-    final friendships = ref.watch(friendshipsProvider).valueOrNull ?? const [];
+    final friendships = ref.watch(friendshipsProvider).value ?? const [];
 
     return Padding(
       padding: const EdgeInsets.all(ColonySpacing.lg),

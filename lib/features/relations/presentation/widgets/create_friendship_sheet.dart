@@ -67,15 +67,15 @@ class _CreateFriendshipSheetState extends ConsumerState<CreateFriendshipSheet> {
 
   @override
   Widget build(BuildContext context) {
-    final people = (ref.watch(peopleProvider).valueOrNull ?? const [])
+    final people = (ref.watch(peopleProvider).value ?? const [])
         .where((p) => !p.isArchived)
         .toList();
     final existing = {
-      for (final f in ref.watch(friendshipsProvider).valueOrNull ?? const [])
+      for (final f in ref.watch(friendshipsProvider).value ?? const [])
         if (!f.isArchived) f.personId,
     };
     final available = people.where((p) => !existing.contains(p.id)).toList();
-    final circles = (ref.watch(friendshipCirclesProvider).valueOrNull ??
+    final circles = (ref.watch(friendshipCirclesProvider).value ??
             const [])
         .where((c) => !c.isArchived)
         .toList();

@@ -61,7 +61,7 @@ class _EditFriendshipSheetState extends ConsumerState<EditFriendshipSheet> {
 
   Future<void> _save() async {
     final memberships =
-        ref.read(friendshipMembershipsProvider).valueOrNull ?? const [];
+        ref.read(friendshipMembershipsProvider).value ?? const [];
     final saved =
         await ref.read(relationsControllerProvider.notifier).saveFriendship(
               widget.friendship.copyWith(
@@ -80,7 +80,7 @@ class _EditFriendshipSheetState extends ConsumerState<EditFriendshipSheet> {
 
   @override
   Widget build(BuildContext context) {
-    final people = ref.watch(peopleProvider).valueOrNull ?? const [];
+    final people = ref.watch(peopleProvider).value ?? const [];
     Person? person;
     for (final p in people) {
       if (p.id == widget.friendship.personId) {
@@ -88,12 +88,12 @@ class _EditFriendshipSheetState extends ConsumerState<EditFriendshipSheet> {
         break;
       }
     }
-    final circles = (ref.watch(friendshipCirclesProvider).valueOrNull ??
+    final circles = (ref.watch(friendshipCirclesProvider).value ??
             const [])
         .where((c) => !c.isArchived)
         .toList();
     final memberships =
-        ref.watch(friendshipMembershipsProvider).valueOrNull ?? const [];
+        ref.watch(friendshipMembershipsProvider).value ?? const [];
     final selectedCircles = _selectedCircles(memberships);
     final interactionsAsync =
         ref.watch(personInteractionsProvider(widget.friendship.personId));

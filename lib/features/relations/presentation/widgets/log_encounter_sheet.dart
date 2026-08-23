@@ -59,7 +59,7 @@ class _LogEncounterSheetState extends ConsumerState<LogEncounterSheet> {
   }
 
   Future<void> _save() async {
-    final people = (ref.read(peopleProvider).valueOrNull ?? const [])
+    final people = (ref.read(peopleProvider).value ?? const [])
         .where((p) => _selected.contains(p.id))
         .toList();
     if (people.isEmpty) return;
@@ -76,7 +76,7 @@ class _LogEncounterSheetState extends ConsumerState<LogEncounterSheet> {
 
   @override
   Widget build(BuildContext context) {
-    final people = (ref.watch(peopleProvider).valueOrNull ?? const [])
+    final people = (ref.watch(peopleProvider).value ?? const [])
         .where((p) => !p.isArchived)
         .toList();
     final bottom = MediaQuery.viewInsetsOf(context).bottom;
