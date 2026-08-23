@@ -120,6 +120,8 @@ void main() {
           title: 'Dummy',
           artists: ['A'],
           year: 2001,
+          imageUrl: 'https://i.scdn.co/image/dummy',
+          genres: const ['modal jazz'],
         ),
       ],
     );
@@ -129,6 +131,14 @@ void main() {
     expect(inspect!.encounters.single.encounterType, MusicEncounterType.contact);
     expect(inspect.state!.discoveryState, MusicDiscoveryState.rumor);
     expect(inspect.state!.discoveryState, isNot(MusicDiscoveryState.cartographed));
+    expect(
+      MusicNodeProvenance.coverArtUrl(inspect.node.provenanceJson),
+      'https://i.scdn.co/image/dummy',
+    );
+    expect(
+      MusicNodeProvenance.territoryKeys(inspect.node.provenanceJson),
+      contains('jazz.modal'),
+    );
   });
 
   test('export v35 includes nodes and never writes token keys', () async {

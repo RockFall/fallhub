@@ -78,7 +78,9 @@ class _Partition extends StatelessWidget {
                       contentPadding: EdgeInsets.zero,
                       title: Text(item.node.canonicalName),
                       onTap: () => context.go(
-                        '/research/music-atlas/nodes/${item.node.id.value}',
+                        MusicNodeKind.isAlbumLike(item.node.nodeType)
+                            ? '/research/music-atlas/albums/${item.node.id.value}'
+                            : '/research/music-atlas/nodes/${item.node.id.value}',
                       ),
                     ),
                 ],

@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import '../../../app/localization/app_strings.dart';
 import '../application/music_atlas_controllers.dart';
 import '../application/music_atlas_providers.dart';
+import 'widgets/album_sleeve.dart';
 import 'widgets/capture_music_encounter_sheet.dart';
 import 'widgets/create_music_node_sheet.dart';
 import 'widgets/import_music_atlas_json_sheet.dart';
@@ -46,6 +47,7 @@ class _MusicAtlasHubScreenState extends ConsumerState<MusicAtlasHubScreen> {
   Widget build(BuildContext context) {
     final overview = ref.watch(musicAtlasOverviewProvider);
     final constellation = ref.watch(musicSpotifyConstellationProvider);
+    final exploration = ref.watch(musicExplorationProvider);
 
     return ListView(
       padding: const EdgeInsets.all(ColonySpacing.lg),
@@ -65,6 +67,11 @@ class _MusicAtlasHubScreenState extends ConsumerState<MusicAtlasHubScreen> {
           runSpacing: ColonySpacing.sm,
           children: [
             FilledButton.icon(
+              onPressed: () => context.go('/research/music-atlas/explore'),
+              icon: const Icon(Icons.account_tree_outlined),
+              label: const Text(AppStrings.musicAtlasOpenMap),
+            ),
+            OutlinedButton.icon(
               onPressed: () => CreateMusicNodeSheet.show(context),
               icon: const Icon(Icons.add),
               label: const Text(AppStrings.musicAtlasCreateNode),
@@ -92,6 +99,35 @@ class _MusicAtlasHubScreenState extends ConsumerState<MusicAtlasHubScreen> {
           ],
         ),
         const SizedBox(height: ColonySpacing.lg),
+        exploration.maybeWhen(
+          data: (map) {
+            final heard = map.albums.where((a) => a.heard).take(10).toList();
+            if (heard.isEmpty) return const SizedBox.shrink();
+            return Padding(
+              padding: const EdgeInsets.only(bottom: ColonySpacing.lg),
+              child: SizedBox(
+                height: 168,
+                child: ListView.separated(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: heard.length,
+                  separatorBuilder: (_, _) =>
+                      const SizedBox(width: ColonySpacing.md),
+                  itemBuilder: (context, index) {
+                    final album = heard[index];
+                    return AlbumSleeve(
+                      album: album,
+                      size: 108,
+                      onTap: () => context.go(
+                        '/research/music-atlas/albums/${album.node.id.value}',
+                      ),
+                    );
+                  },
+                ),
+              ),
+            );
+          },
+          orElse: () => const SizedBox.shrink(),
+        ),
         overview.when(
           loading: () => const Center(child: CircularProgressIndicator()),
           error: (error, _) => Text('$error'),
@@ -118,8 +154,23 @@ class _MusicAtlasHubScreenState extends ConsumerState<MusicAtlasHubScreen> {
                   ),
                 ...data.nodes.map((node) {
                   final state = data.stateOf(node.id);
+                  final album = exploration.asData?.value.albumById(
+                    node.id.value,
+                  );
+                  final albumLike = MusicNodeKind.isAlbumLike(node.nodeType);
                   return ListTile(
                     contentPadding: EdgeInsets.zero,
+                    leading: album == null
+                        ? null
+                        : SizedBox(
+                            width: 44,
+                            child: AlbumSleeve(
+                              album: album,
+                              size: 44,
+                              compact: true,
+                              hero: false,
+                            ),
+                          ),
                     title: Text(node.canonicalName),
                     subtitle: Text(
                       [
@@ -131,8 +182,11 @@ class _MusicAtlasHubScreenState extends ConsumerState<MusicAtlasHubScreen> {
                           ),
                       ].join(' · '),
                     ),
-                    onTap: () =>
-                        context.go('/research/music-atlas/nodes/${node.id.value}'),
+                    onTap: () => context.go(
+                      albumLike
+                          ? '/research/music-atlas/albums/${node.id.value}'
+                          : '/research/music-atlas/nodes/${node.id.value}',
+                    ),
                   );
                 }),
                 if (data.expeditions.isNotEmpty) ...[

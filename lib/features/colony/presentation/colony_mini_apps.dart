@@ -101,7 +101,7 @@ abstract final class ColonyMiniApps {
     ColonyMiniApp(
       id: 'music_atlas',
       label: AppStrings.musicAtlasTitle,
-      route: '/research/music-atlas',
+      route: '/research/music-atlas/explore',
       icon: Icons.album_outlined,
       color: ColonyMiniAppColors.musicAtlas,
       pinned: true,

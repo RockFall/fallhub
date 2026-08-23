@@ -192,6 +192,33 @@ class MusicAtlasRepository {
     return node;
   }
 
+  Future<MusicNode> updateNode(MusicNode node) async {
+    await (_db.update(_db.musicNodes)..where((t) => t.id.equals(node.id.value)))
+        .write(ColonyMappers.fromMusicNode(node));
+    return node;
+  }
+
+  Future<MusicNode?> updateAlbumDossier({
+    required EntityId nodeId,
+    String? notesMarkdown,
+    String? coverArtUrl,
+    List<String>? territoryKeys,
+  }) async {
+    final node = await getNode(nodeId);
+    if (node == null) return null;
+    final next = node.copyWith(
+      provenanceJson: MusicNodeProvenance.merge(
+        node.provenanceJson,
+        notesMarkdown: notesMarkdown,
+        coverArtUrl: coverArtUrl,
+        territoryKeys: territoryKeys,
+      ),
+      updatedAt: _clock().toUtc(),
+      version: node.version + 1,
+    );
+    return updateNode(next);
+  }
+
   Future<PersonalMusicNodeState> setDiscoveryState({
     required EntityId profileId,
     required EntityId nodeId,
@@ -458,12 +485,17 @@ class MusicAtlasRepository {
         final node = await createNode(
           nodeType: step.node.nodeType,
           canonicalName: step.node.title,
-          description: step.node.summary,
+          description: step.node.summary ??
+              (step.node.artists.isEmpty ? null : step.node.artists.join(', ')),
           beginYear: step.node.year,
-          provenanceJson: jsonEncode({
-            'source_type': 'imported_json',
-            'parser_version': 'music_atlas_json_v1',
-          }),
+          provenanceJson: MusicNodeProvenance.merge(
+            jsonEncode({
+              'source_type': 'imported_json',
+              'parser_version': 'music_atlas_json_v1',
+            }),
+            notesMarkdown: step.node.notes,
+            territoryKeys: step.node.territoryKeys,
+          ),
           sourceType: SourceType.import,
         );
         keyToId[step.node.key] = node.id;
@@ -674,21 +706,36 @@ class MusicAtlasRepository {
           entityType: 'album',
           externalId: album.spotifyId,
         );
+        final territoryKeys = MusicGenreAtlas.matchGenreLabels(album.genres);
+        final provenance = MusicNodeProvenance.merge(
+          existing?.provenanceJson ??
+              jsonEncode({'source_type': 'spotify_library'}),
+          coverArtUrl: album.imageUrl,
+          territoryKeys: [
+            ...MusicNodeProvenance.territoryKeys(
+              existing?.provenanceJson ?? '{}',
+            ),
+            ...territoryKeys,
+          ],
+        );
         final node = existing ??
             await createNode(
               nodeType: MusicNodeType.releaseGroup,
               canonicalName: album.title,
               beginYear: album.year,
               description: album.artistCredit,
-              provenanceJson: jsonEncode({
-                'source_type': 'spotify_library',
-              }),
+              provenanceJson: provenance,
               sourceType: SourceType.integration,
             );
         if (existing == null) {
           created++;
         } else {
           linked++;
+          if (provenance != existing.provenanceJson) {
+            await updateNode(
+              existing.copyWith(provenanceJson: provenance, updatedAt: now),
+            );
+          }
         }
         await _upsertIdentities(
           MusicAtlasJsonNode(
@@ -708,6 +755,10 @@ class MusicAtlasRepository {
           ),
           node.id,
           now,
+          metadataJson: jsonEncode({
+            if (album.imageUrl != null) 'imageUrl': album.imageUrl,
+            if (album.genres.isNotEmpty) 'genres': album.genres,
+          }),
         );
         await recordEncounter(
           profileId: profileId,
@@ -942,8 +993,9 @@ class MusicAtlasRepository {
   Future<void> _upsertIdentities(
     MusicAtlasJsonNode node,
     EntityId nodeId,
-    DateTime now,
-  ) async {
+    DateTime now, {
+    String metadataJson = '{}',
+  }) async {
     for (final ext in node.externalIds) {
       final existing = await (_db.select(_db.musicExternalIdentities)
             ..where(
@@ -953,7 +1005,19 @@ class MusicAtlasRepository {
                   t.externalId.equals(ext.id),
             ))
           .getSingleOrNull();
-      if (existing != null) continue;
+      if (existing != null) {
+        if (metadataJson != '{}' && existing.metadataJson == '{}') {
+          await (_db.update(_db.musicExternalIdentities)
+                ..where((t) => t.id.equals(existing.id)))
+              .write(
+                MusicExternalIdentitiesCompanion(
+                  metadataJson: Value(metadataJson),
+                  updatedAt: Value(now.millisecondsSinceEpoch),
+                ),
+              );
+        }
+        continue;
+      }
       final identity = MusicExternalIdentity(
         id: EntityId(_ids.newId()),
         nodeId: nodeId,
@@ -961,6 +1025,7 @@ class MusicAtlasRepository {
         entityType: ext.entityType,
         externalId: ext.id,
         externalUrl: ext.url,
+        metadataJson: metadataJson,
         createdAt: now,
         updatedAt: now,
       );

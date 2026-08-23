@@ -91,5 +91,8 @@ export 'src/google_timeline_analytics.dart';
 export 'src/city_gazetteer.dart';
 export 'src/music_atlas.dart';
 export 'src/music_atlas_json.dart';
+export 'src/music_atlas_exploration.dart';
+export 'src/music_cover_recipe.dart';
+export 'src/music_genre_atlas.dart';
 export 'src/music_spotify.dart';
 

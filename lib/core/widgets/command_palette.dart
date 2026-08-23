@@ -56,6 +56,11 @@ class _CommandPaletteState extends ConsumerState<CommandPalette> {
       '/research/music-atlas/constellation',
       Icons.hub_outlined,
     ),
+    _PaletteCommand(
+      AppStrings.musicAtlasOpenMap,
+      '/research/music-atlas/explore',
+      Icons.account_tree_outlined,
+    ),
     _PaletteCommand('Flashcards', '/flashcards', Icons.style_outlined),
     _PaletteCommand('Estudar flashcards', '/flashcards/study', Icons.play_arrow_outlined),
     _PaletteCommand('Novo cartão', '/flashcards?capture=1', Icons.note_add_outlined),

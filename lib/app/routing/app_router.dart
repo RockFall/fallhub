@@ -30,6 +30,8 @@ import '../../features/quests/presentation/quest_detail_screen.dart';
 import '../../features/decisions/presentation/decision_list_screen.dart';
 import '../../features/research/presentation/research_list_screen.dart';
 import '../../features/research/presentation/research_node_detail_screen.dart';
+import '../../features/music_atlas/presentation/music_album_screen.dart';
+import '../../features/music_atlas/presentation/music_atlas_explore_screen.dart';
 import '../../features/music_atlas/presentation/music_atlas_hub_screen.dart';
 import '../../features/music_atlas/presentation/music_constellation_screen.dart';
 import '../../features/music_atlas/presentation/music_node_inspect_screen.dart';
@@ -227,6 +229,18 @@ final routerProvider = Provider<GoRouter>((ref) {
                     path: 'constellation',
                     builder: (context, state) =>
                         const MusicConstellationScreen(),
+                  ),
+                  GoRoute(
+                    path: 'explore',
+                    builder: (context, state) => MusicAtlasExploreScreen(
+                      initialTerritory: state.uri.queryParameters['t'],
+                    ),
+                  ),
+                  GoRoute(
+                    path: 'albums/:nodeId',
+                    builder: (context, state) => MusicAlbumScreen(
+                      nodeId: state.pathParameters['nodeId']!,
+                    ),
                   ),
                   GoRoute(
                     path: 'nodes/:nodeId',

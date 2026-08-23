@@ -65,6 +65,17 @@ final musicSpotifyConstellationProvider =
       return ref.watch(repositoriesProvider).musicAtlas.constellation(profile.id);
     });
 
+final musicExplorationProvider = FutureProvider<MusicExplorationMap>((
+  ref,
+) async {
+  final profile = await ref.watch(profileProvider.future);
+  if (profile == null) return MusicExplorationMap.empty;
+  final repos = ref.watch(repositoriesProvider);
+  final overview = await repos.musicAtlas.overview(profile.id);
+  final claims = await repos.musicAtlas.listClaims();
+  return MusicAtlasCartographer.compose(overview: overview, claims: claims);
+});
+
 final musicFlashcardCandidatesProvider =
     FutureProvider.family<List<MusicFlashcardCandidate>, String>((
       ref,

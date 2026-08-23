@@ -112,6 +112,8 @@ class SpotifySavedAlbum extends Equatable {
     this.year,
     this.externalUrl,
     this.addedAt,
+    this.imageUrl,
+    this.genres = const [],
   });
 
   final String spotifyId;
@@ -120,6 +122,8 @@ class SpotifySavedAlbum extends Equatable {
   final int? year;
   final String? externalUrl;
   final DateTime? addedAt;
+  final String? imageUrl;
+  final List<String> genres;
 
   String get artistCredit => artists.join(', ');
 
@@ -131,6 +135,8 @@ class SpotifySavedAlbum extends Equatable {
     year,
     externalUrl,
     addedAt,
+    imageUrl,
+    genres,
   ];
 }
 

@@ -158,6 +158,8 @@ class HttpSpotifyCatalog implements SpotifyCatalogPort {
               year: _year(albumMap['release_date']?.toString()),
               externalUrl: _openUrl(albumMap),
               addedAt: DateTime.tryParse(item['added_at']?.toString() ?? ''),
+              imageUrl: _imageUrl(albumMap),
+              genres: _genres(albumMap),
             ),
           );
         }
@@ -254,6 +256,8 @@ class HttpSpotifyCatalog implements SpotifyCatalogPort {
               artists: _artists(trackMap['artists']),
               year: _year(album?['release_date']?.toString()),
               externalUrl: _openUrl(album ?? trackMap),
+              imageUrl: album == null ? null : _imageUrl(album),
+              genres: album == null ? const [] : _genres(album),
             ),
           );
         }
@@ -366,6 +370,26 @@ class HttpSpotifyCatalog implements SpotifyCatalogPort {
       return external['spotify'].toString();
     }
     return null;
+  }
+
+  static String? _imageUrl(Map<String, dynamic> map) {
+    final images = map['images'];
+    if (images is! List || images.isEmpty) return null;
+    for (final image in images) {
+      if (image is Map && image['url'] != null) {
+        return image['url'].toString();
+      }
+    }
+    return null;
+  }
+
+  static List<String> _genres(Map<String, dynamic> map) {
+    final raw = map['genres'];
+    if (raw is! List) return const [];
+    return [
+      for (final item in raw)
+        if (item.toString().trim().isNotEmpty) item.toString().trim(),
+    ];
   }
 
   static SpotifyRecentlyPlayed? _recent(Map<String, dynamic> item) {

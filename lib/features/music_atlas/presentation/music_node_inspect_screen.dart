@@ -2,6 +2,7 @@ import 'package:colony_design_system/colony_design_system.dart';
 import 'package:colony_domain/colony_domain.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../app/localization/app_strings.dart';
@@ -49,6 +50,13 @@ class MusicNodeInspectScreen extends ConsumerWidget {
             Wrap(
               spacing: ColonySpacing.sm,
               children: [
+                if (MusicNodeKind.isAlbumLike(data.node.nodeType))
+                  FilledButton(
+                    onPressed: () => context.go(
+                      '/research/music-atlas/albums/${data.node.id.value}',
+                    ),
+                    child: const Text(AppStrings.musicAtlasOpenAlbum),
+                  ),
                 FilledButton(
                   onPressed: () => CaptureMusicEncounterSheet.show(
                     context,

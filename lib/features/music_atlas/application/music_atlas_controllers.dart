@@ -45,7 +45,38 @@ class MusicAtlasController extends AsyncNotifier<void> {
             description: description,
           );
       ref.invalidate(musicAtlasOverviewProvider);
+      ref.invalidate(musicExplorationProvider);
       return node;
+    });
+  }
+
+  Future<void> saveAlbumNotes({
+    required EntityId nodeId,
+    required String notesMarkdown,
+  }) {
+    return _run(() async {
+      await ref
+          .read(repositoriesProvider)
+          .musicAtlas
+          .updateAlbumDossier(nodeId: nodeId, notesMarkdown: notesMarkdown);
+      ref.invalidate(musicAtlasOverviewProvider);
+      ref.invalidate(musicNodeInspectProvider(nodeId.value));
+      ref.invalidate(musicExplorationProvider);
+    });
+  }
+
+  Future<void> assignTerritories({
+    required EntityId nodeId,
+    required List<String> territoryKeys,
+  }) {
+    return _run(() async {
+      await ref
+          .read(repositoriesProvider)
+          .musicAtlas
+          .updateAlbumDossier(nodeId: nodeId, territoryKeys: territoryKeys);
+      ref.invalidate(musicAtlasOverviewProvider);
+      ref.invalidate(musicNodeInspectProvider(nodeId.value));
+      ref.invalidate(musicExplorationProvider);
     });
   }
 
@@ -70,6 +101,7 @@ class MusicAtlasController extends AsyncNotifier<void> {
           );
       ref.invalidate(musicAtlasOverviewProvider);
       ref.invalidate(musicNodeInspectProvider(nodeId.value));
+      ref.invalidate(musicExplorationProvider);
       return encounter;
     });
   }
@@ -95,6 +127,7 @@ class MusicAtlasController extends AsyncNotifier<void> {
           );
       ref.invalidate(musicAtlasOverviewProvider);
       ref.invalidate(musicNodeInspectProvider(nodeId.value));
+      ref.invalidate(musicExplorationProvider);
     });
   }
 
@@ -156,6 +189,7 @@ class MusicAtlasController extends AsyncNotifier<void> {
           .importJson(profileId: profile.id, document: doc);
       ref.invalidate(musicAtlasOverviewProvider);
       ref.invalidate(musicAtlasPromptProvider);
+      ref.invalidate(musicExplorationProvider);
       return result;
     });
   }
@@ -345,6 +379,7 @@ class MusicAtlasController extends AsyncNotifier<void> {
           );
       ref.invalidate(musicAtlasOverviewProvider);
       ref.invalidate(musicSpotifyConstellationProvider);
+      ref.invalidate(musicExplorationProvider);
       return result;
     });
   }

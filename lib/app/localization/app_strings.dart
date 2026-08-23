@@ -757,6 +757,54 @@ abstract final class AppStrings {
   static const musicAtlasFlashcardsHelp =
       'Só escuta atenta, comparação, prática ou ao vivo sugerem cartões. Nada é criado sem o teu ok.';
   static const musicAtlasPromptTitle = 'Prompt para a IA (fora do app)';
+  static const musicAtlasExploreTitle = 'Ramificações';
+  static const musicAtlasExploreHint =
+      'Toca num território para abrir o delta. Os rios acesos são os que já visitaste; a névoa ainda não tem escuta.';
+  static const musicAtlasExploreEmpty =
+      'O mapa ainda não tem ramificações para pintar.';
+  static const musicAtlasExploreClear = 'Recolher discos';
+  static const musicAtlasHeardShort = 'ouvidos';
+  static const musicAtlasContactShort = 'gravados';
+  static const musicAtlasGoogleSearch = 'Procurar no Google';
+  static const musicAtlasGoogleSearchMore = 'Abrir no Google';
+  static const musicAtlasDossier = 'Ficha';
+  static const musicAtlasNoDossier = 'Ainda não há ficha deste disco';
+  static const musicAtlasWriteDossier = 'Escrever ficha';
+  static const musicAtlasEditNotes = 'Editar notas de campo';
+  static const musicAtlasFieldNotes = 'Notas de campo (markdown)';
+  static const musicAtlasFieldNotesHint =
+      'O que notaste. Markdown serve. Não é biografia da Wikipedia.';
+  static const musicAtlasSaveNotes = 'Guardar notas';
+  static const musicAtlasAssignRiver = 'Ligar a um rio';
+  static const musicAtlasOpenInspect = 'Estados e relações';
+  static const musicAtlasNoEncounters = 'Nenhum encontro ainda.';
+  static const musicAtlasOpenAlbum = 'Abrir ficha do álbum';
+  static const musicAtlasOpenMap = 'Mapa de ramificações';
+
+  static String musicAtlasExploreCounts({
+    required int heard,
+    required int contact,
+  }) {
+    if (heard == 0 && contact == 0) {
+      return 'Nenhum disco neste braço — a margem ainda está por pisar.';
+    }
+    final parts = <String>[
+      if (heard > 0) '$heard já ouvidos neste braço',
+      if (contact > 0) '$contact só gravados, sem escuta',
+    ];
+    return parts.join(' · ');
+  }
+
+  static String musicAtlasNoDossierBody(String title) =>
+      'Não há markdown local para $title. A capa gerada fica no sítio da arte '
+      'enquanto a ficha não existir. A busca abre o Google com artista, título e ano.';
+
+  static String musicAtlasListenDepth(MusicListenDepth depth) => switch (depth) {
+        MusicListenDepth.unknown => 'Sem encontro',
+        MusicListenDepth.contact => 'Contacto / gravado',
+        MusicListenDepth.heard => 'Já ouvido',
+        MusicListenDepth.attentive => 'Escuta atenta',
+      };
 
   static String musicAtlasImportPlanSummary({
     required int create,
