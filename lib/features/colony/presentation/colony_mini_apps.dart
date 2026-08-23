@@ -38,6 +38,9 @@ abstract final class ColonyMiniAppAssets {
   static const home = 'assets/mini_apps/mini_app_home.png';
   static const zones = 'assets/mini_apps/mini_app_zones.png';
   static const people = 'assets/mini_apps/mini_app_people.png';
+  static const friendships = 'assets/mini_apps/mini_app_friendships.png';
+  static const circles = 'assets/mini_apps/mini_app_circles.png';
+  static const encounters = 'assets/mini_apps/mini_app_encounters.png';
   static const organizations = 'assets/mini_apps/mini_app_organizations.png';
   static const commitments = 'assets/mini_apps/mini_app_commitments.png';
   static const inbox = 'assets/mini_apps/mini_app_inbox.png';
@@ -182,6 +185,14 @@ abstract final class ColonyMiniApps {
       assetPath: ColonyMiniAppAssets.zones,
     ),
     ColonyMiniApp(
+      id: 'relations_hub',
+      label: AppStrings.relationsOpenHub,
+      route: '/relations',
+      icon: Icons.map_outlined,
+      color: const Color(0xFF7B5EA7),
+      assetPath: ColonyMiniAppAssets.circles,
+    ),
+    ColonyMiniApp(
       id: 'people',
       label: AppStrings.peopleTitle,
       route: '/relations/people',
@@ -195,7 +206,23 @@ abstract final class ColonyMiniApps {
       route: '/relations/friendships',
       icon: Icons.favorite_outline,
       color: ColonyMiniAppColors.friendships,
-      assetPath: ColonyMiniAppAssets.people,
+      assetPath: ColonyMiniAppAssets.friendships,
+    ),
+    ColonyMiniApp(
+      id: 'circles',
+      label: AppStrings.relationsCirclesTitle,
+      route: '/relations/circles',
+      icon: Icons.hub_outlined,
+      color: const Color(0xFF7B5EA7),
+      assetPath: ColonyMiniAppAssets.circles,
+    ),
+    ColonyMiniApp(
+      id: 'encounters',
+      label: AppStrings.relationsEncountersTitle,
+      route: '/relations/encounters',
+      icon: Icons.event_available_outlined,
+      color: const Color(0xFF2BB7C4),
+      assetPath: ColonyMiniAppAssets.encounters,
     ),
     ColonyMiniApp(
       id: 'organizations',

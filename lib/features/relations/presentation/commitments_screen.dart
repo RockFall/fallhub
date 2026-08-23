@@ -7,6 +7,7 @@ import '../../../app/localization/app_strings.dart';
 import '../../quests/application/quest_providers.dart';
 import '../application/relations_controllers.dart';
 import '../application/relations_providers.dart';
+import 'relations_shortcut_bar.dart';
 import 'widgets/create_commitment_sheet.dart';
 import 'widgets/edit_commitment_sheet.dart';
 
@@ -32,6 +33,8 @@ class CommitmentsScreen extends ConsumerWidget {
             AppStrings.commitmentsDisclaimer,
             style: Theme.of(context).textTheme.bodySmall,
           ),
+          const SizedBox(height: ColonySpacing.md),
+          const RelationsShortcutBar(current: RelationsDoor.commitments),
           const SizedBox(height: ColonySpacing.lg),
           Expanded(
             child: commitmentsAsync.when(

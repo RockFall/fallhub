@@ -6,8 +6,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../app/localization/app_strings.dart';
 import '../application/relations_controllers.dart';
 import '../application/relations_providers.dart';
+import 'relations_assets.dart';
+import 'relations_navigation.dart';
+import 'relations_shortcut_bar.dart';
+import 'relations_visuals.dart';
 import 'widgets/create_person_sheet.dart';
-import 'widgets/edit_person_sheet.dart';
 import 'widgets/log_person_interaction_sheet.dart';
 
 enum _PeopleSort { name, lastContact }
@@ -22,6 +25,7 @@ class PeopleScreen extends ConsumerStatefulWidget {
 class _PeopleScreenState extends ConsumerState<PeopleScreen> {
   final _search = TextEditingController();
   _PeopleSort _sort = _PeopleSort.lastContact;
+  var _birthdayMonthOnly = false;
 
   @override
   void dispose() {
@@ -48,6 +52,10 @@ class _PeopleScreenState extends ConsumerState<PeopleScreen> {
         return haystack.contains(query);
       }).toList();
     }
+    if (_birthdayMonthOnly) {
+      final month = DateTime.now().toUtc().month;
+      visible = visible.where((p) => p.birthday?.month == month).toList();
+    }
     visible.sort((a, b) {
       if (_sort == _PeopleSort.name) {
         return a.displayName.toLowerCase().compareTo(b.displayName.toLowerCase());
@@ -68,6 +76,7 @@ class _PeopleScreenState extends ConsumerState<PeopleScreen> {
   Widget build(BuildContext context) {
     final peopleAsync = ref.watch(peopleProvider);
     final friendships = ref.watch(friendshipsProvider).value ?? const [];
+    final overviews = ref.watch(friendshipOverviewsProvider).value ?? const [];
 
     return Padding(
       padding: const EdgeInsets.all(ColonySpacing.lg),
@@ -83,6 +92,8 @@ class _PeopleScreenState extends ConsumerState<PeopleScreen> {
             AppStrings.peopleDisclaimer,
             style: Theme.of(context).textTheme.bodySmall,
           ),
+          const SizedBox(height: ColonySpacing.md),
+          const RelationsShortcutBar(current: RelationsDoor.people),
           const SizedBox(height: ColonySpacing.md),
           TextField(
             controller: _search,
@@ -109,6 +120,17 @@ class _PeopleScreenState extends ConsumerState<PeopleScreen> {
               setState(() => _sort = value.first);
             },
           ),
+          const SizedBox(height: ColonySpacing.sm),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: FilterChip(
+              label: const Text(AppStrings.peopleBirthdayFilter),
+              selected: _birthdayMonthOnly,
+              onSelected: (selected) {
+                setState(() => _birthdayMonthOnly = selected);
+              },
+            ),
+          ),
           const SizedBox(height: ColonySpacing.lg),
           Expanded(
             child: peopleAsync.when(
@@ -117,19 +139,10 @@ class _PeopleScreenState extends ConsumerState<PeopleScreen> {
               data: (people) {
                 final visible = _visible(people);
                 if (visible.isEmpty) {
-                  return Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(AppStrings.peopleEmpty),
-                        const SizedBox(height: ColonySpacing.sm),
-                        Text(
-                          AppStrings.peopleEmptyHint,
-                          textAlign: TextAlign.center,
-                          style: Theme.of(context).textTheme.bodyMedium,
-                        ),
-                      ],
-                    ),
+                  return RelationsEmptyState(
+                    asset: RelationsAssets.emptyPeople,
+                    title: AppStrings.peopleEmpty,
+                    hint: AppStrings.peopleEmptyHint,
                   );
                 }
                 return ListView.builder(
@@ -137,9 +150,16 @@ class _PeopleScreenState extends ConsumerState<PeopleScreen> {
                   itemBuilder: (context, index) {
                     final person = visible[index];
                     Friendship? friendship;
+                    FriendshipOverview? overview;
                     for (final f in friendships) {
                       if (f.personId == person.id && !f.isArchived) {
                         friendship = f;
+                        break;
+                      }
+                    }
+                    for (final row in overviews) {
+                      if (row.person.id == person.id) {
+                        overview = row;
                         break;
                       }
                     }
@@ -156,9 +176,13 @@ class _PeopleScreenState extends ConsumerState<PeopleScreen> {
                     return Card(
                       margin: const EdgeInsets.only(bottom: ColonySpacing.sm),
                       child: ListTile(
+                        leading: PersonGlyph(
+                          person: person,
+                          attention: overview?.rhythm.attention,
+                        ),
                         title: Text(person.displayName),
                         subtitle: Text(subtitle),
-                        onTap: () => EditPersonSheet.show(context, person),
+                        onTap: () => openPersonDetail(context, person.id),
                         trailing: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [

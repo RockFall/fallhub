@@ -1525,6 +1525,75 @@ abstract final class AppStrings {
   static String typicalIntervalLabel(int days) =>
       'Intervalo típico: $days dias';
 
+  static const relationsHubTitle = 'Relações';
+  static const relationsHubHint =
+      'Pessoas, amizades, círculos e encontros no mesmo mapa social.';
+  static const relationsOpenHub = 'Mapa social';
+  static const relationsCirclesTitle = 'Círculos';
+  static const relationsCirclesHint =
+      'Cada círculo é um contexto. Toque num nó para abrir a pessoa.';
+  static const relationsCirclesEmpty = 'Nenhum círculo ainda.';
+  static const relationsCirclesEmptyHint =
+      'Crie um círculo — RPG, faculdade, vizinhos — e ligue amizades.';
+  static const relationsEncountersTitle = 'Encontros';
+  static const relationsEncountersHint =
+      'Só encontros e reuniões. Mensagens ficam no histórico da pessoa.';
+  static const relationsEncountersEmpty = 'Nenhum encontro registrado.';
+  static const relationsEncountersEmptyHint =
+      'Registe um café, jantar ou reunião para acender o ritmo.';
+  static const relationsBirthdaysTitle = 'Aniversários próximos';
+  static const relationsBirthdaysEmpty = 'Nenhum aniversário neste mês.';
+  static const relationsOpenCommitments = 'Promessas';
+  static const relationsNoCommitments = 'Nenhuma promessa vinculada.';
+  static const relationsOpenOrganizations = 'Organizações';
+  static const personNotFound = 'Pessoa não encontrada.';
+  static const friendshipNotFound = 'Amizade não encontrada.';
+  static const circleNotFound = 'Círculo não encontrado.';
+  static const circleMembersTitle = 'Quem está neste círculo';
+  static const circleMembersEmpty = 'Ninguém ligado a este círculo.';
+  static const circleLogEncounter = 'Encontro deste círculo';
+  static const circleArchive = 'Arquivar círculo';
+  static const personDossier = 'Dossiê';
+  static const friendshipRhythmTitle = 'Ritmo de encontros';
+  static const relationsStatsPeople = 'Pessoas';
+  static const relationsStatsFriendships = 'Amizades';
+  static const relationsStatsCircles = 'Círculos';
+  static const relationsStatsAttention = 'Em atenção';
+
+  static String circleMemberCount(int count) =>
+      count == 1 ? '1 pessoa' : '$count pessoas';
+
+  static String birthdayOnLabel(int day, int month) =>
+      'Aniversário $day/$month';
+
+  static const circleAddMember = 'Ligar pessoa';
+  static const circleAddMemberEmpty = 'Todas as pessoas já estão neste círculo.';
+  static const circleUnlinkMember = 'Retirar do círculo';
+  static const friendshipOpenPerson = 'Abrir dossiê';
+  static const friendshipHowWeMetTitle = 'Como nos conhecemos';
+  static const peopleBirthdayFilter = 'Aniversário no mês';
+  static const relationsNavHub = 'Mapa';
+  static const relationsNavPeople = 'Cadastro';
+  static const relationsNavFriendships = 'Vínculos';
+  static const relationsNavCircles = 'Constelação';
+  static const relationsNavEncounters = 'Crônica';
+  static const relationsNavOrganizations = 'Coletivos';
+  static const relationsEncountersMini = 'Encontros';
+
+  static String friendshipDueOn(DateTime dueAt) =>
+      'Cadência até ${dueAt.toIso8601String().split('T').first}';
+
+  static String encounterDayLabel(DateTime day) {
+    final local = day.toLocal();
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final that = DateTime(local.year, local.month, local.day);
+    final delta = today.difference(that).inDays;
+    if (delta == 0) return 'Hoje';
+    if (delta == 1) return 'Ontem';
+    return '${that.day.toString().padLeft(2, '0')}/${that.month.toString().padLeft(2, '0')}/${that.year}';
+  }
+
   // Inventory (Iteration 42)
   static const inventoryTitle = 'Inventário';
   static const inventoryHint =

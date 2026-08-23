@@ -199,6 +199,38 @@ class RelationsController extends AsyncNotifier<void> {
     return created;
   }
 
+  Future<bool> linkPersonToCircle({
+    required EntityId personId,
+    required EntityId circleId,
+  }) async {
+    state = const AsyncLoading();
+    state = await AsyncValue.guard(() async {
+      await ref.read(repositoriesProvider).friendships.linkPersonToCircle(
+            personId: personId,
+            circleId: circleId,
+          );
+    });
+    if (state.hasError) return false;
+    _invalidateFriendships();
+    return true;
+  }
+
+  Future<bool> unlinkPersonFromCircle({
+    required EntityId personId,
+    required EntityId circleId,
+  }) async {
+    state = const AsyncLoading();
+    state = await AsyncValue.guard(() async {
+      await ref.read(repositoriesProvider).friendships.unlinkPersonFromCircle(
+            personId: personId,
+            circleId: circleId,
+          );
+    });
+    if (state.hasError) return false;
+    _invalidateFriendships();
+    return true;
+  }
+
   Future<FriendshipCircle?> archiveCircle(FriendshipCircle circle) async {
     state = const AsyncLoading();
     FriendshipCircle? archived;

@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../app/localization/app_strings.dart';
 import '../application/relations_controllers.dart';
 import '../application/relations_providers.dart';
+import 'relations_shortcut_bar.dart';
 import 'widgets/create_organization_sheet.dart';
 import 'widgets/edit_organization_sheet.dart';
 
@@ -29,6 +30,8 @@ class OrganizationsScreen extends ConsumerWidget {
             AppStrings.organizationsDisclaimer,
             style: Theme.of(context).textTheme.bodySmall,
           ),
+          const SizedBox(height: ColonySpacing.md),
+          const RelationsShortcutBar(current: RelationsDoor.organizations),
           const SizedBox(height: ColonySpacing.lg),
           Expanded(
             child: orgsAsync.when(

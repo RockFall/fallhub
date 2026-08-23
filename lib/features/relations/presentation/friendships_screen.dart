@@ -5,9 +5,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../app/localization/app_strings.dart';
 import '../application/relations_providers.dart';
+import 'relations_assets.dart';
+import 'relations_navigation.dart';
+import 'relations_shortcut_bar.dart';
+import 'relations_visuals.dart';
 import 'widgets/create_friendship_circle_sheet.dart';
 import 'widgets/create_friendship_sheet.dart';
-import 'widgets/edit_friendship_sheet.dart';
 import 'widgets/log_encounter_sheet.dart';
 
 class FriendshipsScreen extends ConsumerStatefulWidget {
@@ -20,10 +23,14 @@ class FriendshipsScreen extends ConsumerStatefulWidget {
 class _FriendshipsScreenState extends ConsumerState<FriendshipsScreen> {
   EntityId? _circleFilter;
   bool _overdueOnly = false;
+  FriendshipKind? _kindFilter;
 
   List<FriendshipOverview> _filter(List<FriendshipOverview> rows) {
     return rows.where((row) {
       if (_overdueOnly && !row.rhythm.needsAttention) return false;
+      if (_kindFilter != null && row.friendship.kind != _kindFilter) {
+        return false;
+      }
       if (_circleFilter != null &&
           !row.circles.any((c) => c.id == _circleFilter)) {
         return false;
@@ -52,17 +59,21 @@ class _FriendshipsScreenState extends ConsumerState<FriendshipsScreen> {
             style: Theme.of(context).textTheme.bodySmall,
           ),
           const SizedBox(height: ColonySpacing.md),
+          const RelationsShortcutBar(current: RelationsDoor.friendships),
+          const SizedBox(height: ColonySpacing.md),
           Wrap(
             spacing: ColonySpacing.sm,
             runSpacing: ColonySpacing.sm,
             children: [
               FilterChip(
                 label: const Text(AppStrings.friendshipAllFilter),
-                selected: !_overdueOnly && _circleFilter == null,
+                selected:
+                    !_overdueOnly && _circleFilter == null && _kindFilter == null,
                 onSelected: (_) {
                   setState(() {
                     _overdueOnly = false;
                     _circleFilter = null;
+                    _kindFilter = null;
                   });
                 },
               ),
@@ -72,6 +83,23 @@ class _FriendshipsScreenState extends ConsumerState<FriendshipsScreen> {
                 onSelected: (selected) {
                   setState(() => _overdueOnly = selected);
                 },
+              ),
+              ...board.maybeWhen(
+                data: (rows) {
+                  final kinds = <FriendshipKind>{
+                    for (final row in rows) row.friendship.kind,
+                  };
+                  return kinds.map(
+                    (kind) => FilterChip(
+                      label: Text(AppStrings.friendshipKindLabel(kind)),
+                      selected: _kindFilter == kind,
+                      onSelected: (selected) {
+                        setState(() => _kindFilter = selected ? kind : null);
+                      },
+                    ),
+                  );
+                },
+                orElse: () => const <Widget>[],
               ),
               ...circlesAsync.maybeWhen(
                 data: (circles) => circles
@@ -101,19 +129,10 @@ class _FriendshipsScreenState extends ConsumerState<FriendshipsScreen> {
                 final attention =
                     rows.where((r) => r.rhythm.needsAttention).toList();
                 if (rows.isEmpty) {
-                  return Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(AppStrings.friendshipsEmpty),
-                        const SizedBox(height: ColonySpacing.sm),
-                        Text(
-                          AppStrings.friendshipsEmptyHint,
-                          textAlign: TextAlign.center,
-                          style: Theme.of(context).textTheme.bodyMedium,
-                        ),
-                      ],
-                    ),
+                  return RelationsEmptyState(
+                    asset: RelationsAssets.emptyFriendships,
+                    title: AppStrings.friendshipsEmpty,
+                    hint: AppStrings.friendshipsEmptyHint,
                   );
                 }
                 return ListView(
@@ -186,13 +205,14 @@ class _FriendshipTile extends StatelessWidget {
     ].join(' · ');
     return Card(
       color: highlight
-          ? Theme.of(context).colorScheme.surfaceContainerHighest
+          ? friendshipAttentionColor(row.rhythm.attention).withValues(alpha: 0.12)
           : null,
       margin: const EdgeInsets.only(bottom: ColonySpacing.sm),
       child: ListTile(
+        leading: CadenceRing(rhythm: row.rhythm, size: 48),
         title: Text(row.person.displayName),
         subtitle: Text(subtitle),
-        onTap: () => EditFriendshipSheet.show(context, row.friendship),
+        onTap: () => openFriendshipDetail(context, row.friendship.id),
         trailing: IconButton(
           tooltip: AppStrings.friendshipLogEncounter,
           icon: const Icon(Icons.event_available_outlined),

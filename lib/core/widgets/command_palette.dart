@@ -91,9 +91,12 @@ class _CommandPaletteState extends ConsumerState<CommandPalette> {
     _PaletteCommand('Nova manutenção', '/resources/home', Icons.add),
     _PaletteCommand('Zonas', '/resources/zones', Icons.place_outlined),
     _PaletteCommand('Nova zona', '/resources/zones', Icons.add),
+    _PaletteCommand('Mapa social', '/relations', Icons.map_outlined),
     _PaletteCommand('Pessoas', '/relations/people', Icons.people_outline),
     _PaletteCommand('Nova pessoa', '/relations/people', Icons.person_add_outlined),
     _PaletteCommand('Amizades', '/relations/friendships', Icons.favorite_outline),
+    _PaletteCommand('Círculos', '/relations/circles', Icons.hub_outlined),
+    _PaletteCommand('Encontros', '/relations/encounters', Icons.event_available_outlined),
     _PaletteCommand(
       'Nova amizade',
       '/relations/friendships',

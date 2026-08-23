@@ -43,10 +43,16 @@ import '../../features/flashcards/presentation/study_session_screen.dart';
 import '../../features/finance/presentation/finance_ledger_screen.dart';
 import '../../features/health/presentation/health_screen.dart';
 import '../../features/inventory/presentation/inventory_screen.dart';
-import '../../features/relations/presentation/people_screen.dart';
+import '../../features/relations/presentation/circle_detail_screen.dart';
+import '../../features/relations/presentation/circles_map_screen.dart';
+import '../../features/relations/presentation/commitments_screen.dart';
+import '../../features/relations/presentation/encounters_chronicle_screen.dart';
+import '../../features/relations/presentation/friendship_detail_screen.dart';
 import '../../features/relations/presentation/friendships_screen.dart';
 import '../../features/relations/presentation/organizations_screen.dart';
-import '../../features/relations/presentation/commitments_screen.dart';
+import '../../features/relations/presentation/people_screen.dart';
+import '../../features/relations/presentation/person_detail_screen.dart';
+import '../../features/relations/presentation/relations_hub_screen.dart';
 import '../../features/travel/presentation/travel_screen.dart';
 import '../../features/home/presentation/home_maintenance_screen.dart';
 import '../../features/sync/presentation/sync_status_screen.dart';
@@ -331,12 +337,42 @@ final routerProvider = Provider<GoRouter>((ref) {
             builder: (context, state) => const ZonesScreen(),
           ),
           GoRoute(
+            path: '/relations',
+            builder: (context, state) => const RelationsHubScreen(),
+          ),
+          GoRoute(
             path: '/relations/people',
             builder: (context, state) => const PeopleScreen(),
           ),
           GoRoute(
+            path: '/relations/people/:personId',
+            builder: (context, state) => PersonDetailScreen(
+              personId: EntityId(state.pathParameters['personId']!),
+            ),
+          ),
+          GoRoute(
             path: '/relations/friendships',
             builder: (context, state) => const FriendshipsScreen(),
+          ),
+          GoRoute(
+            path: '/relations/friendships/:friendshipId',
+            builder: (context, state) => FriendshipDetailScreen(
+              friendshipId: EntityId(state.pathParameters['friendshipId']!),
+            ),
+          ),
+          GoRoute(
+            path: '/relations/circles',
+            builder: (context, state) => const CirclesMapScreen(),
+          ),
+          GoRoute(
+            path: '/relations/circles/:circleId',
+            builder: (context, state) => CircleDetailScreen(
+              circleId: EntityId(state.pathParameters['circleId']!),
+            ),
+          ),
+          GoRoute(
+            path: '/relations/encounters',
+            builder: (context, state) => const EncountersChronicleScreen(),
           ),
           GoRoute(
             path: '/relations/organizations',
@@ -529,6 +565,11 @@ class _AppShellState extends ConsumerState<AppShell> {
           onSelected: () => context.go('/resources/zones'),
         ),
         ColonyFloatMenuItem(
+          icon: Icons.map_outlined,
+          label: AppStrings.relationsOpenHub,
+          onSelected: () => context.go('/relations'),
+        ),
+        ColonyFloatMenuItem(
           icon: Icons.people_outline,
           label: AppStrings.peopleTitle,
           onSelected: () => context.go('/relations/people'),
@@ -537,6 +578,16 @@ class _AppShellState extends ConsumerState<AppShell> {
           icon: Icons.favorite_outline,
           label: AppStrings.friendshipsTitle,
           onSelected: () => context.go('/relations/friendships'),
+        ),
+        ColonyFloatMenuItem(
+          icon: Icons.hub_outlined,
+          label: AppStrings.relationsCirclesTitle,
+          onSelected: () => context.go('/relations/circles'),
+        ),
+        ColonyFloatMenuItem(
+          icon: Icons.event_available_outlined,
+          label: AppStrings.relationsEncountersTitle,
+          onSelected: () => context.go('/relations/encounters'),
         ),
         ColonyFloatMenuItem(
           icon: Icons.apartment_outlined,
