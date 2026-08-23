@@ -51,5 +51,10 @@ void main() {
 
     expect(tester.takeException(), isNull);
     expect(find.text(AppStrings.schedule), findsOneWidget);
+
+    await tester.pumpWidget(const SizedBox.shrink());
+    for (var i = 0; i < 80; i++) {
+      await tester.pump(const Duration(milliseconds: 1));
+    }
   });
 }
