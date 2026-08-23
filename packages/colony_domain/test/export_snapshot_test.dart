@@ -1143,14 +1143,21 @@ void main() {
     expect(snapshot.musicEncounters, isEmpty);
   });
 
-  test('rejects unsupported version 36', () {
+  test('parses export version 36 with empty activation collections', () {
     final json = Map<String, dynamic>.from(baseJson)..['version'] = 36;
+    final snapshot = ExportSnapshot.fromJson(json);
+    expect(snapshot.version, 36);
+    expect(snapshot.activation.protocols, isEmpty);
+  });
+
+  test('rejects unsupported version 37', () {
+    final json = Map<String, dynamic>.from(baseJson)..['version'] = 37;
 
     expect(
       () => ExportSnapshot.fromJson(json),
       throwsA(
         predicate<ExportSnapshotException>(
-          (e) => e.message.contains('36'),
+          (e) => e.message.contains('37'),
         ),
       ),
     );
