@@ -20,7 +20,7 @@ abstract final class SpotifyHistoryFiles {
           }
           documents.add((
             entry.name,
-            utf8.decode(_zipBytes(entry), allowMalformed: true),
+            utf8.decode(entry.content, allowMalformed: true),
           ));
         }
         continue;
@@ -31,11 +31,5 @@ abstract final class SpotifyHistoryFiles {
       ));
     }
     return SpotifyStreamingHistoryCodec.parseMany(documents);
-  }
-
-  static List<int> _zipBytes(ArchiveFile entry) {
-    final content = entry.content;
-    if (content is List<int>) return content;
-    return entry.readBytes();
   }
 }
