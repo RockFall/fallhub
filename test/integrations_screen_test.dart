@@ -70,6 +70,8 @@ void main() {
       findsOneWidget,
     );
     expect(find.text(AppStrings.integrationsEmpty), findsOneWidget);
+    expect(find.text(AppStrings.musicAtlasSpotifyOpenGuide), findsOneWidget);
+    expect(find.text(AppStrings.musicAtlasSpotifyNotLinked), findsOneWidget);
     expect(find.byType(Semantics), findsWidgets);
 
     await _drainTimers(tester);

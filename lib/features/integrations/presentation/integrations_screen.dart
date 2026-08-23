@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../app/localization/app_strings.dart';
+import '../../music_atlas/application/music_atlas_providers.dart';
 import '../../music_atlas/presentation/widgets/spotify_integration_panel.dart';
 import '../application/integrations_controllers.dart';
 import '../application/integrations_providers.dart';
@@ -365,7 +366,30 @@ class _IntegrationsScreenState extends ConsumerState<IntegrationsScreen>
             },
           ),
           const SizedBox(height: ColonySpacing.lg),
-          const SpotifyIntegrationPanel(),
+          ColonyPanel(
+            title: AppStrings.musicAtlasSpotifyTitle,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Text(
+                  (ref.watch(spotifySessionProvider).asData?.value ?? false)
+                      ? AppStrings.musicAtlasSpotifyLinked
+                      : AppStrings.musicAtlasSpotifyNotLinked,
+                  style: Theme.of(context).textTheme.titleSmall,
+                ),
+                const SizedBox(height: ColonySpacing.xs),
+                Text(
+                  AppStrings.musicAtlasSpotifyDisclaimer,
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
+                const SizedBox(height: ColonySpacing.sm),
+                FilledButton.tonal(
+                  onPressed: () => SpotifyIntegrationPanel.show(context),
+                  child: const Text(AppStrings.musicAtlasSpotifyOpenGuide),
+                ),
+              ],
+            ),
+          ),
           const SizedBox(height: ColonySpacing.lg),
           ColonyPanel(
             title: AppStrings.integrationsCalendarIcs,

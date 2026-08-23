@@ -777,6 +777,7 @@ abstract final class AppStrings {
   static const musicAtlasSpotifyHistoryEmpty =
       'Não encontrei ficheiros de histórico neste pacote.';
   static const musicAtlasConnectSpotify = 'Ligar Spotify';
+  static const musicAtlasSpotifyOpenGuide = 'Abrir guia Spotify';
 
   static String musicAtlasSpotifyHistoryDone({
     required int albums,
