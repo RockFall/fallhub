@@ -2,6 +2,7 @@ import 'package:colony_domain/colony_domain.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/providers/app_providers.dart';
+import 'spotify_runtime.dart';
 
 final musicAtlasOverviewProvider = FutureProvider<MusicAtlasOverview>((
   ref,
@@ -64,6 +65,13 @@ final musicSpotifyConstellationProvider =
       }
       return ref.watch(repositoriesProvider).musicAtlas.constellation(profile.id);
     });
+
+final spotifySessionProvider = FutureProvider<bool>((ref) async {
+  final profile = await ref.watch(profileProvider.future);
+  if (profile == null) return false;
+  final tokens = await ref.watch(spotifyTokenStoreProvider).read(profile.id);
+  return tokens != null;
+});
 
 final musicExplorationProvider = FutureProvider<MusicExplorationMap>((
   ref,

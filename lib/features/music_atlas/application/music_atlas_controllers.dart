@@ -252,8 +252,10 @@ class MusicAtlasController extends AsyncNotifier<void> {
       if (!enabled) {
         await ref.read(spotifyTokenStoreProvider).clear(profile.id);
         await ref.read(repositoriesProvider).musicAtlas.clearSpotifySync(profile.id);
+        await ref.read(spotifyPkceStoreProvider).clear();
       }
       ref.invalidate(integrationConsentsProvider);
+      ref.invalidate(spotifySessionProvider);
     });
   }
 
@@ -270,6 +272,17 @@ class MusicAtlasController extends AsyncNotifier<void> {
       if (clientId.isEmpty) {
         throw StateError(AppStrings.musicAtlasSpotifyNeedClient);
       }
+      final profile = await ref.read(profileProvider.future);
+      if (profile == null) throw StateError('Perfil não configurado');
+      await ref
+          .read(repositoriesProvider)
+          .integrations
+          .setConsentEnabled(
+            profileId: profile.id,
+            kind: IntegrationKind.spotify,
+            enabled: true,
+          );
+      ref.invalidate(integrationConsentsProvider);
       final seed = completePkce(
         MusicSpotifyPolicy.generatePkce(random: Random.secure()),
       );
@@ -284,6 +297,7 @@ class MusicAtlasController extends AsyncNotifier<void> {
         ],
       );
       ref.read(_pkceProvider.notifier).set(seed);
+      await ref.read(spotifyPkceStoreProvider).write(seed);
       final uri = Uri.parse(request.authorizationUrl);
       await launchUrl(uri, mode: LaunchMode.externalApplication);
       return request.authorizationUrl;
@@ -292,11 +306,22 @@ class MusicAtlasController extends AsyncNotifier<void> {
 
   Future<void> completeSpotifyAuth(String rawCallback) {
     return _run(() async {
-      final pkce = ref.read(_pkceProvider);
+      var pkce = ref.read(_pkceProvider);
+      pkce ??= await ref.read(spotifyPkceStoreProvider).read();
       if (pkce == null) {
         throw StateError('Inicia a ligação Spotify primeiro.');
       }
-      final clientId = ref.read(spotifyClientIdProvider).trim();
+      var clientId = ref.read(spotifyClientIdProvider).trim();
+      if (clientId.isEmpty) {
+        final prefs = await SharedPreferences.getInstance();
+        clientId = prefs.getString('spotify.clientId') ?? '';
+        if (clientId.isNotEmpty) {
+          ref.read(spotifyClientIdProvider.notifier).set(clientId);
+        }
+      }
+      if (clientId.isEmpty) {
+        throw StateError(AppStrings.musicAtlasSpotifyNeedClient);
+      }
       final code = MusicSpotifyPolicy.extractAuthorizationCode(
         rawCallback,
         expectedState: pkce.state,
@@ -312,6 +337,8 @@ class MusicAtlasController extends AsyncNotifier<void> {
       final profile = await ref.read(profileProvider.future);
       if (profile == null) throw StateError('Perfil não configurado');
       await ref.read(spotifyTokenStoreProvider).write(profile.id, tokens);
+      await ref.read(spotifyPkceStoreProvider).clear();
+      ref.read(_pkceProvider.notifier).set(null);
       await ref
           .read(repositoriesProvider)
           .integrations
@@ -321,6 +348,24 @@ class MusicAtlasController extends AsyncNotifier<void> {
             enabled: true,
           );
       ref.invalidate(integrationConsentsProvider);
+      ref.invalidate(spotifySessionProvider);
+    });
+  }
+
+  Future<MusicAtlasJsonImportResult?> importSpotifyHistory(
+    SpotifyHistoryParseResult history,
+  ) {
+    return _run(() async {
+      final profile = await ref.read(profileProvider.future);
+      if (profile == null) throw StateError('Perfil não configurado');
+      final result = await ref
+          .read(repositoriesProvider)
+          .musicAtlas
+          .importSpotifyHistory(profileId: profile.id, history: history);
+      ref.invalidate(musicAtlasOverviewProvider);
+      ref.invalidate(musicExplorationProvider);
+      ref.invalidate(musicSpotifyConstellationProvider);
+      return result;
     });
   }
 

@@ -262,6 +262,15 @@ abstract final class MusicSpotifyPolicy {
   static const tokenUrl = 'https://accounts.spotify.com/api/token';
   static const apiBase = 'https://api.spotify.com/v1';
   static const defaultRedirectUri = 'colony://integrations/spotify/callback';
+  static const privacyUrl = 'https://www.spotify.com/account/privacy/';
+  static const developerDashboardUrl =
+      'https://developer.spotify.com/dashboard';
+
+  static bool isCallbackUri(Uri uri) {
+    if (uri.scheme != 'colony') return false;
+    if (uri.host != 'integrations') return false;
+    return uri.path.contains('spotify');
+  }
 
   static const libraryScope = 'user-library-read';
   static const recentScope = 'user-read-recently-played';

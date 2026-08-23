@@ -22,8 +22,15 @@ abstract final class MusicListenPolicy {
           if (depth.index < MusicListenDepth.heard.index) {
             depth = MusicListenDepth.heard;
           }
-        case MusicEncounterType.contact:
         case MusicEncounterType.importListen:
+          if ((encounter.durationSeconds ?? 0) >= 30) {
+            if (depth.index < MusicListenDepth.heard.index) {
+              depth = MusicListenDepth.heard;
+            }
+          } else if (depth == MusicListenDepth.unknown) {
+            depth = MusicListenDepth.contact;
+          }
+        case MusicEncounterType.contact:
           if (depth == MusicListenDepth.unknown) {
             depth = MusicListenDepth.contact;
           }

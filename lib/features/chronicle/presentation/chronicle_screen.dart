@@ -247,6 +247,7 @@ class ChronicleScreen extends ConsumerWidget {
       EventType.spotifyRevoked => 'Spotify revogado',
       EventType.spotifyRecentStaged => 'Recentes do Spotify lidos',
       EventType.spotifyCapabilityDegraded => 'Spotify com capacidade reduzida',
+      EventType.spotifyHistoryImported => 'Histórico Spotify importado',
       EventType.flashcardCandidateProposed => 'Candidato a cartão proposto',
       EventType.flashcardCandidateAccepted => 'Candidato a cartão aceite',
       _ => event.eventType.name,

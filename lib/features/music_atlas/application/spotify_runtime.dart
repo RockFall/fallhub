@@ -77,6 +77,56 @@ class PrefsSpotifyTokenStore implements SpotifyTokenStore {
   }
 }
 
+/// PKCE must survive the browser hop. In-memory only dies when Android
+/// kills the process behind Chrome Custom Tabs.
+class PrefsSpotifyPkceStore {
+  PrefsSpotifyPkceStore([this._prefs]);
+
+  final SharedPreferences? _prefs;
+  static const _key = 'spotify.pkce';
+
+  Future<SharedPreferences> _ready() async =>
+      _prefs ?? SharedPreferences.getInstance();
+
+  Future<void> write(SpotifyPkceChallenge pkce) async {
+    final prefs = await _ready();
+    await prefs.setString(
+      _key,
+      jsonEncode({
+        'verifier': pkce.verifier,
+        'challenge': pkce.challenge,
+        'state': pkce.state,
+      }),
+    );
+  }
+
+  Future<SpotifyPkceChallenge?> read() async {
+    final prefs = await _ready();
+    final raw = prefs.getString(_key);
+    if (raw == null || raw.isEmpty) return null;
+    final json = jsonDecode(raw);
+    if (json is! Map) return null;
+    final verifier = json['verifier']?.toString() ?? '';
+    final challenge = json['challenge']?.toString() ?? '';
+    final state = json['state']?.toString() ?? '';
+    if (verifier.isEmpty || state.isEmpty) return null;
+    return SpotifyPkceChallenge(
+      verifier: verifier,
+      challenge: challenge,
+      state: state,
+    );
+  }
+
+  Future<void> clear() async {
+    final prefs = await _ready();
+    await prefs.remove(_key);
+  }
+}
+
+final spotifyPkceStoreProvider = Provider<PrefsSpotifyPkceStore>((ref) {
+  return PrefsSpotifyPkceStore();
+});
+
 class HttpSpotifyCatalog implements SpotifyCatalogPort {
   HttpSpotifyCatalog({http.Client? client}) : _client = client ?? http.Client();
 

@@ -71,6 +71,7 @@ enum MusicImportSourceKind {
   spotifyLibrary,
   spotifyRecent,
   spotifyPlaylist,
+  spotifyHistory,
   listenbrainz,
   csv,
 }

@@ -742,6 +742,49 @@ abstract final class AppStrings {
       'Indica o Client ID da app Spotify (Development Mode).';
   static const musicAtlasSpotifyNeedConnect =
       'Liga a conta Spotify primeiro.';
+  static const musicAtlasSpotifyLinked = 'Conta ligada neste aparelho.';
+  static const musicAtlasSpotifyNotLinked =
+      'Ainda não há sessão Spotify neste aparelho.';
+  static const musicAtlasSpotifyHowTitle = 'Como ligar a conta';
+  static const musicAtlasSpotifyHow1 =
+      'Abre o dashboard de developers da Spotify e cria uma app (tipo Mobile).';
+  static const musicAtlasSpotifyHow2 =
+      'Em Redirect URIs cola exactamente este valor — sem espaços, sem https:';
+  static const musicAtlasSpotifyHow3 =
+      'Copia o Client ID (é público) para o campo abaixo. Não precisas do Client Secret: o Colony usa PKCE.';
+  static const musicAtlasSpotifyHow4 =
+      'Activa o opt-in e toca Ligar conta. A Spotify abre; autorizas; o Colony deve voltar sozinho. Se o browser ficar numa página vazia, copia o endereço colony://… e cola-o no campo de retorno.';
+  static const musicAtlasSpotifyOpenDashboard = 'Abrir dashboard Spotify';
+  static const musicAtlasSpotifyCopyRedirect = 'Copiar Redirect URI';
+  static const musicAtlasSpotifyRedirectCopied = 'Redirect URI copiado.';
+  static const musicAtlasSpotifyHistoryTitle = 'Histórico alargado (como o stats.fm)';
+  static const musicAtlasSpotifyHistoryLead =
+      'A API da Spotify só entrega a biblioteca gravada e as últimas ~50 faixas. O mapa da tua vida musical vem do ficheiro de privacidade — o mesmo dump que o stats.fm pede. Fica no telemóvel. Nunca partilhes o ZIP.';
+  static const musicAtlasSpotifyHistory1 =
+      'Abre a página de privacidade da Spotify (é preciso estar autenticado).';
+  static const musicAtlasSpotifyHistory2 =
+      'Desce até «Download your data» / «Transferir os teus dados».';
+  static const musicAtlasSpotifyHistory3 =
+      'Desmarca «Account data» / dados da conta. Marca só «Extended streaming history» / histórico de streaming alargado.';
+  static const musicAtlasSpotifyHistory4 =
+      'Toca Request data. Confirma o pedido no email da Spotify.';
+  static const musicAtlasSpotifyHistory5 =
+      'A espera pode ir até 30 dias. Quando o ZIP chegar, descarrega-o. Não o envies a ninguém.';
+  static const musicAtlasSpotifyHistory6 =
+      'Importa o ZIP ou os JSON Streaming_History_Audio_*.json. Escutas com menos de 30s e podcasts ficam de fora. Ouvir importado não vira «cartografado».';
+  static const musicAtlasSpotifyOpenPrivacy = 'Abrir privacidade Spotify';
+  static const musicAtlasSpotifyImportHistory = 'Importar ZIP ou JSON';
+  static const musicAtlasSpotifyHistoryEmpty =
+      'Não encontrei ficheiros de histórico neste pacote.';
+  static const musicAtlasConnectSpotify = 'Ligar Spotify';
+
+  static String musicAtlasSpotifyHistoryDone({
+    required int albums,
+    required int created,
+    required int encounters,
+  }) {
+    return '$albums álbuns no dump · $created novos · $encounters escutas registadas. O mapa acende o que já ouviste.';
+  }
   static const musicAtlasOffline = 'Offline — o núcleo local continua disponível.';
   static const musicAtlasImportEmpty =
       'Cola o JSON ou escolhe um ficheiro. O picker não deita o dump no campo.';

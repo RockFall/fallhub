@@ -74,6 +74,17 @@ void main() {
     expect(find.text(AppStrings.musicAtlasEmpty), findsOneWidget);
     expect(find.text(AppStrings.musicAtlasCreateNode), findsWidgets);
     expect(find.text(AppStrings.musicAtlasImportJson), findsOneWidget);
+    expect(find.text(AppStrings.musicAtlasConnectSpotify), findsOneWidget);
+
+    await tester.tap(find.text(AppStrings.musicAtlasConnectSpotify));
+    await tester.pumpAndSettle();
+    expect(find.text(AppStrings.musicAtlasSpotifyHowTitle), findsOneWidget);
+    expect(find.text(AppStrings.musicAtlasSpotifyHistoryTitle), findsOneWidget);
+    expect(find.text(MusicSpotifyPolicy.defaultRedirectUri), findsOneWidget);
+    Navigator.of(
+      tester.element(find.text(AppStrings.musicAtlasSpotifyHowTitle)),
+    ).pop();
+    await tester.pumpAndSettle();
 
     await tester.tap(find.text(AppStrings.musicAtlasCreateNode).first);
     await tester.pumpAndSettle();

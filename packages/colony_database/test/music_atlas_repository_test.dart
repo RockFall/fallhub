@@ -172,4 +172,41 @@ void main() {
     await repos.musicAtlas.clearSpotifySync(created.id);
     expect(await repos.musicAtlas.getSpotifySync(created.id), isNull);
   });
+
+  test('extended history import lights albums as importListen, not cartographed', () async {
+    final created = await profile();
+    final history = SpotifyStreamingHistoryCodec.parseJson('''
+[
+  {
+    "ts": "2024-01-01T12:00:00Z",
+    "ms_played": 240000,
+    "master_metadata_track_name": "So What",
+    "master_metadata_album_artist_name": "Miles Davis",
+    "master_metadata_album_album_name": "Kind of Blue",
+    "reason_end": "trackdone"
+  }
+]
+''');
+    final result = await repos.musicAtlas.importSpotifyHistory(
+      profileId: created.id,
+      history: history,
+    );
+    expect(result.createdNodes, 1);
+    expect(result.createdEncounters, 1);
+    final inspect = await repos.musicAtlas.inspect(
+      (await repos.musicAtlas.listNodes()).single.id,
+      created.id,
+    );
+    expect(inspect!.encounters.single.encounterType, MusicEncounterType.importListen);
+    expect(inspect.encounters.single.durationSeconds, greaterThanOrEqualTo(30));
+    expect(inspect.state!.discoveryState, MusicDiscoveryState.sampled);
+    expect(inspect.state!.discoveryState, isNot(MusicDiscoveryState.cartographed));
+
+    final again = await repos.musicAtlas.importSpotifyHistory(
+      profileId: created.id,
+      history: history,
+    );
+    expect(again.createdEncounters, 0);
+    expect(again.skippedNodes, 1);
+  });
 }

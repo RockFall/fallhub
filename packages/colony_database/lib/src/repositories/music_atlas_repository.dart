@@ -816,6 +816,149 @@ class MusicAtlasRepository {
     );
   }
 
+  Future<MusicAtlasJsonImportResult> importSpotifyHistory({
+    required EntityId profileId,
+    required SpotifyHistoryParseResult history,
+  }) async {
+    final now = _clock().toUtc();
+    var created = 0;
+    var linked = 0;
+    var encounters = 0;
+    var skipped = 0;
+    late EntityId runId;
+    await _db.transaction(() async {
+      for (final album in history.albums) {
+        var node = await _findByTitleArtist(album.albumTitle, album.artist);
+        if (node == null) {
+          node = await createNode(
+            nodeType: MusicNodeType.releaseGroup,
+            canonicalName: album.albumTitle,
+            description: album.artist,
+            provenanceJson: MusicNodeProvenance.merge(
+              jsonEncode({'source_type': 'spotify_extended_history'}),
+            ),
+            sourceType: SourceType.import,
+          );
+          created++;
+        } else {
+          linked++;
+        }
+        final already = await (_db.select(_db.musicEncounters)..where(
+          (t) =>
+              t.profileId.equals(profileId.value) &
+              t.nodeId.equals(node!.id.value) &
+              t.encounterType.equals(MusicEncounterType.importListen.name) &
+              t.deletedAt.isNull(),
+        )).get();
+        final duplicate = already.any((row) {
+          final source = MusicNodeProvenance.decode(row.provenanceJson);
+          return source['source_type'] == 'spotify_extended_history';
+        });
+        if (duplicate) {
+          skipped++;
+          continue;
+        }
+        await recordEncounter(
+          profileId: profileId,
+          nodeId: node.id,
+          encounterType: MusicEncounterType.importListen,
+          occurredAt: album.lastPlayed,
+          durationSeconds: album.durationSeconds,
+          sourceType: SourceType.import,
+          provenanceJson: jsonEncode({
+            'source_type': 'spotify_extended_history',
+            'playCount': album.playCount,
+            'totalMs': album.totalMs,
+            'firstPlayed': album.firstPlayed.toIso8601String(),
+            if (album.spotifyTrackUri != null)
+              'spotifyTrackUri': album.spotifyTrackUri,
+          }),
+          applySuggestedState: false,
+          note:
+              '${album.playCount} escutas no histórico alargado do Spotify '
+              '(${(album.totalMs / 60000).round()} min).',
+        );
+        encounters++;
+        final current = await (_db.select(_db.personalMusicNodeStates)..where(
+          (t) =>
+              t.profileId.equals(profileId.value) &
+              t.nodeId.equals(node!.id.value),
+        )).getSingleOrNull();
+        if (current == null) {
+          await setDiscoveryState(
+            profileId: profileId,
+            nodeId: node.id,
+            state: MusicDiscoveryState.sampled,
+          );
+        }
+      }
+      runId = EntityId(_ids.newId());
+      final run = MusicImportRun(
+        id: runId,
+        profileId: profileId,
+        sourceKind: MusicImportSourceKind.spotifyHistory,
+        status: MusicImportRunStatus.applied,
+        itemCount: history.albums.length,
+        createdCount: created,
+        skippedCount: skipped,
+        provenanceJson: jsonEncode({
+          'source_type': 'spotify_extended_history',
+          'files': history.files,
+          'streams': history.streamCount,
+        }),
+        reportJson: jsonEncode({
+          'albums': history.albums.length,
+          'podcasts': history.podcastCount,
+          'short': history.shortCount,
+        }),
+        createdAt: now,
+        appliedAt: now,
+      );
+      await _db
+          .into(_db.musicImportRuns)
+          .insert(ColonyMappers.fromMusicImportRun(run));
+      await _events.record(
+        aggregateType: AggregateType.musicImportRun,
+        aggregateId: runId,
+        eventType: EventType.spotifyHistoryImported,
+        payload: {
+          'created': created,
+          'linked': linked,
+          'encounters': encounters,
+        },
+        sourceType: SourceType.import,
+      );
+    });
+    return MusicAtlasJsonImportResult(
+      runId: runId,
+      createdNodes: created,
+      linkedNodes: linked,
+      skippedNodes: skipped,
+      conflictNodes: 0,
+      createdClaims: 0,
+      createdEncounters: encounters,
+      createdExpeditions: 0,
+    );
+  }
+
+  Future<MusicNode?> _findByTitleArtist(String title, String artist) async {
+    final want = MusicIdentityPolicy.matchKey(
+      type: MusicNodeType.releaseGroup,
+      title: title,
+      artist: artist,
+    );
+    for (final node in await listNodes()) {
+      if (!MusicNodeKind.isAlbumLike(node.nodeType)) continue;
+      final got = MusicIdentityPolicy.matchKey(
+        type: MusicNodeType.releaseGroup,
+        title: node.canonicalName,
+        artist: node.description,
+      );
+      if (got == want) return node;
+    }
+    return null;
+  }
+
   Future<MusicEncounter> captureNowPlaying({
     required EntityId profileId,
     required SpotifyNowPlaying playing,

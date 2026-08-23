@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import '../../../app/localization/app_strings.dart';
 import '../application/music_atlas_providers.dart';
 import 'widgets/genre_ramification_map.dart';
+import 'widgets/spotify_integration_panel.dart';
 
 class MusicAtlasExploreScreen extends ConsumerStatefulWidget {
   const MusicAtlasExploreScreen({super.key, this.initialTerritory});
@@ -131,6 +132,11 @@ class _ExploreHeader extends StatelessWidget {
                 title,
                 style: Theme.of(context).textTheme.headlineSmall,
               ),
+            ),
+            IconButton(
+              tooltip: AppStrings.musicAtlasConnectSpotify,
+              onPressed: () => SpotifyIntegrationPanel.show(context),
+              icon: const Icon(Icons.podcasts_outlined),
             ),
             if (onClear != null)
               TextButton(

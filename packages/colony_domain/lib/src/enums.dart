@@ -239,6 +239,7 @@ enum EventType {
   spotifyPlaylistDrafted,
   spotifyNowPlayingCaptured,
   spotifyCapabilityDegraded,
+  spotifyHistoryImported,
 }
 
 enum UndoActionType {

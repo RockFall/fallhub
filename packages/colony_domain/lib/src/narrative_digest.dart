@@ -263,7 +263,8 @@ abstract final class NarrativeDigestRules {
               e.eventType == EventType.musicExpeditionCompleted ||
               e.eventType == EventType.musicAtlasJsonImported ||
               e.eventType == EventType.spotifyLibraryPulled ||
-              e.eventType == EventType.spotifyNowPlayingCaptured,
+              e.eventType == EventType.spotifyNowPlayingCaptured ||
+              e.eventType == EventType.spotifyHistoryImported,
         )
         .toList();
     if (musicEvents.isNotEmpty) {

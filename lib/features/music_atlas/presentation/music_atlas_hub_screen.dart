@@ -11,6 +11,7 @@ import 'widgets/album_sleeve.dart';
 import 'widgets/capture_music_encounter_sheet.dart';
 import 'widgets/create_music_node_sheet.dart';
 import 'widgets/import_music_atlas_json_sheet.dart';
+import 'widgets/spotify_integration_panel.dart';
 import 'widgets/spotify_playlist_expedition_sheet.dart';
 
 class MusicAtlasHubScreen extends ConsumerStatefulWidget {
@@ -90,6 +91,11 @@ class _MusicAtlasHubScreenState extends ConsumerState<MusicAtlasHubScreen> {
               onPressed: () => CaptureMusicEncounterSheet.showNowPlaying(context),
               icon: const Icon(Icons.hearing_outlined),
               label: const Text(AppStrings.musicAtlasNowPlaying),
+            ),
+            FilledButton.tonalIcon(
+              onPressed: () => SpotifyIntegrationPanel.show(context),
+              icon: const Icon(Icons.podcasts_outlined),
+              label: const Text(AppStrings.musicAtlasConnectSpotify),
             ),
             OutlinedButton.icon(
               onPressed: () => SpotifyPlaylistExpeditionSheet.show(context),
