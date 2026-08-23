@@ -5238,21 +5238,25 @@ O prompt **proíbe** o modelo de:
 
 ## 76.4 Conteúdo do prompt vivo
 
-Gerado por `MusicAtlasJsonPromptBuilder.build(...)`, no mesmo estilo de `FlashcardJsonPromptBuilder`:
+Gerado por `MusicAtlasJsonPromptBuilder.build(...)`, no mesmo estilo de `FlashcardJsonPromptBuilder`. O prompt **ensina a ontologia** da §81 — sem isso a IA externa despeja World Music e MPB-como-pai.
 
 1. papel: “formatas um documento do Atlas Musical do Life Colony OS; responde **apenas** JSON”;
-2. schema da §79;
-3. regras de dedup e de estados;
-4. **territórios / scopes** actuais (título + id curto);
-5. **nós** actuais compactos (tipo, nome, ids externos se houver) — teto razoável + “há N mais; não os dupliques pelo nome”;
-6. **claims** já aceites (from → type → to);
-7. **áreas de conhecimento** (floresta ADR-037, sobretudo `Artes / Música`) e baralhos;
-8. **tags** (ADR-039);
-9. **nós de pesquisa** ligados (`ResearchKnowledgeLink`) e títulos;
-10. prateleiras canónicas `arts.music*`, `arts.harmony`, `arts.piano`;
-11. liberdade de criar ramos novos, preferindo grafia existente.
+2. **ontologia**: género ≠ tradição ≠ cena; `territoryKeys` multi-eixo; exemplos (Kind of Blue, Heavy Weather, Clube da Esquina, Funk Carioca);
+3. **proibido**: World Music, Progressive sozinho, moods, MPB como pai do samba, percentagens de cobertura;
+4. **catálogo vivo** (`MusicCanon.promptCatalog`): 26 famílias + filhos, cenas, tradições, movimentos, funções, aliases;
+5. schema da §79 **com** `territoryKeys` (chaves canónicas, não rótulos livres);
+6. regras de dedup e de estados;
+7. **nós** actuais compactos (tipo, nome, `territoryKeys` já gravados) — teto + “há N mais; não os dupliques pelo nome”;
+8. **claims** já aceites (from → type → to);
+9. **áreas de conhecimento** (floresta ADR-037, sobretudo `Artes / Música`) e baralhos;
+10. **tags** (ADR-039);
+11. **nós de pesquisa** ligados (`ResearchKnowledgeLink`) e títulos;
+12. prateleiras canónicas `arts.music*`, `arts.harmony`, `arts.piano`;
+13. “obedece ao pedido do utilizador — não despejes o cânone inteiro”.
 
-Se o mapa estiver vazio, o prompt diz-no e pede uma árvore mínima (um território + alguns nós + uma pergunta de expedição).
+O parse resolve aliases (`modal jazz` → `jazz.modal`, `br.mpb` → `brazilian.mpb`) e **recusa** `world music` / `progressive` sozinhos.
+
+Se o mapa estiver vazio, o prompt pede um recorte mínimo: 3–8 álbuns com chaves canónicas + uma expedição com pergunta de escuta. Não pede uma pasta “World”.
 
 ## 76.5 Plano de importação
 

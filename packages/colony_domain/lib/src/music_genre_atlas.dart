@@ -412,6 +412,60 @@ falte nesta edição.
     return hits;
   }
 
+  /// Resolves a user/AI label to a canon key on any axis.
+  /// Forbidden roots (`world music`, lone `progressive`) stay null.
+  static String? resolveTaxonKey(String raw) {
+    final trimmed = raw.trim();
+    if (trimmed.isEmpty) return null;
+    if (byKey.containsKey(trimmed) &&
+        trimmed != unmappedKey &&
+        trimmed != userRootKey) {
+      return trimmed;
+    }
+    final needle = MusicIdentityPolicy.normalizeTitle(trimmed);
+    if (needle.isEmpty) return null;
+    if (MusicOntologyPolicy.forbiddenGenreRoots.contains(needle)) {
+      return null;
+    }
+    String? best;
+    var bestScore = -1;
+    var bestDepth = -1;
+    for (final spec in byKey.values) {
+      if (spec.key == unmappedKey || spec.key == userRootKey) continue;
+      final labels = [
+        spec.title,
+        spec.key,
+        spec.key.split('.').last,
+        ...spec.aliases,
+      ];
+      for (final label in labels) {
+        final alias = MusicIdentityPolicy.normalizeTitle(label);
+        if (alias != needle) continue;
+        final score = 1000 + alias.length;
+        if (score > bestScore ||
+            (score == bestScore && spec.depth > bestDepth)) {
+          bestScore = score;
+          bestDepth = spec.depth;
+          best = spec.key;
+        }
+      }
+    }
+    return best;
+  }
+
+  static List<String> resolveTaxonKeys(Iterable<String> raw) {
+    final keys = <String>{};
+    for (final label in raw) {
+      final resolved = resolveTaxonKey(label);
+      if (resolved != null) {
+        keys.add(resolved);
+      } else if (label.trim().startsWith('user.')) {
+        keys.add(label.trim());
+      }
+    }
+    return keys.toList();
+  }
+
   static String? matchGenreLabel(String raw) {
     final needle = MusicIdentityPolicy.normalizeTitle(raw);
     if (needle.isEmpty) return null;

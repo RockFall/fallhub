@@ -10,6 +10,9 @@ import 'knowledge_area.dart';
 import 'knowledge_area_catalog.dart';
 import 'knowledge_area_placement.dart';
 import 'music_atlas.dart';
+import 'music_atlas_exploration.dart';
+import 'music_canon.dart';
+import 'music_genre_atlas.dart';
 import 'research_node.dart';
 import 'timeline_byte_source.dart';
 
@@ -812,7 +815,9 @@ abstract final class MusicAtlasJsonCodec {
       title: title,
       artists: _stringList(map['artists']),
       year: _readInt(map['year']),
-      territoryKeys: _stringList(map['territoryKeys']),
+      territoryKeys: MusicGenreAtlas.resolveTaxonKeys(
+        _stringList(map['territoryKeys']),
+      ),
       externalIds: _parseExternalIds(map['externalIds']),
       summary: _readString(map['summary']),
       discoveryState: _readString(map['discoveryState']),
@@ -1129,7 +1134,7 @@ abstract final class MusicAtlasJsonPromptBuilder {
         'Você formata um documento do Atlas Musical do Life Colony OS (local-first).',
       )
       ..writeln(
-        'Responda APENAS com JSON válido (sem markdown, sem comentário).',
+        'Responda APENAS com JSON válido (sem markdown, sem comentário, sem prosa).',
       )
       ..writeln(
         'O app importa o JSON, cria nós em falta, liga IDs externos, ignora duplicados',
@@ -1138,6 +1143,64 @@ abstract final class MusicAtlasJsonPromptBuilder {
         'e NUNCA marca uma obra como cartografada só porque veio no documento.',
       )
       ..writeln()
+      ..writeln('ONTOLOGIA — LÊ ISTO ANTES DE CLASSIFICAR')
+      ..writeln(
+        'Género, tradição, cena, movimento, forma, função, técnica e descritor NÃO são a mesma coisa.',
+      )
+      ..writeln(
+        'Uma árvore única (Música > Rock > Progressive Rock > Canterbury) produz erros.',
+      )
+      ..writeln(
+        'Cada obra pode receber VÁRIOS territoryKeys ao mesmo tempo, de eixos diferentes.',
+      )
+      ..writeln(
+        'Use chaves canónicas ( Canonical Genre Base v1 ). Não invente World Music.',
+      )
+      ..writeln()
+      ..writeln('EXEMPLOS DE CLASSIFICAÇÃO')
+      ..writeln(
+        '- Kind of Blue (Miles Davis, 1959): ["jazz.modal"]',
+      )
+      ..writeln(
+        '- Heavy Weather (Weather Report): ["jazz.fusion.jazz_rock","jazz.fusion.jazz_funk"]',
+      )
+      ..writeln(
+        '- Clube da Esquina (Milton Nascimento & Lô Borges, 1972): ["brazilian.mpb","brazilian.clube_da_esquina","scene.clube_da_esquina"]',
+      )
+      ..writeln(
+        '- Tropicália ou Panis et Circencis: ["brazilian.tropicalia","movement.tropicalismo"]',
+      )
+      ..writeln(
+        '- Loveless (MBV): ["rock.alt.shoegaze"]',
+      )
+      ..writeln(
+        '- Blackgaze: ["metal.black.blackgaze"]  (o cânone já liga Shoegaze como pai secundário)',
+      )
+      ..writeln(
+        '- Neurofunk: ["electronic.dnb.neurofunk"]  (Electronic → Jungle → DnB → Neurofunk)',
+      )
+      ..writeln(
+        '- Funk Carioca / Baile Funk: ["brazilian.funk_br"] — NUNCA a família funk afro-americana.',
+      )
+      ..writeln()
+      ..writeln('PROIBIDO em territoryKeys')
+      ..writeln(
+        '- world / world music / worldbeat (tradições não-ocidentais têm família global_art, brazilian, african, mena, …)',
+      )
+      ..writeln(
+        '- progressive, experimental, fusion, revival, neo, post sozinhos (existem Progressive Rock, Progressive Metal, Progressive House — não um rio “Progressive”)',
+      )
+      ..writeln(
+        '- moods (melancholic, dark, dreamy, warm) e instrumentação (acoustic, electric, lo-fi) como se fossem género',
+      )
+      ..writeln(
+        '- MPB como pai de samba, choro, baião ou funk carioca. MPB (brazilian.mpb) é macro pós-1960, IRMÃ desses rios.',
+      )
+      ..writeln(
+        '- percentagens de cobertura (“conheces 3% do jazz”). O Atlas não mede o mundo.',
+      )
+      ..writeln()
+      ..writeln(MusicCanon.promptCatalog())
       ..writeln('SCHEMA')
       ..writeln('{')
       ..writeln('  "version": 1,')
@@ -1149,27 +1212,58 @@ abstract final class MusicAtlasJsonPromptBuilder {
       ..writeln('      "title": "Kind of Blue",')
       ..writeln('      "artists": ["Miles Davis"],')
       ..writeln('      "year": 1959,')
+      ..writeln('      "territoryKeys": ["jazz.modal"],')
       ..writeln('      "discoveryState": "sighted",')
       ..writeln(
         '      "externalIds": [{"provider":"spotify","entityType":"album","id":"..."}]',
       )
+      ..writeln('    },')
+      ..writeln('    {')
+      ..writeln('      "key": "clube-da-esquina",')
+      ..writeln('      "nodeType": "releaseGroup",')
+      ..writeln('      "title": "Clube da Esquina",')
+      ..writeln('      "artists": ["Milton Nascimento", "Lô Borges"],')
+      ..writeln('      "year": 1972,')
+      ..writeln(
+        '      "territoryKeys": ["brazilian.mpb","brazilian.clube_da_esquina","scene.clube_da_esquina"]',
+      )
       ..writeln('    }')
       ..writeln('  ],')
-      ..writeln('  "claims": [],')
+      ..writeln('  "claims": [')
+      ..writeln(
+        '    {"fromKey":"kind-of-blue","toKey":"clube-da-esquina","relationType":"related","uncertainties":["comparação pedida pelo utilizador, não influência histórica"]}',
+      )
+      ..writeln('  ],')
       ..writeln('  "encounters": [],')
-      ..writeln('  "expeditions": [],')
+      ..writeln('  "expeditions": [')
+      ..writeln('    {')
+      ..writeln('      "title": "Do modal ao mineiro",')
+      ..writeln(
+        '      "question": "O que muda na harmonia quando sais do jazz modal para o Clube da Esquina?",',
+      )
+      ..writeln(
+        '      "stops": [{"nodeKey":"kind-of-blue","role":"camp"},{"nodeKey":"clube-da-esquina","role":"destination"}]',
+      )
+      ..writeln('    }')
+      ..writeln('  ],')
       ..writeln('  "researchLinks": [],')
       ..writeln('  "cards": []')
       ..writeln('}')
       ..writeln()
       ..writeln('REGRAS')
       ..writeln(
-        '- discoveryState só pode ser unknown | sighted | contact. Qualquer outro valor é recusado para sighted.',
+        '- territoryKeys: só chaves do cânone acima (ou aliases). Folha mais específica; podes pôr mais do que uma. Cena/tradição/movimento entram no mesmo array.',
       )
       ..writeln(
-        '- Não afirmes influência sem uncertainties[] ou sources[].',
+        '- discoveryState só pode ser unknown | sighted | contact. Qualquer outro valor (cartographed, demonstrated) é recusado para sighted.',
+      )
+      ..writeln(
+        '- Não afirmes influência sem uncertainties[] ou sources[]. relationType: influenced|sharesScene|successor|contemporaneous|cover|sample|memberOf|related.',
       )
       ..writeln('- Não inventes letras, biografias ou percentagens de cobertura.')
+      ..writeln(
+        '- summary/notes: uma ou duas frases de escuta, não Wikipedia.',
+      )
       ..writeln(
         '- cards[] usa o schema de flashcards (front, back, kind, deck, areaPath).',
       )
@@ -1179,18 +1273,25 @@ abstract final class MusicAtlasJsonPromptBuilder {
       ..writeln(
         '- nodeType: artist|work|recording|releaseGroup|release|territory|scene|concept|label|place|show',
       )
+      ..writeln(
+        '- Nó territory/scene só se o cânone ainda não tiver essa chave. Prefere territoryKeys no álbum a criar pastas novas.',
+      )
       ..writeln();
 
     if (nodes.isEmpty) {
       buffer.writeln(
-        'MAPA ATUAL: ainda não há nós. Cria um recorte mínimo (um território + alguns nós + uma pergunta de expedição).',
+        'MAPA ATUAL: ainda não há nós. Cria um recorte mínimo: 3–8 releaseGroups com territoryKeys canónicos (não uma pasta “World”), mais uma expedição com pergunta real de escuta.',
       );
     } else {
-      buffer.writeln('NÓS JÁ EXISTENTES (não dupliques pelo nome):');
+      buffer.writeln(
+        'NÓS JÁ EXISTENTES (não dupliques pelo nome; reutiliza territoryKeys se já estiverem certos):',
+      );
       final shown = nodes.take(80);
       for (final node in shown) {
+        final keys = MusicNodeProvenance.territoryKeys(node.provenanceJson);
+        final suffix = keys.isEmpty ? '' : '  [${keys.join(', ')}]';
         buffer.writeln(
-          '- [${node.id.value}] ${node.nodeType.name}: ${node.canonicalName}',
+          '- [${node.id.value}] ${node.nodeType.name}: ${node.canonicalName}$suffix',
         );
       }
       if (nodes.length > 80) {
@@ -1272,7 +1373,7 @@ abstract final class MusicAtlasJsonPromptBuilder {
 
     buffer
       ..writeln()
-      ..writeln('PRATELEIRAS CANÓNICAS (opcional):');
+      ..writeln('PRATELEIRAS CANÓNICAS (opcional, para cards[].areaPath):');
     for (final path in KnowledgeAreaCatalog.labeledTitlePaths()) {
       if (path.contains('Música') ||
           path.contains('Harmonia') ||
@@ -1281,6 +1382,11 @@ abstract final class MusicAtlasJsonPromptBuilder {
         buffer.writeln('- $path');
       }
     }
+    buffer
+      ..writeln()
+      ..writeln(
+        'O pedido do utilizador vem a seguir a este bloco (ou já veio acima). Obedecele no recorte — não despejes o cânone inteiro.',
+      );
     return buffer.toString();
   }
 }

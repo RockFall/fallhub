@@ -708,7 +708,7 @@ abstract final class AppStrings {
   static const musicAtlasCopyPrompt = 'Copiar prompt';
   static const musicAtlasPromptCopied = 'Prompt copiado.';
   static const musicAtlasPromptLive =
-      'Este texto muda quando o mapa, as áreas e os baralhos mudam.';
+      'Este texto muda quando o mapa muda. Já leva o cânone de géneros, cenas e tradições — a IA externa só precisa do teu pedido.';
   static const musicAtlasPasteJson = 'Colar JSON';
   static const musicAtlasPickFile = 'Escolher ficheiro';
   static const musicAtlasPreview = 'Pré-visualizar';

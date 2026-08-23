@@ -133,6 +133,13 @@ void main() {
     final empty = MusicAtlasJsonPromptBuilder.build(nodes: const [], claims: const []);
     expect(empty, contains('ainda não há nós'));
     expect(empty, contains('areaPath'));
+    expect(empty, contains('territoryKeys'));
+    expect(empty, contains('jazz.modal'));
+    expect(empty, contains('brazilian.mpb'));
+    expect(empty, contains('scene.clube_da_esquina'));
+    expect(empty, contains('ONTOLOGIA'));
+    expect(empty, contains('World Music'));
+    expect(empty, contains('brazilian.funk_br'));
 
     final filled = MusicAtlasJsonPromptBuilder.build(
       nodes: [
@@ -141,12 +148,36 @@ void main() {
           nodeType: MusicNodeType.territory,
           canonicalName: 'Tropicalismo',
           now: now,
+          provenanceJson: MusicNodeProvenance.merge(
+            '{}',
+            territoryKeys: const ['brazilian.tropicalia'],
+          ),
         ),
       ],
       claims: const [],
     );
     expect(filled, contains('Tropicalismo'));
+    expect(filled, contains('brazilian.tropicalia'));
     expect(filled, contains('percentagens de cobertura'));
+  });
+
+  test('parse resolves canon aliases in territoryKeys', () {
+    final doc = MusicAtlasJsonCodec.parse('''
+{
+  "version": 1,
+  "kind": "music_atlas",
+  "nodes": [{
+    "key": "kob",
+    "title": "Kind of Blue",
+    "nodeType": "releaseGroup",
+    "territoryKeys": ["modal jazz", "br.mpb", "world music", "progressive"]
+  }]
+}
+''');
+    expect(doc.nodes.single.territoryKeys, contains('jazz.modal'));
+    expect(doc.nodes.single.territoryKeys, contains('brazilian.mpb'));
+    expect(doc.nodes.single.territoryKeys, isNot(contains('world music')));
+    expect(doc.nodes.single.territoryKeys, isNot(contains('progressive')));
   });
 
   test('parseSource walks one node at a time and skips unknown blobs', () {

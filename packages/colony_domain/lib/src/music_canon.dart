@@ -182,4 +182,61 @@ abstract final class MusicCanon {
     for (final link in links)
       if (link.fromKey == key) link,
   ];
+
+  /// Compact living catalog for the external-AI prompt. Not the full tree.
+  static String promptCatalog() {
+    final buffer = StringBuffer();
+    buffer.writeln(
+      'FAMÍLIAS DE GÉNERO — desça até à folha mais específica de que tiver certeza:',
+    );
+    for (final key in genreRootKeys) {
+      final root = byKey[key];
+      if (root == null) continue;
+      buffer.writeln('- $key — ${root.title}');
+      final children = [
+        for (final taxon in genres)
+          if (taxon.primaryParent == key) taxon,
+      ];
+      if (children.isEmpty) continue;
+      buffer.writeln(
+        '  ${children.map((child) => child.key.split('.').last).join(', ')}',
+      );
+      for (final child in children) {
+        final grands = [
+          for (final taxon in genres)
+            if (taxon.primaryParent == child.key) taxon.key.split('.').last,
+        ];
+        if (grands.isEmpty) continue;
+        buffer.writeln('  ${child.key}: ${grands.join(', ')}');
+      }
+    }
+
+    void axisBlock(String title, MusicAxisKind axis) {
+      final items = ofAxis(axis);
+      if (items.isEmpty) return;
+      buffer.writeln();
+      buffer.writeln('$title');
+      for (final taxon in items) {
+        buffer.writeln('- ${taxon.key} — ${taxon.title}');
+      }
+    }
+
+    axisBlock('CENAS (eixo scene — não as force como pasta de género):', MusicAxisKind.scene);
+    axisBlock('TRADIÇÕES (eixo tradition):', MusicAxisKind.tradition);
+    axisBlock('MOVIMENTOS (eixo movement):', MusicAxisKind.movement);
+    axisBlock('FUNÇÕES (não são géneros-mãe):', MusicAxisKind.function);
+
+    buffer.writeln();
+    buffer.writeln('ALIASES QUE O APP RESOLVE (prefira a chave canónica):');
+    var aliases = 0;
+    for (final taxon in all) {
+      for (final alias in taxon.aliases) {
+        if (alias == taxon.key || alias == taxon.title) continue;
+        buffer.writeln('- $alias → ${taxon.key}');
+        aliases++;
+        if (aliases >= 80) return buffer.toString();
+      }
+    }
+    return buffer.toString();
+  }
 }

@@ -77,6 +77,9 @@ void main() {
       ),
       isFalse,
     );
+    expect(MusicGenreAtlas.resolveTaxonKey('br.mpb'), 'brazilian.mpb');
+    expect(MusicGenreAtlas.resolveTaxonKey('Clube da Esquina'), isNotNull);
+    expect(MusicGenreAtlas.resolveTaxonKey('world music'), isNull);
     final dossier = MusicGenreAtlas.dossierFor(
       title: 'Clube da Esquina',
       artist: 'Milton Nascimento',
