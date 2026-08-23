@@ -7,7 +7,13 @@ OUT = Path(__file__).resolve().parents[1] / "packages/colony_domain/lib/src/musi
 
 
 def esc(s: str) -> str:
-    return s.replace("\\", "\\\\").replace("'", "\\'")
+    return (
+        s.replace("\\", "\\\\")
+        .replace("'", "\\'")
+        .replace("\n", "\\n")
+        .replace("\r", "\\r")
+        .replace("\t", "\\t")
+    )
 
 
 class N:
