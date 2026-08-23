@@ -5,11 +5,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'app/bootstrap/colony_app.dart';
+import 'app/localization/app_locale.dart';
 import 'app/localization/app_strings.dart';
 import 'core/providers/app_providers.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await AppLocale.ensureInitialized();
 
   if (kIsWeb) {
     runApp(const _WebUnsupportedApp());

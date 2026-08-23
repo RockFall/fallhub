@@ -2,8 +2,8 @@ import 'package:colony_design_system/colony_design_system.dart';
 import 'package:colony_domain/colony_domain.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:intl/intl.dart';
 
+import '../../../../app/localization/app_locale.dart';
 import '../../../../app/localization/app_strings.dart';
 import '../../../../core/providers/app_providers.dart';
 import '../../application/work_controllers.dart';
@@ -145,7 +145,7 @@ class _ScheduleBlockSheetState extends ConsumerState<ScheduleBlockSheet> {
 
   String _formatTime(TimeOfDay time, String locale, bool use24Hour) {
     final dateTime = DateTime(2026, 1, 1, time.hour, time.minute);
-    final format = use24Hour ? DateFormat.Hm(locale) : DateFormat.jm(locale);
+    final format = AppLocale.time(use24Hour: use24Hour, locale: locale);
     return format.format(dateTime);
   }
 

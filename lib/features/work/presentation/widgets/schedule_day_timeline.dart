@@ -2,8 +2,8 @@ import 'package:colony_design_system/colony_design_system.dart';
 import 'package:colony_domain/colony_domain.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:intl/intl.dart';
 
+import '../../../../app/localization/app_locale.dart';
 import '../../../../app/localization/app_strings.dart';
 import '../../application/work_providers.dart';
 import 'schedule_block_sheet.dart';
@@ -43,7 +43,7 @@ class ScheduleDayTimeline extends ConsumerWidget {
           return Text(AppStrings.noScheduleBlocks);
         }
 
-        final timeFormat = use24Hour ? DateFormat.Hm(locale) : DateFormat.jm(locale);
+        final timeFormat = AppLocale.time(use24Hour: use24Hour, locale: locale);
 
         return DayTimeline(
           day: day,

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
+import '../../../../app/localization/app_locale.dart';
 import '../../../../app/localization/app_strings.dart';
 import '../../application/work_providers.dart';
 
@@ -31,7 +32,7 @@ class ScheduleConflictPanel extends ConsumerWidget {
           return const SizedBox.shrink();
         }
 
-        final timeFormat = use24Hour ? DateFormat.Hm(locale) : DateFormat.jm(locale);
+        final timeFormat = AppLocale.time(use24Hour: use24Hour, locale: locale);
 
         return ColonyPanel(
           title: AppStrings.scheduleConflicts,

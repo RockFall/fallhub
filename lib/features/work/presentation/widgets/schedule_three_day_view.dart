@@ -2,8 +2,8 @@ import 'package:colony_design_system/colony_design_system.dart';
 import 'package:colony_domain/colony_domain.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:intl/intl.dart';
 
+import '../../../../app/localization/app_locale.dart';
 import '../../../../app/localization/app_strings.dart';
 import 'schedule_conflict_panel.dart';
 import 'schedule_day_timeline.dart';
@@ -83,7 +83,7 @@ class _ScheduleDayPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final dateLabel = DateFormat('EEE, d MMM', locale).format(day);
+    final dateLabel = AppLocale.date('EEE, d MMM', locale).format(day);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,

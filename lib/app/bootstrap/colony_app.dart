@@ -1,6 +1,7 @@
 import 'package:colony_design_system/colony_design_system.dart';
 import 'package:colony_domain/colony_domain.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../app/localization/app_strings.dart';
@@ -32,6 +33,13 @@ class ColonyApp extends ConsumerWidget {
       darkTheme: ColonyTheme.dark(),
       // RimWorld chrome is dark-only; light preference still uses dark tokens.
       themeMode: themeMode == ThemeMode.light ? ThemeMode.dark : themeMode,
+      locale: const Locale('pt', 'BR'),
+      supportedLocales: const [Locale('pt', 'BR')],
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
       routerConfig: router,
     );
   }
