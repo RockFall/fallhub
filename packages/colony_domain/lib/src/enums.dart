@@ -112,6 +112,10 @@ enum AggregateType {
   flashcardDeck,
   flashcard,
   googleTimeline,
+  musicNode,
+  musicEncounter,
+  musicExpedition,
+  musicImportRun,
   domainEvent,
 }
 
@@ -215,6 +219,26 @@ enum EventType {
   researchKnowledgeLinked,
   researchKnowledgeUnlinked,
   googleTimelineImported,
+  musicNodeCreated,
+  musicNodeUpdated,
+  musicEncounterRecorded,
+  musicEncounterCorrected,
+  musicRelationClaimAdded,
+  musicExpeditionDrafted,
+  musicExpeditionStarted,
+  musicExpeditionCompleted,
+  musicExpeditionAbandoned,
+  musicAtlasJsonImported,
+  musicAtlasJsonRolledBack,
+  flashcardCandidateProposed,
+  flashcardCandidateAccepted,
+  spotifyLinked,
+  spotifyRevoked,
+  spotifyLibraryPulled,
+  spotifyRecentStaged,
+  spotifyPlaylistDrafted,
+  spotifyNowPlayingCaptured,
+  spotifyCapabilityDegraded,
 }
 
 enum UndoActionType {

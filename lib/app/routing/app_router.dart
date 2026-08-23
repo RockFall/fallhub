@@ -30,6 +30,9 @@ import '../../features/quests/presentation/quest_detail_screen.dart';
 import '../../features/decisions/presentation/decision_list_screen.dart';
 import '../../features/research/presentation/research_list_screen.dart';
 import '../../features/research/presentation/research_node_detail_screen.dart';
+import '../../features/music_atlas/presentation/music_atlas_hub_screen.dart';
+import '../../features/music_atlas/presentation/music_constellation_screen.dart';
+import '../../features/music_atlas/presentation/music_node_inspect_screen.dart';
 import '../../features/flashcards/presentation/flashcards_hub_screen.dart';
 import '../../features/flashcards/presentation/flashcard_deck_screen.dart';
 import '../../features/flashcards/presentation/flashcard_tag_screen.dart';
@@ -204,6 +207,35 @@ final routerProvider = Provider<GoRouter>((ref) {
             path: '/research',
             builder: (context, state) => const ResearchListScreen(),
             routes: [
+              GoRoute(
+                path: 'music-atlas',
+                builder: (context, state) => MusicAtlasHubScreen(
+                  openImport:
+                      state.uri.queryParameters['source'] == 'json' ||
+                      state.uri.queryParameters['import'] == '1',
+                  importSource: state.uri.queryParameters['source'],
+                ),
+                routes: [
+                  GoRoute(
+                    path: 'import',
+                    builder: (context, state) => MusicAtlasHubScreen(
+                      openImport: true,
+                      importSource: state.uri.queryParameters['source'],
+                    ),
+                  ),
+                  GoRoute(
+                    path: 'constellation',
+                    builder: (context, state) =>
+                        const MusicConstellationScreen(),
+                  ),
+                  GoRoute(
+                    path: 'nodes/:nodeId',
+                    builder: (context, state) => MusicNodeInspectScreen(
+                      nodeId: state.pathParameters['nodeId']!,
+                    ),
+                  ),
+                ],
+              ),
               GoRoute(
                 path: ':id',
                 builder: (context, state) => ResearchNodeDetailScreen(
@@ -501,6 +533,11 @@ class _AppShellState extends ConsumerState<AppShell> {
           icon: Icons.science_outlined,
           label: AppStrings.research,
           onSelected: () => context.go('/research'),
+        ),
+        ColonyFloatMenuItem(
+          icon: Icons.album_outlined,
+          label: AppStrings.musicAtlasTitle,
+          onSelected: () => context.go('/research/music-atlas'),
         ),
         ColonyFloatMenuItem(
           icon: Icons.folder_outlined,

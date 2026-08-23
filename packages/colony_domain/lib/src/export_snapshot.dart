@@ -43,6 +43,7 @@ import 'knowledge_area_placement.dart';
 import 'flashcard.dart';
 import 'flashcard_tag.dart';
 import 'google_timeline.dart';
+import 'music_atlas.dart';
 import 'schedule_block.dart';
 import 'task.dart';
 import 'weekly_review.dart';
@@ -120,6 +121,14 @@ class ExportSnapshot extends Equatable {
     this.flashcardTagLinks = const [],
     this.googleTimelineImport,
     this.googleTimelinePlaceLabels = const [],
+    this.musicNodes = const [],
+    this.musicExternalIdentities = const [],
+    this.personalMusicNodeStates = const [],
+    this.musicEncounters = const [],
+    this.musicRelationClaims = const [],
+    this.musicExpeditions = const [],
+    this.musicExpeditionStops = const [],
+    this.musicImportRuns = const [],
   });
 
   final DateTime exportedAt;
@@ -180,6 +189,14 @@ class ExportSnapshot extends Equatable {
   final List<FlashcardTagLink> flashcardTagLinks;
   final GoogleTimelineImport? googleTimelineImport;
   final List<TimelinePlaceLabel> googleTimelinePlaceLabels;
+  final List<MusicNode> musicNodes;
+  final List<MusicExternalIdentity> musicExternalIdentities;
+  final List<PersonalMusicNodeState> personalMusicNodeStates;
+  final List<MusicEncounter> musicEncounters;
+  final List<MusicRelationClaim> musicRelationClaims;
+  final List<MusicExpedition> musicExpeditions;
+  final List<MusicExpeditionStop> musicExpeditionStops;
+  final List<MusicImportRun> musicImportRuns;
 
   Map<String, int> get entityCounts => {
         'tasks': tasks.length,
@@ -229,6 +246,14 @@ class ExportSnapshot extends Equatable {
         'flashcard_tag_links': flashcardTagLinks.length,
         'google_timeline_import': googleTimelineImport == null ? 0 : 1,
         'google_timeline_place_labels': googleTimelinePlaceLabels.length,
+        'music_nodes': musicNodes.length,
+        'music_external_identities': musicExternalIdentities.length,
+        'personal_music_node_states': personalMusicNodeStates.length,
+        'music_encounters': musicEncounters.length,
+        'music_relation_claims': musicRelationClaims.length,
+        'music_expeditions': musicExpeditions.length,
+        'music_expedition_stops': musicExpeditionStops.length,
+        'music_import_runs': musicImportRuns.length,
       };
 
   static ExportSnapshot fromJsonString(String source) {
@@ -247,7 +272,7 @@ class ExportSnapshot extends Equatable {
 
   static ExportSnapshot fromJson(Map<String, dynamic> json) {
     final version = _requireInt(json, 'version');
-    if (version < 1 || version > 34) {
+    if (version < 1 || version > 35) {
       throw ExportSnapshotException('Versão de export não suportada: $version');
     }
 
@@ -481,6 +506,36 @@ class ExportSnapshot extends Equatable {
               _parseTimelinePlaceLabel,
             )
           : <TimelinePlaceLabel>[],
+      musicNodes: version >= 35
+          ? _parseList(json['music_nodes'], _parseMusicNode)
+          : const [],
+      musicExternalIdentities: version >= 35
+          ? _parseList(
+              json['music_external_identities'],
+              _parseMusicExternalIdentity,
+            )
+          : const [],
+      personalMusicNodeStates: version >= 35
+          ? _parseList(
+              json['personal_music_node_states'],
+              _parsePersonalMusicNodeState(profileId),
+            )
+          : const [],
+      musicEncounters: version >= 35
+          ? _parseList(json['music_encounters'], _parseMusicEncounter(profileId))
+          : const [],
+      musicRelationClaims: version >= 35
+          ? _parseList(json['music_relation_claims'], _parseMusicRelationClaim)
+          : const [],
+      musicExpeditions: version >= 35
+          ? _parseList(json['music_expeditions'], _parseMusicExpedition(profileId))
+          : const [],
+      musicExpeditionStops: version >= 35
+          ? _parseList(json['music_expedition_stops'], _parseMusicExpeditionStop)
+          : const [],
+      musicImportRuns: version >= 35
+          ? _parseList(json['music_import_runs'], _parseMusicImportRun(profileId))
+          : const [],
     );
   }
 
@@ -1356,6 +1411,204 @@ class ExportSnapshot extends Equatable {
     );
   }
 
+  static MusicNode _parseMusicNode(Map<String, dynamic> json) {
+    return MusicNode(
+      id: EntityId(_requireString(json, 'id')),
+      nodeType: MusicNodeType.values.byName(_requireString(json, 'node_type')),
+      canonicalName: _requireString(json, 'canonical_name'),
+      sortName: _requireString(json, 'sort_name'),
+      description: json['description'] as String?,
+      beginYear: _optionalInt(json, 'begin_year'),
+      endYear: _optionalInt(json, 'end_year'),
+      metadataQuality: (json['metadata_quality'] as num?)?.toDouble() ?? 0,
+      provenanceJson: json['provenance_json'] as String? ?? '{}',
+      createdAt: _parseDateTime(_requireString(json, 'created_at')),
+      updatedAt: _parseDateTime(_requireString(json, 'updated_at')),
+      deletedAt: json['deleted_at'] == null
+          ? null
+          : _parseDateTime(json['deleted_at'] as String),
+      version: _optionalInt(json, 'version') ?? 1,
+    );
+  }
+
+  static MusicExternalIdentity _parseMusicExternalIdentity(
+    Map<String, dynamic> json,
+  ) {
+    return MusicExternalIdentity(
+      id: EntityId(_requireString(json, 'id')),
+      nodeId: EntityId(_requireString(json, 'node_id')),
+      provider: _requireString(json, 'provider'),
+      entityType: _requireString(json, 'entity_type'),
+      externalId: _requireString(json, 'external_id'),
+      externalUrl: json['external_url'] as String?,
+      confidence: (json['confidence'] as num?)?.toDouble() ?? 1,
+      reviewedByUser: json['reviewed_by_user'] == true,
+      metadataJson: json['metadata_json'] as String? ?? '{}',
+      createdAt: _parseDateTime(_requireString(json, 'created_at')),
+      updatedAt: _parseDateTime(_requireString(json, 'updated_at')),
+    );
+  }
+
+  static PersonalMusicNodeState Function(Map<String, dynamic>)
+  _parsePersonalMusicNodeState(EntityId profileId) {
+    return (json) {
+      return PersonalMusicNodeState(
+        profileId: profileId,
+        nodeId: EntityId(_requireString(json, 'node_id')),
+        discoveryState: MusicDiscoveryState.values.byName(
+          _requireString(json, 'discovery_state'),
+        ),
+        resonance: _optionalInt(json, 'resonance'),
+        firstEncounterAt: json['first_encounter_at'] == null
+            ? null
+            : _parseDateTime(json['first_encounter_at'] as String),
+        lastEncounterAt: json['last_encounter_at'] == null
+            ? null
+            : _parseDateTime(json['last_encounter_at'] as String),
+        encounterCount: _optionalInt(json, 'encounter_count') ?? 0,
+        personalSummary: json['personal_summary'] as String?,
+        nextAction: json['next_action'] as String?,
+        createdAt: _parseDateTime(_requireString(json, 'created_at')),
+        updatedAt: _parseDateTime(_requireString(json, 'updated_at')),
+        version: _optionalInt(json, 'version') ?? 1,
+      );
+    };
+  }
+
+  static MusicEncounter Function(Map<String, dynamic>) _parseMusicEncounter(
+    EntityId profileId,
+  ) {
+    return (json) {
+      return MusicEncounter(
+        id: EntityId(_requireString(json, 'id')),
+        profileId: profileId,
+        nodeId: EntityId(_requireString(json, 'node_id')),
+        encounterType: MusicEncounterType.values.byName(
+          _requireString(json, 'encounter_type'),
+        ),
+        occurredAt: _parseDateTime(_requireString(json, 'occurred_at')),
+        durationSeconds: _optionalInt(json, 'duration_seconds'),
+        attentionQuality: _optionalInt(json, 'attention_quality'),
+        resonance: _optionalInt(json, 'resonance'),
+        note: json['note'] as String?,
+        sourceType: SourceType.values.byName(_requireString(json, 'source_type')),
+        provenanceJson: json['provenance_json'] as String? ?? '{}',
+        createdAt: _parseDateTime(_requireString(json, 'created_at')),
+        updatedAt: _parseDateTime(_requireString(json, 'updated_at')),
+        deletedAt: json['deleted_at'] == null
+            ? null
+            : _parseDateTime(json['deleted_at'] as String),
+      );
+    };
+  }
+
+  static MusicRelationClaim _parseMusicRelationClaim(Map<String, dynamic> json) {
+    return MusicRelationClaim(
+      id: EntityId(_requireString(json, 'id')),
+      fromNodeId: EntityId(_requireString(json, 'from_node_id')),
+      toNodeId: EntityId(_requireString(json, 'to_node_id')),
+      relationType: MusicRelationType.values.byName(
+        _requireString(json, 'relation_type'),
+      ),
+      description: json['description'] as String?,
+      status: MusicClaimStatus.values.byName(_requireString(json, 'status')),
+      confidence: (json['confidence'] as num?)?.toDouble(),
+      validFrom: json['valid_from'] as String?,
+      validTo: json['valid_to'] as String?,
+      provenanceJson: json['provenance_json'] as String? ?? '{}',
+      createdAt: _parseDateTime(_requireString(json, 'created_at')),
+      updatedAt: _parseDateTime(_requireString(json, 'updated_at')),
+      deletedAt: json['deleted_at'] == null
+          ? null
+          : _parseDateTime(json['deleted_at'] as String),
+    );
+  }
+
+  static MusicExpedition Function(Map<String, dynamic>) _parseMusicExpedition(
+    EntityId profileId,
+  ) {
+    return (json) {
+      return MusicExpedition(
+        id: EntityId(_requireString(json, 'id')),
+        profileId: profileId,
+        title: _requireString(json, 'title'),
+        question: _requireString(json, 'question'),
+        status: MusicExpeditionStatus.values.byName(
+          _requireString(json, 'status'),
+        ),
+        purpose: json['purpose'] as String?,
+        questId: json['quest_id'] == null
+            ? null
+            : EntityId(json['quest_id'] as String),
+        startedAt: json['started_at'] == null
+            ? null
+            : _parseDateTime(json['started_at'] as String),
+        completedAt: json['completed_at'] == null
+            ? null
+            : _parseDateTime(json['completed_at'] as String),
+        abandonedAt: json['abandoned_at'] == null
+            ? null
+            : _parseDateTime(json['abandoned_at'] as String),
+        abandonmentReason: json['abandonment_reason'] as String?,
+        createdAt: _parseDateTime(_requireString(json, 'created_at')),
+        updatedAt: _parseDateTime(_requireString(json, 'updated_at')),
+        deletedAt: json['deleted_at'] == null
+            ? null
+            : _parseDateTime(json['deleted_at'] as String),
+        version: _optionalInt(json, 'version') ?? 1,
+      );
+    };
+  }
+
+  static MusicExpeditionStop _parseMusicExpeditionStop(
+    Map<String, dynamic> json,
+  ) {
+    return MusicExpeditionStop(
+      id: EntityId(_requireString(json, 'id')),
+      expeditionId: EntityId(_requireString(json, 'expedition_id')),
+      nodeId: EntityId(_requireString(json, 'node_id')),
+      displayOrder: _requireInt(json, 'display_order'),
+      role: MusicExpeditionStopRole.values.byName(_requireString(json, 'role')),
+      reason: json['reason'] as String?,
+      cues: _parseStringList(json['cues']),
+      isOptional: json['is_optional'] != false,
+      completedAt: json['completed_at'] == null
+          ? null
+          : _parseDateTime(json['completed_at'] as String),
+    );
+  }
+
+  static MusicImportRun Function(Map<String, dynamic>) _parseMusicImportRun(
+    EntityId profileId,
+  ) {
+    return (json) {
+      return MusicImportRun(
+        id: EntityId(_requireString(json, 'id')),
+        profileId: profileId,
+        sourceKind: MusicImportSourceKind.values.byName(
+          _requireString(json, 'source_kind'),
+        ),
+        status: MusicImportRunStatus.values.byName(
+          _requireString(json, 'status'),
+        ),
+        documentVersion: _optionalInt(json, 'document_version'),
+        itemCount: _optionalInt(json, 'item_count') ?? 0,
+        createdCount: _optionalInt(json, 'created_count') ?? 0,
+        skippedCount: _optionalInt(json, 'skipped_count') ?? 0,
+        conflictCount: _optionalInt(json, 'conflict_count') ?? 0,
+        provenanceJson: json['provenance_json'] as String? ?? '{}',
+        reportJson: json['report_json'] as String?,
+        createdAt: _parseDateTime(_requireString(json, 'created_at')),
+        appliedAt: json['applied_at'] == null
+            ? null
+            : _parseDateTime(json['applied_at'] as String),
+        rolledBackAt: json['rolled_back_at'] == null
+            ? null
+            : _parseDateTime(json['rolled_back_at'] as String),
+      );
+    };
+  }
+
   static HealthAppointment Function(Map<String, dynamic>)
       _parseHealthAppointment(EntityId profileId) {
     return (json) {
@@ -1615,6 +1868,20 @@ class ExportSnapshot extends Equatable {
               if (label.customName != null) 'custom_name': label.customName,
             },
         ],
+      if (version >= 35) ...{
+        'music_nodes': musicNodes.map(_musicNodeJson).toList(),
+        'music_external_identities':
+            musicExternalIdentities.map(_musicExternalIdentityJson).toList(),
+        'personal_music_node_states':
+            personalMusicNodeStates.map(_personalMusicNodeStateJson).toList(),
+        'music_encounters': musicEncounters.map(_musicEncounterJson).toList(),
+        'music_relation_claims':
+            musicRelationClaims.map(_musicRelationClaimJson).toList(),
+        'music_expeditions': musicExpeditions.map(_musicExpeditionJson).toList(),
+        'music_expedition_stops':
+            musicExpeditionStops.map(_musicExpeditionStopJson).toList(),
+        'music_import_runs': musicImportRuns.map(_musicImportRunJson).toList(),
+      },
     };
   }
 
@@ -2248,6 +2515,147 @@ class ExportSnapshot extends Equatable {
         'updated_at': e.updatedAt.toUtc().toIso8601String(),
       };
 
+  static Map<String, Object?> _musicNodeJson(MusicNode n) => {
+        'id': n.id.value,
+        'node_type': n.nodeType.name,
+        'canonical_name': n.canonicalName,
+        'sort_name': n.sortName,
+        if (n.description != null) 'description': n.description,
+        if (n.beginYear != null) 'begin_year': n.beginYear,
+        if (n.endYear != null) 'end_year': n.endYear,
+        'metadata_quality': n.metadataQuality,
+        'provenance_json': n.provenanceJson,
+        'created_at': n.createdAt.toUtc().toIso8601String(),
+        'updated_at': n.updatedAt.toUtc().toIso8601String(),
+        if (n.deletedAt != null)
+          'deleted_at': n.deletedAt!.toUtc().toIso8601String(),
+        'version': n.version,
+      };
+
+  static Map<String, Object?> _musicExternalIdentityJson(
+    MusicExternalIdentity i,
+  ) =>
+      {
+        'id': i.id.value,
+        'node_id': i.nodeId.value,
+        'provider': i.provider,
+        'entity_type': i.entityType,
+        'external_id': i.externalId,
+        if (i.externalUrl != null) 'external_url': i.externalUrl,
+        'confidence': i.confidence,
+        'reviewed_by_user': i.reviewedByUser,
+        'metadata_json': i.metadataJson,
+        'created_at': i.createdAt.toUtc().toIso8601String(),
+        'updated_at': i.updatedAt.toUtc().toIso8601String(),
+      };
+
+  static Map<String, Object?> _personalMusicNodeStateJson(
+    PersonalMusicNodeState s,
+  ) =>
+      {
+        'node_id': s.nodeId.value,
+        'discovery_state': s.discoveryState.name,
+        if (s.resonance != null) 'resonance': s.resonance,
+        if (s.firstEncounterAt != null)
+          'first_encounter_at': s.firstEncounterAt!.toUtc().toIso8601String(),
+        if (s.lastEncounterAt != null)
+          'last_encounter_at': s.lastEncounterAt!.toUtc().toIso8601String(),
+        'encounter_count': s.encounterCount,
+        if (s.personalSummary != null) 'personal_summary': s.personalSummary,
+        if (s.nextAction != null) 'next_action': s.nextAction,
+        'created_at': s.createdAt.toUtc().toIso8601String(),
+        'updated_at': s.updatedAt.toUtc().toIso8601String(),
+        'version': s.version,
+      };
+
+  static Map<String, Object?> _musicEncounterJson(MusicEncounter e) => {
+        'id': e.id.value,
+        'node_id': e.nodeId.value,
+        'encounter_type': e.encounterType.name,
+        'occurred_at': e.occurredAt.toUtc().toIso8601String(),
+        if (e.durationSeconds != null) 'duration_seconds': e.durationSeconds,
+        if (e.attentionQuality != null) 'attention_quality': e.attentionQuality,
+        if (e.resonance != null) 'resonance': e.resonance,
+        if (e.note != null) 'note': e.note,
+        'source_type': e.sourceType.name,
+        'provenance_json': e.provenanceJson,
+        'created_at': e.createdAt.toUtc().toIso8601String(),
+        'updated_at': e.updatedAt.toUtc().toIso8601String(),
+        if (e.deletedAt != null)
+          'deleted_at': e.deletedAt!.toUtc().toIso8601String(),
+      };
+
+  static Map<String, Object?> _musicRelationClaimJson(MusicRelationClaim c) => {
+        'id': c.id.value,
+        'from_node_id': c.fromNodeId.value,
+        'to_node_id': c.toNodeId.value,
+        'relation_type': c.relationType.name,
+        if (c.description != null) 'description': c.description,
+        'status': c.status.name,
+        if (c.confidence != null) 'confidence': c.confidence,
+        if (c.validFrom != null) 'valid_from': c.validFrom,
+        if (c.validTo != null) 'valid_to': c.validTo,
+        'provenance_json': c.provenanceJson,
+        'created_at': c.createdAt.toUtc().toIso8601String(),
+        'updated_at': c.updatedAt.toUtc().toIso8601String(),
+        if (c.deletedAt != null)
+          'deleted_at': c.deletedAt!.toUtc().toIso8601String(),
+      };
+
+  static Map<String, Object?> _musicExpeditionJson(MusicExpedition e) => {
+        'id': e.id.value,
+        'title': e.title,
+        'question': e.question,
+        'status': e.status.name,
+        if (e.purpose != null) 'purpose': e.purpose,
+        if (e.questId != null) 'quest_id': e.questId!.value,
+        if (e.startedAt != null)
+          'started_at': e.startedAt!.toUtc().toIso8601String(),
+        if (e.completedAt != null)
+          'completed_at': e.completedAt!.toUtc().toIso8601String(),
+        if (e.abandonedAt != null)
+          'abandoned_at': e.abandonedAt!.toUtc().toIso8601String(),
+        if (e.abandonmentReason != null)
+          'abandonment_reason': e.abandonmentReason,
+        'created_at': e.createdAt.toUtc().toIso8601String(),
+        'updated_at': e.updatedAt.toUtc().toIso8601String(),
+        if (e.deletedAt != null)
+          'deleted_at': e.deletedAt!.toUtc().toIso8601String(),
+        'version': e.version,
+      };
+
+  static Map<String, Object?> _musicExpeditionStopJson(MusicExpeditionStop s) =>
+      {
+        'id': s.id.value,
+        'expedition_id': s.expeditionId.value,
+        'node_id': s.nodeId.value,
+        'display_order': s.displayOrder,
+        'role': s.role.name,
+        if (s.reason != null) 'reason': s.reason,
+        'cues': s.cues,
+        'is_optional': s.isOptional,
+        if (s.completedAt != null)
+          'completed_at': s.completedAt!.toUtc().toIso8601String(),
+      };
+
+  static Map<String, Object?> _musicImportRunJson(MusicImportRun r) => {
+        'id': r.id.value,
+        'source_kind': r.sourceKind.name,
+        'status': r.status.name,
+        if (r.documentVersion != null) 'document_version': r.documentVersion,
+        'item_count': r.itemCount,
+        'created_count': r.createdCount,
+        'skipped_count': r.skippedCount,
+        'conflict_count': r.conflictCount,
+        'provenance_json': r.provenanceJson,
+        if (r.reportJson != null) 'report_json': r.reportJson,
+        'created_at': r.createdAt.toUtc().toIso8601String(),
+        if (r.appliedAt != null)
+          'applied_at': r.appliedAt!.toUtc().toIso8601String(),
+        if (r.rolledBackAt != null)
+          'rolled_back_at': r.rolledBackAt!.toUtc().toIso8601String(),
+      };
+
   @override
   List<Object?> get props => [
         exportedAt,
@@ -2308,5 +2716,13 @@ class ExportSnapshot extends Equatable {
         flashcardTagLinks,
         googleTimelineImport,
         googleTimelinePlaceLabels,
+        musicNodes,
+        musicExternalIdentities,
+        personalMusicNodeStates,
+        musicEncounters,
+        musicRelationClaims,
+        musicExpeditions,
+        musicExpeditionStops,
+        musicImportRuns,
       ];
 }

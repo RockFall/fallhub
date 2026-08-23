@@ -89,4 +89,7 @@ export 'src/google_timeline_codec.dart';
 export 'src/timeline_byte_source.dart';
 export 'src/google_timeline_analytics.dart';
 export 'src/city_gazetteer.dart';
+export 'src/music_atlas.dart';
+export 'src/music_atlas_json.dart';
+export 'src/music_spotify.dart';
 

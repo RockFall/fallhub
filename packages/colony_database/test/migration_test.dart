@@ -1829,5 +1829,33 @@ void main() {
       expect(listed.single.accountId, accountB.id);
       expect(listed.single.fingerprint, 'fp-remap-1');
     });
+
+    test('v39 to v40 adds music atlas tables', () async {
+      final db = await openMigratedFrom(
+        39,
+        seed: (sqlite) {
+          seedProfile(sqlite);
+        },
+      );
+      addTearDown(() async {
+        await db.close();
+      });
+
+      final repos = ColonyRepositories.create(
+        db,
+        idGenerator: FixedIdGenerator([
+          for (var i = 1; i <= 20; i++) 'music-mig-$i',
+        ]),
+        clock: () => DateTime.utc(2026, 8, 23, 12),
+      );
+      final profile = (await repos.profiles.getActive())!;
+      final node = await repos.musicAtlas.createNode(
+        nodeType: MusicNodeType.releaseGroup,
+        canonicalName: 'After migration',
+      );
+      expect(node.canonicalName, 'After migration');
+      expect(await repos.musicAtlas.listNodes(), hasLength(1));
+      expect(profile.id.value, isNotEmpty);
+    });
   });
 }

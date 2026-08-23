@@ -103,6 +103,7 @@ abstract final class ColonyMiniAppColors {
   static const work = Color(0xFF8B8F3A);
   static const quests = Color(0xFFE07A3D);
   static const flashcards = Color(0xFF2BB7C4);
+  static const musicAtlas = Color(0xFFC45A8A);
   static const research = Color(0xFF7B5EA7);
   static const finance = Color(0xFFD4A017);
   static const health = Color(0xFFD45B6A);

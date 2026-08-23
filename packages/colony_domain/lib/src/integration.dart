@@ -6,6 +6,8 @@ import 'id_generator.dart';
 enum IntegrationKind {
   calendarIcs,
   notificationListener,
+  spotify,
+  musicbrainz,
 }
 
 /// Opt-in consent for a local integration adapter (ADR-032).

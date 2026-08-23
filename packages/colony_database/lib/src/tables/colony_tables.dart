@@ -1025,3 +1025,213 @@ class GoogleTimelinePlaceLabels extends Table {
   @override
   Set<Column<Object>> get primaryKey => {profileId, placeId};
 }
+
+@DataClassName('MusicNodeRow')
+class MusicNodes extends Table {
+  @override
+  String get tableName => 'music_nodes';
+
+  TextColumn get id => text()();
+  TextColumn get nodeType => text()();
+  TextColumn get canonicalName => text()();
+  TextColumn get sortName => text()();
+  TextColumn get description => text().nullable()();
+  IntColumn get beginYear => integer().nullable()();
+  IntColumn get endYear => integer().nullable()();
+  RealColumn get metadataQuality => real().withDefault(const Constant(0))();
+  TextColumn get provenanceJson => text().withDefault(const Constant('{}'))();
+  IntColumn get createdAt => integer()();
+  IntColumn get updatedAt => integer()();
+  IntColumn get deletedAt => integer().nullable()();
+  IntColumn get version => integer().withDefault(const Constant(1))();
+
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+}
+
+@DataClassName('MusicExternalIdentityRow')
+class MusicExternalIdentities extends Table {
+  @override
+  String get tableName => 'music_external_identities';
+
+  TextColumn get id => text()();
+  TextColumn get nodeId => text().references(MusicNodes, #id)();
+  TextColumn get provider => text()();
+  TextColumn get entityType => text()();
+  TextColumn get externalId => text()();
+  TextColumn get externalUrl => text().nullable()();
+  RealColumn get confidence => real().withDefault(const Constant(1))();
+  BoolColumn get reviewedByUser =>
+      boolean().withDefault(const Constant(false))();
+  TextColumn get metadataJson => text().withDefault(const Constant('{}'))();
+  IntColumn get createdAt => integer()();
+  IntColumn get updatedAt => integer()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+
+  @override
+  List<Set<Column<Object>>> get uniqueKeys => [
+        {provider, entityType, externalId},
+      ];
+}
+
+@DataClassName('PersonalMusicNodeStateRow')
+class PersonalMusicNodeStates extends Table {
+  @override
+  String get tableName => 'personal_music_node_states';
+
+  TextColumn get profileId => text().references(Profiles, #id)();
+  TextColumn get nodeId => text().references(MusicNodes, #id)();
+  TextColumn get discoveryState => text()();
+  IntColumn get resonance => integer().nullable()();
+  IntColumn get firstEncounterAt => integer().nullable()();
+  IntColumn get lastEncounterAt => integer().nullable()();
+  IntColumn get encounterCount => integer().withDefault(const Constant(0))();
+  TextColumn get personalSummary => text().nullable()();
+  TextColumn get nextAction => text().nullable()();
+  IntColumn get createdAt => integer()();
+  IntColumn get updatedAt => integer()();
+  IntColumn get version => integer().withDefault(const Constant(1))();
+
+  @override
+  Set<Column<Object>> get primaryKey => {profileId, nodeId};
+}
+
+@DataClassName('MusicEncounterRow')
+class MusicEncounters extends Table {
+  @override
+  String get tableName => 'music_encounters';
+
+  TextColumn get id => text()();
+  TextColumn get profileId => text().references(Profiles, #id)();
+  TextColumn get nodeId => text().references(MusicNodes, #id)();
+  TextColumn get encounterType => text()();
+  IntColumn get occurredAt => integer()();
+  IntColumn get durationSeconds => integer().nullable()();
+  IntColumn get attentionQuality => integer().nullable()();
+  IntColumn get resonance => integer().nullable()();
+  TextColumn get note => text().nullable()();
+  TextColumn get sourceType => text()();
+  TextColumn get provenanceJson => text().withDefault(const Constant('{}'))();
+  IntColumn get createdAt => integer()();
+  IntColumn get updatedAt => integer()();
+  IntColumn get deletedAt => integer().nullable()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+}
+
+@DataClassName('MusicRelationClaimRow')
+class MusicRelationClaims extends Table {
+  @override
+  String get tableName => 'music_relation_claims';
+
+  TextColumn get id => text()();
+  TextColumn get fromNodeId => text().references(MusicNodes, #id)();
+  TextColumn get toNodeId => text().references(MusicNodes, #id)();
+  TextColumn get relationType => text()();
+  TextColumn get description => text().nullable()();
+  TextColumn get status => text()();
+  RealColumn get confidence => real().nullable()();
+  TextColumn get validFrom => text().nullable()();
+  TextColumn get validTo => text().nullable()();
+  TextColumn get provenanceJson => text().withDefault(const Constant('{}'))();
+  IntColumn get createdAt => integer()();
+  IntColumn get updatedAt => integer()();
+  IntColumn get deletedAt => integer().nullable()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+}
+
+@DataClassName('MusicExpeditionRow')
+class MusicExpeditions extends Table {
+  @override
+  String get tableName => 'music_expeditions';
+
+  TextColumn get id => text()();
+  TextColumn get profileId => text().references(Profiles, #id)();
+  TextColumn get title => text()();
+  TextColumn get question => text()();
+  TextColumn get status => text()();
+  TextColumn get purpose => text().nullable()();
+  TextColumn get questId => text().nullable()();
+  IntColumn get startedAt => integer().nullable()();
+  IntColumn get completedAt => integer().nullable()();
+  IntColumn get abandonedAt => integer().nullable()();
+  TextColumn get abandonmentReason => text().nullable()();
+  IntColumn get createdAt => integer()();
+  IntColumn get updatedAt => integer()();
+  IntColumn get deletedAt => integer().nullable()();
+  IntColumn get version => integer().withDefault(const Constant(1))();
+
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+}
+
+@DataClassName('MusicExpeditionStopRow')
+class MusicExpeditionStops extends Table {
+  @override
+  String get tableName => 'music_expedition_stops';
+
+  TextColumn get id => text()();
+  TextColumn get expeditionId => text().references(MusicExpeditions, #id)();
+  TextColumn get nodeId => text().references(MusicNodes, #id)();
+  IntColumn get displayOrder => integer()();
+  TextColumn get role => text()();
+  TextColumn get reason => text().nullable()();
+  TextColumn get cuesJson => text().withDefault(const Constant('[]'))();
+  BoolColumn get isOptional => boolean().withDefault(const Constant(true))();
+  IntColumn get completedAt => integer().nullable()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+}
+
+@DataClassName('MusicImportRunRow')
+class MusicImportRuns extends Table {
+  @override
+  String get tableName => 'music_import_runs';
+
+  TextColumn get id => text()();
+  TextColumn get profileId => text().references(Profiles, #id)();
+  TextColumn get sourceKind => text()();
+  TextColumn get status => text()();
+  IntColumn get documentVersion => integer().nullable()();
+  IntColumn get itemCount => integer().withDefault(const Constant(0))();
+  IntColumn get createdCount => integer().withDefault(const Constant(0))();
+  IntColumn get skippedCount => integer().withDefault(const Constant(0))();
+  IntColumn get conflictCount => integer().withDefault(const Constant(0))();
+  TextColumn get provenanceJson => text().withDefault(const Constant('{}'))();
+  TextColumn get reportJson => text().nullable()();
+  IntColumn get createdAt => integer()();
+  IntColumn get appliedAt => integer().nullable()();
+  IntColumn get rolledBackAt => integer().nullable()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+}
+
+@DataClassName('MusicSpotifySyncStateRow')
+class MusicSpotifySyncStates extends Table {
+  @override
+  String get tableName => 'music_spotify_sync_state';
+
+  TextColumn get profileId => text().references(Profiles, #id)();
+  TextColumn get consentId => text()();
+  TextColumn get grantedScopesJson =>
+      text().withDefault(const Constant('[]'))();
+  TextColumn get libraryCursor => text().nullable()();
+  TextColumn get recentCursor => text().nullable()();
+  IntColumn get lastLibraryAt => integer().nullable()();
+  IntColumn get lastRecentAt => integer().nullable()();
+  IntColumn get lastPlaylistAt => integer().nullable()();
+  TextColumn get capabilityProbeJson =>
+      text().withDefault(const Constant('{}'))();
+  TextColumn get lastError => text().nullable()();
+  IntColumn get updatedAt => integer()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {profileId};
+}

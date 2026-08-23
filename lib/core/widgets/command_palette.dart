@@ -41,6 +41,21 @@ class _CommandPaletteState extends ConsumerState<CommandPalette> {
     _PaletteCommand('Novo projeto', '/projects?create=1', Icons.create_new_folder_outlined),
     _PaletteCommand('Decisões', '/decisions', Icons.gavel_outlined),
     _PaletteCommand('Pesquisa', '/research', Icons.science_outlined),
+    _PaletteCommand(
+      AppStrings.musicAtlasTitle,
+      '/research/music-atlas',
+      Icons.album_outlined,
+    ),
+    _PaletteCommand(
+      AppStrings.musicAtlasImportJson,
+      '/research/music-atlas/import?source=json',
+      Icons.upload_file_outlined,
+    ),
+    _PaletteCommand(
+      AppStrings.musicAtlasConstellation,
+      '/research/music-atlas/constellation',
+      Icons.hub_outlined,
+    ),
     _PaletteCommand('Flashcards', '/flashcards', Icons.style_outlined),
     _PaletteCommand('Estudar flashcards', '/flashcards/study', Icons.play_arrow_outlined),
     _PaletteCommand('Novo cartão', '/flashcards?capture=1', Icons.note_add_outlined),

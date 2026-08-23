@@ -8,6 +8,7 @@ import 'package:uuid/uuid.dart';
 
 import '../colony_database.dart'
     hide DomainEvent, NeedDefinition, NeedReading, CheckIn, MoodFactor, DailyReview, WeeklyReview, WorkPriority, Bill, ScheduleBlock, Quest, Project, QuestProject, DecisionRecord, QuestDecision, ResearchNode, ResearchPrerequisite;
+import 'music_atlas_repository.dart';
 
 class ProfileRepository {
   ProfileRepository(this._db, this._ids, this._clock);
@@ -363,6 +364,7 @@ class ExportRepository {
     this._weeklyReviews,
     this._flashcards,
     this._googleTimeline,
+    this._musicAtlas,
     this._clock,
   );
 
@@ -393,6 +395,7 @@ class ExportRepository {
   final WeeklyReviewRepository _weeklyReviews;
   final FlashcardRepository _flashcards;
   final GoogleTimelineRepository _googleTimeline;
+  final MusicAtlasRepository _musicAtlas;
   final DateTime Function() _clock;
 
   Future<ExportSnapshot> buildSnapshot() async {
@@ -463,10 +466,21 @@ class ExportRepository {
         await _googleTimeline.getForProfile(profile.id);
     final googleTimelinePlaceLabels =
         await _googleTimeline.listLabels(profile.id);
+    final musicNodes = await _musicAtlas.listNodes();
+    final musicExternalIdentities = await _musicAtlas.listIdentities();
+    final personalMusicNodeStates = await _musicAtlas.listStates(profile.id);
+    final musicEncounters = await _musicAtlas.listEncounters(profile.id);
+    final musicRelationClaims = await _musicAtlas.listClaims();
+    final musicExpeditions = await _musicAtlas.listExpeditions(profile.id);
+    final musicExpeditionStops = <MusicExpeditionStop>[
+      for (final expedition in musicExpeditions)
+        ...await _musicAtlas.listStops(expedition.id),
+    ];
+    final musicImportRuns = await _musicAtlas.listImportRuns(profile.id);
 
     return ExportSnapshot(
       exportedAt: _clock(),
-      version: 34,
+      version: 35,
       profile: profile,
       preferences: prefs,
       tasks: tasks,
@@ -523,6 +537,14 @@ class ExportRepository {
       flashcardTagLinks: flashcardTagLinks,
       googleTimelineImport: googleTimelineImport,
       googleTimelinePlaceLabels: googleTimelinePlaceLabels,
+      musicNodes: musicNodes,
+      musicExternalIdentities: musicExternalIdentities,
+      personalMusicNodeStates: personalMusicNodeStates,
+      musicEncounters: musicEncounters,
+      musicRelationClaims: musicRelationClaims,
+      musicExpeditions: musicExpeditions,
+      musicExpeditionStops: musicExpeditionStops,
+      musicImportRuns: musicImportRuns,
     );
   }
 
@@ -576,6 +598,15 @@ class RestoreRepository {
     await _db.delete(_db.capturedNotifications).go();
     await _db.delete(_db.googleTimelinePlaceLabels).go();
     await _db.delete(_db.googleTimelineImports).go();
+    await _db.delete(_db.musicSpotifySyncStates).go();
+    await _db.delete(_db.musicImportRuns).go();
+    await _db.delete(_db.musicExpeditionStops).go();
+    await _db.delete(_db.musicExpeditions).go();
+    await _db.delete(_db.musicEncounters).go();
+    await _db.delete(_db.personalMusicNodeStates).go();
+    await _db.delete(_db.musicRelationClaims).go();
+    await _db.delete(_db.musicExternalIdentities).go();
+    await _db.delete(_db.musicNodes).go();
     await _db.delete(_db.researchKnowledgeLinks).go();
     await _db.delete(_db.knowledgeAreaPlacements).go();
     await _db.delete(_db.flashcardTagLinks).go();
@@ -652,6 +683,44 @@ class RestoreRepository {
     }
     for (final node in snapshot.researchNodes) {
       await _db.into(_db.researchNodes).insert(ColonyMappers.fromResearchNode(node));
+    }
+    for (final node in snapshot.musicNodes) {
+      await _db.into(_db.musicNodes).insert(ColonyMappers.fromMusicNode(node));
+    }
+    for (final identity in snapshot.musicExternalIdentities) {
+      await _db
+          .into(_db.musicExternalIdentities)
+          .insert(ColonyMappers.fromMusicExternalIdentity(identity));
+    }
+    for (final state in snapshot.personalMusicNodeStates) {
+      await _db
+          .into(_db.personalMusicNodeStates)
+          .insert(ColonyMappers.fromPersonalMusicNodeState(state));
+    }
+    for (final encounter in snapshot.musicEncounters) {
+      await _db
+          .into(_db.musicEncounters)
+          .insert(ColonyMappers.fromMusicEncounter(encounter));
+    }
+    for (final claim in snapshot.musicRelationClaims) {
+      await _db
+          .into(_db.musicRelationClaims)
+          .insert(ColonyMappers.fromMusicRelationClaim(claim));
+    }
+    for (final expedition in snapshot.musicExpeditions) {
+      await _db
+          .into(_db.musicExpeditions)
+          .insert(ColonyMappers.fromMusicExpedition(expedition));
+    }
+    for (final stop in snapshot.musicExpeditionStops) {
+      await _db
+          .into(_db.musicExpeditionStops)
+          .insert(ColonyMappers.fromMusicExpeditionStop(stop));
+    }
+    for (final run in snapshot.musicImportRuns) {
+      await _db
+          .into(_db.musicImportRuns)
+          .insert(ColonyMappers.fromMusicImportRun(run));
     }
     for (final area in snapshot.knowledgeAreas) {
       await _db
@@ -6565,6 +6634,7 @@ class ColonyRepositories {
     required this.integrations,
     required this.flashcards,
     required this.googleTimeline,
+    required this.musicAtlas,
     required this.sync,
     required this.export,
     required this.restore,
@@ -6598,6 +6668,7 @@ class ColonyRepositories {
   final IntegrationRepository integrations;
   final FlashcardRepository flashcards;
   final GoogleTimelineRepository googleTimeline;
+  final MusicAtlasRepository musicAtlas;
   final SyncRepository sync;
   final ExportRepository export;
   final RestoreRepository restore;
@@ -6639,6 +6710,14 @@ class ColonyRepositories {
     final flashcardsRepo = FlashcardRepository(database, ids, now, events);
     final googleTimelineRepo =
         GoogleTimelineRepository(database, ids, now, events);
+    final musicAtlasRepo = MusicAtlasRepository(
+      database,
+      ids,
+      now,
+      events,
+      flashcards: flashcardsRepo,
+      research: research,
+    );
     final dailyReviews = DailyReviewRepository(database, ids, now, events);
     final weeklyReviews = WeeklyReviewRepository(database, ids, now, events);
     final restore = RestoreRepository(database, events, now);
@@ -6671,6 +6750,7 @@ class ColonyRepositories {
       integrations: integrationsRepo,
       flashcards: flashcardsRepo,
       googleTimeline: googleTimelineRepo,
+      musicAtlas: musicAtlasRepo,
       sync: syncRepo,
       export: ExportRepository(
         profiles,
@@ -6700,6 +6780,7 @@ class ColonyRepositories {
         weeklyReviews,
         flashcardsRepo,
         googleTimelineRepo,
+        musicAtlasRepo,
         now,
       ),
       restore: restore,
