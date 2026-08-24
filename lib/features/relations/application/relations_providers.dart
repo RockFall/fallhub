@@ -117,7 +117,7 @@ final friendshipOverviewsProvider = Provider<AsyncValue<List<FriendshipOverview>
         circles: circles.value ?? const [],
         memberships: memberships.value ?? const [],
         interactions: interactions.value ?? const [],
-        now: DateTime.now().toUtc(),
+        now: ref.watch(clockProvider)().toUtc(),
       ),
     );
   },
