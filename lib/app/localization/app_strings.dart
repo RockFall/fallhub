@@ -246,6 +246,91 @@ abstract final class AppStrings {
   static const emptyTimeline = 'Nenhum evento registrado ainda.';
   static const loading = 'Carregando…';
   static const errorGeneric = 'Algo deu errado. Tente novamente.';
+
+  static const planDayTitle = 'Plano de hoje';
+  static const planDayMiniApp = 'Hoje';
+  static const planDayComposerHint = 'Adicionar ao plano de hoje…';
+  static const planDayComposerSubmit = 'Adicionar item';
+  static const planDayEmpty =
+      'O plano de hoje está vazio.';
+  static const planDayEmptyHint =
+      'Nada para puxar ainda — crie o primeiro item abaixo.';
+  static const planDayHomeEmpty = 'Nada planejado ainda hoje.';
+  static const planDayHomeCta = 'Planejar o dia';
+  static const planDayTodayPill = 'Hoje';
+  static const planDayChipToday = 'hoje';
+  static const planDayChipInbox = 'inbox';
+  static const planDayChipNext = 'próxima';
+  static const planDayRemoveFromToday = 'Remover de hoje';
+  static const planDayOpenTask = 'Abrir tarefa';
+  static const planDayMoveUp = 'Mover para cima';
+  static const planDayMoveDown = 'Mover para baixo';
+  static const planDayRename = 'Renomear';
+  static const planDayCarryOverAction = 'Trazer para hoje';
+  static const planDayCarryOverPick = 'Escolher';
+  static const planDayCarryOverDismiss = 'Ignorar por hoje';
+  static const planDayAllDone = 'Tudo concluído por hoje.';
+  static const planDayOnPlanChip = 'No plano de hoje';
+  static const planDayAddToToday = '+Hoje';
+  static const planDayAddToTodayTooltip = 'Adicionar a hoje';
+  static const planDayRemoveFromTodayTooltip = 'Remover de hoje';
+  static const planDayBlockedComplete =
+      'Esta tarefa está bloqueada. Resolva o bloqueio antes de concluir.';
+  static const planDaySuggestions = 'Da caixa de entrada';
+  static const planDayAddFromList = 'Adicionar da lista';
+  static const planDayNoSuggestions =
+      'Nada na caixa de entrada ou em Próximas para trazer para hoje.';
+  static const planDayOpenInbox = 'Abrir caixa de entrada';
+  static const planDayOpenPlan = 'Abrir plano de hoje';
+  static const planDayAddedSnack = 'Adicionado ao plano de hoje';
+  static const planDayCompletedSnack = 'Concluído';
+  static const planDayRemovedSnack = 'Removido de hoje';
+  static const planDayErrorLoad = 'Não foi possível carregar o plano de hoje.';
+  static const planDayRetry = 'Tentar novamente';
+  static const planDayLinkedBadge = 'Vinculada';
+  static const planDayPreviousDay = 'Dia anterior';
+  static const planDayNextDay = 'Próximo dia';
+  static const planDayJumpToday = 'Voltar para hoje';
+  static const planDayPaletteNew = 'Novo item no plano de hoje';
+  static String planDayProgress(int done, int total) =>
+      '$done/$total concluídas';
+  static String planDayCompletedCount(int n) => 'Concluídas ($n)';
+  static String planDayCarryOverBanner(int n) => n == 1
+      ? '1 item de ontem não foi concluído'
+      : '$n itens de ontem não foram concluídos';
+  static String planDayCarryOverAddAll(int n) =>
+      n == 1 ? 'Adicionar o item a hoje' : 'Adicionar os $n a hoje';
+  static String planDayCheckboxSemantics(String title, bool done) =>
+      'Tarefa: $title, ${done ? 'concluída' : 'pendente'}';
+  static String planDayLinkedSemantics(String title, bool done) =>
+      'Tarefa vinculada à caixa de entrada: $title, ${done ? 'concluída' : 'pendente'}';
+  static String planDaySuggestionSemantics(String title) =>
+      "Adicionar '$title' ao plano de hoje";
+  static String planDayScheduledPill(String time) => 'agendado $time';
+  static String planDayDateHeading(String localDate, {required bool isToday}) {
+    final parts = localDate.split('-');
+    if (parts.length != 3) return localDate;
+    const months = [
+      'jan',
+      'fev',
+      'mar',
+      'abr',
+      'mai',
+      'jun',
+      'jul',
+      'ago',
+      'set',
+      'out',
+      'nov',
+      'dez',
+    ];
+    final day = int.tryParse(parts[2]) ?? 0;
+    final month = int.tryParse(parts[1]) ?? 1;
+    final monthLabel = months[(month - 1).clamp(0, 11)];
+    if (isToday) return 'Hoje · $day $monthLabel';
+    return '$day $monthLabel';
+  }
+
   static const bootErrorTitle = 'Dados locais';
   static const bootErrorBody =
       'Não foi possível ler o banco local. Se isto continuar, reinstale o APK ou apague os dados do app.';

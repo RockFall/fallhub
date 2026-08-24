@@ -9,6 +9,7 @@ import 'package:uuid/uuid.dart';
 import '../colony_database.dart'
     hide DomainEvent, NeedDefinition, NeedReading, CheckIn, MoodFactor, DailyReview, WeeklyReview, WorkPriority, Bill, ScheduleBlock, Quest, Project, QuestProject, DecisionRecord, QuestDecision, ResearchNode, ResearchPrerequisite;
 import 'activation_repository.dart';
+import 'day_plan_repository.dart';
 import 'friendship_repository.dart';
 import 'music_atlas_repository.dart';
 
@@ -292,6 +293,14 @@ class TaskRepository {
     return rows.map(ColonyMappers.toTask).toList();
   }
 
+  Stream<List<ColonyTask>> watchByIds(List<EntityId> ids) {
+    if (ids.isEmpty) return Stream.value(const []);
+    return (_db.select(_db.tasks)
+          ..where((t) => t.id.isIn(ids.map((e) => e.value))))
+        .watch()
+        .map((rows) => rows.map(ColonyMappers.toTask).toList());
+  }
+
   Future<List<ColonyTask>> listByQuest(EntityId questId) async {
     final rows = await (_db.select(_db.tasks)
           ..where(
@@ -369,6 +378,7 @@ class ExportRepository {
     this._googleTimeline,
     this._musicAtlas,
     this._activation,
+    this._dayPlan,
     this._clock,
   );
 
@@ -402,6 +412,7 @@ class ExportRepository {
   final GoogleTimelineRepository _googleTimeline;
   final MusicAtlasRepository _musicAtlas;
   final ActivationRepository _activation;
+  final DayPlanRepository _dayPlan;
   final DateTime Function() _clock;
 
   Future<ExportSnapshot> buildSnapshot() async {
@@ -488,10 +499,12 @@ class ExportRepository {
     ];
     final musicImportRuns = await _musicAtlas.listImportRuns(profile.id);
     final activation = await _activation.exportBundle(profile.id);
+    final dayPlans = await _dayPlan.listPlans(profile.id);
+    final dayPlanItems = await _dayPlan.listItems(profile.id);
 
     return ExportSnapshot(
       exportedAt: _clock(),
-      version: 36,
+      version: 37,
       profile: profile,
       preferences: prefs,
       tasks: tasks,
@@ -560,6 +573,8 @@ class ExportRepository {
       friendshipCircles: friendshipCircles,
       friendshipCircleMemberships: friendshipCircleMemberships,
       activation: activation,
+      dayPlans: dayPlans,
+      dayPlanItems: dayPlanItems,
     );
   }
 
@@ -616,6 +631,8 @@ class RestoreRepository {
       _clock,
       _events,
     ).wipeAll();
+    await _db.delete(_db.dayPlanItems).go();
+    await _db.delete(_db.dayPlans).go();
     await _db.delete(_db.capturedNotifications).go();
     await _db.delete(_db.googleTimelinePlaceLabels).go();
     await _db.delete(_db.googleTimelineImports).go();
@@ -950,6 +967,14 @@ class RestoreRepository {
     }
     for (final task in snapshot.tasks) {
       await _db.into(_db.tasks).insert(ColonyMappers.fromTask(task));
+    }
+    for (final plan in snapshot.dayPlans) {
+      await _db.into(_db.dayPlans).insert(ColonyMappers.fromDayPlan(plan));
+    }
+    for (final item in snapshot.dayPlanItems) {
+      await _db
+          .into(_db.dayPlanItems)
+          .insert(ColonyMappers.fromDayPlanItem(item));
     }
     for (final event in snapshot.events) {
       await _db.into(_db.domainEvents).insert(ColonyMappers.fromEvent(event));
@@ -6694,6 +6719,7 @@ class ColonyRepositories {
     required this.googleTimeline,
     required this.musicAtlas,
     required this.activation,
+    required this.dayPlan,
     required this.sync,
     required this.export,
     required this.restore,
@@ -6730,6 +6756,7 @@ class ColonyRepositories {
   final GoogleTimelineRepository googleTimeline;
   final MusicAtlasRepository musicAtlas;
   final ActivationRepository activation;
+  final DayPlanRepository dayPlan;
   final SyncRepository sync;
   final ExportRepository export;
   final RestoreRepository restore;
@@ -6781,6 +6808,7 @@ class ColonyRepositories {
       research: research,
     );
     final activationRepo = ActivationRepository(database, ids, now, events);
+    final dayPlanRepo = DayPlanRepository(database, ids, now, events, tasks);
     final dailyReviews = DailyReviewRepository(database, ids, now, events);
     final weeklyReviews = WeeklyReviewRepository(database, ids, now, events);
     final restore = RestoreRepository(database, events, now);
@@ -6816,6 +6844,7 @@ class ColonyRepositories {
       googleTimeline: googleTimelineRepo,
       musicAtlas: musicAtlasRepo,
       activation: activationRepo,
+      dayPlan: dayPlanRepo,
       sync: syncRepo,
       export: ExportRepository(
         profiles,
@@ -6848,6 +6877,7 @@ class ColonyRepositories {
         googleTimelineRepo,
         musicAtlasRepo,
         activationRepo,
+        dayPlanRepo,
         now,
       ),
       restore: restore,

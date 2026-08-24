@@ -12,6 +12,8 @@ export 'src/need.dart';
 export 'src/need_enums.dart';
 export 'src/preferences.dart';
 export 'src/task.dart';
+export 'src/day_plan.dart';
+export 'src/day_plan_policy.dart';
 export 'src/undo_action.dart';
 export 'src/work_enums.dart';
 export 'src/work_priority.dart';

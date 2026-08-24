@@ -154,6 +154,7 @@ class TaskTransitionPolicy {
       TaskStatus.scheduled,
       TaskStatus.archived,
       TaskStatus.cancelled,
+      TaskStatus.done,
     },
     TaskStatus.next: {
       TaskStatus.doing,
@@ -162,12 +163,14 @@ class TaskTransitionPolicy {
       TaskStatus.waiting,
       TaskStatus.cancelled,
       TaskStatus.archived,
+      TaskStatus.done,
     },
     TaskStatus.scheduled: {
       TaskStatus.doing,
       TaskStatus.next,
       TaskStatus.cancelled,
       TaskStatus.archived,
+      TaskStatus.done,
     },
     TaskStatus.doing: {
       TaskStatus.done,
@@ -182,6 +185,7 @@ class TaskTransitionPolicy {
     TaskStatus.waiting: {
       TaskStatus.next,
       TaskStatus.cancelled,
+      TaskStatus.done,
     },
     TaskStatus.done: {
       TaskStatus.next,

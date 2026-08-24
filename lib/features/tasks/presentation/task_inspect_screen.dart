@@ -8,6 +8,9 @@ import '../../../app/localization/app_strings.dart';
 import '../../../core/providers/app_providers.dart';
 import '../../../core/providers/feature_controllers.dart';
 import '../../activation/application/activation_controllers.dart';
+import '../../plan_day/application/plan_day_controller.dart';
+import '../../plan_day/application/plan_day_providers.dart';
+import '../../plan_day/presentation/widgets/plan_day_feedback.dart';
 
 class TaskInspectScreen extends ConsumerWidget {
   const TaskInspectScreen({super.key, required this.taskId});
@@ -29,6 +32,8 @@ class TaskInspectScreen extends ConsumerWidget {
           return Center(child: Text(AppStrings.errorGeneric));
         }
 
+        final onPlan =
+            ref.watch(todayPlanTaskIdsProvider).contains(task.id.value);
         return Padding(
           padding: const EdgeInsets.all(ColonySpacing.lg),
           child: InspectPane(
@@ -53,6 +58,27 @@ class TaskInspectScreen extends ConsumerWidget {
                 Wrap(
                   spacing: ColonySpacing.sm,
                   children: [
+                    FilledButton.tonal(
+                      onPressed: onPlan || !task.status.isTerminal
+                          ? () async {
+                              await ref
+                                  .read(planDayControllerProvider.notifier)
+                                  .toggleTaskOnToday(task);
+                              if (!context.mounted) return;
+                              showPlanDayOpenSnack(
+                                context,
+                                onPlan
+                                    ? AppStrings.planDayRemovedSnack
+                                    : AppStrings.planDayAddedSnack,
+                              );
+                            }
+                          : null,
+                      child: Text(
+                        onPlan
+                            ? AppStrings.planDayOnPlanChip
+                            : AppStrings.planDayAddToToday,
+                      ),
+                    ),
                     FilledButton.tonal(
                       onPressed: () async {
                         final episode = await ref

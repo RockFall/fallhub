@@ -122,6 +122,7 @@ enum AggregateType {
   activationProtocol,
   activationWaypoint,
   activationExperiment,
+  dayPlan,
   domainEvent,
 }
 
@@ -272,12 +273,23 @@ enum EventType {
   activationInsightGenerated,
   activationEpisodePaused,
   activationEpisodeRestored,
+  dayPlanCreated,
+  dayPlanItemAdded,
+  dayPlanItemPulled,
+  dayPlanItemCompleted,
+  dayPlanItemUncompleted,
+  dayPlanItemRemoved,
+  dayPlanItemReordered,
+  dayPlanItemsCarriedOver,
 }
 
 enum UndoActionType {
   taskCreated,
   taskArchived,
   taskUpdated,
+  dayPlanItemAdded,
+  dayPlanItemRemoved,
+  dayPlanItemToggled,
 }
 
 enum TimelineSeverity {

@@ -57,6 +57,14 @@ abstract final class ColonyMiniAppAssets {
 abstract final class ColonyMiniApps {
   static const all = <ColonyMiniApp>[
     ColonyMiniApp(
+      id: 'plan_day',
+      label: AppStrings.planDayMiniApp,
+      route: '/today',
+      icon: Icons.wb_twilight_outlined,
+      color: ColonyMiniAppColors.planDay,
+      pinned: true,
+    ),
+    ColonyMiniApp(
       id: 'habitat',
       label: AppStrings.habitatTitle,
       route: '/colony/habitat',

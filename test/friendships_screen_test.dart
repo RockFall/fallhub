@@ -111,7 +111,10 @@ void main() {
 
     await tester.pumpWidget(
       ProviderScope(
-        overrides: [databaseProvider.overrideWithValue(db)],
+        overrides: [
+          databaseProvider.overrideWithValue(db),
+          clockProvider.overrideWithValue(() => DateTime.utc(2026, 8, 23, 12)),
+        ],
         child: MaterialApp(
           theme: ColonyTheme.dark(),
           home: const Scaffold(body: FriendshipsScreen()),

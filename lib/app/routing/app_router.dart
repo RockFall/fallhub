@@ -13,6 +13,7 @@ import '../../features/habitat/application/habitat_chrome_provider.dart';
 import '../../features/habitat/presentation/character_create_screen.dart';
 import '../../features/habitat/presentation/habitat_screen.dart';
 import '../../features/habitat/presentation/widgets/mini_habitat_badge.dart';
+import '../../features/plan_day/presentation/plan_day_screen.dart';
 import '../../features/inbox/presentation/inbox_screen.dart';
 import '../../features/onboarding/presentation/onboarding_screen.dart';
 import '../../features/pawn/presentation/daily_review_screen.dart';
@@ -187,6 +188,17 @@ final routerProvider = Provider<GoRouter>((ref) {
                 ),
               ),
             ],
+          ),
+          GoRoute(
+            path: '/today',
+            builder: (context, state) {
+              final date = state.uri.queryParameters['date'];
+              final create = state.uri.queryParameters['create'] == '1';
+              return PlanDayScreen(
+                initialDay: date,
+                focusComposer: create,
+              );
+            },
           ),
           GoRoute(
             path: '/inbox',
@@ -605,6 +617,11 @@ class _AppShellState extends ConsumerState<AppShell> {
           onSelected: () => context.go('/activation'),
         ),
         ColonyFloatMenuItem(
+          icon: Icons.wb_twilight_outlined,
+          label: AppStrings.planDayMiniApp,
+          onSelected: () => context.go('/today'),
+        ),
+        ColonyFloatMenuItem(
           icon: Icons.inbox_outlined,
           label: AppStrings.inbox,
           onSelected: () => context.go('/inbox'),
@@ -734,6 +751,7 @@ class _AppShellState extends ConsumerState<AppShell> {
     }
     // Secondary destinations highlight "More" in the main tab strip.
     if (location.startsWith('/inbox') ||
+        location.startsWith('/today') ||
         location.startsWith('/activation') ||
         location.startsWith('/chronicle') ||
         location.startsWith('/projects') ||
