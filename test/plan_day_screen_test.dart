@@ -12,9 +12,7 @@ import 'package:fallhub/features/plan_day/presentation/widgets/plan_day_home_car
 
 Future<void> _drainTimers(WidgetTester tester) async {
   await tester.pumpWidget(const SizedBox.shrink());
-  for (var i = 0; i < 40; i++) {
-    await tester.pump(const Duration(milliseconds: 1));
-  }
+  await tester.pump(const Duration(seconds: 7));
 }
 
 void main() {
@@ -43,6 +41,10 @@ void main() {
     );
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 50));
+    addTearDown(() async {
+      await tester.pumpWidget(const SizedBox.shrink());
+      await tester.pump(const Duration(seconds: 7));
+    });
   }
 
   setUp(() async {
@@ -124,8 +126,10 @@ void main() {
     expect(find.text('Leite'), findsOneWidget);
     await tester.tap(find.byType(Checkbox));
     await tester.pump();
-    await tester.pump(const Duration(milliseconds: 50));
-    expect(find.text(AppStrings.planDayCompletedCount(1)), findsOneWidget);
+    await tester.pump(const Duration(milliseconds: 300));
+    final loaded = await repos.dayPlan.getForDate(profile.id, '2026-08-24');
+    expect(loaded!.items.single.isDone, isTrue);
+    expect(find.text(AppStrings.planDayAllDone), findsOneWidget);
     await _drainTimers(tester);
   });
 
@@ -138,7 +142,7 @@ void main() {
     await pumpScreen(tester);
     await tester.tap(find.byType(Checkbox));
     await tester.pump();
-    await tester.pump(const Duration(milliseconds: 50));
+    await tester.pump(const Duration(milliseconds: 300));
     expect((await repos.tasks.getById(task.id))!.status, TaskStatus.done);
     await _drainTimers(tester);
   });
