@@ -346,7 +346,7 @@ class DayPlanRepository {
       aggregateId: targetDayPlanId,
       eventType: EventType.dayPlanItemsCarriedOver,
       payload: {
-        'source_day_plan_id': sourceDayPlanId.value,
+        'source_day_plan_id': sourceItems.first.dayPlanId.value,
         'item_ids': carried.map((e) => e.id.value).toList(),
       },
     );
