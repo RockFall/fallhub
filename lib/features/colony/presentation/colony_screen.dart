@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import '../../../app/localization/app_strings.dart';
 import '../../../core/providers/app_providers.dart';
 import '../../pawn/presentation/widgets/check_in_sheet.dart';
+import '../../plan_day/application/plan_day_providers.dart';
 import 'colony_mini_apps.dart';
 import 'widgets/colony_home_digest.dart';
 import 'widgets/colony_home_header.dart';
@@ -19,6 +20,7 @@ class ColonyScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final profile = ref.watch(profileProvider);
     final inbox = ref.watch(inboxTasksProvider);
+    final todayRows = ref.watch(todayPlanRowsProvider);
 
     return profile.when(
       loading: () => const Center(child: CircularProgressIndicator()),
@@ -37,6 +39,10 @@ class ColonyScreen extends ConsumerWidget {
                 profile: p,
                 greeting: AppStrings.homeGreeting(now, p.displayName),
                 inboxCount: inbox.asData?.value.length ?? 0,
+                planOpenCount: todayRows.asData?.value
+                        .where((row) => !row.isDone)
+                        .length ??
+                    0,
               );
               final digest = const ColonyHomeDigest();
               return SingleChildScrollView(
@@ -72,11 +78,13 @@ class _LauncherColumn extends StatelessWidget {
     required this.profile,
     required this.greeting,
     required this.inboxCount,
+    required this.planOpenCount,
   });
 
   final ColonyProfile profile;
   final String greeting;
   final int inboxCount;
+  final int planOpenCount;
 
   @override
   Widget build(BuildContext context) {
@@ -125,7 +133,10 @@ class _LauncherColumn extends StatelessWidget {
           ),
         ),
         const SizedBox(height: ColonySpacing.lg),
-        ColonyMiniAppGrid(inboxBadge: inboxCount),
+        ColonyMiniAppGrid(
+          inboxBadge: inboxCount,
+          planDayBadge: planOpenCount,
+        ),
       ],
     );
   }

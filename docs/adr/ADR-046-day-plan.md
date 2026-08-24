@@ -1,7 +1,7 @@
 # ADR-046: Day Plan (Planejar Dia)
 
 ## Status
-Proposto (design-only; implementação em Iter subsequente)
+Aceito
 
 ## Contexto
 

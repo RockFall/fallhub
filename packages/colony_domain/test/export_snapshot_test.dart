@@ -1154,14 +1154,22 @@ void main() {
     expect(snapshot.activation.protocols, isEmpty);
   });
 
-  test('rejects unsupported version 37', () {
+  test('parses export version 37 with empty day plan collections', () {
     final json = Map<String, dynamic>.from(baseJson)..['version'] = 37;
+    final snapshot = ExportSnapshot.fromJson(json);
+    expect(snapshot.version, 37);
+    expect(snapshot.dayPlans, isEmpty);
+    expect(snapshot.dayPlanItems, isEmpty);
+  });
+
+  test('rejects unsupported version 38', () {
+    final json = Map<String, dynamic>.from(baseJson)..['version'] = 38;
 
     expect(
       () => ExportSnapshot.fromJson(json),
       throwsA(
         predicate<ExportSnapshotException>(
-          (e) => e.message.contains('37'),
+          (e) => e.message.contains('38'),
         ),
       ),
     );

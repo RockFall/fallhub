@@ -63,6 +63,21 @@ class CaptureController extends AsyncNotifier<void> {
         if (action.taskBefore != null) {
           await repos.tasks.save(action.taskBefore!);
         }
+      case UndoActionType.dayPlanItemAdded:
+        if (action.dayPlanItemId != null) {
+          await repos.dayPlan.removeItem(action.dayPlanItemId!);
+        }
+      case UndoActionType.dayPlanItemRemoved:
+        if (action.dayPlanItemBefore != null) {
+          await repos.dayPlan.reinsert(action.dayPlanItemBefore!);
+        }
+      case UndoActionType.dayPlanItemToggled:
+        if (action.dayPlanItemBefore != null) {
+          await repos.dayPlan.overwrite(action.dayPlanItemBefore!);
+        }
+        if (action.taskBefore != null) {
+          await repos.tasks.save(action.taskBefore!);
+        }
     }
     ref.read(undoControllerProvider.notifier).clear();
   }

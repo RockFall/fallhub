@@ -16,6 +16,7 @@ import '../../../storyteller/presentation/narrative_digest_sheet.dart';
 import '../../../work/application/work_providers.dart';
 import '../../../activation/application/activation_controllers.dart';
 import '../../../activation/presentation/widgets/agora_readiness_card.dart';
+import '../../../plan_day/presentation/widgets/plan_day_home_card.dart';
 
 class ColonyHomeDigest extends ConsumerWidget {
   const ColonyHomeDigest({super.key});
@@ -25,6 +26,8 @@ class ColonyHomeDigest extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
+        const PlanDayHomeCard(),
+        const SizedBox(height: ColonySpacing.lg),
         const _NowCard(),
         const SizedBox(height: ColonySpacing.lg),
         const AgoraReadinessCard(),

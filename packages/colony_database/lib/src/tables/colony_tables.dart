@@ -1662,3 +1662,45 @@ class ActivationInsights extends Table {
   @override
   Set<Column<Object>> get primaryKey => {id};
 }
+
+@DataClassName('DayPlanRow')
+class DayPlans extends Table {
+  @override
+  String get tableName => 'day_plans';
+
+  TextColumn get id => text()();
+  TextColumn get profileId => text().references(Profiles, #id)();
+  TextColumn get localDate => text()();
+  IntColumn get createdAt => integer()();
+  IntColumn get updatedAt => integer()();
+  IntColumn get version => integer().withDefault(const Constant(1))();
+
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+
+  @override
+  List<Set<Column<Object>>> get uniqueKeys => [
+        {profileId, localDate},
+      ];
+}
+
+@DataClassName('DayPlanItemRow')
+class DayPlanItems extends Table {
+  @override
+  String get tableName => 'day_plan_items';
+
+  TextColumn get id => text()();
+  TextColumn get dayPlanId => text().references(DayPlans, #id)();
+  TextColumn get taskId => text().nullable().references(Tasks, #id)();
+  TextColumn get title => text()();
+  IntColumn get orderIndex => integer().withDefault(const Constant(0))();
+  TextColumn get sourceType => text().withDefault(const Constant('manual'))();
+  TextColumn get carriedFromItemId => text().nullable()();
+  IntColumn get completedAt => integer().nullable()();
+  IntColumn get createdAt => integer()();
+  IntColumn get updatedAt => integer()();
+  IntColumn get version => integer().withDefault(const Constant(1))();
+
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+}

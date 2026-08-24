@@ -100,6 +100,8 @@ part 'colony_database.g.dart';
   ActivationExperiments,
   ActivationExperimentAssignments,
   ActivationInsights,
+  DayPlans,
+  DayPlanItems,
 ])
 class ColonyDatabase extends _$ColonyDatabase {
   ColonyDatabase(super.e, {this.dataDirectory});
@@ -108,12 +110,13 @@ class ColonyDatabase extends _$ColonyDatabase {
   final String? dataDirectory;
 
   @override
-  int get schemaVersion => 42;
+  int get schemaVersion => 43;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
         onCreate: (m) async {
           await m.createAll();
+          await _ensureDayPlanItemTaskIndex();
         },
         onUpgrade: (m, from, to) async {
           if (from < 2) {
@@ -453,8 +456,20 @@ class ColonyDatabase extends _$ColonyDatabase {
             'activation_insights',
             () => m.createTable(activationInsights),
           );
+          if (from < 43) {
+            await m.createTable(dayPlans);
+            await m.createTable(dayPlanItems);
+            await _ensureDayPlanItemTaskIndex();
+          }
         },
       );
+
+  Future<void> _ensureDayPlanItemTaskIndex() {
+    return customStatement(
+      'CREATE UNIQUE INDEX IF NOT EXISTS idx_day_plan_items_linked_task '
+      'ON day_plan_items (day_plan_id, task_id) WHERE task_id IS NOT NULL',
+    );
+  }
 
   static Future<bool> _tableExists(Migrator m, String name) async {
     final rows = await m.database.customSelect(
@@ -2921,4 +2936,60 @@ class ColonyMappers {
       updatedAt: state.updatedAt.millisecondsSinceEpoch,
     );
   }
+
+  static domain.DayPlan toDayPlan(DayPlanRow row) => domain.DayPlan(
+        id: domain.EntityId(row.id),
+        profileId: domain.EntityId(row.profileId),
+        localDate: row.localDate,
+        createdAt: DateTime.fromMillisecondsSinceEpoch(row.createdAt, isUtc: true),
+        updatedAt: DateTime.fromMillisecondsSinceEpoch(row.updatedAt, isUtc: true),
+        version: row.version,
+      );
+
+  static DayPlansCompanion fromDayPlan(domain.DayPlan plan) =>
+      DayPlansCompanion.insert(
+        id: plan.id.value,
+        profileId: plan.profileId.value,
+        localDate: plan.localDate,
+        createdAt: plan.createdAt.millisecondsSinceEpoch,
+        updatedAt: plan.updatedAt.millisecondsSinceEpoch,
+        version: Value(plan.version),
+      );
+
+  static domain.DayPlanItem toDayPlanItem(DayPlanItemRow row) =>
+      domain.DayPlanItem(
+        id: domain.EntityId(row.id),
+        dayPlanId: domain.EntityId(row.dayPlanId),
+        taskId: row.taskId == null ? null : domain.EntityId(row.taskId!),
+        title: row.title,
+        orderIndex: row.orderIndex,
+        sourceType: domain.SourceType.values.byName(row.sourceType),
+        carriedFromItemId: row.carriedFromItemId == null
+            ? null
+            : domain.EntityId(row.carriedFromItemId!),
+        completedAt: row.completedAt == null
+            ? null
+            : DateTime.fromMillisecondsSinceEpoch(row.completedAt!, isUtc: true),
+        createdAt:
+            DateTime.fromMillisecondsSinceEpoch(row.createdAt, isUtc: true),
+        updatedAt:
+            DateTime.fromMillisecondsSinceEpoch(row.updatedAt, isUtc: true),
+        version: row.version,
+      );
+
+  static DayPlanItemsCompanion fromDayPlanItem(domain.DayPlanItem item) =>
+      DayPlanItemsCompanion.insert(
+        id: item.id.value,
+        dayPlanId: item.dayPlanId.value,
+        taskId: Value(item.taskId?.value),
+        title: item.title,
+        orderIndex: Value(item.orderIndex),
+        sourceType: Value(item.sourceType.name),
+        carriedFromItemId: Value(item.carriedFromItemId?.value),
+        completedAt: Value(item.completedAt?.millisecondsSinceEpoch),
+        createdAt: item.createdAt.millisecondsSinceEpoch,
+        updatedAt: item.updatedAt.millisecondsSinceEpoch,
+        version: Value(item.version),
+      );
 }
+

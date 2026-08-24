@@ -1906,7 +1906,7 @@ void main() {
       expect(await repos.friendships.listMemberships(profile.id), hasLength(1));
     });
 
-    test('v40 to v42 adds activation tables', () async {
+    test('v40 to v43 adds activation and day plan tables', () async {
       final db = await openMigratedFrom(
         40,
         seed: (sqlite) {
@@ -1920,7 +1920,7 @@ void main() {
       final repos = ColonyRepositories.create(
         db,
         idGenerator: FixedIdGenerator([
-          for (var i = 1; i <= 200; i++) 'act-mig-$i',
+          for (var i = 1; i <= 250; i++) 'act-mig-$i',
         ]),
         clock: () => DateTime.utc(2026, 8, 23, 12),
       );
@@ -1932,6 +1932,16 @@ void main() {
         protocols.any((p) => p.seedKey == 'morning_launch_standard'),
         isTrue,
       );
+
+      final plan = await repos.dayPlan.getOrCreateForDate(
+        profile.id,
+        '2026-08-23',
+      );
+      final item = await repos.dayPlan.addAdHoc(
+        dayPlanId: plan.plan.id,
+        title: 'Migrated',
+      );
+      expect(item.title, 'Migrated');
     });
   });
 }

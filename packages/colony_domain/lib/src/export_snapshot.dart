@@ -48,6 +48,7 @@ import 'google_timeline.dart';
 import 'music_atlas.dart';
 import 'schedule_block.dart';
 import 'task.dart';
+import 'day_plan.dart';
 import 'weekly_review.dart';
 import 'work_enums.dart';
 import 'work_priority.dart';
@@ -135,6 +136,8 @@ class ExportSnapshot extends Equatable {
     this.friendshipCircles = const [],
     this.friendshipCircleMemberships = const [],
     this.activation = const ActivationExportBundle(),
+    this.dayPlans = const [],
+    this.dayPlanItems = const [],
   });
 
   final DateTime exportedAt;
@@ -207,6 +210,8 @@ class ExportSnapshot extends Equatable {
   final List<FriendshipCircle> friendshipCircles;
   final List<FriendshipCircleMembership> friendshipCircleMemberships;
   final ActivationExportBundle activation;
+  final List<DayPlan> dayPlans;
+  final List<DayPlanItem> dayPlanItems;
 
   Map<String, int> get entityCounts => {
         'tasks': tasks.length,
@@ -267,6 +272,8 @@ class ExportSnapshot extends Equatable {
         'friendships': friendships.length,
         'friendship_circles': friendshipCircles.length,
         'friendship_circle_memberships': friendshipCircleMemberships.length,
+        'day_plans': dayPlans.length,
+        'day_plan_items': dayPlanItems.length,
         ...activation.counts,
       };
 
@@ -286,7 +293,7 @@ class ExportSnapshot extends Equatable {
 
   static ExportSnapshot fromJson(Map<String, dynamic> json) {
     final version = _requireInt(json, 'version');
-    if (version < 1 || version > 36) {
+    if (version < 1 || version > 37) {
       throw ExportSnapshotException('Versão de export não suportada: $version');
     }
 
@@ -565,6 +572,12 @@ class ExportSnapshot extends Equatable {
       activation: version >= 36
           ? _parseActivationBundle(json)
           : const ActivationExportBundle(),
+      dayPlans: version >= 37
+          ? _parseList(json['day_plans'], _parseDayPlan(profileId))
+          : const [],
+      dayPlanItems: version >= 37
+          ? _parseList(json['day_plan_items'], _parseDayPlanItem)
+          : const [],
     );
   }
 
@@ -2000,6 +2013,10 @@ class ExportSnapshot extends Equatable {
         'activation_insights':
             activation.insights.map((e) => e.toJson()).toList(),
       },
+      if (version >= 37) ...{
+        'day_plans': dayPlans.map(_dayPlanJson).toList(),
+        'day_plan_items': dayPlanItems.map(_dayPlanItemJson).toList(),
+      },
     };
   }
 
@@ -2882,7 +2899,64 @@ class ExportSnapshot extends Equatable {
         friendshipCircles,
         friendshipCircleMemberships,
         activation,
+        dayPlans,
+        dayPlanItems,
       ];
+
+  static Map<String, Object?> _dayPlanJson(DayPlan plan) => {
+        'id': plan.id.value,
+        'local_date': plan.localDate,
+        'created_at': plan.createdAt.toUtc().toIso8601String(),
+        'updated_at': plan.updatedAt.toUtc().toIso8601String(),
+      };
+
+  static DayPlan Function(Map<String, dynamic>) _parseDayPlan(
+    EntityId profileId,
+  ) {
+    return (json) => DayPlan(
+          id: EntityId(_requireString(json, 'id')),
+          profileId: profileId,
+          localDate: _requireString(json, 'local_date'),
+          createdAt: _parseDateTime(_requireString(json, 'created_at')),
+          updatedAt: _parseDateTime(_requireString(json, 'updated_at')),
+        );
+  }
+
+  static Map<String, Object?> _dayPlanItemJson(DayPlanItem item) => {
+        'id': item.id.value,
+        'day_plan_id': item.dayPlanId.value,
+        'task_id': item.taskId?.value,
+        'title': item.title,
+        'order_index': item.orderIndex,
+        'source_type': item.sourceType.name,
+        'carried_from_item_id': item.carriedFromItemId?.value,
+        'created_at': item.createdAt.toUtc().toIso8601String(),
+        'updated_at': item.updatedAt.toUtc().toIso8601String(),
+        if (item.completedAt != null)
+          'completed_at': item.completedAt!.toUtc().toIso8601String(),
+      };
+
+  static DayPlanItem _parseDayPlanItem(Map<String, dynamic> json) =>
+      DayPlanItem(
+        id: EntityId(_requireString(json, 'id')),
+        dayPlanId: EntityId(_requireString(json, 'day_plan_id')),
+        taskId: json['task_id'] == null
+            ? null
+            : EntityId(json['task_id'] as String),
+        title: _requireString(json, 'title'),
+        orderIndex: _requireInt(json, 'order_index'),
+        sourceType: SourceType.values.byName(
+          json['source_type'] as String? ?? 'manual',
+        ),
+        carriedFromItemId: json['carried_from_item_id'] == null
+            ? null
+            : EntityId(json['carried_from_item_id'] as String),
+        createdAt: _parseDateTime(_requireString(json, 'created_at')),
+        updatedAt: _parseDateTime(_requireString(json, 'updated_at')),
+        completedAt: json['completed_at'] == null
+            ? null
+            : _parseDateTime(json['completed_at'] as String),
+      );
 
   static ActivationExportBundle _parseActivationBundle(
     Map<String, dynamic> json,

@@ -9,9 +9,11 @@ class ColonyMiniAppGrid extends StatefulWidget {
   const ColonyMiniAppGrid({
     super.key,
     this.inboxBadge = 0,
+    this.planDayBadge = 0,
   });
 
   final int inboxBadge;
+  final int planDayBadge;
 
   @override
   State<ColonyMiniAppGrid> createState() => _ColonyMiniAppGridState();
@@ -68,7 +70,11 @@ class _ColonyMiniAppGridState extends State<ColonyMiniAppGrid> {
                 icon: app.icon,
                 iconAsset: app.assetPath,
                 backgroundColor: app.color,
-                badgeCount: app.id == 'inbox' ? widget.inboxBadge : null,
+                badgeCount: app.id == 'inbox'
+                    ? widget.inboxBadge
+                    : app.id == 'plan_day'
+                        ? widget.planDayBadge
+                        : null,
                 onPressed: () => context.go(app.route),
               );
             },
