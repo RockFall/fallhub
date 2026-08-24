@@ -110,7 +110,7 @@ class ColonyDatabase extends _$ColonyDatabase {
   final String? dataDirectory;
 
   @override
-  int get schemaVersion => 43;
+  int get schemaVersion => 44;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -461,6 +461,17 @@ class ColonyDatabase extends _$ColonyDatabase {
             await m.createTable(dayPlanItems);
             await _ensureDayPlanItemTaskIndex();
           }
+          if (from < 44) {
+            if (!await _columnExists(m, 'tasks', 'project_id')) {
+              await m.addColumn(tasks, tasks.projectId);
+            }
+            if (!await _columnExists(m, 'tasks', 'parent_task_id')) {
+              await m.addColumn(tasks, tasks.parentTaskId);
+            }
+            if (!await _columnExists(m, 'tasks', 'priority')) {
+              await m.addColumn(tasks, tasks.priority);
+            }
+          }
         },
       );
 
@@ -691,6 +702,11 @@ class ColonyMappers {
           : DateTime.fromMillisecondsSinceEpoch(row.deletedAt!, isUtc: true),
       version: row.version,
       questId: row.questId == null ? null : domain.EntityId(row.questId!),
+      projectId: row.projectId == null ? null : domain.EntityId(row.projectId!),
+      parentTaskId:
+          row.parentTaskId == null ? null : domain.EntityId(row.parentTaskId!),
+      priority: domain.TaskPriority.values.asNameMap()[row.priority] ??
+          domain.TaskPriority.none,
     );
   }
 
@@ -709,6 +725,9 @@ class ColonyMappers {
       energyRequirement: Value(task.energyRequirement.name),
       blockedReason: Value(task.blockedReason),
       questId: Value(task.questId?.value),
+      projectId: Value(task.projectId?.value),
+      parentTaskId: Value(task.parentTaskId?.value),
+      priority: Value(task.priority.name),
       createdAt: task.createdAt.millisecondsSinceEpoch,
       updatedAt: task.updatedAt.millisecondsSinceEpoch,
       completedAt: Value(task.completedAt?.millisecondsSinceEpoch),

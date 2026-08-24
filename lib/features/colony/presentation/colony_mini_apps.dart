@@ -153,6 +153,14 @@ abstract final class ColonyMiniApps {
       pinned: true,
     ),
     ColonyMiniApp(
+      id: 'tasks',
+      label: AppStrings.tasksMiniApp,
+      route: '/tasks',
+      icon: Icons.task_alt_outlined,
+      color: ColonyMiniAppColors.tasks,
+      pinned: true,
+    ),
+    ColonyMiniApp(
       id: 'research',
       label: AppStrings.research,
       route: '/research',

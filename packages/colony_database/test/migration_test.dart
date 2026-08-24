@@ -1943,5 +1943,46 @@ void main() {
       );
       expect(item.title, 'Migrated');
     });
+
+    test('v43 to v44 adds task project, parent and priority', () async {
+      final db = await openMigratedFrom(
+        43,
+        seed: (sqlite) {
+          seedProfile(sqlite);
+          seedTask(sqlite);
+        },
+      );
+      addTearDown(() async {
+        await db.close();
+      });
+
+      final repos = ColonyRepositories.create(
+        db,
+        idGenerator: FixedIdGenerator([
+          'project-1',
+          'event-1',
+          'task-2',
+          'event-2',
+        ]),
+        clock: () => DateTime.utc(2026, 8, 24, 12),
+      );
+      final profile = (await repos.profiles.getActive())!;
+      final existing = (await repos.tasks.listAll(profile.id)).single;
+      expect(existing.priority, TaskPriority.none);
+      expect(existing.projectId, isNull);
+
+      final project = await repos.projects.create(
+        profileId: profile.id,
+        title: 'Casa',
+      );
+      final child = await repos.tasks.createSimple(
+        profileId: profile.id,
+        title: 'Filho',
+        parentTaskId: existing.id,
+        projectId: project.id,
+      );
+      expect(child.parentTaskId, existing.id);
+      expect(child.projectId, project.id);
+    });
   });
 }

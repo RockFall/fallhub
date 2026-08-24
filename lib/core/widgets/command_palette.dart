@@ -75,6 +75,7 @@ class _CommandPaletteState extends ConsumerState<CommandPalette> {
     ),
     _PaletteCommand(AppStrings.planDayTitle, '/today', Icons.wb_twilight_outlined),
     _PaletteCommand(AppStrings.planDayPaletteNew, '/today?create=1', Icons.add_task_outlined),
+    _PaletteCommand(AppStrings.tasksTitle, '/tasks', Icons.task_alt_outlined),
     _PaletteCommand('Flashcards', '/flashcards', Icons.style_outlined),
     _PaletteCommand('Estudar flashcards', '/flashcards/study', Icons.play_arrow_outlined),
     _PaletteCommand('Novo cartão', '/flashcards?capture=1', Icons.note_add_outlined),

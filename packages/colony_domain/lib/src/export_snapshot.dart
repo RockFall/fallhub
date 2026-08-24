@@ -293,7 +293,7 @@ class ExportSnapshot extends Equatable {
 
   static ExportSnapshot fromJson(Map<String, dynamic> json) {
     final version = _requireInt(json, 'version');
-    if (version < 1 || version > 37) {
+    if (version < 1 || version > 38) {
       throw ExportSnapshotException('Versão de export não suportada: $version');
     }
 
@@ -663,6 +663,28 @@ class ExportSnapshot extends Equatable {
         questId: json['quest_id'] == null
             ? null
             : EntityId(json['quest_id'] as String),
+        dueAt: json['due_at'] == null
+            ? null
+            : _parseDateTime(json['due_at'] as String),
+        scheduledStart: json['scheduled_start'] == null
+            ? null
+            : _parseDateTime(json['scheduled_start'] as String),
+        estimatedMinutes: json['estimated_minutes'] as int?,
+        energyRequirement: json['energy_requirement'] == null
+            ? EnergyRequirement.unknown
+            : EnergyRequirement.values.byName(
+                json['energy_requirement'] as String,
+              ),
+        blockedReason: json['blocked_reason'] as String?,
+        projectId: json['project_id'] == null
+            ? null
+            : EntityId(json['project_id'] as String),
+        parentTaskId: json['parent_task_id'] == null
+            ? null
+            : EntityId(json['parent_task_id'] as String),
+        priority: json['priority'] == null
+            ? TaskPriority.none
+            : TaskPriority.values.byName(json['priority'] as String),
       );
     };
   }
@@ -2031,6 +2053,18 @@ class ExportSnapshot extends Equatable {
         'updated_at': task.updatedAt.toUtc().toIso8601String(),
         if (task.completedAt != null)
           'completed_at': task.completedAt!.toUtc().toIso8601String(),
+        if (task.dueAt != null)
+          'due_at': task.dueAt!.toUtc().toIso8601String(),
+        if (task.scheduledStart != null)
+          'scheduled_start': task.scheduledStart!.toUtc().toIso8601String(),
+        if (task.estimatedMinutes != null)
+          'estimated_minutes': task.estimatedMinutes,
+        if (task.energyRequirement != EnergyRequirement.unknown)
+          'energy_requirement': task.energyRequirement.name,
+        if (task.blockedReason != null) 'blocked_reason': task.blockedReason,
+        if (task.projectId != null) 'project_id': task.projectId!.value,
+        if (task.parentTaskId != null) 'parent_task_id': task.parentTaskId!.value,
+        if (task.priority != TaskPriority.none) 'priority': task.priority.name,
       };
 
   static Map<String, Object?> _eventJson(DomainEvent event) => {

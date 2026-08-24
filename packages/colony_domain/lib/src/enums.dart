@@ -81,6 +81,14 @@ enum EnergyRequirement {
   unknown,
 }
 
+/// Qualitative priority — not a score. Default is [none] (no signal).
+enum TaskPriority {
+  none,
+  later,
+  soon,
+  now,
+}
+
 enum AggregateType {
   profile,
   task,

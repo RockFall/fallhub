@@ -49,6 +49,9 @@ class Tasks extends Table {
       text().withDefault(const Constant('unknown'))();
   TextColumn get blockedReason => text().nullable()();
   TextColumn get questId => text().nullable()();
+  TextColumn get projectId => text().nullable()();
+  TextColumn get parentTaskId => text().nullable()();
+  TextColumn get priority => text().withDefault(const Constant('none'))();
   IntColumn get createdAt => integer()();
   IntColumn get updatedAt => integer()();
   IntColumn get completedAt => integer().nullable()();

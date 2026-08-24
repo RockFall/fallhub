@@ -344,6 +344,82 @@ class TaskRepository {
         .watch()
         .map((rows) => rows.map(ColonyMappers.toTask).toList());
   }
+
+  Stream<ColonyTask?> watchById(EntityId id) {
+    return (_db.select(_db.tasks)..where((t) => t.id.equals(id.value)))
+        .watch()
+        .map((rows) => rows.isEmpty ? null : ColonyMappers.toTask(rows.first));
+  }
+
+  Stream<List<ColonyTask>> watchChildren(EntityId parentId) {
+    return (_db.select(_db.tasks)
+          ..where(
+            (t) =>
+                t.parentTaskId.equals(parentId.value) & t.deletedAt.isNull(),
+          )
+          ..orderBy([(t) => OrderingTerm.asc(t.createdAt)]))
+        .watch()
+        .map((rows) => rows.map(ColonyMappers.toTask).toList());
+  }
+
+  Stream<List<ColonyTask>> watchDone(EntityId profileId) {
+    return (_db.select(_db.tasks)
+          ..where(
+            (t) =>
+                t.profileId.equals(profileId.value) &
+                t.status.equals(TaskStatus.done.name) &
+                t.deletedAt.isNull(),
+          )
+          ..orderBy([(t) => OrderingTerm.desc(t.completedAt)]))
+        .watch()
+        .map((rows) => rows.map(ColonyMappers.toTask).toList());
+  }
+
+  Future<ColonyTask> createSimple({
+    required EntityId profileId,
+    required String title,
+    EntityId? parentTaskId,
+    EntityId? projectId,
+    TaskStatus status = TaskStatus.next,
+  }) async {
+    if (parentTaskId != null) {
+      final parent = await getById(parentTaskId);
+      if (parent == null) {
+        throw ArgumentError('Tarefa pai não encontrada');
+      }
+      if (!TaskCapabilityPolicy.canHaveChildren(parent)) {
+        throw ArgumentError('Subtarefa não pode ter filhos');
+      }
+    }
+    final now = _clock();
+    final task = ColonyTask(
+      id: EntityId(_ids.newId()),
+      profileId: profileId,
+      title: title.trim(),
+      status: status,
+      sourceType: SourceType.manual,
+      createdAt: now,
+      updatedAt: now,
+      parentTaskId: parentTaskId,
+      projectId: projectId,
+    );
+
+    await _db.transaction(() async {
+      await _db.into(_db.tasks).insert(ColonyMappers.fromTask(task));
+      await _events.record(
+        aggregateType: AggregateType.task,
+        aggregateId: task.id,
+        eventType: EventType.captureCreated,
+        payload: {
+          'title': task.title,
+          'status': task.status.name,
+          if (parentTaskId != null) 'parent_task_id': parentTaskId.value,
+        },
+        sourceType: SourceType.manual,
+      );
+    });
+    return task;
+  }
 }
 
 class ExportRepository {
@@ -504,7 +580,7 @@ class ExportRepository {
 
     return ExportSnapshot(
       exportedAt: _clock(),
-      version: 37,
+      version: 38,
       profile: profile,
       preferences: prefs,
       tasks: tasks,

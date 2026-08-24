@@ -148,7 +148,7 @@ void main() {
       canonicalName: 'Miles Davis',
     );
     final snapshot = await repos.export.buildSnapshot();
-    expect(snapshot.version, 37);
+    expect(snapshot.version, 38);
     expect(snapshot.profile.id, created.id);
     expect(snapshot.musicNodes, hasLength(1));
     final encoded = jsonEncode(snapshot.toJson());

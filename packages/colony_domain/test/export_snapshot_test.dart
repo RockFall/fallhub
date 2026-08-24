@@ -1162,14 +1162,22 @@ void main() {
     expect(snapshot.dayPlanItems, isEmpty);
   });
 
-  test('rejects unsupported version 38', () {
+  test('parses export version 38 with empty task capability keys', () {
     final json = Map<String, dynamic>.from(baseJson)..['version'] = 38;
+    final snapshot = ExportSnapshot.fromJson(json);
+    expect(snapshot.version, 38);
+    expect(snapshot.tasks.first.priority, TaskPriority.none);
+    expect(snapshot.tasks.first.projectId, isNull);
+  });
+
+  test('rejects unsupported version 39', () {
+    final json = Map<String, dynamic>.from(baseJson)..['version'] = 39;
 
     expect(
       () => ExportSnapshot.fromJson(json),
       throwsA(
         predicate<ExportSnapshotException>(
-          (e) => e.message.contains('38'),
+          (e) => e.message.contains('39'),
         ),
       ),
     );

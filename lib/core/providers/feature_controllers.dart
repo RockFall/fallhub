@@ -170,6 +170,23 @@ class TaskActionsController extends AsyncNotifier<void> {
   Future<void> archive(ColonyTask task) async {
     await updateStatus(task, TaskStatus.archived);
   }
+
+  Future<void> save(ColonyTask previous, ColonyTask next) async {
+    state = const AsyncLoading();
+    state = await AsyncValue.guard(() async {
+      ref.read(undoControllerProvider.notifier).push(
+            UndoAction(
+              id: EntityId(ref.read(idGeneratorProvider).newId()),
+              type: UndoActionType.taskUpdated,
+              createdAt: ref.read(clockProvider)(),
+              description: previous.title,
+              taskBefore: previous,
+              taskId: previous.id,
+            ),
+          );
+      await ref.read(repositoriesProvider).tasks.save(next);
+    });
+  }
 }
 
 final taskActionsControllerProvider =

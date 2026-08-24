@@ -20,7 +20,8 @@ import '../../features/pawn/presentation/daily_review_screen.dart';
 import '../../features/pawn/presentation/weekly_review_screen.dart';
 import '../../features/pawn/presentation/pawn_screen.dart';
 import '../../features/settings/presentation/settings_screen.dart';
-import '../../features/tasks/presentation/task_inspect_screen.dart';
+import '../../features/tasks/presentation/task_detail_screen.dart';
+import '../../features/tasks/presentation/tasks_backlog_screen.dart';
 import '../../features/work/presentation/schedule_screen.dart';
 import '../../features/work/presentation/work_screen.dart';
 import '../bootstrap/boot_screen.dart';
@@ -404,10 +405,16 @@ final routerProvider = Provider<GoRouter>((ref) {
             builder: (context, state) => const CommitmentsScreen(),
           ),
           GoRoute(
-            path: '/tasks/:id',
-            builder: (context, state) => TaskInspectScreen(
-              taskId: state.pathParameters['id']!,
-            ),
+            path: '/tasks',
+            builder: (context, state) => const TasksBacklogScreen(),
+            routes: [
+              GoRoute(
+                path: ':id',
+                builder: (context, state) => TaskDetailScreen(
+                  taskId: state.pathParameters['id']!,
+                ),
+              ),
+            ],
           ),
           GoRoute(
             path: '/activation',
@@ -627,6 +634,11 @@ class _AppShellState extends ConsumerState<AppShell> {
           onSelected: () => context.go('/inbox'),
         ),
         ColonyFloatMenuItem(
+          icon: Icons.task_alt_outlined,
+          label: AppStrings.tasksTitle,
+          onSelected: () => context.go('/tasks'),
+        ),
+        ColonyFloatMenuItem(
           icon: Icons.history,
           label: AppStrings.chronicle,
           onSelected: () => context.go('/chronicle'),
@@ -751,6 +763,7 @@ class _AppShellState extends ConsumerState<AppShell> {
     }
     // Secondary destinations highlight "More" in the main tab strip.
     if (location.startsWith('/inbox') ||
+        location.startsWith('/tasks') ||
         location.startsWith('/today') ||
         location.startsWith('/activation') ||
         location.startsWith('/chronicle') ||

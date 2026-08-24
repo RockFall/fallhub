@@ -1513,6 +1513,40 @@ class $TasksTable extends Tasks with TableInfo<$TasksTable, Task> {
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _projectIdMeta = const VerificationMeta(
+    'projectId',
+  );
+  @override
+  late final GeneratedColumn<String> projectId = GeneratedColumn<String>(
+    'project_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _parentTaskIdMeta = const VerificationMeta(
+    'parentTaskId',
+  );
+  @override
+  late final GeneratedColumn<String> parentTaskId = GeneratedColumn<String>(
+    'parent_task_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _priorityMeta = const VerificationMeta(
+    'priority',
+  );
+  @override
+  late final GeneratedColumn<String> priority = GeneratedColumn<String>(
+    'priority',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('none'),
+  );
   static const VerificationMeta _createdAtMeta = const VerificationMeta(
     'createdAt',
   );
@@ -1584,6 +1618,9 @@ class $TasksTable extends Tasks with TableInfo<$TasksTable, Task> {
     energyRequirement,
     blockedReason,
     questId,
+    projectId,
+    parentTaskId,
+    priority,
     createdAt,
     updatedAt,
     completedAt,
@@ -1705,6 +1742,27 @@ class $TasksTable extends Tasks with TableInfo<$TasksTable, Task> {
         questId.isAcceptableOrUnknown(data['quest_id']!, _questIdMeta),
       );
     }
+    if (data.containsKey('project_id')) {
+      context.handle(
+        _projectIdMeta,
+        projectId.isAcceptableOrUnknown(data['project_id']!, _projectIdMeta),
+      );
+    }
+    if (data.containsKey('parent_task_id')) {
+      context.handle(
+        _parentTaskIdMeta,
+        parentTaskId.isAcceptableOrUnknown(
+          data['parent_task_id']!,
+          _parentTaskIdMeta,
+        ),
+      );
+    }
+    if (data.containsKey('priority')) {
+      context.handle(
+        _priorityMeta,
+        priority.isAcceptableOrUnknown(data['priority']!, _priorityMeta),
+      );
+    }
     if (data.containsKey('created_at')) {
       context.handle(
         _createdAtMeta,
@@ -1803,6 +1861,18 @@ class $TasksTable extends Tasks with TableInfo<$TasksTable, Task> {
         DriftSqlType.string,
         data['${effectivePrefix}quest_id'],
       ),
+      projectId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}project_id'],
+      ),
+      parentTaskId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}parent_task_id'],
+      ),
+      priority: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}priority'],
+      )!,
       createdAt: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
         data['${effectivePrefix}created_at'],
@@ -1846,6 +1916,9 @@ class Task extends DataClass implements Insertable<Task> {
   final String energyRequirement;
   final String? blockedReason;
   final String? questId;
+  final String? projectId;
+  final String? parentTaskId;
+  final String priority;
   final int createdAt;
   final int updatedAt;
   final int? completedAt;
@@ -1865,6 +1938,9 @@ class Task extends DataClass implements Insertable<Task> {
     required this.energyRequirement,
     this.blockedReason,
     this.questId,
+    this.projectId,
+    this.parentTaskId,
+    required this.priority,
     required this.createdAt,
     required this.updatedAt,
     this.completedAt,
@@ -1901,6 +1977,13 @@ class Task extends DataClass implements Insertable<Task> {
     if (!nullToAbsent || questId != null) {
       map['quest_id'] = Variable<String>(questId);
     }
+    if (!nullToAbsent || projectId != null) {
+      map['project_id'] = Variable<String>(projectId);
+    }
+    if (!nullToAbsent || parentTaskId != null) {
+      map['parent_task_id'] = Variable<String>(parentTaskId);
+    }
+    map['priority'] = Variable<String>(priority);
     map['created_at'] = Variable<int>(createdAt);
     map['updated_at'] = Variable<int>(updatedAt);
     if (!nullToAbsent || completedAt != null) {
@@ -1942,6 +2025,13 @@ class Task extends DataClass implements Insertable<Task> {
       questId: questId == null && nullToAbsent
           ? const Value.absent()
           : Value(questId),
+      projectId: projectId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(projectId),
+      parentTaskId: parentTaskId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(parentTaskId),
+      priority: Value(priority),
       createdAt: Value(createdAt),
       updatedAt: Value(updatedAt),
       completedAt: completedAt == null && nullToAbsent
@@ -1973,6 +2063,9 @@ class Task extends DataClass implements Insertable<Task> {
       energyRequirement: serializer.fromJson<String>(json['energyRequirement']),
       blockedReason: serializer.fromJson<String?>(json['blockedReason']),
       questId: serializer.fromJson<String?>(json['questId']),
+      projectId: serializer.fromJson<String?>(json['projectId']),
+      parentTaskId: serializer.fromJson<String?>(json['parentTaskId']),
+      priority: serializer.fromJson<String>(json['priority']),
       createdAt: serializer.fromJson<int>(json['createdAt']),
       updatedAt: serializer.fromJson<int>(json['updatedAt']),
       completedAt: serializer.fromJson<int?>(json['completedAt']),
@@ -1997,6 +2090,9 @@ class Task extends DataClass implements Insertable<Task> {
       'energyRequirement': serializer.toJson<String>(energyRequirement),
       'blockedReason': serializer.toJson<String?>(blockedReason),
       'questId': serializer.toJson<String?>(questId),
+      'projectId': serializer.toJson<String?>(projectId),
+      'parentTaskId': serializer.toJson<String?>(parentTaskId),
+      'priority': serializer.toJson<String>(priority),
       'createdAt': serializer.toJson<int>(createdAt),
       'updatedAt': serializer.toJson<int>(updatedAt),
       'completedAt': serializer.toJson<int?>(completedAt),
@@ -2019,6 +2115,9 @@ class Task extends DataClass implements Insertable<Task> {
     String? energyRequirement,
     Value<String?> blockedReason = const Value.absent(),
     Value<String?> questId = const Value.absent(),
+    Value<String?> projectId = const Value.absent(),
+    Value<String?> parentTaskId = const Value.absent(),
+    String? priority,
     int? createdAt,
     int? updatedAt,
     Value<int?> completedAt = const Value.absent(),
@@ -2046,6 +2145,9 @@ class Task extends DataClass implements Insertable<Task> {
         ? blockedReason.value
         : this.blockedReason,
     questId: questId.present ? questId.value : this.questId,
+    projectId: projectId.present ? projectId.value : this.projectId,
+    parentTaskId: parentTaskId.present ? parentTaskId.value : this.parentTaskId,
+    priority: priority ?? this.priority,
     createdAt: createdAt ?? this.createdAt,
     updatedAt: updatedAt ?? this.updatedAt,
     completedAt: completedAt.present ? completedAt.value : this.completedAt,
@@ -2081,6 +2183,11 @@ class Task extends DataClass implements Insertable<Task> {
           ? data.blockedReason.value
           : this.blockedReason,
       questId: data.questId.present ? data.questId.value : this.questId,
+      projectId: data.projectId.present ? data.projectId.value : this.projectId,
+      parentTaskId: data.parentTaskId.present
+          ? data.parentTaskId.value
+          : this.parentTaskId,
+      priority: data.priority.present ? data.priority.value : this.priority,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
       completedAt: data.completedAt.present
@@ -2107,6 +2214,9 @@ class Task extends DataClass implements Insertable<Task> {
           ..write('energyRequirement: $energyRequirement, ')
           ..write('blockedReason: $blockedReason, ')
           ..write('questId: $questId, ')
+          ..write('projectId: $projectId, ')
+          ..write('parentTaskId: $parentTaskId, ')
+          ..write('priority: $priority, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
           ..write('completedAt: $completedAt, ')
@@ -2117,7 +2227,7 @@ class Task extends DataClass implements Insertable<Task> {
   }
 
   @override
-  int get hashCode => Object.hash(
+  int get hashCode => Object.hashAll([
     id,
     profileId,
     title,
@@ -2131,12 +2241,15 @@ class Task extends DataClass implements Insertable<Task> {
     energyRequirement,
     blockedReason,
     questId,
+    projectId,
+    parentTaskId,
+    priority,
     createdAt,
     updatedAt,
     completedAt,
     deletedAt,
     version,
-  );
+  ]);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -2154,6 +2267,9 @@ class Task extends DataClass implements Insertable<Task> {
           other.energyRequirement == this.energyRequirement &&
           other.blockedReason == this.blockedReason &&
           other.questId == this.questId &&
+          other.projectId == this.projectId &&
+          other.parentTaskId == this.parentTaskId &&
+          other.priority == this.priority &&
           other.createdAt == this.createdAt &&
           other.updatedAt == this.updatedAt &&
           other.completedAt == this.completedAt &&
@@ -2175,6 +2291,9 @@ class TasksCompanion extends UpdateCompanion<Task> {
   final Value<String> energyRequirement;
   final Value<String?> blockedReason;
   final Value<String?> questId;
+  final Value<String?> projectId;
+  final Value<String?> parentTaskId;
+  final Value<String> priority;
   final Value<int> createdAt;
   final Value<int> updatedAt;
   final Value<int?> completedAt;
@@ -2195,6 +2314,9 @@ class TasksCompanion extends UpdateCompanion<Task> {
     this.energyRequirement = const Value.absent(),
     this.blockedReason = const Value.absent(),
     this.questId = const Value.absent(),
+    this.projectId = const Value.absent(),
+    this.parentTaskId = const Value.absent(),
+    this.priority = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
     this.completedAt = const Value.absent(),
@@ -2216,6 +2338,9 @@ class TasksCompanion extends UpdateCompanion<Task> {
     this.energyRequirement = const Value.absent(),
     this.blockedReason = const Value.absent(),
     this.questId = const Value.absent(),
+    this.projectId = const Value.absent(),
+    this.parentTaskId = const Value.absent(),
+    this.priority = const Value.absent(),
     required int createdAt,
     required int updatedAt,
     this.completedAt = const Value.absent(),
@@ -2243,6 +2368,9 @@ class TasksCompanion extends UpdateCompanion<Task> {
     Expression<String>? energyRequirement,
     Expression<String>? blockedReason,
     Expression<String>? questId,
+    Expression<String>? projectId,
+    Expression<String>? parentTaskId,
+    Expression<String>? priority,
     Expression<int>? createdAt,
     Expression<int>? updatedAt,
     Expression<int>? completedAt,
@@ -2264,6 +2392,9 @@ class TasksCompanion extends UpdateCompanion<Task> {
       if (energyRequirement != null) 'energy_requirement': energyRequirement,
       if (blockedReason != null) 'blocked_reason': blockedReason,
       if (questId != null) 'quest_id': questId,
+      if (projectId != null) 'project_id': projectId,
+      if (parentTaskId != null) 'parent_task_id': parentTaskId,
+      if (priority != null) 'priority': priority,
       if (createdAt != null) 'created_at': createdAt,
       if (updatedAt != null) 'updated_at': updatedAt,
       if (completedAt != null) 'completed_at': completedAt,
@@ -2287,6 +2418,9 @@ class TasksCompanion extends UpdateCompanion<Task> {
     Value<String>? energyRequirement,
     Value<String?>? blockedReason,
     Value<String?>? questId,
+    Value<String?>? projectId,
+    Value<String?>? parentTaskId,
+    Value<String>? priority,
     Value<int>? createdAt,
     Value<int>? updatedAt,
     Value<int?>? completedAt,
@@ -2308,6 +2442,9 @@ class TasksCompanion extends UpdateCompanion<Task> {
       energyRequirement: energyRequirement ?? this.energyRequirement,
       blockedReason: blockedReason ?? this.blockedReason,
       questId: questId ?? this.questId,
+      projectId: projectId ?? this.projectId,
+      parentTaskId: parentTaskId ?? this.parentTaskId,
+      priority: priority ?? this.priority,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       completedAt: completedAt ?? this.completedAt,
@@ -2359,6 +2496,15 @@ class TasksCompanion extends UpdateCompanion<Task> {
     if (questId.present) {
       map['quest_id'] = Variable<String>(questId.value);
     }
+    if (projectId.present) {
+      map['project_id'] = Variable<String>(projectId.value);
+    }
+    if (parentTaskId.present) {
+      map['parent_task_id'] = Variable<String>(parentTaskId.value);
+    }
+    if (priority.present) {
+      map['priority'] = Variable<String>(priority.value);
+    }
     if (createdAt.present) {
       map['created_at'] = Variable<int>(createdAt.value);
     }
@@ -2396,6 +2542,9 @@ class TasksCompanion extends UpdateCompanion<Task> {
           ..write('energyRequirement: $energyRequirement, ')
           ..write('blockedReason: $blockedReason, ')
           ..write('questId: $questId, ')
+          ..write('projectId: $projectId, ')
+          ..write('parentTaskId: $parentTaskId, ')
+          ..write('priority: $priority, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
           ..write('completedAt: $completedAt, ')
@@ -60794,6 +60943,9 @@ typedef $$TasksTableCreateCompanionBuilder =
       Value<String> energyRequirement,
       Value<String?> blockedReason,
       Value<String?> questId,
+      Value<String?> projectId,
+      Value<String?> parentTaskId,
+      Value<String> priority,
       required int createdAt,
       required int updatedAt,
       Value<int?> completedAt,
@@ -60816,6 +60968,9 @@ typedef $$TasksTableUpdateCompanionBuilder =
       Value<String> energyRequirement,
       Value<String?> blockedReason,
       Value<String?> questId,
+      Value<String?> projectId,
+      Value<String?> parentTaskId,
+      Value<String> priority,
       Value<int> createdAt,
       Value<int> updatedAt,
       Value<int?> completedAt,
@@ -60930,6 +61085,21 @@ class $$TasksTableFilterComposer
 
   ColumnFilters<String> get questId => $composableBuilder(
     column: $table.questId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get projectId => $composableBuilder(
+    column: $table.projectId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get parentTaskId => $composableBuilder(
+    column: $table.parentTaskId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get priority => $composableBuilder(
+    column: $table.priority,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -61076,6 +61246,21 @@ class $$TasksTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get projectId => $composableBuilder(
+    column: $table.projectId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get parentTaskId => $composableBuilder(
+    column: $table.parentTaskId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get priority => $composableBuilder(
+    column: $table.priority,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<int> get createdAt => $composableBuilder(
     column: $table.createdAt,
     builder: (column) => ColumnOrderings(column),
@@ -61184,6 +61369,17 @@ class $$TasksTableAnnotationComposer
   GeneratedColumn<String> get questId =>
       $composableBuilder(column: $table.questId, builder: (column) => column);
 
+  GeneratedColumn<String> get projectId =>
+      $composableBuilder(column: $table.projectId, builder: (column) => column);
+
+  GeneratedColumn<String> get parentTaskId => $composableBuilder(
+    column: $table.parentTaskId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get priority =>
+      $composableBuilder(column: $table.priority, builder: (column) => column);
+
   GeneratedColumn<int> get createdAt =>
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
 
@@ -61291,6 +61487,9 @@ class $$TasksTableTableManager
                 Value<String> energyRequirement = const Value.absent(),
                 Value<String?> blockedReason = const Value.absent(),
                 Value<String?> questId = const Value.absent(),
+                Value<String?> projectId = const Value.absent(),
+                Value<String?> parentTaskId = const Value.absent(),
+                Value<String> priority = const Value.absent(),
                 Value<int> createdAt = const Value.absent(),
                 Value<int> updatedAt = const Value.absent(),
                 Value<int?> completedAt = const Value.absent(),
@@ -61311,6 +61510,9 @@ class $$TasksTableTableManager
                 energyRequirement: energyRequirement,
                 blockedReason: blockedReason,
                 questId: questId,
+                projectId: projectId,
+                parentTaskId: parentTaskId,
+                priority: priority,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
                 completedAt: completedAt,
@@ -61333,6 +61535,9 @@ class $$TasksTableTableManager
                 Value<String> energyRequirement = const Value.absent(),
                 Value<String?> blockedReason = const Value.absent(),
                 Value<String?> questId = const Value.absent(),
+                Value<String?> projectId = const Value.absent(),
+                Value<String?> parentTaskId = const Value.absent(),
+                Value<String> priority = const Value.absent(),
                 required int createdAt,
                 required int updatedAt,
                 Value<int?> completedAt = const Value.absent(),
@@ -61353,6 +61558,9 @@ class $$TasksTableTableManager
                 energyRequirement: energyRequirement,
                 blockedReason: blockedReason,
                 questId: questId,
+                projectId: projectId,
+                parentTaskId: parentTaskId,
+                priority: priority,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
                 completedAt: completedAt,

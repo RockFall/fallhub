@@ -41,7 +41,7 @@ final dayPlanProvider = StreamProvider.autoDispose<DayPlanWithItems?>((ref) asyn
 
 final planLinkedTasksProvider =
     StreamProvider.autoDispose<Map<String, ColonyTask>>((ref) async* {
-  final plan = await ref.watch(dayPlanProvider.future);
+  final plan = ref.watch(dayPlanProvider).asData?.value;
   final ids = [
     for (final item in plan?.items ?? const <DayPlanItem>[])
       if (item.taskId != null) item.taskId!,
@@ -157,7 +157,7 @@ final planCarryOverProvider =
       .dayPlan
       .getForDate(profile.id, yesterday);
   if (source == null || source.items.isEmpty) return [];
-  final todayPlan = await ref.watch(dayPlanProvider.future);
+  final todayPlan = ref.watch(dayPlanProvider).asData?.value;
   final alreadyCarried = {
     for (final item in todayPlan?.items ?? const <DayPlanItem>[])
       if (item.carriedFromItemId != null) item.carriedFromItemId!.value,
@@ -192,7 +192,7 @@ final planCarryOverProvider =
   ];
 });
 
-final todayPlanProvider = StreamProvider.autoDispose<DayPlanWithItems?>((ref) async* {
+final todayPlanProvider = StreamProvider<DayPlanWithItems?>((ref) async* {
   final profile = await ref.watch(profileProvider.future);
   if (profile == null) {
     yield null;
@@ -205,8 +205,8 @@ final todayPlanProvider = StreamProvider.autoDispose<DayPlanWithItems?>((ref) as
 });
 
 final todayLinkedTasksProvider =
-    StreamProvider.autoDispose<Map<String, ColonyTask>>((ref) async* {
-  final plan = await ref.watch(todayPlanProvider.future);
+    StreamProvider<Map<String, ColonyTask>>((ref) async* {
+  final plan = ref.watch(todayPlanProvider).asData?.value;
   final ids = [
     for (final item in plan?.items ?? const <DayPlanItem>[])
       if (item.taskId != null) item.taskId!,
@@ -241,7 +241,7 @@ List<PlanRow> planRowsFor(
   ];
 }
 
-final todayPlanRowsProvider = Provider.autoDispose<AsyncValue<List<PlanRow>>>((ref) {
+final todayPlanRowsProvider = Provider<AsyncValue<List<PlanRow>>>((ref) {
   final planAsync = ref.watch(todayPlanProvider);
   final tasksAsync = ref.watch(todayLinkedTasksProvider);
   return planAsync.when(
@@ -257,7 +257,7 @@ final todayPlanRowsProvider = Provider.autoDispose<AsyncValue<List<PlanRow>>>((r
   );
 });
 
-final todayPlanTaskIdsProvider = Provider.autoDispose<Set<String>>((ref) {
+final todayPlanTaskIdsProvider = Provider<Set<String>>((ref) {
   final plan = ref.watch(todayPlanProvider).asData?.value;
   return {
     for (final item in plan?.items ?? const <DayPlanItem>[])

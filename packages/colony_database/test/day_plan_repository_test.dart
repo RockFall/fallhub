@@ -161,7 +161,7 @@ void main() {
     final plan = await repos.dayPlan.getOrCreateForDate(p.id, '2026-08-24');
     await repos.dayPlan.addAdHoc(dayPlanId: plan.plan.id, title: 'Pão');
     final snapshot = await repos.export.buildSnapshot();
-    expect(snapshot.version, 37);
+    expect(snapshot.version, 38);
     expect(snapshot.dayPlans, hasLength(1));
     expect(snapshot.dayPlanItems, hasLength(1));
 

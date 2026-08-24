@@ -116,6 +116,7 @@ abstract final class ColonyMiniAppColors {
   static const organizations = Color(0xFF5A7A9A);
   static const commitments = Color(0xFF6BA56A);
   static const inbox = Color(0xFFE07050);
+  static const tasks = Color(0xFF6B8F71);
   static const chronicle = Color(0xFF5A6BB8);
   static const projects = Color(0xFF3D7A8C);
   static const decisions = Color(0xFFA8884A);

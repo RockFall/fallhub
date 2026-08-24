@@ -23,6 +23,9 @@ class ColonyTask extends Equatable {
     this.deletedAt,
     this.version = 1,
     this.questId,
+    this.projectId,
+    this.parentTaskId,
+    this.priority = TaskPriority.none,
   });
 
   final EntityId id;
@@ -43,6 +46,11 @@ class ColonyTask extends Equatable {
   final DateTime? deletedAt;
   final int version;
   final EntityId? questId;
+  final EntityId? projectId;
+  final EntityId? parentTaskId;
+  final TaskPriority priority;
+
+  bool get isTopLevel => parentTaskId == null;
 
   factory ColonyTask.capture({
     required EntityId id,
@@ -77,20 +85,32 @@ class ColonyTask extends Equatable {
     DateTime? deletedAt,
     int? version,
     EntityId? questId,
+    EntityId? projectId,
+    EntityId? parentTaskId,
+    TaskPriority? priority,
+    bool clearDescription = false,
     bool clearBlockedReason = false,
     bool clearCompletedAt = false,
     bool clearQuestId = false,
+    bool clearProjectId = false,
+    bool clearParentTaskId = false,
+    bool clearDueAt = false,
+    bool clearScheduledStart = false,
+    bool clearEstimatedMinutes = false,
   }) {
     return ColonyTask(
       id: id,
       profileId: profileId,
       title: title ?? this.title,
-      description: description ?? this.description,
+      description: clearDescription ? null : (description ?? this.description),
       status: status ?? this.status,
       sourceType: sourceType ?? this.sourceType,
-      dueAt: dueAt ?? this.dueAt,
-      scheduledStart: scheduledStart ?? this.scheduledStart,
-      estimatedMinutes: estimatedMinutes ?? this.estimatedMinutes,
+      dueAt: clearDueAt ? null : (dueAt ?? this.dueAt),
+      scheduledStart:
+          clearScheduledStart ? null : (scheduledStart ?? this.scheduledStart),
+      estimatedMinutes: clearEstimatedMinutes
+          ? null
+          : (estimatedMinutes ?? this.estimatedMinutes),
       actualMinutes: actualMinutes ?? this.actualMinutes,
       energyRequirement: energyRequirement ?? this.energyRequirement,
       blockedReason:
@@ -102,6 +122,10 @@ class ColonyTask extends Equatable {
       deletedAt: deletedAt ?? this.deletedAt,
       version: version ?? this.version,
       questId: clearQuestId ? null : (questId ?? this.questId),
+      projectId: clearProjectId ? null : (projectId ?? this.projectId),
+      parentTaskId:
+          clearParentTaskId ? null : (parentTaskId ?? this.parentTaskId),
+      priority: priority ?? this.priority,
     );
   }
 
@@ -137,6 +161,9 @@ class ColonyTask extends Equatable {
         deletedAt,
         version,
         questId,
+        projectId,
+        parentTaskId,
+        priority,
       ];
 }
 

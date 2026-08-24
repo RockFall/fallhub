@@ -26,72 +26,16 @@ class PlanItemRow extends ConsumerWidget {
     final text = Theme.of(context).textTheme;
     final linked = row.item.isLinked;
     final scheduled = _scheduledLabel(row.linkedTask);
-    return Dismissible(
-      key: ValueKey('plan-dismiss-${row.item.id.value}'),
-      direction: DismissDirection.horizontal,
-      background: const ColoredBox(
-        color: ColonyColors.statusGood,
-        child: Align(
-          alignment: Alignment.centerLeft,
-          child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: ColonySpacing.lg),
-            child: Icon(Icons.check, color: ColonyColors.textPrimary),
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        border: Border(
+          left: BorderSide(
+            width: 2,
+            color: linked ? ColonyColors.accentCyan : ColonyColors.borderSubtle,
           ),
         ),
       ),
-      secondaryBackground: const ColoredBox(
-        color: ColonyColors.statusRisk,
-        child: Align(
-          alignment: Alignment.centerRight,
-          child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: ColonySpacing.lg),
-            child: Icon(
-              Icons.remove_circle_outline,
-              color: ColonyColors.textPrimary,
-            ),
-          ),
-        ),
-      ),
-      confirmDismiss: (direction) async {
-        final controller = ref.read(planDayControllerProvider.notifier);
-        if (direction == DismissDirection.startToEnd) {
-          final rejection = await controller.toggle(row);
-          if (context.mounted) {
-            if (rejection ==
-                DayPlanCompletionRejection.linkedTaskBlocksCompletion) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text(AppStrings.planDayBlockedComplete),
-                ),
-              );
-            } else {
-              showPlanDayUndoSnack(
-                context,
-                ref,
-                AppStrings.planDayCompletedSnack,
-              );
-            }
-          }
-          return false;
-        }
-        await controller.removeFromToday(row.item);
-        if (context.mounted) {
-          showPlanDayUndoSnack(context, ref, AppStrings.planDayRemovedSnack);
-        }
-        return false;
-      },
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          border: Border(
-            left: BorderSide(
-              width: 2,
-              color: linked
-                  ? ColonyColors.accentCyan
-                  : ColonyColors.borderSubtle,
-            ),
-          ),
-        ),
-        child: ListTile(
+      child: ListTile(
           dense: true,
           contentPadding: const EdgeInsets.symmetric(
             horizontal: ColonySpacing.sm,
@@ -220,7 +164,6 @@ class PlanItemRow extends ConsumerWidget {
             ],
           ),
         ),
-      ),
     );
   }
 

@@ -390,6 +390,37 @@ abstract final class AppStrings {
   static const commandPalette = 'Comando';
   static const commandHint = 'Navegar ou criar…';
   static const taskDetails = 'Detalhes da tarefa';
+  static const tasksTitle = 'Tarefas';
+  static const tasksMiniApp = 'Tarefas';
+  static const tasksComposerHint = 'Nova tarefa…';
+  static const tasksComposerSubmit = 'Adicionar tarefa';
+  static const tasksEmpty = 'Nenhuma tarefa aberta.';
+  static const tasksEmptyHint =
+      'Escreva um nome abaixo. Projeto, prazo e o resto vêm depois, se quiser.';
+  static const tasksEmptyDone = 'Nenhuma tarefa concluída.';
+  static const tasksFilterOpen = 'Abertas';
+  static const tasksFilterDeadline = 'Com prazo';
+  static const tasksFilterNoDate = 'Sem data';
+  static const tasksFilterDone = 'Concluídas';
+  static const tasksGroupByProject = 'Por projeto';
+  static const tasksNoProject = 'Sem projeto';
+  static const tasksOpenTask = 'Abrir tarefa';
+  static const taskNotesHint = 'Notas (opcional)';
+  static const taskDeadline = 'Prazo';
+  static const taskForDate = 'Para o dia';
+  static const taskClearDeadline = 'Remover prazo';
+  static const taskClearForDate = 'Remover data';
+  static const taskProject = 'Projeto';
+  static const taskClearProject = 'Sem projeto';
+  static const taskPriority = 'Prioridade';
+  static const taskSubtasks = 'Subtarefas';
+  static const taskSubtaskHint = 'Nova subtarefa…';
+  static const taskEstimate = 'Estimativa (min)';
+  static const taskEnergy = 'Energia';
+  static const taskPickDate = 'Escolher data';
+  static const taskOverdue = 'Atrasada';
+  static const taskBackToList = 'Voltar às tarefas';
+  static const taskNotFound = 'Tarefa não encontrada.';
   static const markNext = 'Próxima ação';
   static const archive = 'Arquivar';
   static const status = 'Status';
@@ -710,6 +741,29 @@ abstract final class AppStrings {
         TaskStatus.cancelled => 'Cancelada',
         TaskStatus.archived => 'Arquivada',
       };
+
+  static String taskPriorityLabel(TaskPriority priority) => switch (priority) {
+        TaskPriority.none => 'Sem prioridade',
+        TaskPriority.later => 'Depois',
+        TaskPriority.soon => 'Em breve',
+        TaskPriority.now => 'Agora',
+      };
+
+  static String taskSubtaskProgress(int done, int total) => '$done/$total';
+
+  static String taskEnergyLabel(EnergyRequirement energy) => switch (energy) {
+        EnergyRequirement.unknown => 'Qualquer',
+        EnergyRequirement.low => 'Baixa',
+        EnergyRequirement.medium => 'Média',
+        EnergyRequirement.high => 'Alta',
+      };
+
+  static String taskDateLabel(DateTime value) {
+    final local = value.toLocal();
+    final day = local.day.toString().padLeft(2, '0');
+    final month = local.month.toString().padLeft(2, '0');
+    return '$day/$month/${local.year}';
+  }
 
   // Projects (Iteration 5)
   static const projects = 'Projetos';
