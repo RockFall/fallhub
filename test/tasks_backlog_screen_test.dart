@@ -9,6 +9,11 @@ import 'package:fallhub/app/localization/app_strings.dart';
 import 'package:fallhub/core/providers/app_providers.dart';
 import 'package:fallhub/features/tasks/presentation/tasks_backlog_screen.dart';
 
+Future<void> _drainTimers(WidgetTester tester) async {
+  await tester.pumpWidget(const SizedBox.shrink());
+  await tester.pump(const Duration(milliseconds: 50));
+}
+
 void main() {
   late ColonyDatabase db;
   late ColonyRepositories repos;
@@ -35,6 +40,10 @@ void main() {
     );
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 50));
+    addTearDown(() async {
+      await tester.pumpWidget(const SizedBox.shrink());
+      await tester.pump(const Duration(milliseconds: 50));
+    });
   }
 
   setUp(() async {
@@ -66,6 +75,7 @@ void main() {
     await pumpScreen(tester);
     expect(find.text(AppStrings.tasksEmpty), findsOneWidget);
     expect(find.byType(TextField), findsOneWidget);
+    await _drainTimers(tester);
   });
 
   testWidgets('creating with only a name shows the task', (tester) async {
@@ -76,6 +86,7 @@ void main() {
     await tester.pump(const Duration(milliseconds: 50));
     expect(find.text('Comprar pão'), findsOneWidget);
     expect(find.text(AppStrings.tasksEmpty), findsNothing);
+    await _drainTimers(tester);
   });
 
   testWidgets('groups open tasks by project', (tester) async {
@@ -103,5 +114,6 @@ void main() {
     expect(find.text('SEM PROJETO'), findsOneWidget);
     expect(find.text('Pintar muro'), findsOneWidget);
     expect(find.text('Ligar para o banco'), findsOneWidget);
+    await _drainTimers(tester);
   });
 }

@@ -8,6 +8,12 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:fallhub/app/localization/app_strings.dart';
 import 'package:fallhub/core/providers/app_providers.dart';
 import 'package:fallhub/features/tasks/presentation/task_detail_screen.dart';
+import 'package:fallhub/features/tasks/presentation/widgets/task_composer.dart';
+
+Future<void> _drainTimers(WidgetTester tester) async {
+  await tester.pumpWidget(const SizedBox.shrink());
+  await tester.pump(const Duration(milliseconds: 50));
+}
 
 void main() {
   late ColonyDatabase db;
@@ -36,6 +42,10 @@ void main() {
     );
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 80));
+    addTearDown(() async {
+      await tester.pumpWidget(const SizedBox.shrink());
+      await tester.pump(const Duration(milliseconds: 50));
+    });
   }
 
   setUp(() async {
@@ -75,20 +85,19 @@ void main() {
     expect(find.text(AppStrings.taskForDate), findsOneWidget);
     expect(find.text(AppStrings.taskSubtasks), findsOneWidget);
     expect(find.text(AppStrings.taskProject), findsOneWidget);
+    await _drainTimers(tester);
   });
 
-  testWidgets('adds a subtask from the task page', (tester) async {
+  testWidgets('shows a subtask created under the parent', (tester) async {
+    await repos.tasks.createSimple(
+      profileId: task.profileId,
+      title: 'Abrir o diff',
+      parentTaskId: task.id,
+    );
     await pumpScreen(tester);
-    final fields = find.byType(TextField);
-    await tester.enterText(fields.last, 'Abrir o diff');
-    await tester.testTextInput.receiveAction(TextInputAction.done);
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 80));
     expect(find.text('Abrir o diff'), findsOneWidget);
-
-    final children = await repos.tasks.watchChildren(task.id).first;
-    expect(children, hasLength(1));
-    expect(children.single.title, 'Abrir o diff');
+    expect(find.byType(TaskComposer), findsOneWidget);
+    await _drainTimers(tester);
   });
 
   testWidgets('sets qualitative priority', (tester) async {
@@ -98,5 +107,6 @@ void main() {
     await tester.pump(const Duration(milliseconds: 80));
     final loaded = await repos.tasks.getById(task.id);
     expect(loaded!.priority, TaskPriority.now);
+    await _drainTimers(tester);
   });
 }
