@@ -9,11 +9,13 @@ class TaskComposer extends ConsumerStatefulWidget {
   const TaskComposer({
     super.key,
     this.enabled = true,
+    this.autoFocus = false,
     this.hint = AppStrings.tasksComposerHint,
     this.onSubmit,
   });
 
   final bool enabled;
+  final bool autoFocus;
   final String hint;
   final Future<void> Function(String title)? onSubmit;
 
@@ -24,6 +26,16 @@ class TaskComposer extends ConsumerStatefulWidget {
 class TaskComposerState extends ConsumerState<TaskComposer> {
   final _controller = TextEditingController();
   final _focus = FocusNode();
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.autoFocus) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _focus.requestFocus();
+      });
+    }
+  }
 
   @override
   void dispose() {

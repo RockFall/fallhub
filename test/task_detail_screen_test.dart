@@ -109,4 +109,23 @@ void main() {
     expect(loaded!.priority, TaskPriority.now);
     await _drainTimers(tester);
   });
+
+  testWidgets('marcar para hoje writes scheduledStart for today', (tester) async {
+    await pumpScreen(tester);
+    await tester.ensureVisible(find.text(AppStrings.planDayAddToToday));
+    await tester.tap(find.text(AppStrings.planDayAddToToday));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 80));
+
+    final loaded = await repos.tasks.getById(task.id);
+    expect(loaded!.scheduledStart, isNotNull);
+    expect(
+      TaskCapabilityPolicy.isScheduledOn(
+        loaded,
+        dayPlanLocalDateKey(clock),
+      ),
+      isTrue,
+    );
+    await _drainTimers(tester);
+  });
 }

@@ -10,7 +10,6 @@ import '../../../core/providers/feature_controllers.dart';
 import '../../activation/application/activation_controllers.dart';
 import '../../plan_day/application/plan_day_controller.dart';
 import '../../plan_day/application/plan_day_providers.dart';
-import '../../plan_day/presentation/widgets/plan_day_feedback.dart';
 import '../../projects/application/project_providers.dart';
 import '../application/task_controller.dart';
 import '../application/task_providers.dart';
@@ -373,14 +372,7 @@ class _TaskDetailBodyState extends ConsumerState<_TaskDetailBody> {
                         : () async {
                             await ref
                                 .read(planDayControllerProvider.notifier)
-                                .toggleTaskOnToday(task);
-                            if (!context.mounted) return;
-                            showPlanDayOpenSnack(
-                              context,
-                              onPlan
-                                  ? AppStrings.planDayRemovedSnack
-                                  : AppStrings.planDayAddedSnack,
-                            );
+                                .toggleMarkedForToday(task);
                           },
                     child: Text(
                       onPlan

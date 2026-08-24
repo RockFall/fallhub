@@ -6,7 +6,6 @@ import 'package:go_router/go_router.dart';
 import '../../../../app/localization/app_strings.dart';
 import '../../application/plan_day_controller.dart';
 import '../../application/plan_day_providers.dart';
-import 'plan_day_feedback.dart';
 
 class PlanDayHomeCard extends ConsumerStatefulWidget {
   const PlanDayHomeCard({super.key});
@@ -27,15 +26,14 @@ class _PlanDayHomeCardState extends ConsumerState<PlanDayHomeCard> {
   Future<void> _submit() async {
     final text = _controller.text.trim();
     if (text.isEmpty) return;
-    await ref.read(planDayControllerProvider.notifier).addAdHocToToday(text);
+    await ref.read(planDayControllerProvider.notifier).createNamed(text);
     if (!mounted) return;
     _controller.clear();
-    showPlanDayOpenSnack(context, AppStrings.planDayAddedSnack);
   }
 
   @override
   Widget build(BuildContext context) {
-    final rows = ref.watch(todayPlanRowsProvider);
+    final lists = ref.watch(todayPlanTasksProvider);
     return ColonyHomeCard(
       icon: Icons.wb_twilight_outlined,
       title: AppStrings.planDayTitle,
@@ -46,24 +44,19 @@ class _PlanDayHomeCardState extends ConsumerState<PlanDayHomeCard> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          rows.when(
+          lists.when(
             loading: () => const LinearProgressIndicator(),
             error: (_, __) => Text(AppStrings.errorGeneric),
-            data: (list) {
-              if (list.isEmpty) {
+            data: (day) {
+              if (day.open.isEmpty && day.done.isEmpty) {
                 return Text(
                   AppStrings.planDayHomeEmpty,
                   style: Theme.of(context).textTheme.bodyMedium,
                 );
               }
-              final done = list.where((row) => row.isDone).length;
-              PlanRow? firstOpen;
-              for (final row in list) {
-                if (!row.isDone) {
-                  firstOpen = row;
-                  break;
-                }
-              }
+              final firstOpen = day.open.isEmpty ? null : day.open.first;
+              final total = day.total;
+              final done = day.done.length;
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
@@ -73,7 +66,7 @@ class _PlanDayHomeCardState extends ConsumerState<PlanDayHomeCard> {
                         width: 28,
                         height: 28,
                         child: CircularProgressIndicator(
-                          value: done / list.length,
+                          value: total == 0 ? 0 : done / total,
                           strokeWidth: 3,
                           color: ColonyMiniAppColors.planDay,
                           backgroundColor: ColonyColors.void_,
@@ -81,7 +74,7 @@ class _PlanDayHomeCardState extends ConsumerState<PlanDayHomeCard> {
                       ),
                       const SizedBox(width: ColonySpacing.sm),
                       Text(
-                        AppStrings.planDayProgress(done, list.length),
+                        AppStrings.planDayProgress(done, total),
                         style: Theme.of(context).textTheme.titleMedium,
                       ),
                     ],
@@ -97,7 +90,7 @@ class _PlanDayHomeCardState extends ConsumerState<PlanDayHomeCard> {
                             value: false,
                             onChanged: (_) => ref
                                 .read(planDayControllerProvider.notifier)
-                                .toggle(firstOpen!),
+                                .toggleDone(firstOpen),
                           ),
                         ),
                         Expanded(

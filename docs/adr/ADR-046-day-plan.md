@@ -1,7 +1,7 @@
 # ADR-046: Day Plan (Planejar Dia)
 
 ## Status
-Aceito
+Supersedido pela UI de ADR-048 (tabelas `day_plans` / `day_plan_items` permanecem no schema/export)
 
 ## Contexto
 

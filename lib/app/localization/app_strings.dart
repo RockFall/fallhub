@@ -249,14 +249,14 @@ abstract final class AppStrings {
 
   static const planDayTitle = 'Plano de hoje';
   static const planDayMiniApp = 'Hoje';
-  static const planDayComposerHint = 'Adicionar ao plano de hoje…';
-  static const planDayComposerSubmit = 'Adicionar item';
+  static const planDayComposerHint = 'Nova tarefa…';
+  static const planDayComposerSubmit = 'Adicionar tarefa';
   static const planDayEmpty =
-      'O plano de hoje está vazio.';
+      'Nenhuma tarefa neste dia.';
   static const planDayEmptyHint =
-      'Nada para puxar ainda — crie o primeiro item abaixo.';
-  static const planDayHomeEmpty = 'Nada planejado ainda hoje.';
-  static const planDayHomeCta = 'Planejar o dia';
+      'Escreva um nome abaixo. Sem data, ela aparece em todos os dias. Para um dia específico, abra a tarefa.';
+  static const planDayHomeEmpty = 'Nenhuma tarefa aberta.';
+  static const planDayHomeCta = 'Abrir hoje';
   static const planDayTodayPill = 'Hoje';
   static const planDayChipToday = 'hoje';
   static const planDayChipInbox = 'inbox';
@@ -270,10 +270,10 @@ abstract final class AppStrings {
   static const planDayCarryOverPick = 'Escolher';
   static const planDayCarryOverDismiss = 'Ignorar por hoje';
   static const planDayAllDone = 'Tudo concluído por hoje.';
-  static const planDayOnPlanChip = 'No plano de hoje';
-  static const planDayAddToToday = '+Hoje';
-  static const planDayAddToTodayTooltip = 'Adicionar a hoje';
-  static const planDayRemoveFromTodayTooltip = 'Remover de hoje';
+  static const planDayOnPlanChip = 'Para hoje';
+  static const planDayAddToToday = 'Marcar para hoje';
+  static const planDayAddToTodayTooltip = 'Marcar para hoje';
+  static const planDayRemoveFromTodayTooltip = 'Tirar a data de hoje';
   static const planDayBlockedComplete =
       'Esta tarefa está bloqueada. Resolva o bloqueio antes de concluir.';
   static const planDaySuggestions = 'Da caixa de entrada';
@@ -282,9 +282,9 @@ abstract final class AppStrings {
       'Nada na caixa de entrada ou em Próximas para trazer para hoje.';
   static const planDayOpenInbox = 'Abrir caixa de entrada';
   static const planDayOpenPlan = 'Abrir plano de hoje';
-  static const planDayAddedSnack = 'Adicionado ao plano de hoje';
+  static const planDayAddedSnack = 'Tarefa criada';
   static const planDayCompletedSnack = 'Concluído';
-  static const planDayRemovedSnack = 'Removido de hoje';
+  static const planDayRemovedSnack = 'Data de hoje removida';
   static const planDayErrorLoad = 'Não foi possível carregar o plano de hoje.';
   static const planDayRetry = 'Tentar novamente';
   static const planDayLinkedBadge = 'Vinculada';

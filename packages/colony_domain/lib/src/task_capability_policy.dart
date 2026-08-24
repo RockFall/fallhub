@@ -1,3 +1,4 @@
+import 'day_plan.dart';
 import 'enums.dart';
 import 'id_generator.dart';
 import 'project.dart';
@@ -67,6 +68,40 @@ class TaskCapabilityPolicy {
     final start = task.scheduledStart;
     if (start == null) return false;
     return _localDateOnly(start) == _localDateOnly(day);
+  }
+
+  static bool hasForDate(ColonyTask task) => task.scheduledStart != null;
+
+  static bool isScheduledOn(ColonyTask task, String localDate) {
+    final start = task.scheduledStart;
+    if (start == null) return false;
+    return dayPlanLocalDateKey(start) == localDate;
+  }
+
+  /// Open top-level tasks with no day mark (always listed) or marked for [localDate].
+  static bool isOpenOnDay(ColonyTask task, String localDate) {
+    if (!task.isTopLevel || task.deletedAt != null || !task.status.isActive) {
+      return false;
+    }
+    return !hasForDate(task) || isScheduledOn(task, localDate);
+  }
+
+  /// Done tasks marked for [localDate], or undated ones completed on that day.
+  static bool isDoneOnDay(ColonyTask task, String localDate) {
+    if (!task.isTopLevel ||
+        task.deletedAt != null ||
+        task.status != TaskStatus.done) {
+      return false;
+    }
+    if (isScheduledOn(task, localDate)) return true;
+    if (task.scheduledStart != null) return false;
+    final completed = task.completedAt;
+    return completed != null && dayPlanLocalDateKey(completed) == localDate;
+  }
+
+  static DateTime localMidnightUtc(DateTime now) {
+    final local = now.toLocal();
+    return DateTime(local.year, local.month, local.day).toUtc();
   }
 
   static DateTime localDateOnly(DateTime value) => _localDateOnly(value);
