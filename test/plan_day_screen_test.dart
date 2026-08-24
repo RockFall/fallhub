@@ -41,10 +41,6 @@ void main() {
     );
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 50));
-    addTearDown(() async {
-      await tester.pumpWidget(const SizedBox.shrink());
-      await tester.pump(const Duration(milliseconds: 50));
-    });
   }
 
   setUp(() async {
@@ -91,7 +87,7 @@ void main() {
     expect(find.byType(Checkbox), findsOneWidget);
 
     final profile = (await repos.profiles.getActive())!;
-    final tasks = await repos.tasks.watchActive(profile.id).first;
+    final tasks = await repos.tasks.listAll(profile.id);
     expect(tasks, hasLength(1));
     expect(tasks.single.title, 'Comprar pão');
     expect(tasks.single.scheduledStart, isNull);
@@ -236,7 +232,7 @@ void main() {
     await tester.pump(const Duration(milliseconds: 50));
 
     final profile = (await repos.profiles.getActive())!;
-    final tasks = await repos.tasks.watchActive(profile.id).first;
+    final tasks = await repos.tasks.listAll(profile.id);
     expect(tasks.single.title, 'Do card');
     expect(tasks.single.scheduledStart, isNull);
     expect(find.text('Do card'), findsOneWidget);
