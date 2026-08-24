@@ -14,6 +14,7 @@ import '../../features/habitat/presentation/character_create_screen.dart';
 import '../../features/habitat/presentation/habitat_screen.dart';
 import '../../features/habitat/presentation/widgets/mini_habitat_badge.dart';
 import '../../features/plan_day/presentation/plan_day_screen.dart';
+import '../../features/inbox/presentation/inbox_screen.dart';
 import '../../features/onboarding/presentation/onboarding_screen.dart';
 import '../../features/pawn/presentation/daily_review_screen.dart';
 import '../../features/pawn/presentation/weekly_review_screen.dart';
