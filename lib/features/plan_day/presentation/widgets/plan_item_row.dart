@@ -5,8 +5,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../app/localization/app_strings.dart';
-import '../application/plan_day_controller.dart';
-import '../application/plan_day_providers.dart';
+import '../../application/plan_day_controller.dart';
+import '../../application/plan_day_providers.dart';
 import 'plan_day_feedback.dart';
 
 class PlanItemRow extends ConsumerWidget {
