@@ -55,30 +55,30 @@ class _PlanDayHomeCardState extends ConsumerState<PlanDayHomeCard> {
                 );
               }
               final firstOpen = day.open.isEmpty ? null : day.open.first;
-              final total = day.total;
-              final done = day.done.length;
+              final dated = day.datedProgress;
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Row(
-                    children: [
-                      SizedBox(
-                        width: 28,
-                        height: 28,
-                        child: CircularProgressIndicator(
-                          value: total == 0 ? 0 : done / total,
-                          strokeWidth: 3,
-                          color: ColonyMiniAppColors.planDay,
-                          backgroundColor: ColonyColors.void_,
+                  if (dated.$2 > 0)
+                    Row(
+                      children: [
+                        SizedBox(
+                          width: 28,
+                          height: 28,
+                          child: CircularProgressIndicator(
+                            value: dated.$2 == 0 ? 0 : dated.$1 / dated.$2,
+                            strokeWidth: 3,
+                            color: ColonyMiniAppColors.planDay,
+                            backgroundColor: ColonyColors.void_,
+                          ),
                         ),
-                      ),
-                      const SizedBox(width: ColonySpacing.sm),
-                      Text(
-                        AppStrings.planDayProgress(done, total),
-                        style: Theme.of(context).textTheme.titleMedium,
-                      ),
-                    ],
-                  ),
+                        const SizedBox(width: ColonySpacing.sm),
+                        Text(
+                          AppStrings.planDayProgress(dated.$1, dated.$2),
+                          style: Theme.of(context).textTheme.titleMedium,
+                        ),
+                      ],
+                    ),
                   if (firstOpen != null) ...[
                     const SizedBox(height: ColonySpacing.xs),
                     Row(

@@ -18,12 +18,15 @@ ADR-046 criou `DayPlan` / `DayPlanItem` como lista diária **paralela** ao backl
 ## Decisão
 
 - Fonte de verdade do que aparece em Hoje: `ColonyTask` de topo (`parentTaskId == null`).
-- **Aberta no dia D**: `status` ativo e (`scheduledStart == null` **ou** data local de `scheduledStart` == D).
+- **Aberta no dia D**: status trabalhável (`next` / `scheduled` / `doing` / `blocked` / `waiting`) e (`scheduledStart == null` **ou** data local de `scheduledStart` == D). `inbox` não entra — a caixa de entrada continua só captura.
+- A lista de Hoje **separa** “Neste dia” (marcadas em D) e “Sem data” (sempre ativas).
+- Progresso do dia conta **só** as marcadas em D. Sem data não entra no numerador/denominador.
 - **Concluída no dia D**: `status == done` e (marcada para D **ou** sem data de dia e `completedAt` em D) — evita que concluídas sem data inundem todos os dias.
-- Compositor de Hoje / card da Home chama `createSimple` (igual Tarefas): título, `next`, sem `scheduledStart`.
-- “Marcar para hoje” na página da tarefa grava `scheduledStart` no calendário local de hoje; limpar devolve a tarefa ao conjunto “sempre ativa”.
+- Compositor de Hoje / card da Home chama `createSimple` (igual Tarefas): título, `next`, sem `scheduledStart`. Fora de hoje, um aviso deixa isso explícito.
+- A página da tarefa tem um campo **Para o dia** (calendário + atalho “Hoje” + limpar). Não há segundo botão “marcar para o plano”.
 - Inbox e atalhos **não** marcam data (só abrem a tarefa).
 - Tabelas `day_plans` / `day_plan_items` e export v37+ **permanecem** (dados antigos / restore). A UI de Hoje deixa de escrever nelas.
+- `scheduledStart` agora é a marca de dia de Hoje **e** o slot de agenda. Agenda/work grid que leem o instante devem tratar meia-noite local como “dia inteiro”, não como horário.
 
 ## Consequências
 

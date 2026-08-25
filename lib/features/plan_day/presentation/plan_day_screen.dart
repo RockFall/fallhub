@@ -140,23 +140,31 @@ class _PlanDayScreenState extends ConsumerState<PlanDayScreen> {
                         sliver: SliverList(
                           delegate: SliverChildListDelegate([
                             for (final section in sections)
-                              if (section.title.isEmpty)
-                                Column(
+                              ColonyPanel(
+                                title: section.title,
+                                child: Column(
                                   children: [
-                                    for (final task in section.tasks)
-                                      TaskListRow(task: task),
+                                    for (final group in section.groups)
+                                      if (group.title.isEmpty)
+                                        Column(
+                                          children: [
+                                            for (final task in group.tasks)
+                                              TaskListRow(task: task),
+                                          ],
+                                        )
+                                      else
+                                        ColonyPanel(
+                                          title: group.title,
+                                          child: Column(
+                                            children: [
+                                              for (final task in group.tasks)
+                                                TaskListRow(task: task),
+                                            ],
+                                          ),
+                                        ),
                                   ],
-                                )
-                              else
-                                ColonyPanel(
-                                  title: section.title,
-                                  child: Column(
-                                    children: [
-                                      for (final task in section.tasks)
-                                        TaskListRow(task: task),
-                                    ],
-                                  ),
                                 ),
+                              ),
                           ]),
                         ),
                       ),
@@ -193,6 +201,24 @@ class _PlanDayScreenState extends ConsumerState<PlanDayScreen> {
             },
           ),
         ),
+        if (day != today)
+          Padding(
+            padding: const EdgeInsets.fromLTRB(
+              ColonySpacing.md,
+              ColonySpacing.xs,
+              ColonySpacing.md,
+              0,
+            ),
+            child: Text(
+              AppStrings.planDayComposerOtherDayHint(
+                AppStrings.planDayDateHeading(day, isToday: false),
+              ),
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: ColonyColors.textMuted,
+                  ),
+            ),
+          ),
         PlanComposer(
           autoFocus: widget.focusComposer,
           enabled: composerEnabled,
@@ -274,15 +300,16 @@ class _PlanHeader extends StatelessWidget {
               ),
             ],
           ),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(ColonyRadii.sm),
-            child: LinearProgressIndicator(
-              minHeight: 3,
-              value: progress,
-              color: ColonyMiniAppColors.planDay,
-              backgroundColor: ColonyColors.void_,
+          if (total > 0)
+            ClipRRect(
+              borderRadius: BorderRadius.circular(ColonyRadii.sm),
+              child: LinearProgressIndicator(
+                minHeight: 3,
+                value: progress,
+                color: ColonyMiniAppColors.planDay,
+                backgroundColor: ColonyColors.void_,
+              ),
             ),
-          ),
         ],
       ),
     );

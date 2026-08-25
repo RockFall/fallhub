@@ -121,6 +121,13 @@ void main() {
     expect(TaskCapabilityPolicy.isOpenOnDay(tomorrow, '2026-08-25'), isTrue);
     expect(TaskCapabilityPolicy.isOpenOnDay(deadlineOnly, '2026-08-24'), isTrue);
     expect(TaskCapabilityPolicy.isOpenOnDay(deadlineOnly, '2026-08-25'), isTrue);
+    expect(
+      TaskCapabilityPolicy.isOpenOnDay(
+        task(id: 'i', title: 'Inbox', status: TaskStatus.inbox),
+        '2026-08-24',
+      ),
+      isFalse,
+    );
   });
 
   test('undated done tasks only appear on the completion day', () {

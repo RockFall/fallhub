@@ -110,10 +110,17 @@ void main() {
     await _drainTimers(tester);
   });
 
-  testWidgets('marcar para hoje writes scheduledStart for today', (tester) async {
+  testWidgets('Para o dia shortcut marks scheduledStart for today',
+      (tester) async {
     await pumpScreen(tester);
-    await tester.ensureVisible(find.text(AppStrings.planDayAddToToday));
-    await tester.tap(find.text(AppStrings.planDayAddToToday));
+    final forDate = find.widgetWithText(ListTile, AppStrings.taskForDate);
+    await tester.ensureVisible(forDate);
+    await tester.tap(
+      find.descendant(
+        of: forDate,
+        matching: find.text(AppStrings.planDayTodayPill),
+      ),
+    );
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 80));
 

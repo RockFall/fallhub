@@ -9,7 +9,6 @@ import '../../../core/providers/app_providers.dart';
 import '../../../core/providers/feature_controllers.dart';
 import '../../activation/application/activation_controllers.dart';
 import '../../plan_day/application/plan_day_controller.dart';
-import '../../plan_day/application/plan_day_providers.dart';
 import '../../projects/application/project_providers.dart';
 import '../application/task_controller.dart';
 import '../application/task_providers.dart';
@@ -141,7 +140,6 @@ class _TaskDetailBodyState extends ConsumerState<_TaskDetailBody> {
   Widget build(BuildContext context) {
     final task = widget.task;
     final text = Theme.of(context).textTheme;
-    final onPlan = ref.watch(todayPlanTaskIdsProvider).contains(task.id.value);
     final children =
         ref.watch(taskChildrenProvider(task.id.value)).asData?.value ?? const [];
     final progress = TaskCapabilityPolicy.subtaskProgress(children);
@@ -261,9 +259,18 @@ class _TaskDetailBodyState extends ConsumerState<_TaskDetailBody> {
                       ? AppStrings.taskPickDate
                       : AppStrings.taskDateLabel(task.scheduledStart!),
                 ),
-                trailing: task.scheduledStart == null
-                    ? const Icon(Icons.today_outlined)
-                    : IconButton(
+                trailing: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (task.scheduledStart == null)
+                      TextButton(
+                        onPressed: () => ref
+                            .read(planDayControllerProvider.notifier)
+                            .toggleMarkedForToday(task),
+                        child: const Text(AppStrings.planDayTodayPill),
+                      )
+                    else
+                      IconButton(
                         tooltip: AppStrings.taskClearForDate,
                         onPressed: () => _save(
                           task.copyWith(
@@ -273,6 +280,9 @@ class _TaskDetailBodyState extends ConsumerState<_TaskDetailBody> {
                         ),
                         icon: const Icon(Icons.close),
                       ),
+                    const Icon(Icons.today_outlined),
+                  ],
+                ),
                 onTap: () => _pickDate(deadline: false),
               ),
               ListTile(
@@ -366,20 +376,6 @@ class _TaskDetailBodyState extends ConsumerState<_TaskDetailBody> {
                 spacing: ColonySpacing.sm,
                 runSpacing: ColonySpacing.sm,
                 children: [
-                  FilledButton.tonal(
-                    onPressed: task.status.isTerminal && !onPlan
-                        ? null
-                        : () async {
-                            await ref
-                                .read(planDayControllerProvider.notifier)
-                                .toggleMarkedForToday(task);
-                          },
-                    child: Text(
-                      onPlan
-                          ? AppStrings.planDayOnPlanChip
-                          : AppStrings.planDayAddToToday,
-                    ),
-                  ),
                   FilledButton.tonal(
                     onPressed: () async {
                       final episode = await ref

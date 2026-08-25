@@ -27,12 +27,34 @@ final planDayGroupByProjectProvider =
     NotifierProvider<PlanDayView, bool>(PlanDayView.new);
 
 class DayTaskLists {
-  const DayTaskLists({required this.open, required this.done});
+  const DayTaskLists({
+    required this.openDated,
+    required this.openUndated,
+    required this.done,
+  });
 
-  final List<ColonyTask> open;
+  final List<ColonyTask> openDated;
+  final List<ColonyTask> openUndated;
   final List<ColonyTask> done;
 
+  List<ColonyTask> get open => [...openDated, ...openUndated];
+
   int get total => open.length + done.length;
+
+  (int, int) get datedProgress {
+    final datedDone = [
+      for (final task in done)
+        if (task.scheduledStart != null) task,
+    ].length;
+    return (datedDone, openDated.length + datedDone);
+  }
+}
+
+class PlanDaySection {
+  const PlanDaySection({required this.title, required this.groups});
+
+  final String title;
+  final List<TaskBacklogSection> groups;
 }
 
 DayTaskLists _listsForDay(
@@ -40,15 +62,46 @@ DayTaskLists _listsForDay(
   List<ColonyTask> active,
   List<ColonyTask> done,
 ) {
-  final open = [
-    for (final task in active)
-      if (TaskCapabilityPolicy.isOpenOnDay(task, day)) task,
-  ]..sort(TaskCapabilityPolicy.compareBacklog);
+  final openDated = <ColonyTask>[];
+  final openUndated = <ColonyTask>[];
+  for (final task in active) {
+    if (!TaskCapabilityPolicy.isOpenOnDay(task, day)) continue;
+    if (TaskCapabilityPolicy.hasForDate(task)) {
+      openDated.add(task);
+    } else {
+      openUndated.add(task);
+    }
+  }
+  openDated.sort(TaskCapabilityPolicy.compareBacklog);
+  openUndated.sort(TaskCapabilityPolicy.compareBacklog);
   final completed = [
     for (final task in done)
       if (TaskCapabilityPolicy.isDoneOnDay(task, day)) task,
   ];
-  return DayTaskLists(open: open, done: completed);
+  return DayTaskLists(
+    openDated: openDated,
+    openUndated: openUndated,
+    done: completed,
+  );
+}
+
+List<TaskBacklogSection> _groupsFor({
+  required List<ColonyTask> tasks,
+  required bool grouped,
+  required List<Project> projects,
+}) {
+  if (tasks.isEmpty) return const [];
+  if (!grouped) {
+    return [TaskBacklogSection(title: '', tasks: tasks)];
+  }
+  return [
+    for (final group in TaskCapabilityPolicy.groupByProject(
+      tasks: tasks,
+      projects: projects,
+      ungroupedTitle: AppStrings.tasksNoProject,
+    ))
+      TaskBacklogSection(title: group.title, tasks: group.tasks),
+  ];
 }
 
 final planDayTasksProvider = Provider<AsyncValue<DayTaskLists>>((ref) {
@@ -67,41 +120,42 @@ final planDayTasksProvider = Provider<AsyncValue<DayTaskLists>>((ref) {
 });
 
 final planDaySectionsProvider =
-    Provider<AsyncValue<List<TaskBacklogSection>>>((ref) {
+    Provider<AsyncValue<List<PlanDaySection>>>((ref) {
   final grouped = ref.watch(planDayGroupByProjectProvider);
   final listsAsync = ref.watch(planDayTasksProvider);
-  if (!grouped) {
-    return listsAsync.when(
-      loading: () => const AsyncLoading(),
-      error: AsyncError.new,
-      data: (lists) => AsyncData([
-        if (lists.open.isNotEmpty)
-          TaskBacklogSection(title: '', tasks: lists.open),
-      ]),
-    );
-  }
-  final projects = ref.watch(projectsProvider).asData?.value ?? const [];
+  final projects = grouped
+      ? (ref.watch(projectsProvider).asData?.value ?? const [])
+      : const <Project>[];
   return listsAsync.when(
     loading: () => const AsyncLoading(),
     error: AsyncError.new,
-    data: (lists) {
-      final groups = TaskCapabilityPolicy.groupByProject(
-        tasks: lists.open,
-        projects: projects,
-        ungroupedTitle: AppStrings.tasksNoProject,
-      );
-      return AsyncData([
-        for (final group in groups)
-          TaskBacklogSection(title: group.title, tasks: group.tasks),
-      ]);
-    },
+    data: (lists) => AsyncData([
+      if (lists.openDated.isNotEmpty)
+        PlanDaySection(
+          title: AppStrings.planDaySectionDated,
+          groups: _groupsFor(
+            tasks: lists.openDated,
+            grouped: grouped,
+            projects: projects,
+          ),
+        ),
+      if (lists.openUndated.isNotEmpty)
+        PlanDaySection(
+          title: AppStrings.planDaySectionUndated,
+          groups: _groupsFor(
+            tasks: lists.openUndated,
+            grouped: grouped,
+            projects: projects,
+          ),
+        ),
+    ]),
   );
 });
 
 final planDayProgressProvider = Provider<(int, int)>((ref) {
   final lists = ref.watch(planDayTasksProvider).asData?.value;
-  if (lists == null || lists.total == 0) return (0, 0);
-  return (lists.done.length, lists.total);
+  if (lists == null) return (0, 0);
+  return lists.datedProgress;
 });
 
 final todayPlanTasksProvider = Provider<AsyncValue<DayTaskLists>>((ref) {
@@ -117,13 +171,4 @@ final todayPlanTasksProvider = Provider<AsyncValue<DayTaskLists>>((ref) {
       data: (done) => AsyncData(_listsForDay(today, active, done)),
     ),
   );
-});
-
-final todayPlanTaskIdsProvider = Provider<Set<String>>((ref) {
-  final today = dayPlanLocalDateKey(ref.watch(clockProvider)());
-  final active = ref.watch(activeTasksProvider).asData?.value ?? const [];
-  return {
-    for (final task in active)
-      if (TaskCapabilityPolicy.isScheduledOn(task, today)) task.id.value,
-  };
 });

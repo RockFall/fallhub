@@ -84,7 +84,10 @@ void main() {
     await tester.pump(const Duration(milliseconds: 50));
 
     expect(find.text('Comprar pão'), findsOneWidget);
+    expect(find.text('SEM DATA'), findsOneWidget);
+    expect(find.text('NESTE DIA'), findsNothing);
     expect(find.byType(Checkbox), findsOneWidget);
+    expect(find.textContaining('concluídas'), findsNothing);
 
     final profile = (await repos.profiles.getActive())!;
     final tasks = await repos.tasks.listAll(profile.id);
@@ -121,6 +124,9 @@ void main() {
     expect(find.text('Sempre ativa'), findsOneWidget);
     expect(find.text('Só hoje'), findsOneWidget);
     expect(find.text('Só amanhã'), findsNothing);
+    expect(find.text('NESTE DIA'), findsOneWidget);
+    expect(find.text('SEM DATA'), findsOneWidget);
+    expect(find.text(AppStrings.planDayProgress(0, 1)), findsOneWidget);
 
     await tester.tap(find.byTooltip(AppStrings.planDayNextDay));
     await tester.pump();
@@ -129,6 +135,28 @@ void main() {
     expect(find.text('Sempre ativa'), findsOneWidget);
     expect(find.text('Só amanhã'), findsOneWidget);
     expect(find.text('Só hoje'), findsNothing);
+    expect(
+      find.text(
+        AppStrings.planDayComposerOtherDayHint(
+          AppStrings.planDayDateHeading('2026-08-25', isToday: false),
+        ),
+      ),
+      findsOneWidget,
+    );
+    await _drainTimers(tester);
+  });
+
+  testWidgets('inbox capture stays off Hoje until it becomes next',
+      (tester) async {
+    final profile = (await repos.profiles.getActive())!;
+    await repos.tasks.capture(
+      profileId: profile.id,
+      title: 'Rascunho inbox',
+    );
+
+    await pumpScreen(tester);
+    expect(find.text('Rascunho inbox'), findsNothing);
+    expect(find.text(AppStrings.planDayEmpty), findsOneWidget);
     await _drainTimers(tester);
   });
 
@@ -209,6 +237,7 @@ void main() {
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 50));
 
+    expect(find.text('SEM DATA'), findsOneWidget);
     expect(find.text('CASA'), findsOneWidget);
     expect(find.text('SEM PROJETO'), findsOneWidget);
     expect(find.text('Pintar muro'), findsOneWidget);

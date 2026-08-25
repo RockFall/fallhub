@@ -78,11 +78,17 @@ class TaskCapabilityPolicy {
     return dayPlanLocalDateKey(start) == localDate;
   }
 
-  /// Open top-level tasks with no day mark (always listed) or marked for [localDate].
+  /// Inbox stays capture-only; Hoje lists next/scheduled/doing/blocked/waiting.
+  static bool isWorkableOnDay(ColonyTask task) {
+    return task.isTopLevel &&
+        task.deletedAt == null &&
+        task.status.isActive &&
+        task.status != TaskStatus.inbox;
+  }
+
+  /// Open top-level work tasks with no day mark (always listed) or marked for [localDate].
   static bool isOpenOnDay(ColonyTask task, String localDate) {
-    if (!task.isTopLevel || task.deletedAt != null || !task.status.isActive) {
-      return false;
-    }
+    if (!isWorkableOnDay(task)) return false;
     return !hasForDate(task) || isScheduledOn(task, localDate);
   }
 
