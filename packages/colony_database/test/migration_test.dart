@@ -1984,5 +1984,37 @@ void main() {
       expect(child.parentTaskId, existing.id);
       expect(child.projectId, project.id);
     });
+    test('v44 to v45 adds sleep_sessions table', () async {
+      final db = await openMigratedFrom(
+        44,
+        seed: (sqlite) {
+          seedProfile(sqlite);
+        },
+      );
+      addTearDown(() async {
+        await db.close();
+      });
+
+      final repos = ColonyRepositories.create(
+        db,
+        idGenerator: FixedIdGenerator([
+          'sleep-1',
+          'event-1',
+        ]),
+        clock: () => DateTime.utc(2026, 8, 8, 12),
+      );
+
+      final profile = (await repos.profiles.getActive())!;
+      final session = await repos.health.closeDetectedSleep(
+        profileId: profile.id,
+        startedAt: DateTime.utc(2026, 8, 7, 23, 10),
+        endedAt: DateTime.utc(2026, 8, 8, 6, 40),
+        confidence: ConfidenceLevel.high,
+      );
+      expect(session.source, SleepSessionSource.detected);
+      expect(session.duration?.inHours, greaterThanOrEqualTo(7));
+      final listed = await repos.health.listSleepSessions(profile.id);
+      expect(listed, hasLength(1));
+    });
   });
 }

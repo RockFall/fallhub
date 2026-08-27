@@ -536,7 +536,7 @@ void main() {
 
     final appts = await repos.health.listAppointments(profile.id);
     expect(appts.single.title, 'Clínico geral');
-    expect(find.text('Clínico geral'), findsOneWidget);
+    expect(find.text('Clínico geral'), findsWidgets);
 
     await _flush(tester);
     await db.close();

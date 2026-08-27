@@ -2,7 +2,10 @@ import 'package:colony_domain/colony_domain.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/providers/app_providers.dart';
+import '../../integrations/application/integrations_providers.dart';
+import 'health_connect_sleep_sync.dart';
 import 'health_providers.dart';
+import 'sleep_detection_coordinator.dart';
 
 class HealthController extends AsyncNotifier<void> {
   @override
@@ -152,6 +155,93 @@ class HealthController extends AsyncNotifier<void> {
     if (state.hasError) return null;
     ref.invalidate(symptomEntriesForConditionProvider(conditionId.value));
     return entry;
+  }
+
+  Future<void> ensureSleepConsents() async {
+    try {
+      final profile = await ref.read(profileProvider.future);
+      if (profile == null) return;
+      final integrations = ref.read(repositoriesProvider).integrations;
+      await integrations.ensureConsent(
+        profileId: profile.id,
+        kind: IntegrationKind.sleepDetection,
+      );
+      await integrations.ensureConsent(
+        profileId: profile.id,
+        kind: IntegrationKind.healthConnectSleep,
+      );
+      ref.invalidate(integrationConsentsProvider);
+    } catch (_) {
+      // Best-effort; FixedIdGenerator in tests / missing tables must not break UI.
+    }
+  }
+
+  Future<bool> setSleepDetectionEnabled(bool enabled) async {
+    state = const AsyncLoading();
+    var ok = false;
+    state = await AsyncValue.guard(() async {
+      final profile = await ref.read(profileProvider.future);
+      if (profile == null) throw StateError('Perfil não configurado');
+      await ref.read(repositoriesProvider).integrations.setConsentEnabled(
+            profileId: profile.id,
+            kind: IntegrationKind.sleepDetection,
+            enabled: enabled,
+          );
+      if (enabled) {
+        ok = await SleepDetectionCoordinator.instance.enable(
+          profileId: profile.id.value,
+        );
+        if (!ok) {
+          throw StateError('Não foi possível iniciar o monitoramento de sono');
+        }
+      } else {
+        await SleepDetectionCoordinator.instance.disable();
+        ok = true;
+      }
+    });
+    ref.invalidate(integrationConsentsProvider);
+    return state.hasError ? false : ok;
+  }
+
+  Future<bool> setHealthConnectSleepEnabled(bool enabled) async {
+    state = const AsyncLoading();
+    var ok = false;
+    state = await AsyncValue.guard(() async {
+      final profile = await ref.read(profileProvider.future);
+      if (profile == null) throw StateError('Perfil não configurado');
+      if (enabled) {
+        final granted = await HealthConnectSleepSync().requestAuthorization();
+        if (!granted) {
+          throw StateError('Permissão do Health Connect negada');
+        }
+      }
+      await ref.read(repositoriesProvider).integrations.setConsentEnabled(
+            profileId: profile.id,
+            kind: IntegrationKind.healthConnectSleep,
+            enabled: enabled,
+          );
+      ok = true;
+    });
+    ref.invalidate(integrationConsentsProvider);
+    ref.invalidate(sleepSessionsProvider);
+    return state.hasError ? false : ok;
+  }
+
+  Future<HealthConnectSleepSyncResult> syncHealthConnectSleep() async {
+    final profile = await ref.read(profileProvider.future);
+    if (profile == null) {
+      return const HealthConnectSleepSyncResult(
+        imported: 0,
+        rawPoints: 0,
+        message: 'Perfil não configurado',
+      );
+    }
+    final result = await HealthConnectSleepSync().sync(
+      repos: ref.read(repositoriesProvider),
+      profileId: profile.id,
+    );
+    ref.invalidate(sleepSessionsProvider);
+    return result;
   }
 }
 

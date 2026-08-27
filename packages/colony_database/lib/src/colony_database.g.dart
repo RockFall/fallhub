@@ -17549,6 +17549,620 @@ class HealthAppointmentsCompanion
   }
 }
 
+class $SleepSessionsTable extends SleepSessions
+    with TableInfo<$SleepSessionsTable, SleepSessionRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $SleepSessionsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _profileIdMeta = const VerificationMeta(
+    'profileId',
+  );
+  @override
+  late final GeneratedColumn<String> profileId = GeneratedColumn<String>(
+    'profile_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES profiles (id)',
+    ),
+  );
+  static const VerificationMeta _startedAtMeta = const VerificationMeta(
+    'startedAt',
+  );
+  @override
+  late final GeneratedColumn<int> startedAt = GeneratedColumn<int>(
+    'started_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _endedAtMeta = const VerificationMeta(
+    'endedAt',
+  );
+  @override
+  late final GeneratedColumn<int> endedAt = GeneratedColumn<int>(
+    'ended_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _sourceMeta = const VerificationMeta('source');
+  @override
+  late final GeneratedColumn<String> source = GeneratedColumn<String>(
+    'source',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _confidenceMeta = const VerificationMeta(
+    'confidence',
+  );
+  @override
+  late final GeneratedColumn<String> confidence = GeneratedColumn<String>(
+    'confidence',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _externalIdMeta = const VerificationMeta(
+    'externalId',
+  );
+  @override
+  late final GeneratedColumn<String> externalId = GeneratedColumn<String>(
+    'external_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _notesMeta = const VerificationMeta('notes');
+  @override
+  late final GeneratedColumn<String> notes = GeneratedColumn<String>(
+    'notes',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<int> createdAt = GeneratedColumn<int>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<int> updatedAt = GeneratedColumn<int>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    profileId,
+    startedAt,
+    endedAt,
+    source,
+    confidence,
+    externalId,
+    notes,
+    createdAt,
+    updatedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'sleep_sessions';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<SleepSessionRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('profile_id')) {
+      context.handle(
+        _profileIdMeta,
+        profileId.isAcceptableOrUnknown(data['profile_id']!, _profileIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_profileIdMeta);
+    }
+    if (data.containsKey('started_at')) {
+      context.handle(
+        _startedAtMeta,
+        startedAt.isAcceptableOrUnknown(data['started_at']!, _startedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_startedAtMeta);
+    }
+    if (data.containsKey('ended_at')) {
+      context.handle(
+        _endedAtMeta,
+        endedAt.isAcceptableOrUnknown(data['ended_at']!, _endedAtMeta),
+      );
+    }
+    if (data.containsKey('source')) {
+      context.handle(
+        _sourceMeta,
+        source.isAcceptableOrUnknown(data['source']!, _sourceMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_sourceMeta);
+    }
+    if (data.containsKey('confidence')) {
+      context.handle(
+        _confidenceMeta,
+        confidence.isAcceptableOrUnknown(data['confidence']!, _confidenceMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_confidenceMeta);
+    }
+    if (data.containsKey('external_id')) {
+      context.handle(
+        _externalIdMeta,
+        externalId.isAcceptableOrUnknown(data['external_id']!, _externalIdMeta),
+      );
+    }
+    if (data.containsKey('notes')) {
+      context.handle(
+        _notesMeta,
+        notes.isAcceptableOrUnknown(data['notes']!, _notesMeta),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  SleepSessionRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return SleepSessionRow(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      profileId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}profile_id'],
+      )!,
+      startedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}started_at'],
+      )!,
+      endedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}ended_at'],
+      ),
+      source: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}source'],
+      )!,
+      confidence: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}confidence'],
+      )!,
+      externalId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}external_id'],
+      ),
+      notes: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}notes'],
+      ),
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}updated_at'],
+      )!,
+    );
+  }
+
+  @override
+  $SleepSessionsTable createAlias(String alias) {
+    return $SleepSessionsTable(attachedDatabase, alias);
+  }
+}
+
+class SleepSessionRow extends DataClass implements Insertable<SleepSessionRow> {
+  final String id;
+  final String profileId;
+  final int startedAt;
+  final int? endedAt;
+  final String source;
+  final String confidence;
+  final String? externalId;
+  final String? notes;
+  final int createdAt;
+  final int updatedAt;
+  const SleepSessionRow({
+    required this.id,
+    required this.profileId,
+    required this.startedAt,
+    this.endedAt,
+    required this.source,
+    required this.confidence,
+    this.externalId,
+    this.notes,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['profile_id'] = Variable<String>(profileId);
+    map['started_at'] = Variable<int>(startedAt);
+    if (!nullToAbsent || endedAt != null) {
+      map['ended_at'] = Variable<int>(endedAt);
+    }
+    map['source'] = Variable<String>(source);
+    map['confidence'] = Variable<String>(confidence);
+    if (!nullToAbsent || externalId != null) {
+      map['external_id'] = Variable<String>(externalId);
+    }
+    if (!nullToAbsent || notes != null) {
+      map['notes'] = Variable<String>(notes);
+    }
+    map['created_at'] = Variable<int>(createdAt);
+    map['updated_at'] = Variable<int>(updatedAt);
+    return map;
+  }
+
+  SleepSessionsCompanion toCompanion(bool nullToAbsent) {
+    return SleepSessionsCompanion(
+      id: Value(id),
+      profileId: Value(profileId),
+      startedAt: Value(startedAt),
+      endedAt: endedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(endedAt),
+      source: Value(source),
+      confidence: Value(confidence),
+      externalId: externalId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(externalId),
+      notes: notes == null && nullToAbsent
+          ? const Value.absent()
+          : Value(notes),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+    );
+  }
+
+  factory SleepSessionRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return SleepSessionRow(
+      id: serializer.fromJson<String>(json['id']),
+      profileId: serializer.fromJson<String>(json['profileId']),
+      startedAt: serializer.fromJson<int>(json['startedAt']),
+      endedAt: serializer.fromJson<int?>(json['endedAt']),
+      source: serializer.fromJson<String>(json['source']),
+      confidence: serializer.fromJson<String>(json['confidence']),
+      externalId: serializer.fromJson<String?>(json['externalId']),
+      notes: serializer.fromJson<String?>(json['notes']),
+      createdAt: serializer.fromJson<int>(json['createdAt']),
+      updatedAt: serializer.fromJson<int>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'profileId': serializer.toJson<String>(profileId),
+      'startedAt': serializer.toJson<int>(startedAt),
+      'endedAt': serializer.toJson<int?>(endedAt),
+      'source': serializer.toJson<String>(source),
+      'confidence': serializer.toJson<String>(confidence),
+      'externalId': serializer.toJson<String?>(externalId),
+      'notes': serializer.toJson<String?>(notes),
+      'createdAt': serializer.toJson<int>(createdAt),
+      'updatedAt': serializer.toJson<int>(updatedAt),
+    };
+  }
+
+  SleepSessionRow copyWith({
+    String? id,
+    String? profileId,
+    int? startedAt,
+    Value<int?> endedAt = const Value.absent(),
+    String? source,
+    String? confidence,
+    Value<String?> externalId = const Value.absent(),
+    Value<String?> notes = const Value.absent(),
+    int? createdAt,
+    int? updatedAt,
+  }) => SleepSessionRow(
+    id: id ?? this.id,
+    profileId: profileId ?? this.profileId,
+    startedAt: startedAt ?? this.startedAt,
+    endedAt: endedAt.present ? endedAt.value : this.endedAt,
+    source: source ?? this.source,
+    confidence: confidence ?? this.confidence,
+    externalId: externalId.present ? externalId.value : this.externalId,
+    notes: notes.present ? notes.value : this.notes,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+  );
+  SleepSessionRow copyWithCompanion(SleepSessionsCompanion data) {
+    return SleepSessionRow(
+      id: data.id.present ? data.id.value : this.id,
+      profileId: data.profileId.present ? data.profileId.value : this.profileId,
+      startedAt: data.startedAt.present ? data.startedAt.value : this.startedAt,
+      endedAt: data.endedAt.present ? data.endedAt.value : this.endedAt,
+      source: data.source.present ? data.source.value : this.source,
+      confidence: data.confidence.present
+          ? data.confidence.value
+          : this.confidence,
+      externalId: data.externalId.present
+          ? data.externalId.value
+          : this.externalId,
+      notes: data.notes.present ? data.notes.value : this.notes,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('SleepSessionRow(')
+          ..write('id: $id, ')
+          ..write('profileId: $profileId, ')
+          ..write('startedAt: $startedAt, ')
+          ..write('endedAt: $endedAt, ')
+          ..write('source: $source, ')
+          ..write('confidence: $confidence, ')
+          ..write('externalId: $externalId, ')
+          ..write('notes: $notes, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    profileId,
+    startedAt,
+    endedAt,
+    source,
+    confidence,
+    externalId,
+    notes,
+    createdAt,
+    updatedAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is SleepSessionRow &&
+          other.id == this.id &&
+          other.profileId == this.profileId &&
+          other.startedAt == this.startedAt &&
+          other.endedAt == this.endedAt &&
+          other.source == this.source &&
+          other.confidence == this.confidence &&
+          other.externalId == this.externalId &&
+          other.notes == this.notes &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt);
+}
+
+class SleepSessionsCompanion extends UpdateCompanion<SleepSessionRow> {
+  final Value<String> id;
+  final Value<String> profileId;
+  final Value<int> startedAt;
+  final Value<int?> endedAt;
+  final Value<String> source;
+  final Value<String> confidence;
+  final Value<String?> externalId;
+  final Value<String?> notes;
+  final Value<int> createdAt;
+  final Value<int> updatedAt;
+  final Value<int> rowid;
+  const SleepSessionsCompanion({
+    this.id = const Value.absent(),
+    this.profileId = const Value.absent(),
+    this.startedAt = const Value.absent(),
+    this.endedAt = const Value.absent(),
+    this.source = const Value.absent(),
+    this.confidence = const Value.absent(),
+    this.externalId = const Value.absent(),
+    this.notes = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  SleepSessionsCompanion.insert({
+    required String id,
+    required String profileId,
+    required int startedAt,
+    this.endedAt = const Value.absent(),
+    required String source,
+    required String confidence,
+    this.externalId = const Value.absent(),
+    this.notes = const Value.absent(),
+    required int createdAt,
+    required int updatedAt,
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       profileId = Value(profileId),
+       startedAt = Value(startedAt),
+       source = Value(source),
+       confidence = Value(confidence),
+       createdAt = Value(createdAt),
+       updatedAt = Value(updatedAt);
+  static Insertable<SleepSessionRow> custom({
+    Expression<String>? id,
+    Expression<String>? profileId,
+    Expression<int>? startedAt,
+    Expression<int>? endedAt,
+    Expression<String>? source,
+    Expression<String>? confidence,
+    Expression<String>? externalId,
+    Expression<String>? notes,
+    Expression<int>? createdAt,
+    Expression<int>? updatedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (profileId != null) 'profile_id': profileId,
+      if (startedAt != null) 'started_at': startedAt,
+      if (endedAt != null) 'ended_at': endedAt,
+      if (source != null) 'source': source,
+      if (confidence != null) 'confidence': confidence,
+      if (externalId != null) 'external_id': externalId,
+      if (notes != null) 'notes': notes,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  SleepSessionsCompanion copyWith({
+    Value<String>? id,
+    Value<String>? profileId,
+    Value<int>? startedAt,
+    Value<int?>? endedAt,
+    Value<String>? source,
+    Value<String>? confidence,
+    Value<String?>? externalId,
+    Value<String?>? notes,
+    Value<int>? createdAt,
+    Value<int>? updatedAt,
+    Value<int>? rowid,
+  }) {
+    return SleepSessionsCompanion(
+      id: id ?? this.id,
+      profileId: profileId ?? this.profileId,
+      startedAt: startedAt ?? this.startedAt,
+      endedAt: endedAt ?? this.endedAt,
+      source: source ?? this.source,
+      confidence: confidence ?? this.confidence,
+      externalId: externalId ?? this.externalId,
+      notes: notes ?? this.notes,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (profileId.present) {
+      map['profile_id'] = Variable<String>(profileId.value);
+    }
+    if (startedAt.present) {
+      map['started_at'] = Variable<int>(startedAt.value);
+    }
+    if (endedAt.present) {
+      map['ended_at'] = Variable<int>(endedAt.value);
+    }
+    if (source.present) {
+      map['source'] = Variable<String>(source.value);
+    }
+    if (confidence.present) {
+      map['confidence'] = Variable<String>(confidence.value);
+    }
+    if (externalId.present) {
+      map['external_id'] = Variable<String>(externalId.value);
+    }
+    if (notes.present) {
+      map['notes'] = Variable<String>(notes.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<int>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<int>(updatedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('SleepSessionsCompanion(')
+          ..write('id: $id, ')
+          ..write('profileId: $profileId, ')
+          ..write('startedAt: $startedAt, ')
+          ..write('endedAt: $endedAt, ')
+          ..write('source: $source, ')
+          ..write('confidence: $confidence, ')
+          ..write('externalId: $externalId, ')
+          ..write('notes: $notes, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 class $InventoryItemsTable extends InventoryItems
     with TableInfo<$InventoryItemsTable, InventoryItemRow> {
   @override
@@ -54507,6 +55121,7 @@ abstract class _$ColonyDatabase extends GeneratedDatabase {
   late final $SymptomEntriesTable symptomEntries = $SymptomEntriesTable(this);
   late final $HealthAppointmentsTable healthAppointments =
       $HealthAppointmentsTable(this);
+  late final $SleepSessionsTable sleepSessions = $SleepSessionsTable(this);
   late final $InventoryItemsTable inventoryItems = $InventoryItemsTable(this);
   late final $PeopleTable people = $PeopleTable(this);
   late final $CategoryBudgetsTable categoryBudgets = $CategoryBudgetsTable(
@@ -54650,6 +55265,7 @@ abstract class _$ColonyDatabase extends GeneratedDatabase {
     healthConditions,
     symptomEntries,
     healthAppointments,
+    sleepSessions,
     inventoryItems,
     people,
     categoryBudgets,
@@ -55182,6 +55798,24 @@ final class $$ProfilesTableReferences
     final cache = $_typedResult.readTableOrNull(
       _healthAppointmentsRefsTable($_db),
     );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$SleepSessionsTable, List<SleepSessionRow>>
+  _sleepSessionsRefsTable(_$ColonyDatabase db) => MultiTypedResultKey.fromTable(
+    db.sleepSessions,
+    aliasName: $_aliasNameGenerator(db.profiles.id, db.sleepSessions.profileId),
+  );
+
+  $$SleepSessionsTableProcessedTableManager get sleepSessionsRefs {
+    final manager = $$SleepSessionsTableTableManager(
+      $_db,
+      $_db.sleepSessions,
+    ).filter((f) => f.profileId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_sleepSessionsRefsTable($_db));
     return ProcessedTableManager(
       manager.$state.copyWith(prefetchedData: cache),
     );
@@ -56603,6 +57237,31 @@ class $$ProfilesTableFilterComposer
           }) => $$HealthAppointmentsTableFilterComposer(
             $db: $db,
             $table: $db.healthAppointments,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> sleepSessionsRefs(
+    Expression<bool> Function($$SleepSessionsTableFilterComposer f) f,
+  ) {
+    final $$SleepSessionsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.sleepSessions,
+      getReferencedColumn: (t) => t.profileId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$SleepSessionsTableFilterComposer(
+            $db: $db,
+            $table: $db.sleepSessions,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -58133,6 +58792,31 @@ class $$ProfilesTableAnnotationComposer
     return f(composer);
   }
 
+  Expression<T> sleepSessionsRefs<T extends Object>(
+    Expression<T> Function($$SleepSessionsTableAnnotationComposer a) f,
+  ) {
+    final $$SleepSessionsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.sleepSessions,
+      getReferencedColumn: (t) => t.profileId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$SleepSessionsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.sleepSessions,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
   Expression<T> inventoryItemsRefs<T extends Object>(
     Expression<T> Function($$InventoryItemsTableAnnotationComposer a) f,
   ) {
@@ -59088,6 +59772,7 @@ class $$ProfilesTableTableManager
             bool healthConditionsRefs,
             bool symptomEntriesRefs,
             bool healthAppointmentsRefs,
+            bool sleepSessionsRefs,
             bool inventoryItemsRefs,
             bool peopleRefs,
             bool categoryBudgetsRefs,
@@ -59219,6 +59904,7 @@ class $$ProfilesTableTableManager
                 healthConditionsRefs = false,
                 symptomEntriesRefs = false,
                 healthAppointmentsRefs = false,
+                sleepSessionsRefs = false,
                 inventoryItemsRefs = false,
                 peopleRefs = false,
                 categoryBudgetsRefs = false,
@@ -59279,6 +59965,7 @@ class $$ProfilesTableTableManager
                     if (healthConditionsRefs) db.healthConditions,
                     if (symptomEntriesRefs) db.symptomEntries,
                     if (healthAppointmentsRefs) db.healthAppointments,
+                    if (sleepSessionsRefs) db.sleepSessions,
                     if (inventoryItemsRefs) db.inventoryItems,
                     if (peopleRefs) db.people,
                     if (categoryBudgetsRefs) db.categoryBudgets,
@@ -59734,6 +60421,27 @@ class $$ProfilesTableTableManager
                                 table,
                                 p0,
                               ).healthAppointmentsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.profileId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (sleepSessionsRefs)
+                        await $_getPrefetchedData<
+                          Profile,
+                          $ProfilesTable,
+                          SleepSessionRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$ProfilesTableReferences
+                              ._sleepSessionsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$ProfilesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).sleepSessionsRefs,
                           referencedItemsForCurrentItem:
                               (item, referencedItems) => referencedItems.where(
                                 (e) => e.profileId == item.id,
@@ -60537,6 +61245,7 @@ typedef $$ProfilesTableProcessedTableManager =
         bool healthConditionsRefs,
         bool symptomEntriesRefs,
         bool healthAppointmentsRefs,
+        bool sleepSessionsRefs,
         bool inventoryItemsRefs,
         bool peopleRefs,
         bool categoryBudgetsRefs,
@@ -75211,6 +75920,431 @@ typedef $$HealthAppointmentsTableProcessedTableManager =
       $$HealthAppointmentsTableUpdateCompanionBuilder,
       (HealthAppointmentRow, $$HealthAppointmentsTableReferences),
       HealthAppointmentRow,
+      PrefetchHooks Function({bool profileId})
+    >;
+typedef $$SleepSessionsTableCreateCompanionBuilder =
+    SleepSessionsCompanion Function({
+      required String id,
+      required String profileId,
+      required int startedAt,
+      Value<int?> endedAt,
+      required String source,
+      required String confidence,
+      Value<String?> externalId,
+      Value<String?> notes,
+      required int createdAt,
+      required int updatedAt,
+      Value<int> rowid,
+    });
+typedef $$SleepSessionsTableUpdateCompanionBuilder =
+    SleepSessionsCompanion Function({
+      Value<String> id,
+      Value<String> profileId,
+      Value<int> startedAt,
+      Value<int?> endedAt,
+      Value<String> source,
+      Value<String> confidence,
+      Value<String?> externalId,
+      Value<String?> notes,
+      Value<int> createdAt,
+      Value<int> updatedAt,
+      Value<int> rowid,
+    });
+
+final class $$SleepSessionsTableReferences
+    extends
+        BaseReferences<_$ColonyDatabase, $SleepSessionsTable, SleepSessionRow> {
+  $$SleepSessionsTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $ProfilesTable _profileIdTable(_$ColonyDatabase db) =>
+      db.profiles.createAlias(
+        $_aliasNameGenerator(db.sleepSessions.profileId, db.profiles.id),
+      );
+
+  $$ProfilesTableProcessedTableManager get profileId {
+    final $_column = $_itemColumn<String>('profile_id')!;
+
+    final manager = $$ProfilesTableTableManager(
+      $_db,
+      $_db.profiles,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_profileIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$SleepSessionsTableFilterComposer
+    extends Composer<_$ColonyDatabase, $SleepSessionsTable> {
+  $$SleepSessionsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get startedAt => $composableBuilder(
+    column: $table.startedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get endedAt => $composableBuilder(
+    column: $table.endedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get source => $composableBuilder(
+    column: $table.source,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get confidence => $composableBuilder(
+    column: $table.confidence,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get externalId => $composableBuilder(
+    column: $table.externalId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get notes => $composableBuilder(
+    column: $table.notes,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$ProfilesTableFilterComposer get profileId {
+    final $$ProfilesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.profileId,
+      referencedTable: $db.profiles,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProfilesTableFilterComposer(
+            $db: $db,
+            $table: $db.profiles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$SleepSessionsTableOrderingComposer
+    extends Composer<_$ColonyDatabase, $SleepSessionsTable> {
+  $$SleepSessionsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get startedAt => $composableBuilder(
+    column: $table.startedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get endedAt => $composableBuilder(
+    column: $table.endedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get source => $composableBuilder(
+    column: $table.source,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get confidence => $composableBuilder(
+    column: $table.confidence,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get externalId => $composableBuilder(
+    column: $table.externalId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get notes => $composableBuilder(
+    column: $table.notes,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$ProfilesTableOrderingComposer get profileId {
+    final $$ProfilesTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.profileId,
+      referencedTable: $db.profiles,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProfilesTableOrderingComposer(
+            $db: $db,
+            $table: $db.profiles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$SleepSessionsTableAnnotationComposer
+    extends Composer<_$ColonyDatabase, $SleepSessionsTable> {
+  $$SleepSessionsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<int> get startedAt =>
+      $composableBuilder(column: $table.startedAt, builder: (column) => column);
+
+  GeneratedColumn<int> get endedAt =>
+      $composableBuilder(column: $table.endedAt, builder: (column) => column);
+
+  GeneratedColumn<String> get source =>
+      $composableBuilder(column: $table.source, builder: (column) => column);
+
+  GeneratedColumn<String> get confidence => $composableBuilder(
+    column: $table.confidence,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get externalId => $composableBuilder(
+    column: $table.externalId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get notes =>
+      $composableBuilder(column: $table.notes, builder: (column) => column);
+
+  GeneratedColumn<int> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<int> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  $$ProfilesTableAnnotationComposer get profileId {
+    final $$ProfilesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.profileId,
+      referencedTable: $db.profiles,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProfilesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.profiles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$SleepSessionsTableTableManager
+    extends
+        RootTableManager<
+          _$ColonyDatabase,
+          $SleepSessionsTable,
+          SleepSessionRow,
+          $$SleepSessionsTableFilterComposer,
+          $$SleepSessionsTableOrderingComposer,
+          $$SleepSessionsTableAnnotationComposer,
+          $$SleepSessionsTableCreateCompanionBuilder,
+          $$SleepSessionsTableUpdateCompanionBuilder,
+          (SleepSessionRow, $$SleepSessionsTableReferences),
+          SleepSessionRow,
+          PrefetchHooks Function({bool profileId})
+        > {
+  $$SleepSessionsTableTableManager(
+    _$ColonyDatabase db,
+    $SleepSessionsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$SleepSessionsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$SleepSessionsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$SleepSessionsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> profileId = const Value.absent(),
+                Value<int> startedAt = const Value.absent(),
+                Value<int?> endedAt = const Value.absent(),
+                Value<String> source = const Value.absent(),
+                Value<String> confidence = const Value.absent(),
+                Value<String?> externalId = const Value.absent(),
+                Value<String?> notes = const Value.absent(),
+                Value<int> createdAt = const Value.absent(),
+                Value<int> updatedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => SleepSessionsCompanion(
+                id: id,
+                profileId: profileId,
+                startedAt: startedAt,
+                endedAt: endedAt,
+                source: source,
+                confidence: confidence,
+                externalId: externalId,
+                notes: notes,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String profileId,
+                required int startedAt,
+                Value<int?> endedAt = const Value.absent(),
+                required String source,
+                required String confidence,
+                Value<String?> externalId = const Value.absent(),
+                Value<String?> notes = const Value.absent(),
+                required int createdAt,
+                required int updatedAt,
+                Value<int> rowid = const Value.absent(),
+              }) => SleepSessionsCompanion.insert(
+                id: id,
+                profileId: profileId,
+                startedAt: startedAt,
+                endedAt: endedAt,
+                source: source,
+                confidence: confidence,
+                externalId: externalId,
+                notes: notes,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$SleepSessionsTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({profileId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (profileId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.profileId,
+                                referencedTable: $$SleepSessionsTableReferences
+                                    ._profileIdTable(db),
+                                referencedColumn: $$SleepSessionsTableReferences
+                                    ._profileIdTable(db)
+                                    .id,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$SleepSessionsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$ColonyDatabase,
+      $SleepSessionsTable,
+      SleepSessionRow,
+      $$SleepSessionsTableFilterComposer,
+      $$SleepSessionsTableOrderingComposer,
+      $$SleepSessionsTableAnnotationComposer,
+      $$SleepSessionsTableCreateCompanionBuilder,
+      $$SleepSessionsTableUpdateCompanionBuilder,
+      (SleepSessionRow, $$SleepSessionsTableReferences),
+      SleepSessionRow,
       PrefetchHooks Function({bool profileId})
     >;
 typedef $$InventoryItemsTableCreateCompanionBuilder =
@@ -106043,6 +107177,8 @@ class $ColonyDatabaseManager {
       $$SymptomEntriesTableTableManager(_db, _db.symptomEntries);
   $$HealthAppointmentsTableTableManager get healthAppointments =>
       $$HealthAppointmentsTableTableManager(_db, _db.healthAppointments);
+  $$SleepSessionsTableTableManager get sleepSessions =>
+      $$SleepSessionsTableTableManager(_db, _db.sleepSessions);
   $$InventoryItemsTableTableManager get inventoryItems =>
       $$InventoryItemsTableTableManager(_db, _db.inventoryItems);
   $$PeopleTableTableManager get people =>

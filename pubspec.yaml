@@ -35,6 +35,11 @@ dependencies:
   shared_preferences: ^2.5.3
   living_habitat_assets:
     path: packages/living_habitat_assets
+  health: ^13.3.1
+  sensors_plus: ^7.1.0
+  battery_plus: ^7.1.1
+  permission_handler: ^13.0.0
+  flutter_foreground_task: ^10.0.0
 
 dev_dependencies:
   flutter_test:

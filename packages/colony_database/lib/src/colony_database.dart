@@ -42,6 +42,7 @@ part 'colony_database.g.dart';
   HealthConditions,
   SymptomEntries,
   HealthAppointments,
+  SleepSessions,
   InventoryItems,
   People,
   CategoryBudgets,
@@ -110,7 +111,7 @@ class ColonyDatabase extends _$ColonyDatabase {
   final String? dataDirectory;
 
   @override
-  int get schemaVersion => 44;
+  int get schemaVersion => 45;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -471,6 +472,9 @@ class ColonyDatabase extends _$ColonyDatabase {
             if (!await _columnExists(m, 'tasks', 'priority')) {
               await m.addColumn(tasks, tasks.priority);
             }
+          }
+          if (from < 45) {
+            await m.createTable(sleepSessions);
           }
         },
       );
@@ -1574,6 +1578,39 @@ class ColonyMappers {
       status: a.status.name,
       createdAt: a.createdAt.millisecondsSinceEpoch,
       updatedAt: a.updatedAt.millisecondsSinceEpoch,
+    );
+  }
+
+  static domain.SleepSession toSleepSession(SleepSessionRow row) {
+    return domain.SleepSession(
+      id: domain.EntityId(row.id),
+      profileId: domain.EntityId(row.profileId),
+      startedAt:
+          DateTime.fromMillisecondsSinceEpoch(row.startedAt, isUtc: true),
+      endedAt: row.endedAt == null
+          ? null
+          : DateTime.fromMillisecondsSinceEpoch(row.endedAt!, isUtc: true),
+      source: domain.SleepSessionSource.values.byName(row.source),
+      confidence: domain.ConfidenceLevel.values.byName(row.confidence),
+      externalId: row.externalId,
+      notes: row.notes,
+      createdAt: DateTime.fromMillisecondsSinceEpoch(row.createdAt, isUtc: true),
+      updatedAt: DateTime.fromMillisecondsSinceEpoch(row.updatedAt, isUtc: true),
+    );
+  }
+
+  static SleepSessionsCompanion fromSleepSession(domain.SleepSession s) {
+    return SleepSessionsCompanion.insert(
+      id: s.id.value,
+      profileId: s.profileId.value,
+      startedAt: s.startedAt.millisecondsSinceEpoch,
+      endedAt: Value(s.endedAt?.millisecondsSinceEpoch),
+      source: s.source.name,
+      confidence: s.confidence.name,
+      externalId: Value(s.externalId),
+      notes: Value(s.notes),
+      createdAt: s.createdAt.millisecondsSinceEpoch,
+      updatedAt: s.updatedAt.millisecondsSinceEpoch,
     );
   }
 

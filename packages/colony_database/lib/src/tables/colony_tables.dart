@@ -493,6 +493,26 @@ class HealthAppointments extends Table {
   Set<Column<Object>> get primaryKey => {id};
 }
 
+@DataClassName('SleepSessionRow')
+class SleepSessions extends Table {
+  @override
+  String get tableName => 'sleep_sessions';
+
+  TextColumn get id => text()();
+  TextColumn get profileId => text().references(Profiles, #id)();
+  IntColumn get startedAt => integer()();
+  IntColumn get endedAt => integer().nullable()();
+  TextColumn get source => text()();
+  TextColumn get confidence => text()();
+  TextColumn get externalId => text().nullable()();
+  TextColumn get notes => text().nullable()();
+  IntColumn get createdAt => integer()();
+  IntColumn get updatedAt => integer()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+}
+
 @DataClassName('InventoryItemRow')
 class InventoryItems extends Table {
   @override

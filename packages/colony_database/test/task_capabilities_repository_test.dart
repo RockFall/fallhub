@@ -118,7 +118,7 @@ void main() {
     );
 
     final snapshot = await repos.export.buildSnapshot();
-    expect(snapshot.version, 38);
+    expect(snapshot.version, 39);
     final encoded = snapshot.toJson();
     final tasks = (encoded['tasks'] as List).cast<Map<String, dynamic>>();
     final reforma = tasks.firstWhere((row) => row['title'] == 'Reforma');
