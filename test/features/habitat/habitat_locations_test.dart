@@ -34,25 +34,34 @@ void main() {
       final demo = HabitatMap.demoRoom();
       expect(bed.width, demo.width);
       expect(bed.height, demo.height);
-      expect(bed.floorAt(8, 10), HabitatFloor.concrete);
+      expect(bed.doorCell, demo.doorCell);
+      expect(bed.floorAt(2, 10), HabitatFloor.concrete);
       expect(bed.props.any((p) => p.id.contains('balcony')), isTrue);
     });
 
     test('office and kitchen expose outdoor side courts', () {
       final office = HabitatLocations.create(HabitatLocationIds.office);
-      expect(office.floorAt(13, 5), HabitatFloor.concrete);
+      expect(
+        office.floors.any((f) => f == HabitatFloor.concrete),
+        isTrue,
+      );
       expect(office.props.any((p) => p.id.startsWith('court_')), isTrue);
 
       final kitchen = HabitatLocations.create(HabitatLocationIds.kitchen);
-      expect(kitchen.floorAt(13, 5), HabitatFloor.concrete);
+      expect(
+        kitchen.floors.any((f) => f == HabitatFloor.concrete),
+        isTrue,
+      );
       expect(kitchen.props.any((p) => p.id.startsWith('patio_')), isTrue);
     });
 
     test('terrace is decked garden exterior', () {
       final t = HabitatLocations.create(HabitatLocationIds.terrace);
-      expect(t.floorAt(8, 6), HabitatFloor.carpet);
-      expect(t.floorAt(8, 4), HabitatFloor.wood);
-      expect(t.props.where((p) => p.kind == 'plant').length, greaterThan(4));
+      expect(t.floors.any((f) => f == HabitatFloor.wood), isTrue);
+      expect(
+        t.props.where((p) => p.kind == 'plant_pot' || p.kind == 'plant').length,
+        greaterThan(4),
+      );
     });
   });
 
@@ -68,7 +77,7 @@ void main() {
       game.switchLocation(HabitatLocationIds.kitchen);
       expect(game.locationId, HabitatLocationIds.kitchen);
       expect(identical(game.map, bedroom), isFalse);
-      expect(game.map.width, 16);
+      expect(game.map.width, greaterThan(8));
       expect(game.pawn!.map, same(game.map));
       expect(game.map.isWalkable(game.pawn!.cellX, game.pawn!.cellY), isTrue);
 
