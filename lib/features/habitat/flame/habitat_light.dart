@@ -5,7 +5,7 @@ import 'package:flutter/painting.dart';
 
 import 'habitat_locations.dart';
 import 'habitat_map.dart';
-import 'habitat_prop_catalog.dart';
+import 'furniture/furniture.dart';
 
 /// Per-cell darkness for gameplay + soft radial lamp rendering (V9.11).
 ///
@@ -41,8 +41,14 @@ abstract final class HabitatLightField {
     return _lerp(0.88, 0.95, (h - 18) / 6);
   }
 
-  static double lampRadiusFor(HabitatProp lamp) =>
-      lampRadius + lamp.quality.lightBonus * 2.2;
+  static double lampRadiusFor(HabitatProp lamp) {
+    final base = FurnitureInteractions.lightRadius(
+          lamp.kind,
+          qualityBonus: lamp.quality.lightBonus * 2.2,
+        );
+    if (base > 0) return base;
+    return lampRadius + lamp.quality.lightBonus * 2.2;
+  }
 
   /// Soft illumination 0–1 at tile distance [dist] from a lamp.
   static double lampIllumination(double dist, double radius, double bonus) {
@@ -60,14 +66,19 @@ abstract final class HabitatLightField {
     required double phase,
     required String locationId,
     bool lineOfSight = true,
+    double ambientBias = 0,
+    bool lampsEnabled = true,
   }) {
     final outdoor = HabitatLocations.isOutdoor(locationId);
-    final ambient = ambientDarkness(phase, outdoor: outdoor);
+    final ambient = (ambientDarkness(phase, outdoor: outdoor) + ambientBias)
+        .clamp(0.0, 1.0);
     final n = map.width * map.height;
     final out = List<double>.filled(n, ambient);
 
+    if (!lampsEnabled) return out;
+
     for (final p in map.props) {
-      if (p.kind != HabitatPropKinds.lamp) continue;
+      if (!FurnitureInteractions.isLight(p.kind) || !p.poweredOn) continue;
       final bonus = p.quality.lightBonus;
       final radius = lampRadiusFor(p);
       final (ox, oy) = p.origin;
@@ -100,28 +111,31 @@ abstract final class HabitatLightField {
 
   /// Soft ambient darkness + radial lamp cutouts (diffuse edges, not a grid).
   ///
-  /// Walls receive **only** global ambient — never lamp cutouts.
+  /// Walls are never darkened — only floors take ambient + lamp cutouts.
+  /// (Wall ambient looked like a black frame and fought the wall art.)
   static void paintSoftDarkness(
     Canvas canvas, {
     required HabitatMap map,
     required double tileSize,
     required double phase,
     required String locationId,
+    double ambientBias = 0,
+    bool lampsEnabled = true,
   }) {
     final outdoor = HabitatLocations.isOutdoor(locationId);
-    final ambient = ambientDarkness(phase, outdoor: outdoor);
+    final ambient = (ambientDarkness(phase, outdoor: outdoor) + ambientBias)
+        .clamp(0.0, 0.98);
     if (ambient < 0.015) return;
 
     final mapW = map.width * tileSize;
     final mapH = map.height * tileSize;
     final bounds = Rect.fromLTWH(0, 0, mapW, mapH);
-    final ambientColor = Color.fromRGBO(0, 0, 0, ambient.clamp(0.0, 0.98));
+    final ambientColor = Color.fromRGBO(0, 0, 0, ambient);
     final ambientPaint = Paint()..color = ambientColor;
 
     canvas.saveLayer(bounds, Paint());
 
-    // Floors only — lamps may punch these. Walls are painted later, untouched
-    // by local light.
+    // Floors only — lamps may punch these. Walls stay fully lit (no overlay).
     for (var y = 0; y < map.height; y++) {
       for (var x = 0; x < map.width; x++) {
         if (map.isWallCell(x, y)) continue;
@@ -132,8 +146,13 @@ abstract final class HabitatLightField {
       }
     }
 
+    if (!lampsEnabled) {
+      canvas.restore();
+      return;
+    }
+
     for (final p in map.props) {
-      if (p.kind != HabitatPropKinds.lamp) continue;
+      if (!FurnitureInteractions.isLight(p.kind) || !p.poweredOn) continue;
       final (ox, oy) = p.origin;
       final radius = lampRadiusFor(p);
       final rPx = radius * tileSize;
@@ -181,20 +200,6 @@ abstract final class HabitatLightField {
           ..blendMode = BlendMode.dstOut,
       );
       canvas.restore();
-    }
-
-    // Walls: global ambient only (replace any accidental bleed).
-    final wallPaint = Paint()
-      ..color = ambientColor
-      ..blendMode = BlendMode.src;
-    for (var y = 0; y < map.height; y++) {
-      for (var x = 0; x < map.width; x++) {
-        if (!map.isWallCell(x, y)) continue;
-        canvas.drawRect(
-          Rect.fromLTWH(x * tileSize, y * tileSize, tileSize, tileSize),
-          wallPaint,
-        );
-      }
     }
 
     canvas.restore();

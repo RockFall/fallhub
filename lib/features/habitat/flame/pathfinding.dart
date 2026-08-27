@@ -1,19 +1,27 @@
+import '../simulation/microbehavior/approach_slots.dart';
+import '../simulation/microbehavior/micro_facing.dart';
+import '../simulation/microbehavior/route_preference.dart';
 import 'habitat_map.dart';
 
 /// Compact A* on the habitat grid (4-neighborhood).
+///
+/// Optional [cellCost] adds soft preference weight (R12/R17) without blocking.
 List<(int, int)> findPath({
   required HabitatMap map,
   required (int, int) from,
   required (int, int) to,
   bool Function(int x, int y)? allowed,
+  double Function(int x, int y)? cellCost,
 }) {
   if (from == to) return const [];
   if (!map.isWalkable(to.$1, to.$2)) return const [];
   if (allowed != null && !allowed(to.$1, to.$2)) return const [];
 
   const dirs = [(1, 0), (-1, 0), (0, 1), (0, -1)];
-  final open = <_Node>[_Node(from.$1, from.$2, 0, _h(from, to), null)];
-  final bestG = <(int, int), int>{from: 0};
+  final open = <_Node>[
+    _Node(from.$1, from.$2, 0, _h(from, to).toDouble(), null),
+  ];
+  final bestG = <(int, int), double>{from: 0};
   final closed = <(int, int)>{};
 
   while (open.isNotEmpty) {
@@ -34,8 +42,11 @@ List<(int, int)> findPath({
       if (allowed != null && !allowed(nx, ny)) continue;
       final nKey = (nx, ny);
       if (closed.contains(nKey)) continue;
-      final g = current.g + 1;
-      if (g >= (bestG[nKey] ?? 1 << 30)) continue;
+      final extra = cellCost?.call(nx, ny) ?? 0.0;
+      // Keep costs positive-ish so A* stays well-behaved.
+      final step = (1.0 + extra).clamp(0.15, 4.0);
+      final g = current.g + step;
+      if (g >= (bestG[nKey] ?? 1e18)) continue;
       bestG[nKey] = g;
       open.add(_Node(nx, ny, g, g + _h(nKey, to), current));
     }
@@ -60,31 +71,123 @@ class _Node {
   _Node(this.x, this.y, this.g, this.f, this.parent);
   final int x;
   final int y;
-  final int g;
-  final int f;
+  final double g;
+  final double f;
   final _Node? parent;
 }
 
-/// Nearest walkable cell adjacent to a prop footprint (for “go to furniture”).
-(int, int)? approachCell(HabitatMap map, HabitatProp prop, (int, int) from) {
-  final (ox, oy) = prop.origin;
-  final (w, h) = prop.size;
-  final candidates = <(int, int)>[];
-  for (var y = oy - 1; y <= oy + h; y++) {
-    for (var x = ox - 1; x <= ox + w; x++) {
-      final onBorder = x == ox - 1 ||
-          x == ox + w ||
-          y == oy - 1 ||
-          y == oy + h;
-      if (!onBorder) continue;
-      if (map.isWalkable(x, y)) candidates.add((x, y));
-    }
+/// Options for intelligent approach slot ranking (R10).
+class ApproachOptions {
+  const ApproachOptions({
+    this.lookAtCell,
+    this.propFacing,
+    this.occupiedCells = const {},
+    this.pawnCells = const [],
+    this.personalSpaceCostAt,
+    this.activityGroupCells = const [],
+    this.preferenceBias = 0,
+    this.pawnId,
+  });
+
+  final (int, int)? lookAtCell;
+  final MicroFacing? propFacing;
+  final Set<(int, int)> occupiedCells;
+  final List<(int, int)> pawnCells;
+  final double Function(int x, int y)? personalSpaceCostAt;
+  final List<(int, int)> activityGroupCells;
+  final double preferenceBias;
+  final String? pawnId;
+}
+
+/// Best walkable cell adjacent to a prop footprint (R10 ranking when options set).
+(int, int)? approachCell(
+  HabitatMap map,
+  HabitatProp prop,
+  (int, int) from, {
+  ApproachOptions? options,
+}) {
+  final opts = options;
+  if (opts == null) {
+    // Legacy: nearest Manhattan border cell.
+    final ranked = ApproachSlotRanker.rank(
+      ctx: ApproachSlotContext(
+        from: from,
+        propOrigin: prop.origin,
+        propSize: prop.size,
+      ),
+      isWalkable: map.isWalkable,
+    );
+    return ranked.isEmpty ? null : ranked.first.cell;
   }
-  if (candidates.isEmpty) return null;
-  candidates.sort(
-    (a, b) =>
-        ((a.$1 - from.$1).abs() + (a.$2 - from.$2).abs()) -
-        ((b.$1 - from.$1).abs() + (b.$2 - from.$2).abs()),
+
+  var ranked = ApproachSlotRanker.rank(
+    ctx: ApproachSlotContext(
+      from: from,
+      propOrigin: prop.origin,
+      propSize: prop.size,
+      propFacing: opts.propFacing,
+      lookAtCell: opts.lookAtCell,
+      occupiedCells: opts.occupiedCells,
+      pawnCells: opts.pawnCells,
+      personalSpaceCostAt: opts.personalSpaceCostAt,
+      activityGroupCells: opts.activityGroupCells,
+      preferenceBias: opts.preferenceBias,
+      routeLengthTo: (x, y) =>
+          findPath(map: map, from: from, to: (x, y)).length,
+    ),
+    isWalkable: map.isWalkable,
   );
-  return candidates.first;
+  if (opts.pawnId != null && ranked.length > 1) {
+    // Tiny deterministic tie-break.
+    ranked = [
+      for (final s in ranked)
+        ApproachSlot(
+          cell: s.cell,
+          score: s.score + slotTieNoise(opts.pawnId!, s.cell),
+          facingQuality: s.facingQuality,
+          crowdPenalty: s.crowdPenalty,
+          personalSpacePenalty: s.personalSpacePenalty,
+          routeCost: s.routeCost,
+          preferenceBonus: s.preferenceBonus,
+          groupFitBonus: s.groupFitBonus,
+          debugLabel: s.debugLabel,
+        ),
+    ]..sort((a, b) => a.score.compareTo(b.score));
+  }
+  return ranked.isEmpty ? null : ranked.first.cell;
+}
+
+/// Pick among near-equal length paths using [RoutePreference] (R17).
+List<(int, int)> findPreferredPath({
+  required HabitatMap map,
+  required (int, int) from,
+  required (int, int) to,
+  bool Function(int x, int y)? allowed,
+  RoutePreferenceContext? preference,
+}) {
+  final shortest = findPath(map: map, from: from, to: to, allowed: allowed);
+  if (preference == null ||
+      preference.profile == RoutePreferenceProfile.shortest) {
+    return shortest;
+  }
+  final preferred = findPath(
+    map: map,
+    from: from,
+    to: to,
+    allowed: allowed,
+    cellCost: (x, y) => RoutePreference.cellExtraCost(
+      x: x,
+      y: y,
+      ctx: preference,
+    ),
+  );
+  if (preferred.isEmpty) return shortest;
+  if (!RoutePreference.isAcceptableDetour(
+    shortestLen: shortest.length,
+    candidateLen: preferred.length,
+    ctx: preference,
+  )) {
+    return shortest;
+  }
+  return preferred;
 }

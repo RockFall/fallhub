@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
@@ -10,19 +8,11 @@ import '../../flame/habitat_game.dart';
 import '../../flame/habitat_map.dart';
 
 /// Bottom-right stack: optional selection name on top, then clock / temp / weather.
-class HabitatAmbientHud extends ConsumerStatefulWidget {
+class HabitatAmbientHud extends ConsumerWidget {
   const HabitatAmbientHud({super.key, required this.game, this.selection});
 
   final HabitatGame game;
   final HabitatSelection? selection;
-
-  @override
-  ConsumerState<HabitatAmbientHud> createState() => _HabitatAmbientHudState();
-}
-
-class _HabitatAmbientHudState extends ConsumerState<HabitatAmbientHud> {
-  late DateTime _now;
-  Timer? _clock;
 
   static const _style = TextStyle(
     color: Colors.white,
@@ -38,22 +28,6 @@ class _HabitatAmbientHudState extends ConsumerState<HabitatAmbientHud> {
     ],
   );
 
-  @override
-  void initState() {
-    super.initState();
-    _now = DateTime.now();
-    _clock = Timer.periodic(const Duration(seconds: 20), (_) {
-      if (!mounted) return;
-      setState(() => _now = DateTime.now());
-    });
-  }
-
-  @override
-  void dispose() {
-    _clock?.cancel();
-    super.dispose();
-  }
-
   String _outdoorTempLabel(AmbientWeather? w) {
     final t = w?.temperatureC;
     if (t == null) return AppStrings.habitatAmbientTempPlaceholder;
@@ -61,8 +35,13 @@ class _HabitatAmbientHudState extends ConsumerState<HabitatAmbientHud> {
   }
 
   String _indoorTempLabel() {
-    final indoor = widget.game.indoorTemperatureC.round();
-    return '${AppStrings.habitatIndoorTemp} $indoor°C';
+    final indoor = game.indoorTemperatureC.round();
+    final eff = game.indoorTemperatureEffective;
+    final source = eff?.source.name ??
+        game.indoorTemperatureSignal?.source.name ??
+        'simulated';
+    final conflict = eff?.hasConflict == true ? ' !' : '';
+    return '${AppStrings.habitatIndoorTemp} $indoor°C · $source$conflict';
   }
 
   String _climateLabel(AmbientWeather? w) {
@@ -79,7 +58,7 @@ class _HabitatAmbientHudState extends ConsumerState<HabitatAmbientHud> {
       };
 
   String? get _selectionLine {
-    return switch (widget.selection) {
+    return switch (selection) {
       null => null,
       HabitatPawnSelection(:final pawn) => pawn.displayName,
       HabitatPropSelection(:final prop) => prop.name,
@@ -88,7 +67,7 @@ class _HabitatAmbientHudState extends ConsumerState<HabitatAmbientHud> {
   }
 
   String _cellLabel((int, int) cell) {
-    final map = widget.game.map;
+    final map = game.map;
     final (x, y) = cell;
     if (map.doorCell == cell) return AppStrings.habitatEditToolDoor;
     if (map.isWallCell(x, y)) return AppStrings.habitatEditToolWall;
@@ -96,11 +75,13 @@ class _HabitatAmbientHudState extends ConsumerState<HabitatAmbientHud> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final async = ref.watch(ambientWeatherProvider);
     final weather = async.asData?.value;
-    final time = DateFormat.Hm().format(_now);
+    final sceneNow = game.clocks.scene.now();
+    final time = DateFormat.Hm().format(sceneNow);
     final selectionLine = _selectionLine;
+    final clockDebug = game.showClockDebug ? game.clockDebugLine : null;
 
     return IgnorePointer(
       child: Align(
@@ -133,6 +114,12 @@ class _HabitatAmbientHudState extends ConsumerState<HabitatAmbientHud> {
                 textAlign: TextAlign.right,
                 style: _style,
               ),
+              if (clockDebug != null)
+                Text(
+                  clockDebug,
+                  textAlign: TextAlign.right,
+                  style: _style.copyWith(fontSize: 10, color: Colors.white70),
+                ),
             ],
           ),
         ),

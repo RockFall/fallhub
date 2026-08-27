@@ -1,17 +1,26 @@
 import 'dart:ui';
 
-/// Cosmetic day/night tint driven by the device local clock (V9.5+).
+import '../simulation/time/habitat_clock_bundle.dart';
+
+/// Cosmetic day/night tint driven by the [HabitatSceneClock] (V9.5+ / M2).
 ///
-/// No agenda linkage — [phase] and [overlayColor] follow wall-clock time.
+/// No agenda linkage — [phase] and [overlayColor] follow scene time.
 ///
 /// Periods (local hour, half-open `[start, end)`):
 /// - Madrugada 00–05 · Amanhecer 05–07 · Dia 07–17 · Entardecer 17–18 · Noite 18–00
 class HabitatPresence {
-  HabitatPresence({DateTime Function()? now}) : _now = now ?? DateTime.now {
+  HabitatPresence({HabitatSceneClock? sceneClock})
+      : _scene = sceneClock ?? HabitatSceneClock() {
     syncFromClock();
   }
 
-  final DateTime Function() _now;
+  HabitatSceneClock _scene;
+
+  /// Bind to the game's scene clock (M2).
+  void attachSceneClock(HabitatSceneClock clock) {
+    _scene = clock;
+    syncFromClock();
+  }
 
   /// 0 = midnight, 0.5 = noon (fraction of local day).
   double phase = 0;
@@ -19,15 +28,18 @@ class HabitatPresence {
   /// Sounds off by default (spec V9.5).
   bool muted = true;
 
-  /// Refresh [phase] from local wall clock.
+  /// Refresh [phase] from the scene clock.
   void syncFromClock([DateTime? at]) {
-    final t = at ?? _now();
-    final secs =
-        t.hour * 3600 + t.minute * 60 + t.second + t.millisecond / 1000;
-    phase = (secs / 86400.0) % 1.0;
+    if (at != null) {
+      final secs =
+          at.hour * 3600 + at.minute * 60 + at.second + at.millisecond / 1000;
+      phase = (secs / 86400.0) % 1.0;
+      return;
+    }
+    phase = _scene.phase;
   }
 
-  /// Called each frame — keeps tint aligned with real time.
+  /// Called each frame — keeps tint aligned with scene time (clock ticked by game).
   void tick(double dt) {
     syncFromClock();
   }

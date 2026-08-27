@@ -1,5 +1,6 @@
 import 'package:fallhub/features/habitat/flame/habitat_game.dart';
 import 'package:fallhub/features/habitat/flame/habitat_presence.dart';
+import 'package:fallhub/features/habitat/simulation/time/time.dart';
 import 'package:flame/components.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -7,9 +8,10 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   group('HabitatPresence', () {
-    test('follows local wall clock periods', () {
-      final noon = DateTime(2026, 8, 7, 12, 0, 0);
-      final p = HabitatPresence(now: () => noon);
+    test('follows scene clock periods', () {
+      final scene = HabitatSceneClock();
+      scene.freeze(DateTime(2026, 8, 7, 12, 0, 0));
+      final p = HabitatPresence(sceneClock: scene);
       expect(p.phase, closeTo(0.5, 0.01));
       expect(p.phaseLabel, 'Dia');
       expect(p.overlayColor.a, lessThan(0.1));
@@ -40,7 +42,9 @@ void main() {
     });
 
     test('audio stub respects mute default', () {
-      final p = HabitatPresence(now: () => DateTime(2026, 8, 7, 12));
+      final scene = HabitatSceneClock();
+      scene.freeze(DateTime(2026, 8, 7, 12));
+      final p = HabitatPresence(sceneClock: scene);
       expect(p.muted, isTrue);
       p.playStub('tap');
       expect(p.stubPlayCount, 0);

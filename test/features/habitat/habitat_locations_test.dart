@@ -16,7 +16,6 @@ void main() {
         expect(map.props, isNotEmpty);
         expect(map.walkableCells(), isNotEmpty);
         final spawn = HabitatLocations.spawn(id);
-        // Spawn itself may be on furniture — nearest walkable must exist.
         expect(
           map.walkableCells().any(
             (c) =>
@@ -27,15 +26,33 @@ void main() {
         sizes.add((map.width, map.height));
         expect(HabitatLocations.label(id), isNotEmpty);
       }
-      // Layouts are not all identical footprints.
       expect(sizes.length, greaterThan(1));
     });
 
-    test('bedroom preset matches demoRoom size', () {
+    test('bedroom matches demoRoom and has outdoor balcony', () {
       final bed = HabitatLocations.create(HabitatLocationIds.bedroom);
       final demo = HabitatMap.demoRoom();
       expect(bed.width, demo.width);
       expect(bed.height, demo.height);
+      expect(bed.floorAt(8, 10), HabitatFloor.concrete);
+      expect(bed.props.any((p) => p.id.contains('balcony')), isTrue);
+    });
+
+    test('office and kitchen expose outdoor side courts', () {
+      final office = HabitatLocations.create(HabitatLocationIds.office);
+      expect(office.floorAt(13, 5), HabitatFloor.concrete);
+      expect(office.props.any((p) => p.id.startsWith('court_')), isTrue);
+
+      final kitchen = HabitatLocations.create(HabitatLocationIds.kitchen);
+      expect(kitchen.floorAt(13, 5), HabitatFloor.concrete);
+      expect(kitchen.props.any((p) => p.id.startsWith('patio_')), isTrue);
+    });
+
+    test('terrace is decked garden exterior', () {
+      final t = HabitatLocations.create(HabitatLocationIds.terrace);
+      expect(t.floorAt(8, 6), HabitatFloor.carpet);
+      expect(t.floorAt(8, 4), HabitatFloor.wood);
+      expect(t.props.where((p) => p.kind == 'plant').length, greaterThan(4));
     });
   });
 
@@ -46,18 +63,17 @@ void main() {
       final bedroom = game.map;
       expect(game.locationId, HabitatLocationIds.bedroom);
 
-      // Edit bedroom floor — should survive a round-trip.
-      bedroom.setFloor(4, 8, HabitatFloor.concrete);
+      bedroom.setFloor(4, 5, HabitatFloor.concrete);
 
       game.switchLocation(HabitatLocationIds.kitchen);
       expect(game.locationId, HabitatLocationIds.kitchen);
       expect(identical(game.map, bedroom), isFalse);
-      expect(game.map.width, 12);
+      expect(game.map.width, 16);
       expect(game.pawn!.map, same(game.map));
       expect(game.map.isWalkable(game.pawn!.cellX, game.pawn!.cellY), isTrue);
 
       game.switchLocation(HabitatLocationIds.bedroom);
-      expect(game.map.floorAt(4, 8), HabitatFloor.concrete);
+      expect(game.map.floorAt(4, 5), HabitatFloor.concrete);
       game.dispose();
     });
   });

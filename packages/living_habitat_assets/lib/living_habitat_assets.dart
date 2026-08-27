@@ -67,8 +67,19 @@ abstract final class HabitatAssets {
   static const carpet = 'assets/v0/tiles/carpet.png';
   static const concrete = 'assets/v0/tiles/concrete.png';
 
-  static const bedSouth = 'assets/v0/furniture/bed_south.png';
-  static const chairSouth = 'assets/v0/furniture/chair_south.png';
-  static const tableSouth = 'assets/v0/furniture/table_south.png';
-  static const lamp = 'assets/v0/furniture/lamp.png';
+  /// Legacy flat aliases (still loaded for older saves / tests).
+  static const bedSouth = 'assets/v0/furniture/bed/south.png';
+  static const chairSouth = 'assets/v0/furniture/dining_chair/south.png';
+  static const tableSouth = 'assets/v0/furniture/table_2x2/south.png';
+  static const lamp = 'assets/v0/furniture/lamp_standing/south.png';
+  static const tvSouth = 'assets/v0/furniture/tv_south.png';
+
+  /// Exported from RimWorld-style `DoorSimple_Mover.psd` (game_art_source).
+  static const doorSimpleMover = 'assets/v0/furniture/door_simple_mover.png';
+
+  static String furniture(String id, [String facing = 'south']) =>
+      'assets/v0/furniture/$id/$facing.png';
+
+  static String furnitureMask(String id, [String facing = 'south']) =>
+      'assets/v0/furniture/$id/${facing}_mask.png';
 }

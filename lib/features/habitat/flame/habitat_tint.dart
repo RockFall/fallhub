@@ -31,11 +31,27 @@ abstract final class VisualLoadouts {
   static const home = 'home';
   static const work = 'work';
   static const outdoors = 'outdoors';
+  static const sleep = 'sleep';
+  static const study = 'study';
+  static const exercise = 'exercise';
+  static const socialCasual = 'socialCasual';
+  static const socialFormal = 'socialFormal';
+  static const travel = 'travel';
+  static const outsideCold = 'outsideCold';
+  static const outsideHot = 'outsideHot';
 
   static String label(String id) => switch (id) {
         home => 'Casa',
         work => 'Trabalho',
         outdoors => 'Externo',
+        sleep => 'Sono',
+        study => 'Estudo',
+        exercise => 'Exercício',
+        socialCasual => 'Social',
+        socialFormal => 'Formal',
+        travel => 'Viagem',
+        outsideCold => 'Frio',
+        outsideHot => 'Calor',
         _ => id,
       };
 
@@ -44,6 +60,14 @@ abstract final class VisualLoadouts {
         home => ('shirt_basic', null),
         work => ('shirt_button', 'tuque'),
         outdoors => ('jacket', 'cowboy'),
+        sleep => ('shirt_basic', null),
+        study => ('shirt_button', null),
+        exercise => ('shirt_basic', null),
+        socialCasual => ('shirt_button', null),
+        socialFormal => ('shirt_button', 'cowboy'),
+        travel => ('jacket', 'tuque'),
+        outsideCold => ('jacket', 'tuque'),
+        outsideHot => ('shirt_basic', null),
         _ => ('shirt_basic', null),
       };
 }
@@ -260,6 +284,7 @@ abstract final class StuffPalettes {
   static const clothPurple = Color(0xFF7A6B99);
   static const gold = Color(0xFFD4AF37);
   static const plastic = Color(0xFFE8E0D0);
+  static const stone = Color(0xFF9A9A9A);
 
   static const List<Color> furnitureSwatches = [
     natural,
@@ -272,5 +297,6 @@ abstract final class StuffPalettes {
     clothPurple,
     gold,
     plastic,
+    stone,
   ];
 }

@@ -48,15 +48,16 @@ class HabitatEditorBar extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               SizedBox(
-                height: 40,
+                height: 56,
                 child: Row(
                   children: [
                     _IconTool(
+                      label: 'OK',
                       tooltip: AppStrings.habitatEditDone,
                       selected: true,
                       accent: true,
                       onTap: onDone,
-                      child: const Icon(Icons.check, size: 20, color: Colors.white),
+                      child: const Icon(Icons.check, size: 16, color: Colors.white),
                     ),
                     const SizedBox(width: 6),
                     const _VDiv(),
@@ -66,48 +67,70 @@ class HabitatEditorBar extends StatelessWidget {
                         scrollDirection: Axis.horizontal,
                         children: [
                           _IconTool(
+                            label: 'Sel',
                             tooltip: AppStrings.habitatEditToolSelect,
                             selected: editor.tool == HabitatEditTool.select,
                             onTap: () => _setTool(HabitatEditTool.select),
-                            child: const Icon(Icons.near_me, size: 18),
+                            child: const Icon(Icons.near_me, size: 16),
                           ),
                           _IconTool(
+                            label: 'Piso',
                             tooltip: AppStrings.habitatEditToolFloor,
                             selected: editor.tool == HabitatEditTool.floor,
                             onTap: () => _setTool(HabitatEditTool.floor),
-                            child: const Icon(Icons.grid_on, size: 18),
+                            child: const Icon(Icons.grid_on, size: 16),
                           ),
                           _IconTool(
+                            label: 'Móvel',
                             tooltip: AppStrings.habitatEditToolPlace,
                             selected: editor.tool == HabitatEditTool.place,
                             onTap: () => _setTool(HabitatEditTool.place),
-                            child: const Icon(Icons.chair_outlined, size: 18),
+                            child: const Icon(Icons.chair_outlined, size: 16),
                           ),
                           _IconTool(
+                            label: 'Mover',
                             tooltip: AppStrings.habitatEditToolMove,
                             selected: editor.tool == HabitatEditTool.move,
                             onTap: () => _setTool(HabitatEditTool.move),
-                            child: const Icon(Icons.open_with, size: 18),
+                            child: const Icon(Icons.open_with, size: 16),
                           ),
                           _IconTool(
+                            label: 'Apagar',
                             tooltip: AppStrings.habitatEditToolErase,
                             selected: editor.tool == HabitatEditTool.erase,
                             onTap: () => _setTool(HabitatEditTool.erase),
-                            child: const Icon(Icons.delete_outline, size: 18),
+                            child: const Icon(Icons.delete_outline, size: 16),
                           ),
                           _IconTool(
+                            label: 'Parede',
                             tooltip: AppStrings.habitatEditToolWall,
                             selected: editor.tool == HabitatEditTool.wall,
                             onTap: () => _setTool(HabitatEditTool.wall),
-                            child: const Icon(Icons.crop_square, size: 18),
+                            child: const Icon(Icons.crop_square, size: 16),
                           ),
                           _IconTool(
+                            label: 'Porta',
                             tooltip: AppStrings.habitatEditToolDoor,
                             selected: editor.tool == HabitatEditTool.door,
                             onTap: () => _setTool(HabitatEditTool.door),
-                            child: const Icon(Icons.door_front_door_outlined, size: 18),
+                            child: const Icon(Icons.door_front_door_outlined, size: 16),
                           ),
                           _IconTool(
+                            label: 'Janela',
+                            tooltip: 'Janela',
+                            selected: editor.tool == HabitatEditTool.window,
+                            onTap: () => _setTool(HabitatEditTool.window),
+                            child: const Icon(Icons.window_outlined, size: 16),
+                          ),
+                          _IconTool(
+                            label: 'Cômodo',
+                            tooltip: 'Desenhar cômodo',
+                            selected: editor.tool == HabitatEditTool.drawRoom,
+                            onTap: () => _setTool(HabitatEditTool.drawRoom),
+                            child: const Icon(Icons.crop_free, size: 16),
+                          ),
+                          _IconTool(
+                            label: 'Zona',
                             tooltip: AppStrings.habitatEditToolZone,
                             selected: editor.tool == HabitatEditTool.zone,
                             onTap: () {
@@ -119,15 +142,17 @@ class HabitatEditorBar extends StatelessWidget {
                               }
                               onChanged();
                             },
-                            child: const Icon(Icons.border_inner, size: 18),
+                            child: const Icon(Icons.border_inner, size: 16),
                           ),
                           _IconTool(
+                            label: 'Zona−',
                             tooltip: AppStrings.habitatEditToolZoneErase,
                             selected: editor.tool == HabitatEditTool.zoneErase,
                             onTap: () => _setTool(HabitatEditTool.zoneErase),
-                            child: const Icon(Icons.layers_clear, size: 18),
+                            child: const Icon(Icons.layers_clear, size: 16),
                           ),
                           _IconTool(
+                            label: 'Livre',
                             tooltip: AppStrings.habitatEditZoneClear,
                             selected: false,
                             onTap: () {
@@ -135,12 +160,13 @@ class HabitatEditorBar extends StatelessWidget {
                               if (fp != null) game.clearZone(fp.memberId);
                               onChanged();
                             },
-                            child: const Icon(Icons.all_inclusive, size: 18),
+                            child: const Icon(Icons.all_inclusive, size: 16),
                           ),
                           const SizedBox(width: 4),
                           const _VDiv(),
                           const SizedBox(width: 4),
                           _IconTool(
+                            label: 'Undo',
                             tooltip: AppStrings.habitatEditUndo,
                             selected: false,
                             enabled: editor.canUndo,
@@ -148,7 +174,7 @@ class HabitatEditorBar extends StatelessWidget {
                               game.undoEdit();
                               onChanged();
                             },
-                            child: const Icon(Icons.undo, size: 18),
+                            child: const Icon(Icons.undo, size: 16),
                           ),
                         ],
                       ),
@@ -159,6 +185,7 @@ class HabitatEditorBar extends StatelessWidget {
               if (showFloors) ...[
                 const SizedBox(height: 6),
                 SizedBox(
+                  width: double.infinity,
                   height: 44,
                   child: ListView(
                     scrollDirection: Axis.horizontal,
@@ -181,44 +208,43 @@ class HabitatEditorBar extends StatelessWidget {
                 ),
               ],
               if (showPlace) ...[
-                const SizedBox(height: 6),
+                const SizedBox(height: 8),
+                // Colors above, full width.
                 SizedBox(
-                  height: 48,
-                  child: Row(
+                  width: double.infinity,
+                  height: 28,
+                  child: _CompactSwatches(
+                    colors: StuffPalettes.furnitureSwatches,
+                    selected: editor.placeTint,
+                    onSelected: (c) {
+                      editor.placeTint = c;
+                      game.setHoverCell(game.hoverCell);
+                      onChanged();
+                    },
+                  ),
+                ),
+                const SizedBox(height: 6),
+                // Furniture gallery full width below.
+                SizedBox(
+                  width: double.infinity,
+                  height: 52,
+                  child: ListView(
+                    scrollDirection: Axis.horizontal,
                     children: [
-                      Expanded(
-                        child: ListView(
-                          scrollDirection: Axis.horizontal,
-                          children: [
-                            for (final kind in HabitatPropKinds.all)
-                              _ThumbTool(
-                                tooltip: HabitatPropCatalog.label(kind),
-                                selected: editor.placeKind == kind,
-                                onTap: () {
-                                  editor.placeKind = kind;
-                                  game.setHoverCell(game.hoverCell);
-                                  onChanged();
-                                },
-                                child: _PropThumb(
-                                  kind: kind,
-                                  tint: editor.placeTint,
-                                ),
-                              ),
-                          ],
+                      for (final kind in HabitatPropKinds.all)
+                        _ThumbTool(
+                          tooltip: HabitatPropCatalog.label(kind),
+                          selected: editor.placeKind == kind,
+                          onTap: () {
+                            editor.placeKind = kind;
+                            game.setHoverCell(game.hoverCell);
+                            onChanged();
+                          },
+                          child: _PropThumb(
+                            kind: kind,
+                            tint: editor.placeTint,
+                          ),
                         ),
-                      ),
-                      const SizedBox(width: 6),
-                      const _VDiv(),
-                      const SizedBox(width: 6),
-                      _CompactSwatches(
-                        colors: StuffPalettes.furnitureSwatches,
-                        selected: editor.placeTint,
-                        onSelected: (c) {
-                          editor.placeTint = c;
-                          game.setHoverCell(game.hoverCell);
-                          onChanged();
-                        },
-                      ),
                     ],
                   ),
                 ),
@@ -248,12 +274,13 @@ class _VDiv extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(width: 1, height: 28, color: const Color(0x44FFFFFF));
+    return Container(width: 1, height: 36, color: const Color(0x44FFFFFF));
   }
 }
 
 class _IconTool extends StatelessWidget {
   const _IconTool({
+    required this.label,
     required this.tooltip,
     required this.selected,
     required this.onTap,
@@ -262,6 +289,7 @@ class _IconTool extends StatelessWidget {
     this.accent = false,
   });
 
+  final String label;
   final String tooltip;
   final bool selected;
   final bool enabled;
@@ -276,6 +304,9 @@ class _IconTool extends StatelessWidget {
         : selected
             ? const Color(0xFFE8E8E8)
             : const Color(0xFF4A4A4A);
+    final fg = enabled
+        ? (selected || accent ? Colors.white : Colors.white70)
+        : ColonyColors.textDisabled;
     return Padding(
       padding: const EdgeInsets.only(right: 4),
       child: Tooltip(
@@ -285,26 +316,41 @@ class _IconTool extends StatelessWidget {
           borderRadius: BorderRadius.circular(3),
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 90),
-            width: 36,
-            height: 36,
-            alignment: Alignment.center,
+            width: 48,
+            height: 52,
+            padding: const EdgeInsets.symmetric(vertical: 4),
             decoration: BoxDecoration(
               color: accent
                   ? const Color(0xFF3A3420)
                   : selected
                       ? const Color(0xFF2A2A2E)
                       : const Color(0xFF1C1C1E),
-              border: Border.all(color: border, width: selected || accent ? 1.5 : 1),
+              border: Border.all(
+                color: border,
+                width: selected || accent ? 1.5 : 1,
+              ),
               borderRadius: BorderRadius.circular(3),
             ),
-            child: IconTheme(
-              data: IconThemeData(
-                color: enabled
-                    ? (selected || accent ? Colors.white : Colors.white70)
-                    : ColonyColors.textDisabled,
-                size: 18,
-              ),
-              child: child,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                IconTheme(
+                  data: IconThemeData(color: fg, size: 16),
+                  child: child,
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    color: fg,
+                    fontSize: 9,
+                    fontWeight: FontWeight.w600,
+                    height: 1,
+                  ),
+                ),
+              ],
             ),
           ),
         ),
@@ -337,8 +383,8 @@ class _ThumbTool extends StatelessWidget {
           borderRadius: BorderRadius.circular(3),
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 90),
-            width: 44,
-            height: 44,
+            width: 48,
+            height: 48,
             padding: const EdgeInsets.all(3),
             decoration: BoxDecoration(
               color: selected ? const Color(0xFF2A2A2E) : const Color(0xFF141416),
@@ -388,7 +434,7 @@ class _PropThumb extends StatelessWidget {
     if (HabitatPropKinds.isProcedural(kind)) {
       return CustomPaint(
         painter: _DecorThumbPainter(kind: kind, tint: tint),
-        size: const Size(38, 38),
+        size: const Size(42, 42),
       );
     }
     return ColorFiltered(
@@ -418,7 +464,12 @@ class _DecorThumbPainter extends CustomPainter {
       case HabitatPropKinds.plant:
         canvas.drawRRect(
           RRect.fromRectAndRadius(
-            Rect.fromLTWH(size.width * 0.3, size.height * 0.55, size.width * 0.4, size.height * 0.35),
+            Rect.fromLTWH(
+              size.width * 0.3,
+              size.height * 0.55,
+              size.width * 0.4,
+              size.height * 0.35,
+            ),
             const Radius.circular(2),
           ),
           Paint()..color = dark,
@@ -468,35 +519,34 @@ class _CompactSwatches extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
+    return ListView(
       scrollDirection: Axis.horizontal,
-      child: Row(
-        children: [
-          for (final c in colors)
-            Padding(
-              padding: const EdgeInsets.only(right: 4),
-              child: Tooltip(
-                message: AppStrings.habitatStuffColor,
-                child: InkWell(
-                  onTap: () => onSelected(c),
-                  child: Container(
-                    width: 18,
-                    height: 18,
-                    decoration: BoxDecoration(
-                      color: c,
-                      border: Border.all(
-                        color: c.toARGB32() == selected.toARGB32()
-                            ? Colors.white
-                            : const Color(0xFF666666),
-                        width: c.toARGB32() == selected.toARGB32() ? 2 : 1,
-                      ),
+      children: [
+        for (final c in colors)
+          Padding(
+            padding: const EdgeInsets.only(right: 6),
+            child: Tooltip(
+              message: AppStrings.habitatStuffColor,
+              child: InkWell(
+                onTap: () => onSelected(c),
+                child: Container(
+                  width: 22,
+                  height: 22,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    color: c,
+                    border: Border.all(
+                      color: c.toARGB32() == selected.toARGB32()
+                          ? Colors.white
+                          : const Color(0xFF666666),
+                      width: c.toARGB32() == selected.toARGB32() ? 2 : 1,
                     ),
                   ),
                 ),
               ),
             ),
-        ],
-      ),
+          ),
+      ],
     );
   }
 }

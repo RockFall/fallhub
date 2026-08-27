@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../flame/furniture/furniture.dart';
 import '../flame/habitat_locations.dart';
 import '../flame/habitat_map.dart';
 import '../flame/habitat_prop_catalog.dart';
@@ -20,7 +21,7 @@ class HabitatWorldSave {
 
 /// SharedPreferences store for multi-locale habitat maps.
 abstract final class HabitatMapStore {
-  static const prefsKey = 'habitat_maps_v1';
+  static const prefsKey = 'habitat_maps_v3';
 
   static Future<SharedPreferences?> _prefs() async {
     try {
@@ -103,6 +104,8 @@ abstract final class HabitatMapStore {
               'oy': p.origin.$2,
               'tint': p.tint.toARGB32(),
               'quality': p.quality.name,
+              'facing': p.facing.name,
+              'poweredOn': p.poweredOn,
             },
         ],
       };
@@ -145,12 +148,20 @@ abstract final class HabitatMapStore {
         final ox = m['ox'];
         final oy = m['oy'];
         if (kind == null || ox is! num || oy is! num) continue;
-        if (!HabitatPropKinds.all.contains(kind)) continue;
+        if (!HabitatPropKinds.all.contains(kind) &&
+            FurnitureRegistry.tryGet(kind) == null) {
+          continue;
+        }
         final tint = m['tint'];
         final qualityName = m['quality'] as String? ?? 'normal';
         final quality = HabitatPropQuality.values.firstWhere(
           (q) => q.name == qualityName,
           orElse: () => HabitatPropQuality.normal,
+        );
+        final facingName = m['facing'] as String? ?? 'south';
+        final facing = HabitatPropFacing.values.firstWhere(
+          (f) => f.name == facingName,
+          orElse: () => HabitatPropFacing.south,
         );
         props.add(
           HabitatPropCatalog.spawn(
@@ -159,6 +170,8 @@ abstract final class HabitatMapStore {
             id: m['id'] as String?,
             tint: tint is int ? Color(tint) : null,
             quality: quality,
+            facing: facing,
+            poweredOn: m['poweredOn'] as bool? ?? true,
           ),
         );
       }

@@ -84,7 +84,7 @@ void main() {
         expect(
           path == HabitatPropCatalog.proceduralAsset || path.contains('.png'),
           isTrue,
-          reason: '$kind → $path',
+          reason: 'kind=$kind path=$path',
         );
       }
     });

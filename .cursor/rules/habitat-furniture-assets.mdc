@@ -1,0 +1,73 @@
+---
+description: Checklist ao adicionar/ajustar sprites de furniture no Habitat
+globs: packages/living_habitat_assets/**/*,lib/features/habitat/flame/furniture/**/*,tool/export_furniture*.py,tool/audit_furniture*.py
+alwaysApply: false
+---
+
+# Habitat furniture sprites
+
+Ao adicionar ou alterar móveis do Living Habitat, siga **na ordem**. Não pule a auditoria.
+
+## Pipeline
+
+1. Fonte em `docs/produto/assets/reference/game_art_source/` (gitignored).
+2. Export: `python tool/export_furniture_assets.py`
+   - Prefere PSD; **ignora só a layer matte preta de canvas inteiro** (backdrop).
+   - Punch de fundo preto opaco residual + **trim**.
+   - **Preservar outline preto** do estilo RimWorld — NÃO fazer defringe/un-premultiply global.
+   - Halo feio (ex. luminária antiga) = flatten em matte preta; resolve pulando a matte, não apagando bordas pretas da arte.
+3. Registrar em `FurnitureRegistry` (`lib/features/habitat/flame/furniture/`).
+4. Auditar: `python tool/audit_furniture_alpha.py` e `python tool/audit_furniture_fit.py`
+5. Testes: `flutter test test/features/habitat/furniture_layout_test.dart test/features/habitat/furniture_registry_test.dart`
+6. Full restart do app (hot reload não recarrega assets novos).
+
+## Escala visual (obrigatório entender)
+
+**Footprint ≠ tamanho desenhado.**
+
+- Colisão / pathfinding = `footprint`
+- Desenho = `srcPx / pixelsPerTile` tiles, depois **clamp** dentro do footprint
+- Default `pixelsPerTile = 64` (arte RimWorld típica)
+- **Nunca** usar fit-cover do footprint inteiro para props com sprite — isso amplia lâmpada/vaso (~30px) até 1×1 tile → grande e pixelado
+
+Exemplos @ 64ppt:
+
+| sprite trim | footprint | resultado |
+|-------------|-----------|-----------|
+| cama 68×128 | 1×2 | ~1.0×2.0 (preenche) |
+| sofá 134×73 | 2×1 | ~2.0×1.1 (preenche) |
+| luminária 30×43 | 1×1 | ~0.47×0.67 (pequena) |
+| vaso 40×50 | 1×1 | ~0.63×0.78 (pequeno) |
+
+### Cuidado manual no registry
+
+- Se o móvel parecer **gigante/borrado**: confirme que o render usa `furnitureDrawSizePx` (não cover).
+- Se a arte foi authorada em **128px por célula**: set `pixelsPerTile: 128` no `FurnitureDef`.
+- Se ainda ficar grande demais após ppt certo: a arte trimada está grande demais vs o footprint — revisar trim/fonte, não “esticar regras” no draw.
+- `drawSize` no def é legado/hint para procedural; **sprites ignoram drawSize** em favor de ppt.
+
+## Checklist visual / técnico
+
+- [ ] Outline preto do estilo RimWorld **preservado** (não “limpar” bordas escuras).
+- [ ] Sem halo sujo de flatten em matte (layer backdrop ignorada no export).
+- [ ] PNG tem alpha real fora do sprite (cantos `a=0`), canvas preto de fundo não.
+- [ ] PNG está **trimmed** — aspect do arquivo ≈ aspect da arte (cama south ~0.5, não 1.0).
+- [ ] `footprint` no registry bate com tiles ocupados (cama 1×2, sofá 2×1, …).
+- [ ] Facing: south/east/north quando `cardinal`; west = flip east.
+- [ ] Tags corretas (`sit` / `sleep` / `light` / `joy` / …).
+- [ ] Escala: props pequenos (lâmpada, vaso, mesa de cabeceira) **não** preenchem a célula; camas/sofás sim.
+- [ ] Smoke no jogo após full restart.
+
+## Como adicionar um móvel novo
+
+1. Exportar arte → `assets/v0/furniture/<id>/{south,east,north}.png`
+2. Entrada em `FurnitureRegistry.all` com footprint + tags + use (+ `pixelsPerTile` só se necessário)
+3. Rodar audits; corrigir até 0 suspects de alpha/fit
+4. Interação especial → tags / `FurnitureInteractions`, sem novos `switch (kind)` espalhados
+
+## Não fazer
+
+- Não commitar o dump `game_art_source/`.
+- Não inventar frames se o asset for “mover”/composto (ver porta).
+- Não assumir que PSD composite já tem alpha.
+- Não fazer fit-cover genérico do footprint para “resolver” escala.

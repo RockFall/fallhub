@@ -4,10 +4,12 @@ import 'dart:ui';
 import 'package:flutter/painting.dart';
 import 'package:flame/components.dart';
 
+import '../habitat_door.dart';
 import '../habitat_map.dart';
 import '../habitat_prop_catalog.dart';
 import '../habitat_sprites.dart';
 import '../habitat_tint.dart';
+import '../furniture/furniture.dart';
 
 /// Draws floor tiles, procedural walls/door, furniture, and prop selection.
 class GridMapComponent extends PositionComponent {
@@ -94,16 +96,25 @@ class GridMapComponent extends PositionComponent {
   }
 
   void _drawDoor(Canvas canvas) {
-    final (x, y) = map.doorCell;
-    final rect = Rect.fromLTWH(x * tileSize, y * tileSize, tileSize, tileSize);
+    final door = map.door;
+    final (x, y) = door.cell;
+    final pos = Vector2(x * tileSize, y * tileSize);
+    final cell = Vector2(tileSize, tileSize);
 
     // Floor under the doorway cell.
     _floorSprite(map.floorAt(x, y)).render(
       canvas,
-      position: Vector2(x * tileSize, y * tileSize),
-      size: Vector2(tileSize, tileSize),
+      position: pos,
+      size: cell,
     );
 
+    final doorSprite = sprites.door;
+    if (doorSprite != null) {
+      _drawDualLeafDoor(canvas, door, doorSprite);
+      return;
+    }
+
+    final rect = Rect.fromLTWH(x * tileSize, y * tileSize, tileSize, tileSize);
     final frame = Paint()..color = const Color(0xFF5C4030);
     final panel = Paint()..color = const Color(0xFF8B6914);
     final panelInner = Paint()..color = const Color(0xFF9A7618);
@@ -144,6 +155,46 @@ class GridMapComponent extends PositionComponent {
       knobR,
       Paint()..color = const Color(0xFFD4AF37),
     );
+  }
+
+  /// RimWorld `DrawMovers`: same sprite twice, second flipped; offset by open %.
+  void _drawDualLeafDoor(Canvas canvas, HabitatDoor door, Sprite sprite) {
+    final (x, y) = door.cell;
+    final cx = (x + 0.5) * tileSize;
+    final cy = (y + 0.5) * tileSize;
+    final offset =
+        tileSize * HabitatDoor.maxLeafOffsetTiles * door.openProgress;
+    final horizontal = door.slideAxis == HabitatDoorSlideAxis.horizontal;
+
+    void drawLeaf({
+      required double worldX,
+      required double worldY,
+      required bool flipX,
+    }) {
+      canvas.save();
+      canvas.translate(worldX, worldY);
+      if (!horizontal) {
+        // Door in a N–S wall: rotate so leaves slide along Y.
+        canvas.rotate(math.pi / 2);
+      }
+      if (flipX) {
+        canvas.scale(-1, 1);
+      }
+      sprite.render(
+        canvas,
+        position: Vector2(-tileSize / 2, -tileSize / 2),
+        size: Vector2(tileSize, tileSize),
+      );
+      canvas.restore();
+    }
+
+    if (horizontal) {
+      drawLeaf(worldX: cx - offset, worldY: cy, flipX: false);
+      drawLeaf(worldX: cx + offset, worldY: cy, flipX: true);
+    } else {
+      drawLeaf(worldX: cx, worldY: cy - offset, flipX: false);
+      drawLeaf(worldX: cx, worldY: cy + offset, flipX: true);
+    }
   }
 
   void _drawPropOutline(Canvas canvas, HabitatProp prop) {
@@ -286,18 +337,18 @@ class GridMapComponent extends PositionComponent {
   void _drawProp(Canvas canvas, HabitatProp p, {required double alpha}) {
     final (ox, oy) = p.origin;
     final (fw, fh) = p.size;
-    final (vw, vh) = p.visualSize;
-    final drawW = vw * tileSize;
-    final drawH = vh * tileSize;
     final footW = fw * tileSize;
     final footH = fh * tileSize;
-    final px = ox * tileSize + (footW - drawW) / 2;
-    final py = switch (p.drawAlign) {
-      HabitatPropAlign.center => oy * tileSize + (footH - drawH) / 2,
-      HabitatPropAlign.south => oy * tileSize + (footH - drawH),
-    };
 
     if (HabitatPropKinds.isProcedural(p.kind)) {
+      final (vw, vh) = p.visualSize;
+      final drawW = vw * tileSize;
+      final drawH = vh * tileSize;
+      final px = ox * tileSize + (footW - drawW) / 2;
+      final py = switch (p.drawAlign) {
+        HabitatPropAlign.center => oy * tileSize + (footH - drawH) / 2,
+        HabitatPropAlign.south => oy * tileSize + (footH - drawH),
+      };
       _drawProceduralDecor(
         canvas,
         p,
@@ -307,16 +358,65 @@ class GridMapComponent extends PositionComponent {
       return;
     }
 
-    final sprite = sprites.props[p.kind] ?? sprites.props[p.id];
+    final sprite = sprites.propSprite(p.kind, p.facing);
     if (sprite == null) return;
-    final tint = p.tint.withValues(alpha: p.tint.a * alpha);
-    renderTinted(
-      sprite,
-      canvas,
-      position: Vector2(px, py),
-      size: Vector2(drawW, drawH),
-      tint: tint,
+
+    // Native px→tile scale (default 64ppt). Do NOT fit-cover the footprint —
+    // that upscales tiny lamps/plants to a full cell (big + blurry).
+    final srcW = sprite.srcSize.x;
+    final srcH = sprite.srcSize.y;
+    if (srcW <= 0 || srcH <= 0) return;
+    final ppt = FurnitureRegistry.tryGet(p.kind)?.pixelsPerTile ??
+        kDefaultFurniturePixelsPerTile;
+    final (drawW, drawH) = furnitureDrawSizePx(
+      srcW: srcW,
+      srcH: srcH,
+      tileSize: tileSize,
+      footW: footW,
+      footH: footH,
+      pixelsPerTile: ppt,
     );
+    final px = ox * tileSize + (footW - drawW) / 2;
+    final py = switch (p.drawAlign) {
+      HabitatPropAlign.center => oy * tileSize + (footH - drawH) / 2,
+      HabitatPropAlign.south => oy * tileSize + footH - drawH,
+    };
+
+    final tint = p.tint.withValues(alpha: p.tint.a * alpha);
+
+    canvas.save();
+    if (p.facing.flipX) {
+      canvas.translate(px + drawW / 2, py);
+      canvas.scale(-1, 1);
+      canvas.translate(-drawW / 2, 0);
+      renderTinted(
+        sprite,
+        canvas,
+        position: Vector2.zero(),
+        size: Vector2(drawW, drawH),
+        tint: tint,
+      );
+    } else {
+      renderTinted(
+        sprite,
+        canvas,
+        position: Vector2(px, py),
+        size: Vector2(drawW, drawH),
+        tint: tint,
+      );
+    }
+    canvas.restore();
+
+    // Soft “on” cue for powered lights (glow disc under the fixture).
+    if (FurnitureInteractions.isLight(p.kind) && p.poweredOn) {
+      final glow = Paint()
+        ..color = const Color(0x33FFE8A0).withValues(alpha: 0.22 * alpha);
+      canvas.drawCircle(
+        Offset(px + drawW / 2, py + drawH * 0.35),
+        math.max(drawW, drawH) * 0.45,
+        glow,
+      );
+    }
   }
 
   void _drawProceduralDecor(

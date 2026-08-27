@@ -98,7 +98,7 @@ void main() {
       game.dispose();
     });
 
-    test('hold on chair issues sit; bed uses goTo not sleep', () async {
+    test('hold on chair issues sit; bed issues sleep job', () async {
       final game = HabitatGame(tileSize: 48);
       await game.onLoad();
       game.onGameResize(Vector2(800, 600));
@@ -133,8 +133,8 @@ void main() {
           ),
           isTrue,
         );
-        expect(pawn.jobs.kind, HabitatJobKind.goTo);
-        expect(pawn.jobs.kind, isNot(HabitatJobKind.sleep));
+        // Hold on bed starts the sleep job (arrival choreography + lie posture).
+        expect(pawn.jobs.kind, HabitatJobKind.sleep);
       }
 
       game.dispose();
