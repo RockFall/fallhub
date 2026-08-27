@@ -75,7 +75,7 @@ void main() {
     final dueLater = task(
       id: '4',
       title: 'Prazo tarde',
-      dueAt: DateTime.utc(2026, 8, 30),
+      dueAt: DateTime.utc(2026, 8, 30, 12),
     );
     final list = [later, dueLater, dueSoon, nowP]
       ..sort(TaskCapabilityPolicy.compareBacklog);
@@ -101,17 +101,18 @@ void main() {
 
   test('hoje lists undated tasks on every day and dated only on their day', () {
     final undated = task(id: 'u', title: 'Sem data');
+    // Noon UTC stays on the intended calendar day for typical TZ offsets.
     final today = task(
       id: 't',
       title: 'Hoje',
       dueAt: null,
-    ).copyWith(scheduledStart: DateTime.utc(2026, 8, 24));
+    ).copyWith(scheduledStart: DateTime.utc(2026, 8, 24, 12));
     final tomorrow = task(id: 'm', title: 'Amanhã')
-        .copyWith(scheduledStart: DateTime.utc(2026, 8, 25));
+        .copyWith(scheduledStart: DateTime.utc(2026, 8, 25, 12));
     final deadlineOnly = task(
       id: 'p',
       title: 'Prazo',
-      dueAt: DateTime.utc(2026, 8, 30),
+      dueAt: DateTime.utc(2026, 8, 30, 12),
     );
     expect(TaskCapabilityPolicy.isOpenOnDay(undated, '2026-08-24'), isTrue);
     expect(TaskCapabilityPolicy.isOpenOnDay(undated, '2026-08-25'), isTrue);
