@@ -1,23 +1,20 @@
 import 'dart:math' as math;
 import 'dart:ui';
 
+import 'furniture/furniture_def.dart';
+import 'furniture/furniture_interactions.dart';
+import 'furniture/furniture_registry.dart';
+import 'habitat_door.dart';
 import 'habitat_prop_catalog.dart';
 import 'habitat_tint.dart';
+
+export 'furniture/furniture_def.dart' show HabitatPropAlign, HabitatPropFacing;
 
 /// Floor material for a single cell.
 enum HabitatFloor { wood, carpet, concrete }
 
 /// Facing used by pawn sprites (west = flip east).
 enum HabitatFacing { south, east, north, west }
-
-/// How a prop sprite is placed relative to its footprint.
-enum HabitatPropAlign {
-  /// Centered on the footprint (tables, lamps).
-  center,
-
-  /// South / feet edge (beds, chairs that “sit” on the cell).
-  south,
-}
 
 /// Visual / stat quality tier (V9.11).
 enum HabitatPropQuality {
@@ -77,11 +74,13 @@ class HabitatProp {
     this.drawAlign = HabitatPropAlign.south,
     this.tint = StuffPalettes.natural,
     this.quality = HabitatPropQuality.normal,
+    this.facing = HabitatPropFacing.south,
+    this.poweredOn = true,
   });
 
   final String id;
 
-  /// Catalog kind (`bed`, `table`, …) — stable for jobs even when [id] is unique.
+  /// Catalog kind (`bed`, `dining_chair`, …) — stable for jobs even when [id] is unique.
   final String kind;
   final String name;
   final String assetPath;
@@ -108,6 +107,12 @@ class HabitatProp {
   /// Normal / Bom / Excelente (V9.11).
   HabitatPropQuality quality;
 
+  /// Sprite facing (west mirrors east).
+  HabitatPropFacing facing;
+
+  /// Lights / devices — off dims lamp contribution and TV glow hooks.
+  bool poweredOn;
+
   /// Resolved draw size in tiles.
   (double, double) get visualSize => drawSize ?? (drawScale, drawScale);
 
@@ -126,18 +131,21 @@ class HabitatMapSnapshot {
     required List<double> filth,
     required this.doorCell,
     required Set<(int, int)> customWalls,
+    Set<(int, int)>? windowCells,
   })  : floors = List<HabitatFloor>.from(floors),
         props = [
           for (final p in props) HabitatPropCatalog.copyOf(p),
         ],
         filth = List<double>.from(filth),
-        customWalls = Set<(int, int)>.from(customWalls);
+        customWalls = Set<(int, int)>.from(customWalls),
+        windowCells = Set<(int, int)>.from(windowCells ?? const {});
 
   final List<HabitatFloor> floors;
   final List<HabitatProp> props;
   final List<double> filth;
   final (int, int) doorCell;
   final Set<(int, int)> customWalls;
+  final Set<(int, int)> windowCells;
 }
 
 /// Room layout — floors, walls, door, furniture (mutable for V7 editor).
@@ -149,14 +157,21 @@ class HabitatMap {
     required List<HabitatProp> props,
     (int, int)? doorCell,
     Set<(int, int)>? customWalls,
+    Set<(int, int)>? windowCells,
     List<double>? filth,
   })  : floors = List<HabitatFloor>.from(floors),
         props = List<HabitatProp>.from(props),
         filth = filth ?? List<double>.filled(width * height, 0),
         doorCell = doorCell ?? (width ~/ 2, height - 1),
-        customWalls = {...?customWalls} {
+        customWalls = {...?customWalls},
+        windowCells = {...?windowCells} {
     assert(floors.length == width * height);
     assert(this.filth.length == width * height);
+    door = HabitatDoor(
+      cell: this.doorCell,
+      slideAxis: HabitatDoorSlideAxis.horizontal,
+    );
+    door.slideAxis = HabitatDoor.axisAt(this, this.doorCell.$1, this.doorCell.$2);
     rebuildBlocked();
   }
 
@@ -168,11 +183,17 @@ class HabitatMap {
   /// Traffic filth 0..1 per cell (V9.9).
   final List<double> filth;
 
-  /// South-wall doorway cell (walkable gap).
+  /// South-wall doorway cell (walkable gap for pathfinding).
   (int, int) doorCell;
+
+  /// Dual-leaf animated door on [doorCell].
+  late final HabitatDoor door;
 
   /// Extra interior wall cells (perimeter is always wall except [doorCell]).
   final Set<(int, int)> customWalls;
+
+  /// Wall cells marked as windows (still non-walkable; light cue) — M26.
+  final Set<(int, int)> windowCells;
 
   late Set<(int, int)> _blocked;
 
@@ -191,6 +212,16 @@ class HabitatMap {
   }
 
   bool isWalkable(int x, int y) => inBounds(x, y) && !_blocked.contains((x, y));
+
+  bool isDoorCell(int x, int y) => doorCell == (x, y);
+
+  /// True when a pawn may not yet step onto [x],[y] because the door is shut.
+  bool doorBlocksStep(int x, int y) =>
+      isDoorCell(x, y) && door.blocksPassage;
+
+  /// Geometry walkable AND door fully open if this is the doorway.
+  bool canStepOnto(int x, int y) =>
+      isWalkable(x, y) && !doorBlocksStep(x, y);
 
   void rebuildBlocked() {
     final next = <(int, int)>{};
@@ -221,6 +252,7 @@ class HabitatMap {
         filth: filth,
         doorCell: doorCell,
         customWalls: customWalls,
+        windowCells: windowCells,
       );
 
   void restore(HabitatMapSnapshot snap) {
@@ -234,9 +266,16 @@ class HabitatMap {
       ..clear()
       ..addAll(snap.props.map(HabitatPropCatalog.copyOf));
     doorCell = snap.doorCell;
+    door.reseat(
+      doorCell,
+      HabitatDoor.axisAt(this, doorCell.$1, doorCell.$2),
+    );
     customWalls
       ..clear()
       ..addAll(snap.customWalls);
+    windowCells
+      ..clear()
+      ..addAll(snap.windowCells);
     rebuildBlocked();
   }
 
@@ -294,6 +333,7 @@ class HabitatMap {
     if (!isPerimeter(cell.$1, cell.$2)) return;
     doorCell = cell;
     customWalls.remove(cell);
+    door.reseat(cell, HabitatDoor.axisAt(this, cell.$1, cell.$2));
     rebuildBlocked();
   }
 
@@ -303,6 +343,7 @@ class HabitatMap {
     final key = (x, y);
     if (customWalls.contains(key)) {
       customWalls.remove(key);
+      windowCells.remove(key);
     } else {
       // Don't wall over props — remove prop first or refuse.
       if (propAt(x, y) != null) return;
@@ -365,32 +406,619 @@ class HabitatMap {
   }
 
   HabitatProp? propByKind(String kind) {
+    final resolved = FurnitureRegistry.resolveId(kind);
     for (final p in props) {
-      if (p.kind == kind) return p;
+      if (p.kind == kind || FurnitureRegistry.resolveId(p.kind) == resolved) {
+        return p;
+      }
+    }
+    // Job helpers still ask for legacy 'bed' / 'chair' / 'table'.
+    if (kind == 'bed' || kind == HabitatPropKinds.bed) {
+      for (final p in props) {
+        if (FurnitureInteractions.isSleep(p.kind)) return p;
+      }
+    }
+    if (kind == 'chair' || kind == HabitatPropKinds.chair) {
+      for (final p in props) {
+        if (FurnitureInteractions.isSit(p.kind)) return p;
+      }
+    }
+    if (kind == 'table' || kind == HabitatPropKinds.table) {
+      for (final p in props) {
+        if (FurnitureInteractions.isTable(p.kind)) return p;
+      }
     }
     return null;
   }
 
-  /// Default 16×11 living room for V0/V1.
-  factory HabitatMap.demoRoom() {
+  /// Default living suite — used by tests + bedroom locale.
+  factory HabitatMap.demoRoom() => HabitatMap.bedroomPreset();
+
+  /// Quarto + estar + varanda sul (área externa).
+  ///
+  /// ```
+  ///  # sleep (carpet) | living (wood) #
+  ///  # bed + lamp     | TV + chairs   #
+  ///  #----------------|---------------#
+  ///  # hall                             #
+  ///  #=========== door to balcony =====#
+  ///  # balcony deck + plants (concrete) #
+  /// ```
+  factory HabitatMap.bedroomPreset() {
+    const w = 18;
+    const h = 13;
+    final floors = List<HabitatFloor>.filled(w * h, HabitatFloor.wood);
+
+    void fill(int x0, int y0, int x1, int y1, HabitatFloor f) {
+      for (var y = y0; y <= y1; y++) {
+        for (var x = x0; x <= x1; x++) {
+          if (x > 0 && x < w - 1 && y > 0 && y < h - 1) {
+            floors[y * w + x] = f;
+          }
+        }
+      }
+    }
+
+    // Sleeping alcove — soft carpet.
+    fill(1, 1, 7, 6, HabitatFloor.carpet);
+    // Living / TV zone.
+    fill(9, 1, 16, 6, HabitatFloor.wood);
+    // Hall.
+    fill(1, 7, 16, 8, HabitatFloor.wood);
+    // Outdoor balcony.
+    fill(1, 9, 16, 11, HabitatFloor.concrete);
+
+    // Partition between sleep and living (opening at y=3..4).
+    final walls = <(int, int)>{
+      for (var y = 1; y <= 6; y++)
+        if (y < 3 || y > 4) (8, y),
+    };
+    // Wall between hall and balcony with a wide door opening.
+    for (var x = 1; x <= 16; x++) {
+      if (x < 7 || x > 10) walls.add((x, 8));
+    }
+
+    final windows = <(int, int)>{
+      (8, 2),
+      (8, 5),
+      (3, 8),
+      (14, 8),
+      (1, 10), // balcony side light
+      (16, 10),
+    };
+
+    return HabitatMap(
+      width: w,
+      height: h,
+      floors: floors,
+      doorCell: (w ~/ 2, h - 1),
+      customWalls: walls,
+      windowCells: windows,
+      props: [
+        HabitatPropCatalog.spawn(
+          'bed',
+          (3, 2),
+          id: 'bed',
+          tint: StuffPalettes.clothBlue,
+          quality: HabitatPropQuality.good,
+        ),
+        HabitatPropCatalog.spawn(
+          'end_table',
+          (5, 2),
+          id: 'nightstand',
+          tint: StuffPalettes.woodDark,
+        ),
+        HabitatPropCatalog.spawn(
+          'lamp_standing',
+          (6, 2),
+          id: 'bed_lamp',
+          tint: StuffPalettes.gold,
+        ),
+        HabitatPropCatalog.spawn(
+          'dresser',
+          (1, 4),
+          id: 'dresser',
+          tint: StuffPalettes.wood,
+        ),
+        HabitatPropCatalog.spawn(
+          HabitatPropKinds.painting,
+          (2, 1),
+          id: 'bed_art',
+          tint: StuffPalettes.clothRed,
+        ),
+        HabitatPropCatalog.spawn(
+          HabitatPropKinds.rug,
+          (4, 5),
+          id: 'bed_rug',
+          tint: StuffPalettes.clothBlue,
+        ),
+        HabitatPropCatalog.spawn(
+          HabitatPropKinds.tv,
+          (14, 2),
+          id: 'tv',
+          tint: StuffPalettes.steel,
+        ),
+        HabitatPropCatalog.spawn(
+          'couch',
+          (12, 4),
+          id: 'sofa',
+          tint: StuffPalettes.clothGreen,
+        ),
+        HabitatPropCatalog.spawn(
+          'armchair',
+          (15, 3),
+          id: 'lounge_chair',
+          tint: StuffPalettes.clothBlue,
+        ),
+        HabitatPropCatalog.spawn(
+          'end_table',
+          (11, 4),
+          id: 'coffee_table',
+          tint: StuffPalettes.woodDark,
+        ),
+        HabitatPropCatalog.spawn(
+          'bookcase',
+          (10, 1),
+          id: 'bookcase',
+          tint: StuffPalettes.woodDark,
+        ),
+        HabitatPropCatalog.spawn(
+          'lamp_standing',
+          (15, 5),
+          id: 'living_lamp',
+        ),
+        HabitatPropCatalog.spawn(
+          'plant_pot',
+          (16, 1),
+          id: 'living_plant',
+          tint: StuffPalettes.clothGreen,
+        ),
+        // Balcony (outdoor strip).
+        HabitatPropCatalog.spawn(
+          'stool',
+          (8, 10),
+          id: 'balcony_chair',
+          tint: StuffPalettes.wood,
+        ),
+        HabitatPropCatalog.spawn(
+          'plant_pot',
+          (3, 10),
+          id: 'balcony_plant_a',
+          tint: StuffPalettes.clothGreen,
+          quality: HabitatPropQuality.good,
+        ),
+        HabitatPropCatalog.spawn(
+          'plant_pot',
+          (5, 9),
+          id: 'balcony_plant_b',
+          tint: StuffPalettes.clothGreen,
+        ),
+        HabitatPropCatalog.spawn(
+          'plant_pot',
+          (14, 10),
+          id: 'balcony_plant_c',
+          tint: StuffPalettes.clothGreen,
+        ),
+        HabitatPropCatalog.spawn(
+          HabitatPropKinds.vase,
+          (12, 9),
+          id: 'balcony_vase',
+          tint: StuffPalettes.woodDark,
+        ),
+        HabitatPropCatalog.spawn(
+          'flood_light',
+          (2, 9),
+          id: 'balcony_light',
+          tint: StuffPalettes.steel,
+        ),
+      ],
+    );
+  }
+
+  /// Escritório com luz de pátio interno a leste.
+  factory HabitatMap.officePreset() {
     const w = 16;
-    const h = 11;
-    final floors = List<HabitatFloor>.generate(w * h, (i) {
-      final x = i % w;
-      final y = i ~/ w;
-      if (y <= 3) return HabitatFloor.carpet;
-      if (x >= 11) return HabitatFloor.concrete;
-      return HabitatFloor.wood;
-    });
+    const h = 12;
+    final floors = List<HabitatFloor>.filled(w * h, HabitatFloor.wood);
 
-    final props = <HabitatProp>[
-      HabitatPropCatalog.spawn(HabitatPropKinds.bed, (2, 2), id: 'bed'),
-      HabitatPropCatalog.spawn(HabitatPropKinds.table, (7, 5), id: 'table'),
-      HabitatPropCatalog.spawn(HabitatPropKinds.chair, (7, 7), id: 'chair'),
-      HabitatPropCatalog.spawn(HabitatPropKinds.lamp, (12, 3), id: 'lamp'),
-    ];
+    void fill(int x0, int y0, int x1, int y1, HabitatFloor f) {
+      for (var y = y0; y <= y1; y++) {
+        for (var x = x0; x <= x1; x++) {
+          if (x > 0 && x < w - 1 && y > 0 && y < h - 1) {
+            floors[y * w + x] = f;
+          }
+        }
+      }
+    }
 
-    return HabitatMap(width: w, height: h, floors: floors, props: props);
+    fill(1, 1, 10, 10, HabitatFloor.carpet);
+    // East light-court / outdoor strip.
+    fill(12, 1, 14, 10, HabitatFloor.concrete);
+
+    final walls = <(int, int)>{
+      for (var y = 1; y <= 10; y++)
+        if (y < 4 || y > 6) (11, y),
+    };
+    final windows = <(int, int)>{
+      (11, 3),
+      (11, 5),
+      (11, 7),
+      (14, 2),
+      (14, 8),
+    };
+
+    return HabitatMap(
+      width: w,
+      height: h,
+      floors: floors,
+      doorCell: (5, h - 1),
+      customWalls: walls,
+      windowCells: windows,
+      props: [
+        HabitatPropCatalog.spawn(
+          HabitatPropKinds.table,
+          (3, 3),
+          id: 'desk',
+          tint: StuffPalettes.woodDark,
+          quality: HabitatPropQuality.good,
+        ),
+        HabitatPropCatalog.spawn(
+          HabitatPropKinds.chair,
+          (3, 5),
+          id: 'office_chair',
+          tint: StuffPalettes.steel,
+        ),
+        HabitatPropCatalog.spawn(
+          HabitatPropKinds.lamp,
+          (6, 2),
+          id: 'office_lamp',
+          tint: StuffPalettes.gold,
+          quality: HabitatPropQuality.good,
+        ),
+        HabitatPropCatalog.spawn(
+          HabitatPropKinds.chair,
+          (7, 4),
+          id: 'guest_chair',
+          tint: StuffPalettes.clothBlue,
+        ),
+        HabitatPropCatalog.spawn(
+          HabitatPropKinds.painting,
+          (2, 1),
+          id: 'office_art',
+          tint: StuffPalettes.clothBlue,
+        ),
+        HabitatPropCatalog.spawn(
+          HabitatPropKinds.plant,
+          (9, 2),
+          id: 'office_plant',
+          tint: StuffPalettes.clothGreen,
+        ),
+        HabitatPropCatalog.spawn(
+          HabitatPropKinds.boardgame,
+          (8, 7),
+          id: 'shelf_game',
+          tint: StuffPalettes.wood,
+        ),
+        HabitatPropCatalog.spawn(
+          HabitatPropKinds.heater,
+          (2, 8),
+          id: 'office_heater',
+          tint: StuffPalettes.steel,
+        ),
+        // Light court (outdoor feel).
+        HabitatPropCatalog.spawn(
+          HabitatPropKinds.plant,
+          (13, 3),
+          id: 'court_plant_a',
+          tint: StuffPalettes.clothGreen,
+          quality: HabitatPropQuality.excellent,
+        ),
+        HabitatPropCatalog.spawn(
+          HabitatPropKinds.plant,
+          (12, 7),
+          id: 'court_plant_b',
+          tint: StuffPalettes.clothGreen,
+        ),
+        HabitatPropCatalog.spawn(
+          HabitatPropKinds.rug,
+          (12, 5),
+          id: 'court_mat',
+          tint: StuffPalettes.plastic,
+        ),
+        HabitatPropCatalog.spawn(
+          HabitatPropKinds.cooler,
+          (13, 9),
+          id: 'court_breeze',
+          tint: StuffPalettes.steel,
+        ),
+      ],
+    );
+  }
+
+  /// Cozinha em L + jantar + pátio de serviço a leste.
+  factory HabitatMap.kitchenPreset() {
+    const w = 16;
+    const h = 12;
+    final floors = List<HabitatFloor>.filled(w * h, HabitatFloor.wood);
+
+    void fill(int x0, int y0, int x1, int y1, HabitatFloor f) {
+      for (var y = y0; y <= y1; y++) {
+        for (var x = x0; x <= x1; x++) {
+          if (x > 0 && x < w - 1 && y > 0 && y < h - 1) {
+            floors[y * w + x] = f;
+          }
+        }
+      }
+    }
+
+    // Work counters — concrete L.
+    fill(1, 1, 10, 2, HabitatFloor.concrete);
+    fill(9, 1, 10, 7, HabitatFloor.concrete);
+    // Dining wood.
+    fill(1, 3, 7, 8, HabitatFloor.wood);
+    // Service patio outdoors.
+    fill(12, 1, 14, 10, HabitatFloor.concrete);
+
+    final walls = <(int, int)>{
+      for (var y = 1; y <= 10; y++)
+        if (y < 5 || y > 7) (11, y),
+    };
+    final windows = <(int, int)>{
+      (11, 5),
+      (11, 6),
+      (5, 1),
+      (14, 4),
+    };
+
+    return HabitatMap(
+      width: w,
+      height: h,
+      floors: floors,
+      doorCell: (4, h - 1),
+      customWalls: walls,
+      windowCells: windows,
+      props: [
+        HabitatPropCatalog.spawn(
+          HabitatPropKinds.table,
+          (3, 4),
+          id: 'kitchen_table',
+          tint: StuffPalettes.wood,
+          quality: HabitatPropQuality.good,
+        ),
+        HabitatPropCatalog.spawn(
+          HabitatPropKinds.chair,
+          (3, 6),
+          id: 'kitchen_chair_a',
+        ),
+        HabitatPropCatalog.spawn(
+          HabitatPropKinds.chair,
+          (5, 6),
+          id: 'kitchen_chair_b',
+          tint: StuffPalettes.woodDark,
+        ),
+        HabitatPropCatalog.spawn(
+          HabitatPropKinds.chair,
+          (2, 5),
+          id: 'kitchen_chair_c',
+          tint: StuffPalettes.clothBlue,
+        ),
+        HabitatPropCatalog.spawn(
+          HabitatPropKinds.lamp,
+          (7, 3),
+          id: 'kitchen_lamp',
+          tint: StuffPalettes.gold,
+        ),
+        HabitatPropCatalog.spawn(
+          HabitatPropKinds.cooler,
+          (9, 3),
+          id: 'fridge_zone',
+          tint: StuffPalettes.steel,
+        ),
+        HabitatPropCatalog.spawn(
+          HabitatPropKinds.heater,
+          (9, 6),
+          id: 'stove_zone',
+          tint: StuffPalettes.steel,
+        ),
+        HabitatPropCatalog.spawn(
+          HabitatPropKinds.vase,
+          (1, 3),
+          id: 'kitchen_vase',
+          tint: StuffPalettes.plastic,
+        ),
+        HabitatPropCatalog.spawn(
+          HabitatPropKinds.plant,
+          (8, 8),
+          id: 'kitchen_herb',
+          tint: StuffPalettes.clothGreen,
+        ),
+        // Service patio.
+        HabitatPropCatalog.spawn(
+          HabitatPropKinds.plant,
+          (13, 2),
+          id: 'patio_herb_a',
+          tint: StuffPalettes.clothGreen,
+          quality: HabitatPropQuality.good,
+        ),
+        HabitatPropCatalog.spawn(
+          HabitatPropKinds.plant,
+          (12, 4),
+          id: 'patio_herb_b',
+          tint: StuffPalettes.clothGreen,
+        ),
+        HabitatPropCatalog.spawn(
+          HabitatPropKinds.plant,
+          (13, 7),
+          id: 'patio_herb_c',
+          tint: StuffPalettes.clothGreen,
+        ),
+        HabitatPropCatalog.spawn(
+          HabitatPropKinds.chair,
+          (12, 8),
+          id: 'patio_stool',
+          tint: StuffPalettes.wood,
+        ),
+        HabitatPropCatalog.spawn(
+          HabitatPropKinds.cooler,
+          (13, 9),
+          id: 'patio_ice',
+          tint: StuffPalettes.steel,
+        ),
+      ],
+    );
+  }
+
+  /// Terraço pleno — deck, jardim e caminho.
+  factory HabitatMap.terracePreset() {
+    const w = 18;
+    const h = 14;
+    final floors = List<HabitatFloor>.filled(w * h, HabitatFloor.concrete);
+
+    void fill(int x0, int y0, int x1, int y1, HabitatFloor f) {
+      for (var y = y0; y <= y1; y++) {
+        for (var x = x0; x <= x1; x++) {
+          if (x > 0 && x < w - 1 && y > 0 && y < h - 1) {
+            floors[y * w + x] = f;
+          }
+        }
+      }
+    }
+
+    // Main wooden deck.
+    fill(4, 3, 13, 9, HabitatFloor.wood);
+    // Soft rug-like carpet island for lounge.
+    fill(6, 5, 10, 7, HabitatFloor.carpet);
+    // Path from apartment door (north).
+    fill(7, 1, 10, 2, HabitatFloor.wood);
+
+    final windows = <(int, int)>{
+      (2, 1),
+      (15, 1),
+      (1, 6),
+      (16, 6),
+    };
+
+    return HabitatMap(
+      width: w,
+      height: h,
+      floors: floors,
+      doorCell: (w ~/ 2, 0), // from apartment
+      windowCells: windows,
+      props: [
+        HabitatPropCatalog.spawn(
+          HabitatPropKinds.table,
+          (7, 4),
+          id: 'terrace_table',
+          tint: StuffPalettes.woodDark,
+          quality: HabitatPropQuality.good,
+        ),
+        HabitatPropCatalog.spawn(
+          HabitatPropKinds.chair,
+          (7, 6),
+          id: 'terrace_chair_a',
+          tint: StuffPalettes.clothGreen,
+        ),
+        HabitatPropCatalog.spawn(
+          HabitatPropKinds.chair,
+          (9, 6),
+          id: 'terrace_chair_b',
+          tint: StuffPalettes.clothGreen,
+        ),
+        HabitatPropCatalog.spawn(
+          HabitatPropKinds.chair,
+          (6, 5),
+          id: 'terrace_chair_c',
+          tint: StuffPalettes.wood,
+        ),
+        HabitatPropCatalog.spawn(
+          HabitatPropKinds.lamp,
+          (12, 3),
+          id: 'terrace_lamp',
+          tint: StuffPalettes.steel,
+          quality: HabitatPropQuality.good,
+        ),
+        HabitatPropCatalog.spawn(
+          HabitatPropKinds.lamp,
+          (5, 8),
+          id: 'terrace_lamp_b',
+          tint: StuffPalettes.gold,
+        ),
+        HabitatPropCatalog.spawn(
+          HabitatPropKinds.gatheringSpot,
+          (8, 8),
+          id: 'terrace_gather',
+        ),
+        HabitatPropCatalog.spawn(
+          HabitatPropKinds.plant,
+          (2, 3),
+          id: 'garden_a',
+          tint: StuffPalettes.clothGreen,
+          quality: HabitatPropQuality.excellent,
+        ),
+        HabitatPropCatalog.spawn(
+          HabitatPropKinds.plant,
+          (2, 5),
+          id: 'garden_b',
+          tint: StuffPalettes.clothGreen,
+        ),
+        HabitatPropCatalog.spawn(
+          HabitatPropKinds.plant,
+          (2, 8),
+          id: 'garden_c',
+          tint: StuffPalettes.clothGreen,
+          quality: HabitatPropQuality.good,
+        ),
+        HabitatPropCatalog.spawn(
+          HabitatPropKinds.plant,
+          (15, 3),
+          id: 'garden_d',
+          tint: StuffPalettes.clothGreen,
+        ),
+        HabitatPropCatalog.spawn(
+          HabitatPropKinds.plant,
+          (15, 6),
+          id: 'garden_e',
+          tint: StuffPalettes.clothGreen,
+          quality: HabitatPropQuality.good,
+        ),
+        HabitatPropCatalog.spawn(
+          HabitatPropKinds.plant,
+          (15, 9),
+          id: 'garden_f',
+          tint: StuffPalettes.clothGreen,
+        ),
+        HabitatPropCatalog.spawn(
+          HabitatPropKinds.plant,
+          (4, 11),
+          id: 'garden_g',
+          tint: StuffPalettes.clothGreen,
+        ),
+        HabitatPropCatalog.spawn(
+          HabitatPropKinds.plant,
+          (12, 11),
+          id: 'garden_h',
+          tint: StuffPalettes.clothGreen,
+        ),
+        HabitatPropCatalog.spawn(
+          HabitatPropKinds.vase,
+          (10, 3),
+          id: 'terrace_vase',
+          tint: StuffPalettes.woodDark,
+        ),
+        HabitatPropCatalog.spawn(
+          HabitatPropKinds.instrument,
+          (4, 4),
+          id: 'terrace_music',
+          tint: StuffPalettes.wood,
+        ),
+        HabitatPropCatalog.spawn(
+          HabitatPropKinds.cooler,
+          (13, 8),
+          id: 'terrace_cooler',
+          tint: StuffPalettes.steel,
+        ),
+      ],
+    );
   }
 }
 

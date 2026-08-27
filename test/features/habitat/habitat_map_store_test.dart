@@ -29,7 +29,7 @@ void main() {
     expect(loaded, isNotNull);
     expect(loaded!.locationId, HabitatLocationIds.bedroom);
     final restored = loaded.maps[HabitatLocationIds.bedroom]!;
-    expect(restored.props.any((p) => p.kind == HabitatPropKinds.plant), isTrue);
+    expect(restored.props.any((p) => p.kind == 'plant_pot' || p.kind == HabitatPropKinds.plant), isTrue);
     expect(restored.floorAt(5, 5), HabitatFloor.carpet);
   });
 

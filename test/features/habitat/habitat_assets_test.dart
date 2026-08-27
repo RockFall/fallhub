@@ -21,6 +21,7 @@ void main() {
       HabitatAssets.beard('full', 'south'),
       HabitatAssets.beard('goatee', 'north'), // falls back to south file
       HabitatAssets.bedSouth,
+      HabitatAssets.tvSouth,
     ];
     for (final rel in paths) {
       final key = 'packages/${HabitatAssets.package}/$rel';

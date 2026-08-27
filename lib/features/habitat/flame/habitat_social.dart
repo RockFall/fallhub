@@ -43,6 +43,9 @@ class SocialPawnSnapshot {
     required this.isDrafted,
     required this.isBusy,
     this.allowedZone,
+    this.socialTolerance = 0.7,
+    this.solitudePressure = 0.15,
+    this.socialConnectionPressure = 0.3,
   });
 
   final String memberId;
@@ -53,6 +56,11 @@ class SocialPawnSnapshot {
   final bool isDrafted;
   final bool isBusy;
   final Set<(int, int)>? allowedZone;
+
+  /// Embodied social battery (M10) — 0..1.
+  final double socialTolerance;
+  final double solitudePressure;
+  final double socialConnectionPressure;
 }
 
 /// Inputs for one social tick (testable without Flame).
@@ -308,6 +316,19 @@ class HabitatSocialDirector {
 
     final hour = _hourFactor(ctx.phaseLabel);
     score += 0.10 * hour;
+
+    // M10 — social battery / solitude (independent axes).
+    final tol = (a.socialTolerance + b.socialTolerance) / 2;
+    final solitude = (a.solitudePressure + b.solitudePressure) / 2;
+    final desire = (a.socialConnectionPressure + b.socialConnectionPressure) / 2;
+    score += 0.12 * desire;
+    score -= 0.18 * (1 - tol);
+    score -= 0.15 * solitude;
+    // Low tolerance: prefer quieter venues (stand/doorway over table/party feel).
+    if (tol < 0.35 &&
+        (venue == SocialVenue.table || venue == SocialVenue.gatheringSpot)) {
+      score -= 0.12;
+    }
 
     final venueKey = '${venue.name}_${key.minId}';
     if (memory.venueCooldownUntil[venueKey] != null &&

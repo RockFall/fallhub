@@ -2,6 +2,7 @@ import 'package:flame/cache.dart';
 import 'package:flame/components.dart';
 import 'package:living_habitat_assets/living_habitat_assets.dart';
 
+import 'furniture/furniture.dart';
 import 'habitat_map.dart';
 import 'habitat_prop_catalog.dart';
 
@@ -11,6 +12,7 @@ class HabitatSprites {
     required this.wood,
     required this.carpet,
     required this.concrete,
+    required this.door,
     required this.bodyByType,
     required this.headByType,
     required this.hairByStyle,
@@ -18,11 +20,15 @@ class HabitatSprites {
     required this.hatByStyle,
     required this.beardByStyle,
     required this.props,
+    required this.propMasks,
   });
 
   final Sprite wood;
   final Sprite carpet;
   final Sprite concrete;
+
+  /// Door leaf (`DoorSimple_Mover`); null → procedural fallback.
+  final Sprite? door;
 
   /// bodyType → dir → sprite
   final Map<String, Map<String, Sprite>> bodyByType;
@@ -39,7 +45,12 @@ class HabitatSprites {
 
   /// beard → dir → sprite (north may be absent — use south)
   final Map<String, Map<String, Sprite>> beardByStyle;
+
+  /// `"kind|facing"` → sprite (facing = south|east|north).
   final Map<String, Sprite> props;
+
+  /// Bedding overlays `"kind|facing"` when present.
+  final Map<String, Sprite> propMasks;
 
   Map<String, Sprite> hairFor(String style) =>
       hairByStyle[style] ?? hairByStyle['bob']!;
@@ -68,6 +79,24 @@ class HabitatSprites {
     final map = beardByStyle[style];
     if (map == null) return null;
     return map[dir] ?? map['south'];
+  }
+
+  Sprite? propSprite(
+    String kind, [
+    HabitatPropFacing facing = HabitatPropFacing.south,
+  ]) {
+    final resolved = FurnitureRegistry.resolveId(kind);
+    final key = '$resolved|${facing.spriteKey}';
+    return props[key] ?? props['$resolved|south'] ?? props['$kind|south'];
+  }
+
+  Sprite? propMask(
+    String kind, [
+    HabitatPropFacing facing = HabitatPropFacing.south,
+  ]) {
+    final resolved = FurnitureRegistry.resolveId(kind);
+    final key = '$resolved|${facing.spriteKey}';
+    return propMasks[key] ?? propMasks['$resolved|south'];
   }
 
   static Sprite? _cached(Images images, String path) {
@@ -146,30 +175,36 @@ class HabitatSprites {
       if (dirs.isNotEmpty) beardByStyle[style] = dirs;
     }
 
-    Sprite? propSprite(String kind) {
-      final path = HabitatPropCatalog.assetPath(kind);
-      if (!images.containsKey(path)) return null;
-      final crop = HabitatPropCatalog.srcRect(kind);
-      if (crop == null) return Sprite(images.fromCache(path));
-      final (sx, sy, sw, sh) = crop;
-      return Sprite(
-        images.fromCache(path),
-        srcPosition: Vector2(sx, sy),
-        srcSize: Vector2(sw, sh),
-      );
+    final props = <String, Sprite>{};
+    final propMasks = <String, Sprite>{};
+
+    void putProp(String kind, String facing, String path) {
+      final s = _cached(images, path);
+      if (s != null) props['$kind|$facing'] = s;
     }
 
-    // Key by catalog kind so multiple instances share one sprite.
-    final props = <String, Sprite>{};
-    for (final kind in HabitatPropKinds.furniture) {
-      final s = propSprite(kind);
-      if (s != null) props[kind] = s;
+    for (final def in FurnitureRegistry.all) {
+      for (final dir in const ['south', 'east', 'north']) {
+        putProp(def.id, dir, def.assetPath(dir));
+        final mask = def.maskPath(dir);
+        if (mask != null) {
+          final s = _cached(images, mask);
+          if (s != null) propMasks['${def.id}|$dir'] = s;
+        }
+      }
+    }
+
+    putProp(HabitatPropKinds.tv, 'south', HabitatAssets.tvSouth);
+
+    for (final p in map.props) {
+      putProp(p.kind, p.facing.spriteKey, p.assetPath);
     }
 
     return HabitatSprites._(
       wood: floor(HabitatAssets.woodFloor),
       carpet: floor(HabitatAssets.carpet),
       concrete: floor(HabitatAssets.concrete),
+      door: _cached(images, HabitatAssets.doorSimpleMover),
       bodyByType: bodyByType,
       headByType: headByType,
       hairByStyle: hairByStyle,
@@ -177,6 +212,7 @@ class HabitatSprites {
       hatByStyle: hatByStyle,
       beardByStyle: beardByStyle,
       props: props,
+      propMasks: propMasks,
     );
   }
 }

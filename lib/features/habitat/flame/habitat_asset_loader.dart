@@ -4,6 +4,7 @@ import 'package:flutter/painting.dart';
 import 'package:flutter/services.dart';
 import 'package:living_habitat_assets/living_habitat_assets.dart';
 
+import 'furniture/furniture.dart';
 import 'habitat_map.dart';
 import 'habitat_prop_catalog.dart';
 
@@ -16,21 +17,22 @@ Future<void> loadHabitatAssets(Images images, HabitatMap map) async {
     HabitatAssets.woodFloor,
     HabitatAssets.carpet,
     HabitatAssets.concrete,
-    for (final kind in HabitatPropKinds.furniture) ...[
-      if (HabitatPropCatalog.assetPath(kind) !=
-          HabitatPropCatalog.proceduralAsset)
-        HabitatPropCatalog.assetPath(kind),
-    ],
+    HabitatAssets.doorSimpleMover,
     for (final dir in HabitatAssets.directions) ...[
       HabitatAssets.body(dir, bodyType: 'male'),
       HabitatAssets.head(dir, bodyType: 'male'),
       HabitatAssets.hair(dir, style: 'bob'),
     ],
-    for (final p in map.props)
-      if (p.assetPath != HabitatPropCatalog.proceduralAsset) p.assetPath,
   };
 
   final optional = <String>{
+    HabitatAssets.tvSouth,
+    for (final def in FurnitureRegistry.all) ...[
+      for (final dir in const ['south', 'east', 'north']) ...[
+        def.assetPath(dir),
+        if (def.hasBeddingMask) def.maskPath(dir)!,
+      ],
+    ],
     for (final dir in HabitatAssets.directions) ...[
       for (final body in HabitatAssets.bodyTypes)
         if (body != 'male') ...[
@@ -48,6 +50,8 @@ Future<void> loadHabitatAssets(Images images, HabitatMap map) async {
       HabitatAssets.beard(style, 'south'),
       HabitatAssets.beard(style, 'east'),
     ],
+    for (final p in map.props)
+      if (p.assetPath != HabitatPropCatalog.proceduralAsset) p.assetPath,
   };
 
   for (final path in required) {

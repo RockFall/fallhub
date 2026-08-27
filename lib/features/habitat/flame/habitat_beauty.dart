@@ -3,6 +3,7 @@ import 'dart:ui';
 
 import 'habitat_map.dart';
 import 'habitat_prop_catalog.dart';
+import 'furniture/furniture.dart';
 
 /// Per-cell cosmetic beauty field (V9.8). Walls block contribution.
 abstract final class HabitatBeautyField {
@@ -10,22 +11,21 @@ abstract final class HabitatBeautyField {
   static const int radius = 3;
 
   /// Score contribution of a prop kind at its origin (before falloff).
-  static int emitForKind(String kind) => switch (kind) {
-        HabitatPropKinds.plant => 22,
-        HabitatPropKinds.painting => 26,
-        HabitatPropKinds.vase => 14,
-        HabitatPropKinds.rug => 12,
-        HabitatPropKinds.bed => 8,
-        HabitatPropKinds.table => 6,
-        HabitatPropKinds.chair => 4,
-        HabitatPropKinds.lamp => 7,
-        HabitatPropKinds.boardgame => 10,
-        HabitatPropKinds.tv => 8,
-        HabitatPropKinds.instrument => 12,
-        HabitatPropKinds.heater => 3,
-        HabitatPropKinds.cooler => 3,
-        _ => 3,
-      };
+  static int emitForKind(String kind) {
+    final fromRegistry = FurnitureInteractions.beauty(kind);
+    if (fromRegistry != 0) return fromRegistry.round().clamp(-5, 40);
+    return switch (kind) {
+      HabitatPropKinds.painting => 26,
+      HabitatPropKinds.vase => 14,
+      HabitatPropKinds.rug => 12,
+      HabitatPropKinds.boardgame => 10,
+      HabitatPropKinds.tv => 8,
+      HabitatPropKinds.instrument => 12,
+      HabitatPropKinds.heater => 3,
+      HabitatPropKinds.cooler => 3,
+      _ => 3,
+    };
+  }
 
   static int floorBase(HabitatFloor f) => switch (f) {
         HabitatFloor.carpet => 5,

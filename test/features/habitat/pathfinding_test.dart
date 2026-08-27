@@ -10,7 +10,7 @@ void main() {
   });
 
   test('findPath reaches open cell around furniture', () {
-    const from = (4, 8);
+    const from = (4, 5);
     expect(map.isWalkable(from.$1, from.$2), isTrue);
     final bed = map.props.firstWhere((p) => p.id == 'bed');
     final target = approachCell(map, bed, from);
@@ -24,7 +24,12 @@ void main() {
   });
 
   test('findPath empty when target blocked', () {
-    final path = findPath(map: map, from: (4, 8), to: (2, 2)); // bed cell
+    final bed = map.props.firstWhere((p) => p.id == 'bed');
+    final path = findPath(
+      map: map,
+      from: (4, 5),
+      to: bed.origin, // bed footprint cell
+    );
     expect(path, isEmpty);
   });
 }

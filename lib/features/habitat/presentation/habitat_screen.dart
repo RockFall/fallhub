@@ -13,11 +13,15 @@ import '../application/colony_roster.dart';
 import '../application/habitat_chrome_provider.dart';
 import '../application/habitat_map_store.dart';
 import '../application/habitat_zone_store.dart';
+import '../flame/furniture/furniture.dart';
 import '../flame/habitat_prop_catalog.dart';
 import '../flame/habitat_game.dart';
 import '../flame/habitat_locations.dart';
 import 'widgets/habitat_ambient_hud.dart';
+import 'widgets/habitat_clock_debug_bar.dart';
 import 'widgets/habitat_editor_bar.dart';
+import 'widgets/habitat_inspect_pane.dart';
+import 'widgets/habitat_sim_status_hud.dart';
 import 'widgets/habitat_location_bar.dart';
 import 'widgets/habitat_room_stats_strip.dart';
 import 'widgets/habitat_roster_bar.dart';
@@ -62,8 +66,8 @@ class _HabitatScreenState extends ConsumerState<HabitatScreen> {
     _presenceTick = Timer.periodic(const Duration(milliseconds: 400), (_) {
       if (!mounted || !_game.sceneReady) return;
       _publishChrome();
-      // Refresh HUD job status while a pawn is selected.
-      if (_selection is HabitatPawnSelection) setState(() {});
+      // Keep ambient HUD / clock debug / STATE pane fresh (M2+).
+      setState(() {});
     });
   }
 
@@ -258,12 +262,28 @@ class _HabitatScreenState extends ConsumerState<HabitatScreen> {
             },
           ),
         );
-        if (prop.kind == HabitatPropKinds.instrument) {
+        items.add(
+          ColonyFloatMenuItem(
+            label: 'Girar',
+            icon: Icons.rotate_right,
+            onSelected: () {
+              _game.rotateProp(prop);
+              _refresh();
+            },
+          ),
+        );
+        if (FurnitureInteractions.isLight(prop.kind) ||
+            prop.kind == HabitatPropKinds.tv) {
           items.add(
             ColonyFloatMenuItem(
-              label: AppStrings.musicAtlasFromHabitat,
-              icon: Icons.album_outlined,
-              onSelected: () => context.go('/research/music-atlas'),
+              label: prop.poweredOn ? 'Desligar' : 'Ligar',
+              icon: prop.poweredOn
+                  ? Icons.lightbulb
+                  : Icons.lightbulb_outline,
+              onSelected: () {
+                _game.togglePropPower(prop);
+                _refresh();
+              },
             ),
           );
         }
@@ -631,6 +651,20 @@ class _HabitatScreenState extends ConsumerState<HabitatScreen> {
                   ),
                 ),
                 HabitatAmbientHud(game: _game, selection: _selection),
+                HabitatSimStatusHud(game: _game),
+                if (_selection case HabitatPawnSelection(:final pawn))
+                  HabitatStateInspectPane(game: _game, pawn: pawn),
+                Positioned(
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  child: HabitatClockDebugBar(
+                    game: _game,
+                    onChanged: () {
+                      if (mounted) setState(() {});
+                    },
+                  ),
+                ),
               ],
             ],
           ),

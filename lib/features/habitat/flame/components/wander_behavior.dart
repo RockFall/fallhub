@@ -28,6 +28,9 @@ class WanderBehavior {
   /// Restrict wander targets (V9.13).
   Set<(int, int)>? allowedZone;
 
+  /// Condition presentation speed scale (M7).
+  double speedScale = 1;
+
   void pause() {
     _paused = true;
     _path.clear();
@@ -40,11 +43,18 @@ class WanderBehavior {
     _phase = _WanderPhase.idle;
   }
 
+  /// Next / remaining wander steps include the doorway.
+  bool willTraverseDoor((int, int) doorCell) {
+    if (_phase != _WanderPhase.walking) return false;
+    return _path.contains(doorCell);
+  }
+
   void update(double dt) {
     if (_paused) return;
+    final scaled = dt * speedScale.clamp(0.7, 1.2);
     switch (_phase) {
       case _WanderPhase.idle:
-        _idleLeft -= dt;
+        _idleLeft -= scaled;
         if (_idleLeft <= 0) _beginWalk();
       case _WanderPhase.walking:
         if (pawn.isMoving) return;
@@ -56,6 +66,12 @@ class WanderBehavior {
         final dx = next.$1 - pawn.cellX;
         final dy = next.$2 - pawn.cellY;
         if (!pawn.tryStep(dx, dy)) {
+          // Waiting for a sliding door — keep the step and hold the door open.
+          if (map.doorBlocksStep(next.$1, next.$2)) {
+            map.door.requestOpen();
+            _path.insert(0, next);
+            return;
+          }
           // Blocked mid-path — replan or idle.
           _enterIdle();
         }

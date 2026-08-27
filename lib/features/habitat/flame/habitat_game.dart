@@ -7,6 +7,23 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/painting.dart';
 
 import '../application/colony_roster.dart';
+import '../simulation/embodied/embodied.dart';
+import '../simulation/identity/identity.dart';
+import '../simulation/identity/pawn_identity.dart';
+import '../simulation/microbehavior/microbehavior.dart';
+import '../simulation/mirror/mirror.dart';
+import '../simulation/presence/habitat_appointment.dart';
+import '../simulation/presence/planned_activity.dart';
+import '../simulation/presence/remote_call.dart';
+import '../simulation/time/time.dart';
+import '../simulation/world/habitat_commands.dart';
+import '../simulation/world/perceived_comfort.dart';
+import '../simulation/world/room_detector.dart';
+import '../simulation/content/habitat_custom_content.dart';
+import '../simulation/content/habitat_devices.dart';
+import '../simulation/content/habitat_inventory.dart';
+import '../simulation/presence/habitat_transit.dart';
+import '../simulation/world/scene_preset.dart';
 import '../../../app/localization/app_strings.dart';
 import 'components/beauty_overlay_component.dart';
 import 'components/day_night_overlay.dart';
@@ -25,6 +42,7 @@ import 'habitat_locations.dart';
 import 'habitat_map.dart';
 import 'habitat_presence.dart';
 import 'habitat_prop_catalog.dart';
+import 'furniture/furniture.dart';
 import 'habitat_room_stats.dart';
 import 'habitat_social.dart';
 import 'habitat_sprites.dart';
@@ -86,6 +104,7 @@ class HabitatGame extends FlameGame
             ColonyRosterStore.seedDefaults(playerLook: appearance) {
     _maps[this.locationId] = this.map;
     editor = HabitatEditor(this.map);
+    commands = HabitatCommandStack(editor);
     social = HabitatSocialDirector(rng: _rng);
   }
 
@@ -101,6 +120,7 @@ class HabitatGame extends FlameGame
   final List<ColonyMember> initialRoster;
   final math.Random _rng = math.Random();
   late final HabitatEditor editor;
+  late final HabitatCommandStack commands;
 
   GridMapComponent? grid;
 
@@ -127,6 +147,18 @@ class HabitatGame extends FlameGame
   bool followFocused = false;
 
   final HabitatPresence presence = HabitatPresence();
+  final HabitatClockBundle clocks = HabitatClockBundle();
+  final HabitatEpisodeLedger episodes = HabitatEpisodeLedger();
+  final PawnEmbodiedStore embodied = PawnEmbodiedStore();
+  late final EmbodiedRuntime embodiedRuntime = EmbodiedRuntime(
+    store: embodied,
+    episodes: episodes,
+  );
+
+  /// When true, shows clock debug strip (M2).
+  bool showClockDebug = false;
+
+  double _conditionMoteTimer = 0;
   final List<HabitatBubble> bubbles = [];
   double _idleBubbleTimer = 0;
 
@@ -139,8 +171,29 @@ class HabitatGame extends FlameGame
 
   /// Per-cell darkness + temperature (V9.11 / V9.12).
   List<double> darknessField = const [];
+
+  /// Extra ambient darkness from ScenePreset (M30 visual).
+  double sceneAmbientBias = 0;
+
+  /// When false, lamps do not punch darkness (preset sleep/cinema).
+  bool lampsEnabled = true;
+
+  /// TV screen glow when scene/device says on.
+  bool tvScreenOn = false;
   List<double> climateField = const [];
   double? outdoorTemperatureC;
+
+  /// Indoor average °C as a mirror signal (MD 08 M0) — always `simulated`.
+  MirrorSignal<double>? indoorTemperatureSignal;
+
+  /// Optional debug/manual override for indoor temperature (M1).
+  HabitatStateOverride<double>? indoorTemperatureOverride;
+
+  /// Last resolution of indoor temperature (M1).
+  EffectiveValue<double>? indoorTemperatureEffective;
+
+  final EffectiveStateResolver<double> _indoorTempResolver =
+      EffectiveStateResolver<double>();
 
   /// Session clock for joy cooldowns (V9.10).
   double sessionTime = 0;
@@ -154,12 +207,45 @@ class HabitatGame extends FlameGame
 
   late final HabitatSocialDirector social;
 
+  /// Block B shared navigation boards.
+  final PropOccupancyBoard occupancy = PropOccupancyBoard();
+  final DoorReservationBoard doorReservations = DoorReservationBoard();
+  final StationQueueBoard stationQueues = StationQueueBoard();
+
+  /// Block C object logic state (not sprite-owned).
+  final ObjectStateBoard objectState = ObjectStateBoard();
+  final Map<String, int> itemUsageByPawn = {};
+
+  /// Blocks D–K refinement boards.
+  final Map<String, double> lastGreetingAt = {};
+  final Map<String, double> lastAckAt = {};
+  final Map<String, double> lastCallbackAt = {};
+  final Map<String, double> lastBackchannelAt = {};
+  ConversationGroup? activeConversationGroup;
+  SharedSilenceSession? sharedSilence;
+  final QuietnessController quietness = QuietnessController();
+  final ForeshadowingBoard foreshadow = ForeshadowingBoard();
+  final CausalityChainDebug causality = CausalityChainDebug();
+  final AntiLoopDetector antiLoop = AntiLoopDetector();
+  final CooldownFamily bubbleCooldown = CooldownFamily(
+    id: 'bubble',
+    baseSeconds: 8,
+  );
+  final CameraFocusController cameraFocus = CameraFocusController();
+  final ObserverCinematicController observer = ObserverCinematicController();
+  final BubblePacingState bubblePacing = BubblePacingState();
+  final RecentlyUsedCatalog editorRecentlyUsed = RecentlyUsedCatalog();
+  final EditorHistoryPane editorHistory = EditorHistoryPane();
+  final EditorClipboard editorClipboard = EditorClipboard();
+  DebugHudPreset debugHudPreset = DebugHudPreset.minimal;
+  PetEnergyPacing? petEnergy;
+  EventFocusHint? eventFocusHint;
+
   double _headShakeT = 0;
   String? _socialPauseA;
   String? _socialPauseB;
   SocialEncounterPhase? _lastSocialPhase;
 
-  double _idleAutonomyTimer = 0;
   /// Seconds standing in true darkness before a thought may fire.
   final Map<LivingPawnComponent, double> _darkIdleTimer = {};
   /// Earliest [sessionTime] each pawn may complain about darkness again.
@@ -181,6 +267,7 @@ class HabitatGame extends FlameGame
   Future<void> onLoad() async {
     images.prefix = '';
     try {
+      presence.attachSceneClock(clocks.scene);
       await loadHabitatAssets(images, map);
       sprites = HabitatSprites.fromCache(images, map);
 
@@ -234,6 +321,17 @@ class HabitatGame extends FlameGame
     HabitatBubbleKind kind = HabitatBubbleKind.speech,
     String? stackGroupId,
   }) {
+    // R109 bubble pacing + R116 habituation cooldown.
+    if (kind == HabitatBubbleKind.speech) {
+      if (!bubblePacing.maySpeak(sessionTime)) return;
+      if (!bubbleCooldown.ready(target.memberId, sessionTime)) return;
+      bubblePacing.markSpoken(sessionTime);
+      bubbleCooldown.mark(target.memberId, sessionTime);
+    }
+    // R118 anti-loop on repeated identical speech.
+    if (antiLoop.observe(target.memberId, 'bubble:$text')) {
+      return;
+    }
     // Habbo-style stack: newest at the chin, older rows rise and fade.
     // Active social encounter → both speakers share one column.
     var group = stackGroupId;
@@ -399,7 +497,53 @@ class HabitatGame extends FlameGame
       tileSize: tileSize,
       phase: presence.phase,
       locationId: locationId,
+      ambientBias: sceneAmbientBias,
+      lampsEnabled: lampsEnabled,
     );
+    if (tvScreenOn) {
+      _paintTvGlow(canvas);
+    }
+  }
+
+  void _paintTvGlow(Canvas canvas) {
+    for (final p in map.props) {
+      if (p.kind != HabitatPropKinds.tv) continue;
+      final (ox, oy) = p.origin;
+      final cx = (ox + 0.5) * tileSize;
+      final cy = (oy + 0.35) * tileSize;
+      final r = tileSize * 2.2;
+      final shader = RadialGradient(
+        colors: const [
+          Color(0xAA4FC3F7),
+          Color(0x554FC3F7),
+          Color(0x004FC3F7),
+        ],
+      ).createShader(Rect.fromCircle(center: Offset(cx, cy), radius: r));
+      canvas.drawCircle(
+        Offset(cx, cy),
+        r,
+        Paint()
+          ..shader = shader
+          ..blendMode = BlendMode.plus,
+      );
+    }
+  }
+
+  void _tickDoor(double dt) {
+    final door = map.door;
+    // Occupants and adjacent pawns keep the door held open (RimWorld-ish).
+    for (final p in pawns) {
+      final dist = (p.cellX - door.cell.$1).abs() + (p.cellY - door.cell.$2).abs();
+      if (dist == 0) {
+        door.requestOpen();
+      } else if (dist == 1) {
+        // Approaching: next queued step is the door, or path goes through it.
+        if (p.jobs.willTraverseDoor(door.cell)) {
+          door.requestOpen();
+        }
+      }
+    }
+    door.tick(dt);
   }
 
   void _refreshAtmosphere() {
@@ -407,6 +551,8 @@ class HabitatGame extends FlameGame
       map,
       phase: presence.phase,
       locationId: locationId,
+      ambientBias: sceneAmbientBias,
+      lampsEnabled: lampsEnabled,
     );
     climateField = HabitatClimateField.compute(
       map,
@@ -414,6 +560,81 @@ class HabitatGame extends FlameGame
       phase: presence.phase,
       outdoorC: outdoorTemperatureC,
     );
+    _publishIndoorTemperatureSignal();
+  }
+
+  void _publishIndoorTemperatureSignal() {
+    final c = HabitatClimateField.indoorAverage(
+      map,
+      climateField,
+      locationId: locationId,
+    );
+    final now = clocks.real.now().toUtc();
+    final outdoor = outdoorTemperatureC;
+    // Honest provenance: outdoor from live weather → derived indoor.
+    final MirrorSignalSource source;
+    final List<String> chain;
+    final double confidence;
+    if (outdoor != null) {
+      source = MirrorSignalSource.systemDerived;
+      chain = const [
+        'outdoor_temperature',
+        'climate_field',
+        'indoor_average',
+      ];
+      confidence = 0.85;
+    } else {
+      source = MirrorSignalSource.simulated;
+      chain = const ['climate_field_simulated'];
+      confidence = 1;
+    }
+    indoorTemperatureSignal = MirrorSignal<double>(
+      id: HabitatMirrorIds.indoorTemperatureC,
+      value: c,
+      source: source,
+      observedAt: now,
+      confidence: confidence,
+      transformationChain: chain,
+      sourceRef: outdoor != null ? 'outdoor:$outdoor' : null,
+    );
+    _resolveIndoorTemperature(now: now);
+  }
+
+  void _resolveIndoorTemperature({DateTime? now}) {
+    final at = now ?? clocks.real.now().toUtc();
+    final signal = indoorTemperatureSignal;
+    if (signal == null) {
+      indoorTemperatureEffective = null;
+      return;
+    }
+    indoorTemperatureEffective = _indoorTempResolver.resolve(
+      signals: [signal],
+      override: indoorTemperatureOverride,
+      now: at,
+      fallback: signal.value,
+    );
+  }
+
+  /// Apply a temporary manual indoor temperature override (debug / M1 demo).
+  void setIndoorTemperatureOverride(
+    double celsius, {
+    required String reason,
+    Duration ttl = const Duration(minutes: 5),
+  }) {
+    final now = clocks.real.now().toUtc();
+    indoorTemperatureOverride = HabitatStateOverride<double>(
+      dimensionId: HabitatMirrorIds.indoorTemperatureC,
+      value: celsius,
+      startedAt: now,
+      expiresAt: now.add(ttl),
+      reason: reason,
+    );
+    _resolveIndoorTemperature(now: now);
+  }
+
+  void clearIndoorTemperatureOverride() {
+    indoorTemperatureOverride = null;
+    _resolveIndoorTemperature();
   }
 
   void setOutdoorTemperature(double? c) {
@@ -421,7 +642,10 @@ class HabitatGame extends FlameGame
     _refreshAtmosphere();
   }
 
-  double get indoorTemperatureC => HabitatClimateField.indoorAverage(
+  double get indoorTemperatureC =>
+      indoorTemperatureEffective?.value ??
+      indoorTemperatureSignal?.value ??
+      HabitatClimateField.indoorAverage(
         map,
         climateField.isEmpty
             ? HabitatClimateField.compute(
@@ -434,9 +658,1204 @@ class HabitatGame extends FlameGame
         locationId: locationId,
       );
 
+  /// Debug provenance / resolution line for indoor temperature (M0–M1).
+  String? get indoorTemperatureDebugLine {
+    final eff = indoorTemperatureEffective;
+    if (eff != null) {
+      final conflict = eff.hasConflict ? ' conflict' : '';
+      return '${MirrorProvenance.debugLine(eff.winningSignal)} | '
+          '${eff.explanation}$conflict';
+    }
+    final s = indoorTemperatureSignal;
+    if (s == null) return null;
+    return MirrorProvenance.debugLine(s);
+  }
+
+  /// Debug: simulation/scene speed (1 / 5 / 30).
+  void setDebugSimSpeed(double speed) {
+    clocks.setDebugSpeed(speed);
+    showClockDebug = true;
+  }
+
+  void debugSkipOneHour() {
+    clocks.skipOneHour();
+    presence.syncFromClock();
+    _refreshAtmosphere();
+    showClockDebug = true;
+  }
+
+  void debugSetSceneHour(double hour) {
+    clocks.scene.setSceneHour(hour);
+    presence.syncFromClock();
+    _refreshAtmosphere();
+    showClockDebug = true;
+  }
+
+  String get clockDebugLine => clocks.debugSummary();
+
+  void _tickEmbodiedSystems(double dt) {
+    final sim = clocks.simulation.elapsedSeconds;
+    final hour = presence.phase * 24;
+    final now = clocks.real.now().toUtc();
+    final comfortStress = HabitatClimateField.comfortDelta(indoorTemperatureC)
+        .abs()
+        .clamp(0.0, 8.0) /
+        8.0;
+
+    for (final p in pawns) {
+      final jobSleep = p.jobs.kind == HabitatJobKind.sleep;
+      final sedentary = p.jobs.kind == HabitatJobKind.sit ||
+          p.jobs.kind == HabitatJobKind.goToTable ||
+          p.jobs.kind == HabitatJobKind.recreate;
+      final state = embodiedRuntime.tickPawn(
+        pawnId: p.memberId,
+        simSeconds: sim,
+        sceneHour: hour,
+        observedAt: now,
+        isMoving: p.isMoving,
+        isSedentary: sedentary && !p.isMoving,
+        jobIsSleep: jobSleep,
+        comfortStress: comfortStress,
+        socialIntensity: social.active != null ? 0.35 : 0,
+        activityPhysicalLoad: p.jobs.kind == HabitatJobKind.clean ? 0.25 : 0,
+        darkness: darknessField.isEmpty
+            ? 0.3
+            : darknessField[
+                (p.cellY * map.width + p.cellX).clamp(0, darknessField.length - 1)],
+      );
+
+      final loc =
+          embodiedRuntime.transit.locationState[p.memberId];
+      embodiedRuntime.resolveLoadout(
+        pawnId: p.memberId,
+        jobIsSleep: jobSleep ||
+            state.sleepPhase == SleepPhase.sleeping ||
+            state.sleepPhase == SleepPhase.nap,
+        isOutdoor: HabitatLocations.isOutdoor(locationId),
+        inTransit: loc == PawnPresenceLocation.inTransit ||
+            loc == PawnPresenceLocation.away,
+        applyVisual: (top, hat) {
+          p.appearance.apparelTop = top;
+          p.appearance.hat = hat;
+          p.appearance.loadoutId =
+              embodiedRuntime.loadouts.currentByPawn[p.memberId] ??
+                  p.appearance.loadoutId;
+        },
+      );
+
+      embodiedRuntime.travel.tickAdaptation(p.memberId, dtSim: dt);
+
+      // R5 + M7: locomotor style from embodied + job context.
+      final presentation =
+          ConditionEngine.combinedPresentation(state.conditions);
+      final urgency = p.drafted && p.jobs.kind == HabitatJobKind.goTo
+          ? 0.85
+          : (state.need(NeedKind.sleep)?.pressure ?? 0) > 0.75
+              ? 0.35
+              : 0.0;
+      final relaxed = state.conditions.any((c) => c.kind == PawnConditionKind.relaxed)
+          ? 0.45
+          : 0.0;
+      p.micro.profile ??= BehaviorProfile.fromSeed(p.memberId);
+      p.micro.updateLocomotor(
+        LocomotorStyleInput(
+          fatigue: state.movement.physicalFatigue,
+          sleepiness: state.circadian.sleepPressure,
+          urgency: urgency,
+          relaxed: relaxed,
+          carryingItem: p.heldLabel != null && p.heldLabel!.isNotEmpty,
+          socialApproach: social.active != null &&
+              (social.active!.aId == p.memberId ||
+                  social.active!.bId == p.memberId) &&
+              social.active!.phase == SocialEncounterPhase.approach,
+          conditionWalkMultiplier: presentation.walkSpeedMultiplier,
+        ),
+      );
+      p.jobs.wanderSpeedScale =
+          p.micro.locomotor.speedMultiplier * p.micro.locomotor.cadenceMultiplier;
+
+      p.micro.profile ??= BehaviorProfile.fromSeed(p.memberId);
+
+      // R9: per-pawn need reevaluation (no global metronome).
+      if (p.micro.desync.consumeNeedReeval(
+        sim,
+        period: 4.5,
+      )) {
+        _runEmbodiedAutonomyFor(p);
+      }
+    }
+
+    _conditionMoteTimer += dt;
+    if (_conditionMoteTimer >= 8) {
+      _conditionMoteTimer = 0;
+      _maybeConditionBubble();
+    }
+
+    _tickPresenceAndAppointments();
+    _tickAmbientReactions(sim);
+  }
+
+  void _runEmbodiedAutonomyFor(LivingPawnComponent p) {
+    if (p.drafted) return;
+    if (p.jobs.kind != HabitatJobKind.wander) return;
+    final suggestion = embodiedRuntime.suggestAffordance(
+      p.memberId,
+      simSeconds: clocks.simulation.elapsedSeconds,
+    );
+    if (suggestion == null) return;
+    final job = switch (suggestion) {
+      HabitatAffordances.sleep => HabitatJobKind.sleep,
+      HabitatAffordances.sit || HabitatAffordances.rest => HabitatJobKind.sit,
+      HabitatAffordances.goToTable => HabitatJobKind.goToTable,
+      HabitatAffordances.recreate ||
+      HabitatAffordances.listenMusic ||
+      HabitatAffordances.watchTv ||
+      HabitatAffordances.creativeShort =>
+        HabitatJobKind.recreate,
+      HabitatAffordances.clean => HabitatJobKind.clean,
+      HabitatAffordances.stretch ||
+      HabitatAffordances.terraceWalk ||
+      HabitatAffordances.wander =>
+        HabitatJobKind.wander,
+      _ => null,
+    };
+    if (job == null || job == HabitatJobKind.wander) return;
+    final state = embodied[p.memberId];
+    if (state == null) return;
+    final score = embodiedRuntime.scorer.score(
+      affordanceId: suggestion,
+      state: state,
+    );
+    if (score < 0.55) return;
+    p.jobs.order(job);
+    if (suggestion == HabitatAffordances.sleep &&
+        state.circadian.sleepPressure > 0.6) {
+      pushBubble(p, 'Hora de deitar…', kind: HabitatBubbleKind.thought);
+    }
+  }
+
+  String? _lastAmbientKey; // reserved for weather foreshadow hooks
+
+  /// R2 + R9: staggered ambient reactions (e.g. darkness / comfort).
+  void _tickAmbientReactions(double sim) {
+    for (final p in pawns) {
+      for (final r in p.micro.reactions.drainReady(sim)) {
+        if (r.eventClass != ReactionEventClass.ambientEvent) continue;
+        final text = r.payload as String?;
+        if (text != null) {
+          pushBubble(p, text, kind: HabitatBubbleKind.thought);
+          final door = map.door.cell;
+          p.micro.attention.lookAt(
+            reason: AttentionReason.interestingEvent,
+            now: sim,
+            cellX: door.$1,
+            cellY: door.$2,
+            holdOverride: 0.9,
+          );
+        }
+      }
+    }
+
+    for (final pawn in pawns) {
+      if (pawn.drafted ||
+          pawn.isMoving ||
+          pawn.jobs.kind != HabitatJobKind.wander) {
+        continue;
+      }
+      if (!pawn.micro.desync.consumeAmbientProbe(sim, period: 5)) continue;
+      final d = HabitatLightField.at(
+        darknessField,
+        map,
+        pawn.cellX,
+        pawn.cellY,
+      );
+      if (d < HabitatLightField.tooDarkThreshold) continue;
+      final readyAt = _darkCommentReadyAt[pawn] ?? 0;
+      if (sessionTime < readyAt) continue;
+      final delay = pawn.micro.reactionDelay(
+        ReactionLatencyContext(
+          eventClass: ReactionEventClass.ambientEvent,
+          pawnId: pawn.memberId,
+          salience: (d - HabitatLightField.tooDarkThreshold).clamp(0.0, 1.0),
+          busyCommitment: 0,
+          hasAttentionFocus: pawn.micro.attention.current != null,
+          profile: pawn.micro.profile,
+          salt: sim.floor(),
+        ),
+      );
+      pawn.micro.reactions.schedule(
+        PendingReaction(
+          id: 'ambient.dark',
+          eventClass: ReactionEventClass.ambientEvent,
+          firesAt: sim + delay,
+          payload: HabitatBubbleLines.forTooDark(_rng),
+        ),
+      );
+      _darkCommentReadyAt[pawn] =
+          sessionTime + 14 + pawn.micro.offsets.ambientReactionProbe;
+    }
+    // Touch reserved key so analyzer keeps the foreshadow hook visible.
+    _lastAmbientKey ??= darknessField.isEmpty ? null : 'dark';
+  }
+
+  void _tickPresenceAndAppointments() {
+    embodiedRuntime.activeMapLocationId = locationId;
+    final sim = clocks.simulation.elapsedSeconds;
+    embodiedRuntime.calls.tick(sim);
+
+    final transitEvents = embodiedRuntime.transit.tick(sim);
+    for (final ev in transitEvents) {
+      if (ev.kind == 'left') {
+        final p = pawnByMemberId(ev.pawnId);
+        if (p != null) {
+          pushBubble(p, 'Saindo…', kind: HabitatBubbleKind.thought);
+          // Soft despawn while in transit / away from this site.
+          if (p.parent != null) p.removeFromParent();
+        }
+      } else if (ev.kind == 'arrived') {
+        final p = pawnByMemberId(ev.pawnId);
+        if (p != null) {
+          if (p.parent == null) world.add(p);
+          final spawn = HabitatLocations.spawn(locationId);
+          p.teleportToCell(spawn);
+          pushBubble(p, 'Cheguei.', kind: HabitatBubbleKind.speech);
+        }
+      } else if (ev.kind == 'away') {
+        final p = pawnByMemberId(ev.pawnId);
+        if (p != null && p.parent != null) p.removeFromParent();
+        final host = focusedPawn ?? (pawns.isEmpty ? null : pawns.first);
+        // Home may stay empty while primary is away.
+        if (host != null && host.memberId != ev.pawnId) {
+          pushBubble(
+            host,
+            'Casa mais quieta…',
+            kind: HabitatBubbleKind.thought,
+          );
+        }
+      }
+    }
+
+    final events = embodiedRuntime.visitors.tick(
+      simSeconds: sim,
+      siteId: locationId,
+    );
+    for (final id in events.spawnAtEntrance) {
+      _spawnVisitorPawn(id);
+      final host = focusedPawn ?? (pawns.isEmpty ? null : pawns.first);
+      if (host != null) {
+        pushBubble(host, 'Alguém chegou!', kind: HabitatBubbleKind.thought);
+      }
+      final visitor = pawnByMemberId(id);
+      if (visitor != null && events.greetOpportunity.contains(id)) {
+        pushBubble(visitor, 'Oi!', kind: HabitatBubbleKind.speech);
+      }
+    }
+    for (final id in events.farewellOpportunity) {
+      final visitor = pawnByMemberId(id);
+      final goodbye = GoodbyeGrammar.decide(
+        trigger: GoodbyeTrigger.visitorLeaving,
+        interrupted: visitor?.drafted == true,
+      );
+      if (goodbye.line == null) continue;
+      if (visitor != null) {
+        final host = focusedPawn;
+        if (goodbye.facePartner && host != null) {
+          visitor.facing = facingFromDelta(
+            host.cellX - visitor.cellX,
+            host.cellY - visitor.cellY,
+          );
+        }
+        pushBubble(visitor, goodbye.line!, kind: HabitatBubbleKind.speech);
+      } else {
+        final host = focusedPawn ?? (pawns.isEmpty ? null : pawns.first);
+        if (host != null) {
+          pushBubble(
+            host,
+            goodbye.line!,
+            kind: HabitatBubbleKind.speech,
+          );
+        }
+      }
+    }
+    for (final id in events.despawn) {
+      _despawnVisitorPawn(id);
+    }
+
+    final intents = embodiedRuntime.appointments.tick(sim);
+    for (final intent in intents) {
+      switch (intent.kind) {
+        case AppointmentIntentKind.prepare:
+          for (final id in intent.participantIds) {
+            final p = pawnByMemberId(id);
+            if (p != null && !p.drafted) {
+              pushBubble(
+                p,
+                'Preparar para o encontro…',
+                kind: HabitatBubbleKind.thought,
+              );
+            }
+          }
+        case AppointmentIntentKind.start:
+          HabitatAppointment? appt;
+          for (final a in embodiedRuntime.appointments.appointments) {
+            if (a.appointment.id == intent.appointmentId) {
+              appt = a.appointment;
+              break;
+            }
+          }
+          if (appt != null) {
+            final planned = embodiedRuntime.planned.attach(
+              appt,
+              isAvailable: (aff) => HabitatAffordances.all.contains(aff),
+            );
+            embodiedRuntime.planned.advancePhase(
+              appt.id,
+              PlannedActivityPhase.primary,
+            );
+            for (final id in intent.participantIds) {
+              final p = pawnByMemberId(id);
+              if (p == null || p.drafted) continue;
+              final job = _jobForAffordance(
+                planned.resolvedAffordance ?? intent.activityKind ?? 'sit',
+              );
+              if (job != null) p.jobs.order(job);
+            }
+          } else {
+            for (final id in intent.participantIds) {
+              final p = pawnByMemberId(id);
+              if (p == null || p.drafted) continue;
+              if (intent.activityKind == 'dinner' ||
+                  intent.activityKind == 'hangout') {
+                p.jobs.order(HabitatJobKind.goToTable);
+              }
+            }
+          }
+        case AppointmentIntentKind.complete:
+          embodiedRuntime.planned.complete(intent.appointmentId);
+      }
+    }
+
+    // Remote call bubble (M20).
+    final call = embodiedRuntime.calls.active;
+    if (call != null && call.phase == RemoteCallPhase.active) {
+      final local = pawnByMemberId(call.localPawnId);
+      if (local != null && !local.drafted && sim.toInt() % 25 == 0) {
+        pushBubble(
+          local,
+          'Em chamada com ${call.remote.displayName}…',
+          kind: HabitatBubbleKind.speech,
+        );
+      }
+    }
+  }
+
+  HabitatJobKind? _jobForAffordance(String affordance) {
+    return switch (affordance) {
+      HabitatAffordances.sleep => HabitatJobKind.sleep,
+      HabitatAffordances.sit => HabitatJobKind.sit,
+      HabitatAffordances.goToTable => HabitatJobKind.goToTable,
+      HabitatAffordances.wander => HabitatJobKind.wander,
+      HabitatAffordances.recreate => HabitatJobKind.recreate,
+      HabitatAffordances.listenMusic => HabitatJobKind.sit,
+      HabitatAffordances.watchTv => HabitatJobKind.sit,
+      HabitatAffordances.socialChat => HabitatJobKind.wander,
+      HabitatAffordances.rest => HabitatJobKind.sit,
+      HabitatAffordances.clean => HabitatJobKind.clean,
+      _ => null,
+    };
+  }
+
+  void _spawnVisitorPawn(String visitorId) {
+    if (sprites == null) return;
+    if (pawnByMemberId(visitorId) != null) return;
+    embodiedRuntime.ensureIdentity(
+      visitorId,
+      kind: PawnIdentityKind.personProxy,
+    );
+    final spawn = HabitatLocations.spawn(locationId);
+    // Entrance-adjacent: stay near spawn, never mid-room teleport.
+    final cell = _firstWalkableNear(spawn.$1, spawn.$2);
+    final pawnComp = LivingPawnComponent(
+      map: map,
+      tileSize: tileSize,
+      sprites: sprites!,
+      startCell: cell,
+      memberId: visitorId,
+      displayName: 'Visitante',
+      appearance: PawnAppearance(
+        name: 'Visitante',
+        hair: const Color(0xFF5C4033),
+        apparelTint: const Color(0xFF3D5A80),
+      ),
+    );
+    _wirePawnJobs(pawnComp);
+    embodied.ensure(
+      visitorId,
+      presence: EmbodiedPresenceContext(
+        roomRole: locationId,
+        isHome: false,
+      ),
+    );
+    pawns.add(pawnComp);
+    world.add(pawnComp);
+  }
+
+  void _despawnVisitorPawn(String visitorId) {
+    final p = pawnByMemberId(visitorId);
+    if (p == null) return;
+    bubbles.removeWhere((b) => b.pawn == p);
+    embodied.remove(visitorId);
+    p.removeFromParent();
+    pawns.remove(p);
+  }
+
+  /// Debug: schedule a demo dinner appointment (M19).
+  void debugScheduleDinnerAppointment() {
+    final ids = {for (final p in pawns) p.memberId};
+    if (ids.isEmpty) return;
+    embodiedRuntime.appointments.scheduleDemoDinner(
+      participants: ids,
+      nowSim: clocks.simulation.elapsedSeconds,
+      delaySeconds: 45,
+      durationSeconds: 90,
+      siteId: locationId,
+    );
+    showClockDebug = true;
+    final host = focusedPawn ?? pawns.first;
+    pushBubble(
+      host,
+      'Jantar marcado (demo).',
+      kind: HabitatBubbleKind.thought,
+    );
+  }
+
+  /// Debug: schedule a visitor arrival (M18).
+  void debugScheduleVisitor() {
+    const visitorId = 'visitor-demo';
+    final sim = clocks.simulation.elapsedSeconds;
+    embodiedRuntime.visitors.scheduleVisit(
+      pawnId: visitorId,
+      arriveAtSim: sim + 20,
+      leaveAtSim: sim + 120,
+    );
+    embodiedRuntime.ensureIdentity(
+      visitorId,
+      kind: PawnIdentityKind.personProxy,
+    );
+    showClockDebug = true;
+  }
+
+  /// Debug: start a simulated voice call (M20).
+  void debugStartVoiceCall() {
+    final host = focusedPawn ?? (pawns.isEmpty ? null : pawns.first);
+    if (host == null) return;
+    final fit = embodiedRuntime.activeContext.callFit();
+    if (fit < 0.5) {
+      pushBubble(
+        host,
+        'Lugar ruim pra ligar…',
+        kind: HabitatBubbleKind.thought,
+      );
+    }
+    embodiedRuntime.calls.startVoiceCall(
+      localPawnId: host.memberId,
+      remotePawnId: 'remote-friend',
+      remoteName: 'Amigo',
+      nowSim: clocks.simulation.elapsedSeconds,
+    );
+    embodiedRuntime.interruptActivities(
+      host.memberId,
+      nowSim: clocks.simulation.elapsedSeconds,
+    );
+    embodiedRuntime.ensureIdentity(
+      'remote-friend',
+      kind: PawnIdentityKind.personProxy,
+    );
+    host.jobs.order(HabitatJobKind.sit);
+    showClockDebug = true;
+    pushBubble(host, 'Ligando…', kind: HabitatBubbleKind.thought);
+  }
+
+  /// Debug: end active call.
+  void debugEndVoiceCall() {
+    embodiedRuntime.calls.endActive(
+      clocks.simulation.elapsedSeconds,
+      interrupted: true,
+    );
+  }
+
+  /// Debug: leave home toward cafe (M23).
+  void debugBeginTransitToCafe() {
+    final host = focusedPawn ?? (pawns.isEmpty ? null : pawns.first);
+    if (host == null) return;
+    final origin =
+        embodiedRuntime.world.siteForMapLocation(locationId)?.id ??
+            'home_apartment';
+    embodiedRuntime.transit.beginTransit(
+      pawnId: host.memberId,
+      originSiteId: origin,
+      destinationSiteId: 'generic_cafe_01',
+      nowSim: clocks.simulation.elapsedSeconds,
+      durationSeconds: 40,
+    );
+    showClockDebug = true;
+    pushBubble(host, 'Vou ao café…', kind: HabitatBubbleKind.thought);
+  }
+
+  /// Objective + perceived comfort for inspect (M25).
+  PerceivedEnvironmentFit perceivedComfortFor(String pawnId) {
+    final s = roomStats;
+    final objective = ObjectiveRoomMetrics(
+      beauty: (s.beauty / 100).clamp(0.0, 1.0),
+      space: (s.space / 100).clamp(0.0, 1.0),
+      cleanliness: (s.cleanliness / 100).clamp(0.0, 1.0),
+      light: HabitatLocations.isOutdoor(locationId) ? 0.9 : 0.65,
+      temperatureComfort: (s.comfort / 100).clamp(0.0, 1.0),
+      quality: (s.wealth / 100).clamp(0.0, 1.0),
+    );
+    return embodiedRuntime.perceivedFit(
+      pawnId,
+      objective: objective,
+      isOutdoor: HabitatLocations.isOutdoor(locationId),
+    );
+  }
+
+  /// Debug: stamp a reading nook prefab near spawn (M28).
+  void debugStampPrefab() {
+    if (!editor.enabled) editor.enter();
+    final spawn = HabitatLocations.spawn(locationId);
+    commands.stampPrefab(
+      HabitatPrefabs.readingNook,
+      spawn.$1,
+      spawn.$2,
+      simSeconds: clocks.simulation.elapsedSeconds,
+    );
+    notifyMapVisualChanged();
+    refreshRoomStats();
+  }
+
+  /// Debug: auto-furnish by detected role (M29).
+  void debugAutoFurnish() {
+    final regions = HabitatRoomDetector.detect(map);
+    final role = regions.isEmpty ? 'generic' : regions.first.role.name;
+    editor.pushUndo();
+    final n = HabitatAutoFurnish.furnish(
+      map,
+      pickPrefab: HabitatAutoFurnish.prefabForRole,
+      roleHint: role,
+    );
+    commands.history.add(
+      HabitatEditorCommand(
+        id: 'autofurnish-$n',
+        label: 'autofurnish:$role ×$n',
+        atSimSeconds: clocks.simulation.elapsedSeconds,
+      ),
+    );
+    notifyMapVisualChanged();
+    refreshRoomStats();
+  }
+
+  /// Sync ScenePreset / env switches → visible light + TV (M30).
+  void applyEnvironmentVisuals() {
+    final env = embodiedRuntime.scenes.environment;
+    final lighting =
+        embodiedRuntime.scenes.active?.lightingPreset ?? 'normal';
+    sceneAmbientBias = switch (lighting) {
+      'cinema' => 0.55,
+      'night' => 0.45,
+      'dim' => 0.28,
+      'morning' => -0.04,
+      'bright' => -0.06,
+      _ => 0.0,
+    };
+    lampsEnabled = env[HabitatEnvSwitch.lampOn];
+    tvScreenOn = env[HabitatEnvSwitch.tvOn] ||
+        embodiedRuntime.devices.devices['tv']?.activeMode == 'watch';
+
+    for (final p in map.props) {
+      if (p.kind == HabitatPropKinds.tv) {
+        p.tint = tvScreenOn
+            ? const Color(0xFF81D4FA)
+            : StuffPalettes.natural;
+      }
+      if (p.kind == HabitatPropKinds.lamp) {
+        p.tint = lampsEnabled
+            ? StuffPalettes.natural
+            : const Color(0xFF3A3A3A);
+      }
+    }
+    _refreshAtmosphere();
+    notifyMapVisualChanged();
+  }
+
+  /// Human-readable sim status for HUD (always-on feedback).
+  String get simStatusLine {
+    final host = focusedPawn ?? (pawns.isEmpty ? null : pawns.first);
+    final preset = embodiedRuntime.scenes.activePresetId ?? '—';
+    final loadout = host == null
+        ? '—'
+        : (embodiedRuntime.loadouts.currentByPawn[host.memberId] ??
+            host.appearance.loadoutId);
+    final held = host == null
+        ? null
+        : embodiedRuntime.inventory.items.values
+            .where(
+              (it) =>
+                  it.location.kind == HabitatItemLocationKind.heldByPawn &&
+                  it.location.pawnId == host.memberId,
+            )
+            .map((it) => it.label)
+            .firstOrNull;
+    final focus = host == null
+        ? null
+        : embodiedRuntime.devices.activities.values
+            .where((a) => a.pawnId == host.memberId)
+            .where(
+              (a) =>
+                  a.phase == SustainedActivityPhase.active ||
+                  a.phase == SustainedActivityPhase.resumable,
+            )
+            .map((a) => '${a.kind}/${a.phase.name}')
+            .firstOrNull;
+    final loc = host == null
+        ? null
+        : embodiedRuntime.transit.locationState[host.memberId]?.name;
+    final parts = <String>[
+      'cena:$preset',
+      'roupa:$loadout',
+      if (held != null) 'mão:$held',
+      if (focus != null) 'foco:$focus',
+      if (loc != null && loc != 'atSite') 'loc:$loc',
+      if (tvScreenOn) 'TV:on',
+      if (!lampsEnabled) 'luz:off',
+    ];
+    return parts.join(' · ');
+  }
+
+  /// Debug: cycle scene presets (M30).
+  void debugCycleScenePreset() {
+    final presets = embodiedRuntime.scenes.presets;
+    if (presets.isEmpty) return;
+    final cur = embodiedRuntime.scenes.activePresetId;
+    var i = presets.indexWhere((p) => p.id == cur);
+    i = (i + 1) % presets.length;
+    embodiedRuntime.applyScenePreset(
+      presets[i].id,
+      nowSim: clocks.simulation.elapsedSeconds,
+    );
+    if (presets[i].id == 'movieNight') {
+      embodiedRuntime.devices.devices['tv']?.use(
+        mode: 'watch',
+        mediaId: 'film.demo',
+        userId: focusedPawn?.memberId,
+      );
+      embodiedRuntime.scenes.markAftermath('movie');
+    }
+    applyEnvironmentVisuals();
+    showClockDebug = true;
+    final host = focusedPawn ?? (pawns.isEmpty ? null : pawns.first);
+    if (host != null) {
+      pushBubble(
+        host,
+        'cena: ${presets[i].label}',
+        kind: HabitatBubbleKind.thought,
+      );
+    }
+  }
+
+  /// Debug: force sleep loadout (M31).
+  void debugApplySleepLoadout() {
+    final host = focusedPawn ?? (pawns.isEmpty ? null : pawns.first);
+    if (host == null) return;
+    final loadout = embodiedRuntime.loadouts.byId('sleep')!;
+    embodiedRuntime.loadouts.maybeApply(
+      pawnId: host.memberId,
+      loadout: loadout,
+      force: true,
+      applyVisual: (top, hat) {
+        // Visually distinct from day clothes (no top = clear "pijama").
+        host.appearance.apparelTop = null;
+        host.appearance.hat = null;
+        host.appearance.apparelTint = const Color(0xFF9FA8DA);
+        host.appearance.loadoutId = loadout.id;
+      },
+    );
+    host.jobs.order(HabitatJobKind.sleep);
+    embodiedRuntime.applyScenePreset(
+      'sleepMode',
+      nowSim: clocks.simulation.elapsedSeconds,
+    );
+    applyEnvironmentVisuals();
+    showClockDebug = true;
+    pushBubble(host, 'pijama + luz off', kind: HabitatBubbleKind.thought);
+  }
+
+  /// Debug: inventory — first tap holds book (visible); second puts in bag.
+  void debugInventoryPath() {
+    final host = focusedPawn ?? (pawns.isEmpty ? null : pawns.first);
+    if (host == null) return;
+    embodiedRuntime.inventory.seedDemo();
+    final inv = embodiedRuntime.inventory;
+    if (!inv.items.containsKey('mug.red')) {
+      inv.putNew(
+        HabitatItem(
+          id: 'mug.red',
+          label: 'Caneca vermelha',
+          tags: {'cup'},
+          location: const HabitatItemLocation(
+            kind: HabitatItemLocationKind.surfaceSlot,
+            containerId: 'table',
+            slotId: '1',
+          ),
+          preferredStorageId: 'wardrobe',
+        ),
+      );
+    }
+    const book = 'book.dune';
+    final item = inv.items[book];
+    final holding = item?.location.kind == HabitatItemLocationKind.heldByPawn &&
+        item?.location.pawnId == host.memberId;
+    final journal = ItemTransferJournal(inv);
+    if (holding) {
+      final txn = journal.begin(
+        op: ItemTransferOp.place,
+        itemId: book,
+        to: const HabitatItemLocation(
+          kind: HabitatItemLocationKind.storageSlot,
+          containerId: 'bag',
+          slotId: '0',
+        ),
+      );
+      if (txn != null) {
+        if (!journal.commit(txn)) journal.rollback(txn);
+      }
+      host.heldLabel = null;
+      objectState.ensure(book)
+        ..setState(ObjectLogicState.closed)
+        ..markUsed(sessionTime, traceKey: 'openPage');
+      pushBubble(host, 'guardou na bolsa', kind: HabitatBubbleKind.thought);
+    } else {
+      final txn = journal.begin(
+        op: ItemTransferOp.pickup,
+        itemId: book,
+        to: HabitatItemLocation.held(host.memberId),
+      );
+      if (txn != null && journal.commit(txn)) {
+        host.heldLabel = 'Duna';
+        objectState.ensure(book)
+          ..setState(ObjectLogicState.open)
+          ..openPage = 12
+          ..markUsed(sessionTime, traceKey: 'openPage');
+        itemUsageByPawn['${host.memberId}::$book'] =
+            (itemUsageByPawn['${host.memberId}::$book'] ?? 0) + 1;
+        pushBubble(
+          host,
+          ObjectFeedbackCatalog.moteLabel(ObjectFeedbackKind.bookPage),
+          kind: HabitatBubbleKind.mote,
+        );
+        pushBubble(host, 'pegou o livro', kind: HabitatBubbleKind.speech);
+      } else if (txn != null) {
+        journal.rollback(txn);
+      }
+    }
+    showClockDebug = true;
+  }
+
+  /// Debug: start reading then leave candidate for interrupt (M33).
+  void debugStartReading() {
+    final host = focusedPawn ?? (pawns.isEmpty ? null : pawns.first);
+    if (host == null) return;
+    embodiedRuntime.startReadingDemo(
+      host.memberId,
+      nowSim: clocks.simulation.elapsedSeconds,
+    );
+    host.jobs.order(HabitatJobKind.sit);
+    showClockDebug = true;
+    pushBubble(host, 'lendo…', kind: HabitatBubbleKind.thought);
+  }
+
+  /// Debug: resume interrupted activity (M33).
+  void debugResumeActivity() {
+    final host = focusedPawn ?? (pawns.isEmpty ? null : pawns.first);
+    if (host == null) return;
+    final cand = embodiedRuntime.devices.bestResume(
+      host.memberId,
+      clocks.simulation.elapsedSeconds,
+    );
+    if (cand == null) {
+      pushBubble(host, 'nada pra retomar', kind: HabitatBubbleKind.thought);
+      return;
+    }
+    embodiedRuntime.resumeActivity(
+      cand.activityId,
+      nowSim: clocks.simulation.elapsedSeconds,
+    );
+    pushBubble(host, 'retomando…', kind: HabitatBubbleKind.thought);
+  }
+
+  /// Debug: run prepareSleep routine (M34).
+  void debugStartRoutine([String id = 'prepareSleep']) {
+    final host = focusedPawn ?? (pawns.isEmpty ? null : pawns.first);
+    if (host == null) return;
+    embodiedRuntime.startRoutine(id, host.memberId);
+    showClockDebug = true;
+    _advanceRoutineSteps(host, steps: 16);
+  }
+
+  /// Debug: morning then bedtime (M35).
+  void debugMorningBedtime() {
+    final host = focusedPawn ?? (pawns.isEmpty ? null : pawns.first);
+    if (host == null) return;
+    embodiedRuntime.startRoutine('morning', host.memberId);
+    _advanceRoutineSteps(host, steps: 20);
+    embodiedRuntime.startRoutine('bedtime', host.memberId);
+    _advanceRoutineSteps(host, steps: 16);
+    applyEnvironmentVisuals();
+    showClockDebug = true;
+  }
+
+  /// Debug: prepare leave + transit + arrive (M36).
+  void debugLeaveAndArrive() {
+    final host = focusedPawn ?? (pawns.isEmpty ? null : pawns.first);
+    if (host == null) return;
+    final prep = embodiedRuntime.prepareForContext('work', host.memberId);
+    embodiedRuntime.startRoutine('prepareToLeave', host.memberId);
+    _advanceRoutineSteps(host, steps: 10);
+    debugBeginTransitToCafe();
+    // Soft return: arrive routine + home loadout.
+    embodiedRuntime.transit.ensureAtSite(host.memberId, 'home_apartment');
+    embodiedRuntime.startRoutine('arriveHome', host.memberId);
+    _advanceRoutineSteps(host, steps: 12);
+    showClockDebug = true;
+    pushBubble(
+      host,
+      prep.satisfied ? 'ida/volta ok' : 'faltou ${prep.missingRequired}',
+      kind: HabitatBubbleKind.thought,
+    );
+  }
+
+  /// Debug: shared meal (M37).
+  void debugSharedMeal() {
+    final host = focusedPawn ?? (pawns.isEmpty ? null : pawns.first);
+    if (host == null) return;
+    embodiedRuntime.ensureIdentity(host.memberId, isPrimarySelf: true);
+    final guestId = pawns.length > 1 ? pawns[1].memberId : 'guest-meal';
+    if (guestId == 'guest-meal') {
+      embodiedRuntime.ensureIdentity(guestId, kind: PawnIdentityKind.personProxy);
+      embodiedRuntime.store.ensure(guestId);
+    }
+    embodiedRuntime.store.ensure(host.memberId);
+    final meal = embodiedRuntime.demoSharedMeal(
+      cookId: host.memberId,
+      guests: [guestId],
+      nowSim: clocks.simulation.elapsedSeconds,
+    );
+    host.jobs.order(HabitatJobKind.goToTable);
+    showClockDebug = true;
+    pushBubble(
+      host,
+      'jantar ${meal.recipeId}',
+      kind: HabitatBubbleKind.speech,
+    );
+  }
+
+  /// Debug: multi-session painting (M38).
+  void debugWorkpiece() {
+    final host = focusedPawn ?? (pawns.isEmpty ? null : pawns.first);
+    if (host == null) return;
+    var w = embodiedRuntime.workOnPainting(host.memberId, delta: 0.28);
+    w = embodiedRuntime.workOnPainting(host.memberId, delta: 0.28);
+    showClockDebug = true;
+    pushBubble(
+      host,
+      'tela ${w.stage} ${(w.visualProgress * 100).round()}%',
+      kind: HabitatBubbleKind.thought,
+    );
+  }
+
+  /// Debug: prep requirements for work (M39).
+  void debugPrepWork() {
+    final host = focusedPawn ?? (pawns.isEmpty ? null : pawns.first);
+    if (host == null) return;
+    final r = embodiedRuntime.prepareForContext('work', host.memberId);
+    showClockDebug = true;
+    pushBubble(
+      host,
+      r.satisfied
+          ? 'prep ok (${r.collectedItemIds.length})'
+          : 'falta ${r.missingRequired.join(",")}',
+      kind: HabitatBubbleKind.thought,
+    );
+  }
+
+  /// Debug: SP → Tokyo hotel + jet lag (M40).
+  void debugJetLagHop() {
+    final host = focusedPawn ?? (pawns.isEmpty ? null : pawns.first);
+    if (host == null) return;
+    final hotelId = embodiedRuntime.beginJetLagDemo(
+      host.memberId,
+      nowSim: clocks.simulation.elapsedSeconds,
+    );
+    final site = embodiedRuntime.world.sites[hotelId];
+    clocks.siteTimezoneId = site?.timezoneId ?? 'Asia/Tokyo';
+    clocks.scene.siteTimezoneId = clocks.siteTimezoneId;
+    // Scene hour jumps; body clock lags via travel director.
+    clocks.scene.setSceneHour((presence.phase * 24 + 12) % 24);
+    presence.syncFromClock();
+    _refreshAtmosphere();
+    showClockDebug = true;
+    final circ = embodiedRuntime.travel.stateFor(host.memberId);
+    pushBubble(
+      host,
+      'jet lag Δ${circ.bodyClockOffsetHours.toStringAsFixed(0)}h',
+      kind: HabitatBubbleKind.thought,
+    );
+  }
+
+  /// Debug: world map → café (M41).
+  void debugWorldMapGo() {
+    final host = focusedPawn ?? (pawns.isEmpty ? null : pawns.first);
+    if (host == null) return;
+    final id = embodiedRuntime.goWorldMap(
+      'CAFÉ',
+      host.memberId,
+      nowSim: clocks.simulation.elapsedSeconds,
+    );
+    showClockDebug = true;
+    pushBubble(host, 'mapa→$id', kind: HabitatBubbleKind.thought);
+  }
+
+  /// Debug: register saxophone + custom guitar (M42/M43).
+  void debugCustomContent() {
+    final host = focusedPawn ?? (pawns.isEmpty ? null : pawns.first);
+    final sax = embodiedRuntime.content.getPropDefinition('prop.saxophone_alto');
+    final prop = embodiedRuntime.customContent.createProp(
+      CustomContentDraft(
+        kind: 'prop',
+        name: 'Minha Guitarra',
+        tags: {'music', 'instrument', 'guitar'},
+        affordances: ['practiceInstrument'],
+        interestTags: {'music'},
+      ),
+    );
+    final act = embodiedRuntime.customContent.createActivity(
+      CustomContentDraft(
+        kind: 'activity',
+        name: 'Ouvir vinil',
+        tags: {'recordPlayer', 'vinyl'},
+        durationSim: 40,
+        needEffects: {'recreation': 0.3},
+        interestTags: {'music'},
+      ),
+    );
+    showClockDebug = true;
+    if (host != null) {
+      pushBubble(
+        host,
+        'sax=${sax != null} prop=${prop.isOk} act=${act.isOk}',
+        kind: HabitatBubbleKind.thought,
+      );
+    }
+  }
+
+  /// Debug: snapshot save/load (M47) + gate (M50).
+  void debugPersistAndGate() {
+    final host = focusedPawn ?? (pawns.isEmpty ? null : pawns.first);
+    embodiedRuntime.snapshots.forceSave(
+      embodiedRuntime.buildSnapshot(
+        clockState: {
+          'sim': clocks.simulation.elapsedSeconds,
+          'tz': clocks.siteTimezoneId,
+        },
+      ),
+    );
+    final loaded = embodiedRuntime.snapshots.load();
+    final gate = embodiedRuntime.mirrorReadyGateIssues();
+    showClockDebug = true;
+    if (host != null) {
+      pushBubble(
+        host,
+        'save v${loaded?.schemaVersion} gate=${gate.isEmpty ? "ok" : gate}',
+        kind: HabitatBubbleKind.thought,
+      );
+    }
+  }
+
+  void _advanceRoutineSteps(LivingPawnComponent host, {int steps = 6}) {
+    final now = clocks.simulation.elapsedSeconds;
+    for (var i = 0; i < steps; i++) {
+      embodiedRuntime.routines.tick(
+        pawnId: host.memberId,
+        nowSim: now + i * 5,
+        effects: (node) {
+          switch (node.kind) {
+            case RoutineNodeKind.applyPreset:
+              final pid = node.params['presetId'] as String? ?? 'normal';
+              embodiedRuntime.applyScenePreset(pid, nowSim: now + i * 5);
+              applyEnvironmentVisuals();
+            case RoutineNodeKind.applyLoadout:
+              final lid = node.params['loadoutId'] as String? ?? 'home';
+              final lo = embodiedRuntime.loadouts.byId(lid);
+              if (lo != null) {
+                embodiedRuntime.loadouts.maybeApply(
+                  pawnId: host.memberId,
+                  loadout: lo,
+                  force: true,
+                  applyVisual: (top, hat) {
+                    host.appearance.apparelTop = top;
+                    host.appearance.hat = hat;
+                    host.appearance.loadoutId = lo.id;
+                  },
+                );
+              }
+            case RoutineNodeKind.emitBubble:
+              final text = node.params['text'] as String? ?? '…';
+              pushBubble(host, text, kind: HabitatBubbleKind.speech);
+            case RoutineNodeKind.goTo:
+              final target = node.params['target'] as String? ?? '';
+              if (target == 'bed') {
+                host.jobs.order(HabitatJobKind.sleep);
+              } else if (target == 'table') {
+                host.jobs.order(HabitatJobKind.goToTable);
+              } else if (target == 'entrance' || target == 'bathroom') {
+                host.jobs.order(HabitatJobKind.wander);
+              }
+            case RoutineNodeKind.putIn:
+              final hint = node.params['itemHint'] as String? ?? 'held';
+              final container =
+                  node.params['containerId'] as String? ?? 'bag';
+              if (hint == 'prep') {
+                embodiedRuntime.prepareForContext('work', host.memberId);
+              } else if (hint == 'bag') {
+                // Drop bag contents onto table/dropzone.
+                for (final it in embodiedRuntime.inventory.items.values
+                    .where(
+                      (x) =>
+                          x.location.containerId == 'bag' ||
+                          (x.location.kind ==
+                                  HabitatItemLocationKind.heldByPawn &&
+                              x.location.pawnId == host.memberId),
+                    )
+                    .toList()) {
+                  embodiedRuntime.inventory.putIn(
+                    itemId: it.id,
+                    containerId: container,
+                  );
+                }
+              } else {
+                final held = embodiedRuntime.inventory.items.values
+                    .where(
+                      (it) =>
+                          it.location.kind ==
+                              HabitatItemLocationKind.heldByPawn &&
+                          it.location.pawnId == host.memberId,
+                    )
+                    .firstOrNull;
+                if (held != null) {
+                  embodiedRuntime.inventory.putIn(
+                    itemId: held.id,
+                    containerId: container,
+                  );
+                }
+              }
+            case RoutineNodeKind.wait:
+              return (node.params['seconds'] as num?)?.toDouble() ?? 0;
+            default:
+              break;
+          }
+          return 0;
+        },
+        branch: (node) {
+          final key = node.params['key'] as String? ?? '';
+          if (key == 'showerAvailable') return 'fail';
+          return 'default';
+        },
+      );
+      final run = embodiedRuntime.routines.runsByPawn[host.memberId];
+      if (run == null ||
+          run.status == RoutineRunStatus.completed ||
+          run.status == RoutineRunStatus.aborted) {
+        break;
+      }
+    }
+  }
+
+  /// Latest room detection snapshot (M27).
+  List<DetectedRoomRegion> detectRooms() => HabitatRoomDetector.detect(map);
+
+  // Embodied autonomy is driven per-pawn via BehaviorDesyncClock (R9).
+
+  void _maybeConditionBubble() {
+    for (final p in pawns) {
+      final pres = embodiedRuntime.presentationFor(p.memberId);
+      final tag = pres.bubbleTag;
+      if (tag == null) continue;
+      if (_rng.nextDouble() > 0.35) continue;
+      final text = switch (tag) {
+        'sleepy' => '…bocejo',
+        'groggy' => 'Ainda meio zonzo.',
+        'cold' => 'Brr.',
+        'hot' => 'Ufa.',
+        'need_space' => 'Preciso de um tempo.',
+        _ => null,
+      };
+      if (text != null) {
+        pushBubble(p, text, kind: HabitatBubbleKind.thought);
+      }
+    }
+  }
+
   void cyclePropQuality(HabitatProp prop) {
     prop.quality = prop.quality.next();
     notifyMapVisualChanged(positive: true);
+  }
+
+  /// Rotate placed furniture 90° (updates footprint + sprite facing).
+  void rotateProp(HabitatProp prop) {
+    final def = FurnitureRegistry.tryGet(prop.kind);
+    final nextFacing = prop.facing.next;
+    if (def != null) {
+      final nextSize = def.footprintFor(nextFacing);
+      final probe = HabitatProp(
+        id: prop.id,
+        kind: prop.kind,
+        name: prop.name,
+        assetPath: def.assetPath(nextFacing.spriteKey),
+        origin: prop.origin,
+        size: nextSize,
+        blocksWalk: prop.blocksWalk,
+        drawSize: def.visualSizeFor(nextFacing),
+        drawAlign: prop.drawAlign,
+        tint: prop.tint,
+        quality: prop.quality,
+        facing: nextFacing,
+        poweredOn: prop.poweredOn,
+      );
+      if (!map.canPlace(probe, prop.origin, ignoreId: prop.id)) {
+        presence.playStub('reject');
+        return;
+      }
+      final idx = map.props.indexOf(prop);
+      if (idx < 0) return;
+      map.props[idx] = probe;
+      map.rebuildBlocked();
+      grid?.selectedProp = probe;
+    } else {
+      prop.facing = nextFacing;
+    }
+    notifyMapVisualChanged(positive: true);
+  }
+
+  void togglePropPower(HabitatProp prop) {
+    if (!FurnitureInteractions.isLight(prop.kind) &&
+        prop.kind != HabitatPropKinds.tv) {
+      return;
+    }
+    prop.poweredOn = !prop.poweredOn;
+    if (prop.kind == HabitatPropKinds.tv) {
+      tvScreenOn = prop.poweredOn;
+    }
+    notifyMapVisualChanged(positive: prop.poweredOn);
   }
 
   bool _isJoyOnCooldown(String kind) {
@@ -449,9 +1868,9 @@ class HabitatGame extends FlameGame
     final spots = <(int, int)>[];
     var hasLamp = false;
     for (final p in map.props) {
-      if (p.kind == HabitatPropKinds.table) tables.add(p.origin);
+      if (FurnitureInteractions.isTable(p.kind)) tables.add(p.origin);
       if (p.kind == HabitatPropKinds.gatheringSpot) spots.add(p.origin);
-      if (p.kind == HabitatPropKinds.lamp) hasLamp = true;
+      if (FurnitureInteractions.isLight(p.kind) && p.poweredOn) hasLamp = true;
     }
     final comfortDelta = HabitatClimateField.comfortDelta(
       HabitatClimateField.effectiveOutdoor(
@@ -476,6 +1895,15 @@ class HabitatGame extends FlameGame
                     (p.memberId == enc.aId || p.memberId == enc.bId) &&
                     p.jobs.kind == HabitatJobKind.goTo),
             allowedZone: zoneFor(p),
+            socialTolerance:
+                embodied[p.memberId]?.capacity(CapacityKind.socialTolerance)?.level ??
+                    0.7,
+            solitudePressure:
+                embodied[p.memberId]?.need(NeedKind.solitude)?.pressure ?? 0.15,
+            socialConnectionPressure: embodied[p.memberId]
+                    ?.need(NeedKind.socialConnection)
+                    ?.pressure ??
+                0.3,
           ),
       ],
       roomStats: roomStats,
@@ -540,8 +1968,18 @@ class HabitatGame extends FlameGame
     }
 
     // Never path both pawns onto the same cell.
-    var hCell = hostCell;
-    var gCell = guestCell;
+    // R34: prefer conversational arc slots around the midpoint.
+    final mid = (
+      ((hostCell.$1 + guestCell.$1) / 2).round(),
+      ((hostCell.$2 + guestCell.$2) / 2).round(),
+    );
+    final slots = ConversationalPositioning.planSlots(
+      center: mid,
+      count: 2,
+      isWalkable: map.isWalkable,
+    );
+    var hCell = slots.isNotEmpty ? slots[0] : hostCell;
+    var gCell = slots.length > 1 ? slots[1] : guestCell;
     if (hCell == gCell) {
       final host = pawnByMemberId(hostId);
       if (host != null) {
@@ -587,12 +2025,425 @@ class HabitatGame extends FlameGame
     }
   }
 
+  (int, int)? _nearestRoomInterest(LivingPawnComponent p) {
+    (int, int)? best;
+    var bestD = 1 << 30;
+    for (final prop in map.props) {
+      final kind = prop.kind;
+      if (!(kind.contains('window') ||
+          kind == 'tv' ||
+          kind.contains('tv') ||
+          kind.contains('table'))) {
+        continue;
+      }
+      final c = (
+        prop.origin.$1 + prop.size.$1 ~/ 2,
+        prop.origin.$2 + prop.size.$2 ~/ 2,
+      );
+      final d = (c.$1 - p.cellX).abs() + (c.$2 - p.cellY).abs();
+      if (d < bestD) {
+        bestD = d;
+        best = c;
+      }
+    }
+    return best;
+  }
+
+  void _tickSoftAvoidance() {
+    final snaps = <AvoidanceAgentSnapshot>[
+      for (final p in pawns)
+        AvoidanceAgentSnapshot(
+          pawnId: p.memberId,
+          cell: (p.cellX, p.cellY),
+          nextCell: p.jobs.remainingPath.isEmpty
+              ? null
+              : p.jobs.remainingPath.first,
+          urgency: p.micro.urgentLocomotion
+              ? 0.9
+              : (p.drafted ? 0.7 : 0.2),
+          carrying: p.heldLabel != null && p.heldLabel!.isNotEmpty,
+          remainingPathLength: p.jobs.remainingPath.length,
+        ),
+    ];
+    final blocked = {for (final p in pawns) (p.cellX, p.cellY)};
+    for (final p in pawns) {
+      if (p.isMoving || p.jobs.avoidanceWaitLeft > 0) continue;
+      final self = snaps.firstWhere((s) => s.pawnId == p.memberId);
+      final conflict = SoftLocalAvoidance.detect(self: self, others: snaps);
+      if (conflict == null) {
+        p.jobs.avoidanceOscillation = 0;
+        continue;
+      }
+      final other = snaps.firstWhere((s) => s.pawnId == conflict.otherId);
+      final decision = SoftLocalAvoidance.resolve(
+        self: self,
+        other: other,
+        conflict: conflict,
+        isWalkable: map.isWalkable,
+        blockedByPawns: blocked,
+        oscillationCount: p.jobs.avoidanceOscillation,
+        unitNoise: HabitatRng.unit(p.memberId, 'avoid', sessionTime.floor()),
+      );
+      switch (decision.action) {
+        case AvoidanceAction.wait:
+          p.jobs.avoidanceWaitLeft = decision.waitSeconds;
+        case AvoidanceAction.sideStep:
+          final side = decision.sideStepCell;
+          if (side != null) {
+            final dx = side.$1 - p.cellX;
+            final dy = side.$2 - p.cellY;
+            if (p.tryStep(dx, dy)) {
+              p.jobs.avoidanceOscillation++;
+            } else {
+              p.jobs.avoidanceWaitLeft = SoftLocalAvoidance.waitMin;
+            }
+          }
+        case AvoidanceAction.shortReplan:
+          p.jobs.avoidanceWaitLeft = SoftLocalAvoidance.waitMin;
+        case AvoidanceAction.none:
+          break;
+      }
+    }
+  }
+
+  void _tickRoomEntryScans() {
+    for (final p in pawns) {
+      // Treat door cell crossing as room portal for MVP.
+      final onDoor = p.cellX == map.door.cell.$1 && p.cellY == map.door.cell.$2;
+      final roomKey = onDoor ? 'portal:${locationId}' : locationId;
+      if (p.jobs.lastRoomId == roomKey) continue;
+      final prev = p.jobs.lastRoomId;
+      p.jobs.lastRoomId = roomKey;
+      if (prev == null) continue; // spawn
+      if (!onDoor && prev.startsWith('portal:')) {
+        // Entered room after portal — scan.
+        final cues = <RoomSalienceCue>[
+          for (final o in pawns)
+            if (o.memberId != p.memberId)
+              RoomSalienceCue(
+                cell: (o.cellX, o.cellY),
+                score: o.jobs.kind == HabitatJobKind.recreate ? 0.8 : 0.4,
+                entityId: o.memberId,
+                label: o.jobs.kind.name,
+              ),
+          for (final prop in map.props)
+            if (FurnitureInteractions.isJoy(prop.kind))
+              RoomSalienceCue(
+                cell: prop.origin,
+                score: 0.7,
+                entityId: prop.id,
+                label: prop.kind,
+              ),
+        ];
+        final scan = RoomEntryScanner.begin(
+          pawnId: p.memberId,
+          roomId: locationId,
+          now: sessionTime,
+          cues: cues,
+          urgent: p.micro.urgentLocomotion || p.drafted,
+          transitOnly: p.jobs.kind == HabitatJobKind.goTo &&
+              p.jobs.remainingPath.length > 6,
+        );
+        p.jobs.roomScan = scan;
+        final att = scan?.attention;
+        if (att != null) {
+          p.micro.attention.propose(candidate: att, now: sessionTime);
+        }
+      }
+    }
+  }
+
+  void _tickCrowdingRelocate() {
+    final cells = [for (final p in pawns) (p.cellX, p.cellY)];
+    for (final p in pawns) {
+      if (p.drafted || p.isMoving) continue;
+      if (p.jobs.kind != HabitatJobKind.wander) continue;
+      if (p.jobs.isInArrivalPipeline || p.jobs.isPosing) continue;
+      if (!p.micro.desync.consumeSocialProbe(sessionTime, period: 6)) continue;
+      final local = CrowdingAwareness.scoreAt(
+        cell: (p.cellX, p.cellY),
+        pawnCells: cells,
+      );
+      final state = embodied[p.memberId];
+      final should = CrowdingAwareness.shouldRelocate(
+        local: local,
+        socialStyle: p.micro.profile?.socialStyle ?? SocialStyle.balanced,
+        solitudePressure: state?.need(NeedKind.solitude)?.pressure ?? 0,
+        socialTolerance:
+            state?.capacity(CapacityKind.socialTolerance)?.level ?? 0.5,
+        activityCommitted: false,
+      );
+      if (!should) continue;
+      final quieter = CrowdingAwareness.pickQuieterCell(
+        from: (p.cellX, p.cellY),
+        pawnCells: cells,
+        isWalkable: map.isWalkable,
+      );
+      if (quieter != null) {
+        p.jobs.orderGoToCell(quieter, urgent: false);
+      }
+    }
+  }
+
+  void _tickRefinementSystems(double dt) {
+    final hour = presence.phase * 24;
+    quietness.setDaypart(AtmospherePresets.fromHour(hour));
+    quietness.tick(dt);
+    observer.tick(dt);
+    cameraFocus.tick(sessionTime);
+
+    // R70 footsteps stub when moving.
+    for (final p in pawns) {
+      if (!p.isMoving) continue;
+      final floor = map.floorAt(p.cellX, p.cellY);
+      final mat = Footsteps.fromFloor(floor);
+      // Soft presence cue — no spam: only occasionally.
+      if (HabitatRng.unit(p.memberId, 'step', sessionTime.floor()) > 0.92) {
+        presence.playStub(Footsteps.stubId(mat));
+      }
+    }
+
+    // R112 foreshadow due cues → soft event focus hint (no camera steal).
+    for (final cue in foreshadow.due(sessionTime)) {
+      eventFocusHint = EventFocusHints.forEvent(
+        cell: pawns.isEmpty ? null : (pawns.first.cellX, pawns.first.cellY),
+        label: cue.label,
+        salience: 0.7,
+      );
+      causality.record(
+        CausalityLink(
+          causeId: cue.id,
+          effectId: cue.eventKind,
+          label: cue.label,
+        ),
+      );
+    }
+
+    // R59 sleep body signals → mote grammar.
+    for (final p in pawns) {
+      final st = embodied[p.memberId];
+      if (st == null) continue;
+      final sig = SleepBodySignals.forPressure(st.circadian.sleepPressure);
+      if (sig == SleepBodySignal.yawn &&
+          HabitatRng.unit(p.memberId, 'yawn', sessionTime.floor()) > 0.97) {
+        pushBubble(
+          p,
+          MoteThoughtGrammar.glyph(ThoughtMoteGrammar.yawn),
+          kind: HabitatBubbleKind.mote,
+        );
+      }
+    }
+
+    // R82–R87: pet energy pacing when a pet identity is present.
+    String? petId;
+    for (final p in pawns) {
+      if (embodiedRuntime.identity[p.memberId]?.kind == PawnIdentityKind.pet) {
+        petId = p.memberId;
+        break;
+      }
+    }
+    if (petId != null) {
+      petEnergy ??= PetEnergyPacing();
+      petEnergy!.tick(
+        sessionTime,
+        energy: 0.5 + HabitatRng.unit(petId, 'energy') * 0.4,
+      );
+      final pet = pawnByMemberId(petId);
+      if (pet != null && petEnergy!.phase == PetEnergyPhase.zoomies) {
+        if (!pet.isMoving &&
+            !pet.drafted &&
+            pet.jobs.kind == HabitatJobKind.wander) {
+          pet.jobs.orderGoToCell(
+            (
+              (pet.cellX + 2).clamp(0, map.width - 1),
+              (pet.cellY + 1).clamp(0, map.height - 1),
+            ),
+            urgent: false,
+          );
+        }
+      }
+    }
+
+    _tickConversationEtiquette();
+  }
+
+  /// Block D — backchannels, overhearing, memory callbacks, shared silence.
+  void _tickConversationEtiquette() {
+    final enc = social.active;
+    final group = activeConversationGroup;
+    if (enc == null || group == null) {
+      sharedSilence = null;
+      return;
+    }
+    if (enc.phase != SocialEncounterPhase.beatLoop &&
+        enc.phase != SocialEncounterPhase.formUp) {
+      return;
+    }
+
+    final a = pawnByMemberId(enc.aId);
+    final b = pawnByMemberId(enc.bId);
+    if (a == null || b == null) return;
+
+    // R35 turn bookkeeping from who last spoke via bubbles is soft —
+    // alternate candidate when silence grows.
+    final speaker = group.turns.currentSpeaker ?? enc.aId;
+    final listenerId = speaker == enc.aId ? enc.bId : enc.aId;
+    final listener = pawnByMemberId(listenerId);
+    if (listener != null) {
+      final style =
+          listener.micro.profile?.socialStyle ?? SocialStyle.balanced;
+      final kind = BackchannelScheduler.maybeEmit(
+        style: style,
+        listenerId: listenerId,
+        now: sessionTime,
+        lastEmitAt: lastBackchannelAt[listenerId] ?? -999,
+      );
+      if (kind != null) {
+        lastBackchannelAt[listenerId] = sessionTime;
+        switch (kind) {
+          case BackchannelKind.moteEllipsis:
+            pushBubble(
+              listener,
+              MoteThoughtGrammar.glyph(ThoughtMoteGrammar.ellipsis),
+              kind: HabitatBubbleKind.mote,
+            );
+          case BackchannelKind.shortAck:
+            pushBubble(listener, 'hm', kind: HabitatBubbleKind.speech);
+          case BackchannelKind.facingAdjust:
+            listener.facing = facingFromDelta(
+              (speaker == enc.aId ? a : b).cellX - listener.cellX,
+              (speaker == enc.aId ? a : b).cellY - listener.cellY,
+            );
+          case BackchannelKind.nod:
+            listener.poseOffsetX = 1.5;
+        }
+      }
+    }
+
+    // R38 memory callback (strong cooldown).
+    final pairKey =
+        enc.aId.compareTo(enc.bId) <= 0 ? '${enc.aId}::${enc.bId}' : '${enc.bId}::${enc.aId}';
+    final mem = MemoryCallback.maybeLine(
+      sharedEventIds: const ['rematch', 'musica', 'visita'],
+      now: sessionTime,
+      lastCallbackAt: lastCallbackAt,
+      pairKey: pairKey,
+    );
+    if (mem != null) {
+      lastCallbackAt[pairKey] = sessionTime;
+      pushBubble(a, mem, kind: HabitatBubbleKind.speech);
+    }
+
+    // R39 overhearing — nearby non-participants glance only.
+    for (final p in pawns) {
+      if (p.memberId == enc.aId || p.memberId == enc.bId) continue;
+      final dist = (p.cellX - a.cellX).abs() + (p.cellY - a.cellY).abs();
+      final hear = Overhearing.evaluate(
+        distance: dist.toDouble(),
+        sameRoom: true,
+        doorClosedBetween: false,
+        noiseProfile: (1.0 - quietness.current).clamp(0.0, 1.0),
+      );
+      if (!hear.canOverhear) continue;
+      if (HabitatRng.unit(p.memberId, 'overhear', sessionTime.floor()) < 0.92) {
+        continue;
+      }
+      p.micro.attention.lookAt(
+        reason: AttentionReason.interestingEvent,
+        now: sessionTime,
+        entityId: enc.aId,
+        cellX: a.cellX,
+        cellY: a.cellY,
+        holdOverride: 0.8,
+      );
+    }
+
+    // R43 shared silence — soft hold when neither moves a beat.
+    sharedSilence ??= SharedSilenceSession(
+      startedAt: sessionTime,
+      participantIds: [enc.aId, enc.bId],
+      activityKind: 'chat',
+    );
+  }
+
+  /// R119 gate snapshot for debug / tests.
+  RefinementGateResult refinementGate({required bool testsGreen}) =>
+      HabitatRefinementGate.evaluate(
+        blockA: true,
+        blockB: true,
+        blockC: true,
+        blockD: true,
+        blockE: true,
+        blockF: true,
+        blockG: true,
+        blockH: true,
+        blockI: true,
+        blockJ: true,
+        blockK: true,
+        testsGreen: testsGreen,
+      );
+
   void _faceSocialPair(String aId, String bId) {
     final a = pawnByMemberId(aId);
     final b = pawnByMemberId(bId);
     if (a == null || b == null) return;
     a.facing = facingFromDelta(b.cellX - a.cellX, b.cellY - a.cellY);
     b.facing = facingFromDelta(a.cellX - b.cellX, a.cellY - b.cellY);
+    // R0: conversation partner wins ambient gaze.
+    final now = sessionTime;
+    a.micro.attention.lookAt(
+      reason: AttentionReason.conversationPartner,
+      now: now,
+      entityId: bId,
+      cellX: b.cellX,
+      cellY: b.cellY,
+    );
+    b.micro.attention.lookAt(
+      reason: AttentionReason.conversationPartner,
+      now: now,
+      entityId: aId,
+      cellX: a.cellX,
+      cellY: a.cellY,
+    );
+    a.jobs.partnerCell = (b.cellX, b.cellY);
+    b.jobs.partnerCell = (a.cellX, a.cellY);
+    a.micro.microIdle.interrupt();
+    b.micro.microIdle.interrupt();
+
+    // R32 greeting grammar.
+    final greet = GreetingGrammar.decide(
+      timeSinceLastSeen: 400,
+      familiarity: 0.6,
+      affinity: 0.5,
+      isVisitor: embodiedRuntime.identity[bId]?.kind ==
+          PawnIdentityKind.personProxy,
+      justArrived: false,
+      style: a.micro.profile?.socialStyle ?? SocialStyle.balanced,
+      aId: aId,
+      bId: bId,
+      now: now,
+      lastGreetingAt: lastGreetingAt,
+    );
+    if (greet.mode == GreetingMode.bubble && greet.line != null) {
+      final key = aId.compareTo(bId) <= 0 ? '$aId::$bId' : '$bId::$aId';
+      lastGreetingAt[key] = now;
+      pushBubble(a, greet.line!, kind: HabitatBubbleKind.speech);
+    } else if (greet.mode == GreetingMode.glance) {
+      // Attention already set.
+    }
+
+    activeConversationGroup = ConversationGroup(
+      id: 'enc.$aId.$bId',
+      participantIds: [aId, bId],
+      topicId: embodiedRuntime.lastSocialTopic?.id ?? 'smalltalk',
+    );
+    causality.record(
+      CausalityLink(
+        causeId: 'social.formUp',
+        effectId: 'social.greeting',
+        label: 'encounter greeting',
+      ),
+    );
   }
 
   void _markJoyUsed(String kind) {
@@ -741,16 +2592,54 @@ class HabitatGame extends FlameGame
   @override
   void update(double dt) {
     super.update(dt);
+    clocks.tick(dt);
     presence.tick(dt);
-    sessionTime += dt;
+    sessionTime = clocks.simulation.elapsedSeconds;
+    for (final p in pawns) {
+      p.syncSessionClock(sessionTime);
+    }
+    _tickDoor(dt);
     _refreshAtmosphere();
+    _tickEmbodiedSystems(dt);
 
     final prefer = _wanderPreferWeights();
+    final peerCells = [for (final p in pawns) (p.cellX, p.cellY)];
+    final peerAgents = [
+      for (final p in pawns)
+        PersonalSpaceAgent(
+          pawnId: p.memberId,
+          cell: (p.cellX, p.cellY),
+          moving: p.isMoving,
+        ),
+    ];
+    doorReservations.tick(sessionTime);
+    objectState.tick(sessionTime);
     for (final p in pawns) {
       p.jobs.wander.preferBright = prefer;
       p.jobs.wander.allowedZone = zoneFor(p);
       p.jobs.allowedZone = zoneFor(p);
+      p.jobs.occupancy = occupancy;
+      p.jobs.doors = doorReservations;
+      p.jobs.queues = stationQueues;
+      p.jobs.peerCells = peerCells;
+      p.jobs.peerAgents = peerAgents;
+      p.jobs.routePreference ??= RoutePreferenceContext(
+        profile: RoutePreferenceProfile.avoidCrowd,
+        crowdCostAt: (x, y) => PersonalSpace.costAt(
+          cell: (x, y),
+          agents: peerAgents,
+          selfId: p.memberId,
+          socialStyle: p.micro.profile?.socialStyle ?? SocialStyle.balanced,
+        ),
+      );
+      // Nearest room interest POI (R1 polish).
+      p.jobs.roomInterestCell = _nearestRoomInterest(p);
     }
+
+    _tickSoftAvoidance();
+    _tickRoomEntryScans();
+    _tickCrowdingRelocate();
+    _tickRefinementSystems(dt);
 
     if (zoneRejectFlash != null) {
       final (x, y, age) = zoneRejectFlash!;
@@ -809,6 +2698,24 @@ class HabitatGame extends FlameGame
         _stopSocialMovement(enc.aId, enc.bId);
         _separateIfOverlapping(enc.aId, enc.bId);
         _faceSocialPair(enc.aId, enc.bId);
+        // M16 — pick interest/media topic and seed a bubble.
+        final topic = embodiedRuntime.pickSocialTopic(
+          aId: enc.aId,
+          bId: enc.bId,
+          simSeconds: sessionTime,
+        );
+        final phrase = embodiedRuntime.lastTopicPhrase;
+        if (topic != null && phrase != null) {
+          final speaker = pawnByMemberId(enc.aId);
+          if (speaker != null) {
+            pushBubble(
+              speaker,
+              phrase,
+              kind: HabitatBubbleKind.speech,
+              stackGroupId: socialBubbleStackId(enc.aId, enc.bId),
+            );
+          }
+        }
       }
       _lastSocialPhase = enc.phase;
       // Approach: let goTo run. FormUp/BeatLoop: pause wander in place.
@@ -831,6 +2738,7 @@ class HabitatGame extends FlameGame
           p.jobs.wander.resume();
           p.poseOffsetX = 0;
         }
+        p?.jobs.partnerCell = null;
       }
       _socialPauseA = _socialPauseB = null;
       _lastSocialPhase = null;
@@ -841,32 +2749,38 @@ class HabitatGame extends FlameGame
     }
     bubbles.removeWhere((b) => b.done);
 
-    _idleAutonomyTimer += dt;
-    if (_idleAutonomyTimer >= 7) {
-      _idleAutonomyTimer = 0;
-      final socialIds = social.active == null
-          ? const <String>{}
-          : {social.active!.aId, social.active!.bId};
-      for (final pawn in pawns) {
-        if (pawn.drafted || pawn.jobs.kind != HabitatJobKind.wander) continue;
-        if (pawn.isMoving) continue;
-        if (socialIds.contains(pawn.memberId)) continue;
-        if (_rng.nextDouble() < 0.35) {
-          final dirty = _nearestDirtyCell((pawn.cellX, pawn.cellY));
-          if (dirty != null) {
-            pawn.jobs.orderCleanCell(dirty);
-            continue;
-          }
+    // R9: per-pawn idle probes (clean / recreate) — desynced.
+    final socialIds = social.active == null
+        ? const <String>{}
+        : {social.active!.aId, social.active!.bId};
+    for (final pawn in pawns) {
+      if (pawn.drafted || pawn.jobs.kind != HabitatJobKind.wander) continue;
+      if (pawn.isMoving) continue;
+      if (socialIds.contains(pawn.memberId)) continue;
+      if (!pawn.micro.desync.consumeIdleProbe(sessionTime, period: 7)) {
+        continue;
+      }
+      final stream = HabitatRng.stream(
+        pawnId: pawn.memberId,
+        concern: 'idleAutonomy',
+        worldSeed: sessionTime.floor(),
+      );
+      if (stream.nextDouble() < 0.35) {
+        final dirty = _nearestDirtyCell((pawn.cellX, pawn.cellY));
+        if (dirty != null) {
+          pawn.jobs.orderCleanCell(dirty);
+          continue;
         }
-        if (_rng.nextDouble() < 0.28) {
-          final joy = _pickJoyStation();
-          if (joy != null) {
-            pawn.jobs.orderRecreate(joy);
-          }
+      }
+      if (stream.nextDouble() < 0.28) {
+        final joy = _pickJoyStation();
+        if (joy != null) {
+          pawn.jobs.orderRecreate(joy);
         }
       }
     }
 
+    // Darkness standing timer kept for inspect/debug; bubbles via R2 scheduler.
     final socialBusy = social.active != null
         ? {social.active!.aId, social.active!.bId}
         : const <String>{};
@@ -884,23 +2798,8 @@ class HabitatGame extends FlameGame
         pawn.cellX,
         pawn.cellY,
       );
-      // Outdoor moonlight peaks ~0.48 — never "too dark". Indoor night
-      // without lamps is ~0.88–0.95.
       if (d >= HabitatLightField.tooDarkThreshold) {
-        final t = (_darkIdleTimer[pawn] ?? 0) + dt;
-        _darkIdleTimer[pawn] = t;
-        final readyAt = _darkCommentReadyAt[pawn] ?? 0;
-        if (t >= 2.8 && sessionTime >= readyAt) {
-          pushBubble(
-            pawn,
-            HabitatBubbleLines.forTooDark(_rng),
-            kind: HabitatBubbleKind.thought,
-          );
-          // Long cooldown — complain rarely, not every linger.
-          _darkCommentReadyAt[pawn] =
-              sessionTime + 80 + _rng.nextDouble() * 50;
-          _darkIdleTimer[pawn] = 0;
-        }
+        _darkIdleTimer[pawn] = (_darkIdleTimer[pawn] ?? 0) + dt;
       } else {
         _darkIdleTimer.remove(pawn);
       }
@@ -1135,16 +3034,20 @@ class HabitatGame extends FlameGame
       case HabitatPawnSelection():
         return false;
       case HabitatPropSelection(:final prop):
-        final job = switch (prop.kind) {
-          'chair' => HabitatJobKind.sit,
-          'table' => HabitatJobKind.goToTable,
-          'bed' => HabitatJobKind.goTo,
-          _ when HabitatPropKinds.isRecreateTarget(prop.kind) =>
-            HabitatJobKind.recreate,
-          _ => HabitatJobKind.goTo,
-        };
+        // Lights toggle in place; other uses route via furniture tags.
+        if (FurnitureInteractions.isLight(prop.kind)) {
+          prop.poweredOn = !prop.poweredOn;
+          notifyMapVisualChanged(positive: prop.poweredOn);
+          presence.playStub('order');
+          return true;
+        }
+        final job = FurnitureInteractions.jobForUse(prop.kind) ??
+            HabitatJobKind.goTo;
         if (job == HabitatJobKind.recreate) {
           pawn.jobs.orderRecreate(prop);
+        } else if (job == HabitatJobKind.sleep) {
+          // Sleep is a full job — approach then rest pose.
+          pawn.jobs.orderGoToProp(prop, HabitatJobKind.sleep);
         } else {
           pawn.jobs.orderGoToProp(prop, job);
         }
@@ -1206,6 +3109,7 @@ class HabitatGame extends FlameGame
     social.cancelActive(player: true);
     final next = _maps.putIfAbsent(id, () => HabitatLocations.create(id));
     locationId = id;
+    embodiedRuntime.activeMapLocationId = id;
     map = next;
     editor.bind(next);
     grid?.rebindMap(next);
@@ -1333,10 +3237,32 @@ class HabitatGame extends FlameGame
         final kind = pawnComp.jobs.lastJoyKindFinished;
         if (kind != null) _markJoyUsed(kind);
       }
+      _applyJobNeedSatisfaction(pawnComp.memberId, job);
     };
-    pawnComp.jobs.onCleanCell = (_, __) {
+    pawnComp.jobs.onCleanCell = (_, _) {
       notifyMapVisualChanged(positive: true);
     };
+  }
+
+  void _applyJobNeedSatisfaction(String memberId, HabitatJobKind job) {
+    final affordance = switch (job) {
+      HabitatJobKind.sleep => HabitatAffordances.sleep,
+      HabitatJobKind.sit => HabitatAffordances.sit,
+      HabitatJobKind.goToTable => HabitatAffordances.goToTable,
+      HabitatJobKind.recreate => HabitatAffordances.recreate,
+      HabitatJobKind.clean => HabitatAffordances.clean,
+      HabitatJobKind.wander || HabitatJobKind.goTo => HabitatAffordances.wander,
+    };
+    final def = AffordanceCatalog.get(affordance);
+    if (def == null || def.satisfies.isEmpty) return;
+    final current = embodied.ensure(memberId);
+    embodied.put(
+      embodiedRuntime.needs.applySatisfaction(
+        state: current,
+        satisfies: def.satisfies,
+        observedAt: clocks.real.now().toUtc(),
+      ),
+    );
   }
 
   void _spawnRoster(List<ColonyMember> roster) {
@@ -1354,10 +3280,30 @@ class HabitatGame extends FlameGame
         appearance: member.appearance.copy(),
       );
       _wirePawnJobs(pawnComp);
+      embodiedRuntime.ensureIdentity(
+        member.id,
+        isPrimarySelf: member.isPlayer,
+        kind: member.isPlayer ? PawnIdentityKind.self : PawnIdentityKind.resident,
+      );
+      embodied.ensure(
+        member.id,
+        presence: EmbodiedPresenceContext(
+          roomRole: locationId,
+          isHome: true,
+        ),
+      );
       pawns.add(pawnComp);
       world.add(pawnComp);
     }
   }
+
+  /// Embodied state for inspect — never stored only on the Flame component.
+  PawnEmbodiedState? embodiedFor(String memberId) => embodied[memberId];
+
+  PawnEmbodiedState ensureEmbodied(String memberId) => embodied.ensure(
+        memberId,
+        presence: EmbodiedPresenceContext(roomRole: locationId),
+      );
 
   (int, int) _spawnCellForIndex((int, int) base, int index) {
     final offsets = <(int, int)>[
@@ -1381,6 +3327,7 @@ class HabitatGame extends FlameGame
     final removing = [for (final p in pawns) if (!keep.contains(p.memberId)) p];
     for (final p in removing) {
       bubbles.removeWhere((b) => b.pawn == p);
+      embodied.remove(p.memberId);
       p.removeFromParent();
       pawns.remove(p);
     }
@@ -1389,6 +3336,7 @@ class HabitatGame extends FlameGame
       if (existing != null) {
         existing.appearance.copyFrom(m.appearance);
         existing.displayName = m.appearance.name;
+        embodied.ensure(m.id);
       } else {
         final spawn = HabitatLocations.spawn(locationId);
         final cell = _spawnCellForIndex(spawn, pawns.length);
@@ -1402,6 +3350,10 @@ class HabitatGame extends FlameGame
           appearance: m.appearance.copy(),
         );
         _wirePawnJobs(pawnComp);
+        embodied.ensure(
+          m.id,
+          presence: EmbodiedPresenceContext(roomRole: locationId),
+        );
         pawns.add(pawnComp);
         world.add(pawnComp);
       }

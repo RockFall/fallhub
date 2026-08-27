@@ -91,3 +91,15 @@ flutter run -d android
 `tool/test_all` executa `flutter analyze` (0 erros; infos/warnings não bloqueiam), `flutter test` (app), `flutter test packages/colony_domain` e `flutter test packages/colony_database` — gate Definition of Done.
 
 APK de teste no celular (sem desktop): workflow `sideload_apk` → [`docs/dev/SIDELOAD.md`](docs/dev/SIDELOAD.md).
+
+## Habitat furniture (sprites)
+
+Ao adicionar móveis: regra `.cursor/rules/habitat-furniture-assets.mdc`.
+
+Escala: `srcPx / 64` tiles (clamp no footprint) — não preencher a célula com fit-cover.
+
+```bash
+python tool/export_furniture_assets.py   # PSD/PNG → trimmed + alpha fix
+python tool/audit_furniture_alpha.py     # fundo preto
+python tool/audit_furniture_fit.py       # aspect vs footprint (anti-squash)
+```

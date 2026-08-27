@@ -22,6 +22,17 @@ abstract final class AppStrings {
   static const habitatInspectPropSoon =
       'Objeto do habitat. Projeção de vida real chega nas próximas fases.';
   static const habitatStatus = 'Estado';
+  static const habitatStateTitle = 'Estado';
+  static const habitatStateNeeds = 'Necessidades';
+  static const habitatStateCapacities = 'Capacidades';
+  static const habitatStateConditions = 'Condições';
+  static const habitatStateSignals = 'Sinais';
+  static const habitatStateContext = 'Contexto';
+  static const habitatStateExplain = 'Explicar';
+  static const habitatStateSource = 'Origem';
+  static const habitatStateDerivedFrom = 'Derivado de';
+  static const habitatStateRedacted = 'oculto';
+  static const habitatStateJob = 'Trabalho';
   static const habitatJobSleep = 'Dormir';
   static const habitatJobSit = 'Sentar';
   static const habitatJobTable = 'Ir à mesa';
