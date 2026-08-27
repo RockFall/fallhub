@@ -6,9 +6,6 @@ import 'package:go_router/go_router.dart';
 import '../../../app/localization/app_strings.dart';
 import '../../../core/providers/app_providers.dart';
 import '../../activation/application/activation_controllers.dart';
-import '../../plan_day/application/plan_day_controller.dart';
-import '../../plan_day/application/plan_day_providers.dart';
-import '../../plan_day/presentation/widgets/plan_day_feedback.dart';
 
 class InboxScreen extends ConsumerWidget {
   const InboxScreen({super.key});
@@ -16,7 +13,6 @@ class InboxScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final inbox = ref.watch(inboxTasksProvider);
-    final onToday = ref.watch(todayPlanTaskIdsProvider);
 
     return Padding(
       padding: const EdgeInsets.all(ColonySpacing.lg),
@@ -63,33 +59,7 @@ class InboxScreen extends ConsumerWidget {
                     return ListTile(
                       title: Text(task.title),
                       subtitle: Text(task.createdAt.toLocal().toString()),
-                      trailing: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          IconButton(
-                            tooltip: onToday.contains(task.id.value)
-                                ? AppStrings.planDayRemoveFromTodayTooltip
-                                : AppStrings.planDayAddToTodayTooltip,
-                            icon: Icon(
-                              onToday.contains(task.id.value)
-                                  ? Icons.wb_twilight
-                                  : Icons.wb_twilight_outlined,
-                            ),
-                            onPressed: () => ref
-                                .read(planDayControllerProvider.notifier)
-                                .toggleTaskOnToday(task).then((_) {
-                              if (!context.mounted) return;
-                              showPlanDayOpenSnack(
-                                context,
-                                onToday.contains(task.id.value)
-                                    ? AppStrings.planDayRemovedSnack
-                                    : AppStrings.planDayAddedSnack,
-                              );
-                            }),
-                          ),
-                          const Icon(Icons.chevron_right),
-                        ],
-                      ),
+                      trailing: const Icon(Icons.chevron_right),
                       onTap: () => context.go('/tasks/${task.id.value}'),
                     );
                   },

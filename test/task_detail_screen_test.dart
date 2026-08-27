@@ -109,4 +109,30 @@ void main() {
     expect(loaded!.priority, TaskPriority.now);
     await _drainTimers(tester);
   });
+
+  testWidgets('Para o dia shortcut marks scheduledStart for today',
+      (tester) async {
+    await pumpScreen(tester);
+    final forDate = find.widgetWithText(ListTile, AppStrings.taskForDate);
+    await tester.ensureVisible(forDate);
+    await tester.tap(
+      find.descendant(
+        of: forDate,
+        matching: find.text(AppStrings.planDayTodayPill),
+      ),
+    );
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 80));
+
+    final loaded = await repos.tasks.getById(task.id);
+    expect(loaded!.scheduledStart, isNotNull);
+    expect(
+      TaskCapabilityPolicy.isScheduledOn(
+        loaded,
+        dayPlanLocalDateKey(clock),
+      ),
+      isTrue,
+    );
+    await _drainTimers(tester);
+  });
 }

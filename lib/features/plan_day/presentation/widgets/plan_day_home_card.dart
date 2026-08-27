@@ -6,7 +6,6 @@ import 'package:go_router/go_router.dart';
 import '../../../../app/localization/app_strings.dart';
 import '../../application/plan_day_controller.dart';
 import '../../application/plan_day_providers.dart';
-import 'plan_day_feedback.dart';
 
 class PlanDayHomeCard extends ConsumerStatefulWidget {
   const PlanDayHomeCard({super.key});
@@ -27,15 +26,14 @@ class _PlanDayHomeCardState extends ConsumerState<PlanDayHomeCard> {
   Future<void> _submit() async {
     final text = _controller.text.trim();
     if (text.isEmpty) return;
-    await ref.read(planDayControllerProvider.notifier).addAdHocToToday(text);
+    await ref.read(planDayControllerProvider.notifier).createNamed(text);
     if (!mounted) return;
     _controller.clear();
-    showPlanDayOpenSnack(context, AppStrings.planDayAddedSnack);
   }
 
   @override
   Widget build(BuildContext context) {
-    final rows = ref.watch(todayPlanRowsProvider);
+    final lists = ref.watch(todayPlanTasksProvider);
     return ColonyHomeCard(
       icon: Icons.wb_twilight_outlined,
       title: AppStrings.planDayTitle,
@@ -46,46 +44,41 @@ class _PlanDayHomeCardState extends ConsumerState<PlanDayHomeCard> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          rows.when(
+          lists.when(
             loading: () => const LinearProgressIndicator(),
             error: (_, __) => Text(AppStrings.errorGeneric),
-            data: (list) {
-              if (list.isEmpty) {
+            data: (day) {
+              if (day.open.isEmpty && day.done.isEmpty) {
                 return Text(
                   AppStrings.planDayHomeEmpty,
                   style: Theme.of(context).textTheme.bodyMedium,
                 );
               }
-              final done = list.where((row) => row.isDone).length;
-              PlanRow? firstOpen;
-              for (final row in list) {
-                if (!row.isDone) {
-                  firstOpen = row;
-                  break;
-                }
-              }
+              final firstOpen = day.open.isEmpty ? null : day.open.first;
+              final dated = day.datedProgress;
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Row(
-                    children: [
-                      SizedBox(
-                        width: 28,
-                        height: 28,
-                        child: CircularProgressIndicator(
-                          value: done / list.length,
-                          strokeWidth: 3,
-                          color: ColonyMiniAppColors.planDay,
-                          backgroundColor: ColonyColors.void_,
+                  if (dated.$2 > 0)
+                    Row(
+                      children: [
+                        SizedBox(
+                          width: 28,
+                          height: 28,
+                          child: CircularProgressIndicator(
+                            value: dated.$2 == 0 ? 0 : dated.$1 / dated.$2,
+                            strokeWidth: 3,
+                            color: ColonyMiniAppColors.planDay,
+                            backgroundColor: ColonyColors.void_,
+                          ),
                         ),
-                      ),
-                      const SizedBox(width: ColonySpacing.sm),
-                      Text(
-                        AppStrings.planDayProgress(done, list.length),
-                        style: Theme.of(context).textTheme.titleMedium,
-                      ),
-                    ],
-                  ),
+                        const SizedBox(width: ColonySpacing.sm),
+                        Text(
+                          AppStrings.planDayProgress(dated.$1, dated.$2),
+                          style: Theme.of(context).textTheme.titleMedium,
+                        ),
+                      ],
+                    ),
                   if (firstOpen != null) ...[
                     const SizedBox(height: ColonySpacing.xs),
                     Row(
@@ -97,7 +90,7 @@ class _PlanDayHomeCardState extends ConsumerState<PlanDayHomeCard> {
                             value: false,
                             onChanged: (_) => ref
                                 .read(planDayControllerProvider.notifier)
-                                .toggle(firstOpen!),
+                                .toggleDone(firstOpen),
                           ),
                         ),
                         Expanded(

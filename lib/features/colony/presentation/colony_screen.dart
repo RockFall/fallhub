@@ -20,7 +20,7 @@ class ColonyScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final profile = ref.watch(profileProvider);
     final inbox = ref.watch(inboxTasksProvider);
-    final todayRows = ref.watch(todayPlanRowsProvider);
+    final todayLists = ref.watch(todayPlanTasksProvider);
 
     return profile.when(
       loading: () => const Center(child: CircularProgressIndicator()),
@@ -39,10 +39,8 @@ class ColonyScreen extends ConsumerWidget {
                 profile: p,
                 greeting: AppStrings.homeGreeting(now, p.displayName),
                 inboxCount: inbox.asData?.value.length ?? 0,
-                planOpenCount: todayRows.asData?.value
-                        .where((row) => !row.isDone)
-                        .length ??
-                    0,
+                planOpenCount:
+                    todayLists.asData?.value.open.length ?? 0,
               );
               final digest = const ColonyHomeDigest();
               return SingleChildScrollView(

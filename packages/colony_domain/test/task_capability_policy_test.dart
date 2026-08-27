@@ -99,6 +99,47 @@ void main() {
     expect(TaskCapabilityPolicy.isOverdue(done, now), isFalse);
   });
 
+  test('hoje lists undated tasks on every day and dated only on their day', () {
+    final undated = task(id: 'u', title: 'Sem data');
+    final today = task(
+      id: 't',
+      title: 'Hoje',
+      dueAt: null,
+    ).copyWith(scheduledStart: DateTime.utc(2026, 8, 24));
+    final tomorrow = task(id: 'm', title: 'Amanhã')
+        .copyWith(scheduledStart: DateTime.utc(2026, 8, 25));
+    final deadlineOnly = task(
+      id: 'p',
+      title: 'Prazo',
+      dueAt: DateTime.utc(2026, 8, 30),
+    );
+    expect(TaskCapabilityPolicy.isOpenOnDay(undated, '2026-08-24'), isTrue);
+    expect(TaskCapabilityPolicy.isOpenOnDay(undated, '2026-08-25'), isTrue);
+    expect(TaskCapabilityPolicy.isOpenOnDay(today, '2026-08-24'), isTrue);
+    expect(TaskCapabilityPolicy.isOpenOnDay(today, '2026-08-25'), isFalse);
+    expect(TaskCapabilityPolicy.isOpenOnDay(tomorrow, '2026-08-24'), isFalse);
+    expect(TaskCapabilityPolicy.isOpenOnDay(tomorrow, '2026-08-25'), isTrue);
+    expect(TaskCapabilityPolicy.isOpenOnDay(deadlineOnly, '2026-08-24'), isTrue);
+    expect(TaskCapabilityPolicy.isOpenOnDay(deadlineOnly, '2026-08-25'), isTrue);
+    expect(
+      TaskCapabilityPolicy.isOpenOnDay(
+        task(id: 'i', title: 'Inbox', status: TaskStatus.inbox),
+        '2026-08-24',
+      ),
+      isFalse,
+    );
+  });
+
+  test('undated done tasks only appear on the completion day', () {
+    final doneToday = task(
+      id: 'd',
+      status: TaskStatus.done,
+      completedAt: DateTime.utc(2026, 8, 24, 18),
+    );
+    expect(TaskCapabilityPolicy.isDoneOnDay(doneToday, '2026-08-24'), isTrue);
+    expect(TaskCapabilityPolicy.isDoneOnDay(doneToday, '2026-08-25'), isFalse);
+  });
+
   test('group by project puts ungrouped last', () {
     final trip = Project(
       id: EntityId('proj-1'),
