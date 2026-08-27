@@ -103,9 +103,9 @@ void main() {
     );
   });
 
-  test('export v39 is rejected', () {
+  test('export v40 is rejected', () {
     expect(
-      () => ExportSnapshot.fromJson(base(version: 39)),
+      () => ExportSnapshot.fromJson(base(version: 40)),
       throwsA(isA<ExportSnapshotException>()),
     );
   });

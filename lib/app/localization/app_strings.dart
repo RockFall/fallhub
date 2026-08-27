@@ -2210,6 +2210,90 @@ abstract final class AppStrings {
         InventoryItemStatus.archived => 'Arquivado',
       };
 
+  static const healthSleepTitle = 'Sono';
+  static const healthSleepHint =
+      'Detec├º├úo autom├ítica no celular (movimento + quietude) e/ou importa├º├úo do Health Connect (ex.: Samsung Health). Opt-in; n├úo diagnostica.';
+  static const healthSleepDetectionToggle = 'Detectar sono automaticamente';
+  static const healthSleepDetectionOn =
+      'Ativo ÔÇö monitora em segundo plano (notifica├º├úo persistente no Android).';
+  static const healthSleepDetectionOff =
+      'Desligado ÔÇö ative para registrar in├¡cio e fim do sono sem abrir o app.';
+  static const healthSleepDetectionError =
+      'N├úo foi poss├¡vel iniciar a detec├º├úo. Verifique permiss├Áes de notifica├º├úo e bateria.';
+  static const healthSleepHealthConnectToggle = 'Ler sono do Health Connect';
+  static const healthSleepHealthConnectOn =
+      'Ativo ÔÇö usa sess├Áes do Samsung Health / wearables quando dispon├¡veis.';
+  static const healthSleepHealthConnectOff =
+      'Desligado ÔÇö conceda acesso ao Health Connect para espelhar o sono do sistema.';
+  static const healthSleepHealthConnectError =
+      'N├úo foi poss├¡vel autorizar o Health Connect. Instale/atualize o app Health Connect e permita leitura de sono.';
+  static const healthSleepSyncNow = 'Sincronizar agora';
+  static const healthSleepHcSetupTitle = 'Samsung Health ÔåÆ Health Connect';
+  static const healthSleepHcSetupBody =
+      'O Col├┤nia s├│ l├¬ o que j├í est├í no Health Connect. Noites antigas no Samsung Health '
+      's├│ aparecem aqui se o Samsung as tiver enviado ao HC ÔÇö ÔÇ£Acessar dados anterioresÔÇØ '
+      'libera a leitura pelo Col├┤nia, mas n├úo for├ºa o Samsung a reenviar o hist├│rico.';
+  static const healthSleepHcSetupSteps =
+      '1. Abra o Samsung Health ÔåÆ Ôï« Configura├º├Áes ÔåÆ Health Connect.\n'
+      '2. Em permiss├Áes do Samsung Health, permita escrever Sono (Allow all se preferir).\n'
+      '3. Health Connect ÔåÆ App permissions ÔåÆ Col├┤nia: ative Sono (leitura) e ÔÇ£Acessar dados anterioresÔÇØ.\n'
+      '4. Volte ao Samsung Health (obrigat├│rio ap├│s mudar permiss├Áes) e aguarde alguns minutos.\n'
+      '5. No Health Connect ÔåÆ Browse data ÔåÆ Sleep, confira se as noites antigas existem l├í.\n'
+      '6. Se Browse data s├│ tem noites recentes, o Samsung n├úo backfillou ÔÇö s├│ o futuro chega ao HC.\n'
+      '7. Depois toque em Sincronizar agora (ou Diagnosticar) neste app.';
+  static const healthSleepOpenHealthConnect = 'Abrir Health Connect';
+  static const healthSleepOpenSamsungHealth = 'Abrir Samsung Health';
+  static const healthSleepHcHowTo = 'Como liberar o sono do Samsung';
+  static const healthSleepDiagnose = 'Diagnosticar Health Connect';
+  static const healthSleepEmpty = 'Nenhuma sess├úo de sono registrada ainda.';
+  static const healthSleepInProgress = 'Dormindo agoraÔÇª';
+  static const healthSleepHistoryTitle = 'Hist├│rico de sono';
+  static const healthSleepHistoryOpen = 'Ver por dia';
+  static const healthSleepHistoryHint =
+      'Cada dia mostra o total e os hor├írios (noite atribu├¡da ao dia em que voc├¬ acordou).';
+  static const healthSleepHistoryEmpty = 'Sem sono registrado.';
+  static const healthSleepHistoryEmptyHint =
+      'Ative a detec├º├úo ou o Health Connect para preencher os dias automaticamente.';
+
+  static String healthSleepHistorySessionCount(int n) =>
+      n == 1 ? '1 sess├úo' : '$n sess├Áes';
+
+  static String healthSleepSyncDone(int n) =>
+      n == 0
+          ? 'Nenhuma sess├úo nova.'
+          : '$n sess├úo${n == 1 ? '' : '├Áes'} sincronizada${n == 1 ? '' : 's'}.';
+
+  static String healthSleepSyncResult({
+    required int imported,
+    required int rawPoints,
+    String? message,
+  }) {
+    if (message != null && message.isNotEmpty) return message;
+    return healthSleepSyncDone(imported);
+  }
+
+  static String healthSleepDuration(Duration d) {
+    final h = d.inHours;
+    final m = d.inMinutes.remainder(60);
+    if (h <= 0) return '${m}min de sono';
+    return '${h}h ${m.toString().padLeft(2, '0')}min de sono';
+  }
+
+  static String healthSleepSourceLabel(SleepSessionSource source) =>
+      switch (source) {
+        SleepSessionSource.detected => 'Detectado no celular',
+        SleepSessionSource.healthConnect => 'Health Connect',
+        SleepSessionSource.manual => 'Manual',
+      };
+
+  static String healthSleepConfidenceLabel(ConfidenceLevel level) =>
+      switch (level) {
+        ConfidenceLevel.high => 'confian├ºa alta',
+        ConfidenceLevel.medium => 'confian├ºa m├®dia',
+        ConfidenceLevel.low => 'confian├ºa baixa',
+        ConfidenceLevel.insufficient => 'confian├ºa insuficiente',
+      };
+
   static const healthTitle = 'Saúde';
   static const healthDisclaimer = HealthSafetyPolicy.disclaimer;
   static const healthSeekCareHint = HealthSafetyPolicy.seekCareHint;

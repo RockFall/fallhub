@@ -8,6 +8,12 @@ enum IntegrationKind {
   notificationListener,
   spotify,
   musicbrainz,
+
+  /// Opt-in on-device automatic sleep detection (ADR-035).
+  sleepDetection,
+
+  /// Opt-in Health Connect sleep session read (ADR-035).
+  healthConnectSleep,
 }
 
 /// Opt-in consent for a local integration adapter (ADR-032).

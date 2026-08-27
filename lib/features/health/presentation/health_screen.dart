@@ -10,6 +10,7 @@ import 'widgets/create_health_appointment_sheet.dart';
 import 'widgets/create_health_condition_sheet.dart';
 import 'widgets/edit_health_appointment_sheet.dart';
 import 'widgets/edit_health_condition_sheet.dart';
+import 'widgets/sleep_panel.dart';
 
 class HealthScreen extends ConsumerWidget {
   const HealthScreen({super.key});
@@ -35,6 +36,8 @@ class HealthScreen extends ConsumerWidget {
             AppStrings.healthSeekCareHint,
             style: Theme.of(context).textTheme.bodySmall,
           ),
+          const SizedBox(height: ColonySpacing.lg),
+          const SleepPanel(),
           const SizedBox(height: ColonySpacing.lg),
           Text(
             AppStrings.healthAppointmentsTitle,
@@ -78,13 +81,12 @@ class HealthScreen extends ConsumerWidget {
                             IconButton(
                               tooltip: AppStrings.healthEditAppointment,
                               icon: const Icon(Icons.edit_outlined),
-                              onPressed: () => EditHealthAppointmentSheet.show(
-                                context,
-                                a,
-                              ),
+                              onPressed: () =>
+                                  EditHealthAppointmentSheet.show(context, a),
                             ),
                             IconButton(
-                              tooltip: AppStrings.healthAppointmentMarkCancelled,
+                              tooltip:
+                                  AppStrings.healthAppointmentMarkCancelled,
                               icon: const Icon(Icons.cancel_outlined),
                               onPressed: () => ref
                                   .read(healthControllerProvider.notifier)
@@ -158,10 +160,8 @@ class HealthScreen extends ConsumerWidget {
                               ),
                           ].join(' · '),
                         ),
-                        onTap: () => EditHealthConditionSheet.show(
-                          context,
-                          condition,
-                        ),
+                        onTap: () =>
+                            EditHealthConditionSheet.show(context, condition),
                         trailing: condition.status.isTerminal
                             ? null
                             : IconButton(

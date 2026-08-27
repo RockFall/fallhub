@@ -526,6 +526,7 @@ class ExportRepository {
     final healthConditions = await _health.listAll(profile.id);
     final symptomEntries = await _health.listAllSymptomEntries(profile.id);
     final healthAppointments = await _health.listAppointments(profile.id);
+    final sleepSessions = await _health.listSleepSessions(profile.id);
     final inventoryItems = await _inventory.listAll(profile.id);
     final people = await _people.listAll(profile.id);
     final categoryBudgets = await _finance.listBudgets(profile.id);
@@ -580,7 +581,7 @@ class ExportRepository {
 
     return ExportSnapshot(
       exportedAt: _clock(),
-      version: 38,
+      version: 39,
       profile: profile,
       preferences: prefs,
       tasks: tasks,
@@ -611,6 +612,7 @@ class ExportRepository {
       healthConditions: healthConditions,
       symptomEntries: symptomEntries,
       healthAppointments: healthAppointments,
+      sleepSessions: sleepSessions,
       inventoryItems: inventoryItems,
       people: people,
       categoryBudgets: categoryBudgets,
@@ -751,6 +753,7 @@ class RestoreRepository {
     await _db.delete(_db.people).go();
     await _db.delete(_db.inventoryItems).go();
     await _db.delete(_db.healthAppointments).go();
+    await _db.delete(_db.sleepSessions).go();
     await _db.delete(_db.symptomEntries).go();
     await _db.delete(_db.healthConditions).go();
     await _db.delete(_db.ledgerTransactions).go();
@@ -941,6 +944,11 @@ class RestoreRepository {
       await _db
           .into(_db.healthAppointments)
           .insert(ColonyMappers.fromHealthAppointment(appointment));
+    }
+    for (final sleep in snapshot.sleepSessions) {
+      await _db
+          .into(_db.sleepSessions)
+          .insert(ColonyMappers.fromSleepSession(sleep));
     }
     for (final item in snapshot.inventoryItems) {
       await _db
@@ -3652,6 +3660,171 @@ class HealthRepository {
     );
     return updated;
   }
+
+  Stream<List<SleepSession>> watchSleepSessions(EntityId profileId) {
+    return (_db.select(_db.sleepSessions)
+          ..where((t) => t.profileId.equals(profileId.value))
+          ..orderBy([(t) => OrderingTerm.desc(t.startedAt)]))
+        .watch()
+        .map((rows) => rows.map(ColonyMappers.toSleepSession).toList());
+  }
+
+  Future<List<SleepSession>> listSleepSessions(EntityId profileId) async {
+    final rows = await (_db.select(_db.sleepSessions)
+          ..where((t) => t.profileId.equals(profileId.value))
+          ..orderBy([(t) => OrderingTerm.desc(t.startedAt)]))
+        .get();
+    return rows.map(ColonyMappers.toSleepSession).toList();
+  }
+
+  Future<SleepSession?> findOpenSleepSession(EntityId profileId) async {
+    final row = await (_db.select(_db.sleepSessions)
+          ..where(
+            (t) =>
+                t.profileId.equals(profileId.value) & t.endedAt.isNull(),
+          )
+          ..orderBy([(t) => OrderingTerm.desc(t.startedAt)])
+          ..limit(1))
+        .getSingleOrNull();
+    return row == null ? null : ColonyMappers.toSleepSession(row);
+  }
+
+  Future<SleepSession?> findSleepByExternalId({
+    required EntityId profileId,
+    required String externalId,
+  }) async {
+    final row = await (_db.select(_db.sleepSessions)
+          ..where(
+            (t) =>
+                t.profileId.equals(profileId.value) &
+                t.externalId.equals(externalId),
+          ))
+        .getSingleOrNull();
+    return row == null ? null : ColonyMappers.toSleepSession(row);
+  }
+
+  Future<SleepSession> upsertSleepSession(SleepSession session) async {
+    SleepSession? existing;
+    if (session.externalId != null) {
+      existing = await findSleepByExternalId(
+        profileId: session.profileId,
+        externalId: session.externalId!,
+      );
+    }
+    existing ??= await (_db.select(_db.sleepSessions)
+          ..where((t) => t.id.equals(session.id.value)))
+        .getSingleOrNull()
+        .then((row) => row == null ? null : ColonyMappers.toSleepSession(row));
+
+    final persisted = existing == null
+        ? session
+        : SleepSession(
+            id: existing.id,
+            profileId: session.profileId,
+            startedAt: session.startedAt,
+            endedAt: session.endedAt,
+            source: session.source,
+            confidence: session.confidence,
+            externalId: session.externalId ?? existing.externalId,
+            notes: session.notes ?? existing.notes,
+            createdAt: existing.createdAt,
+            updatedAt: _clock(),
+          );
+
+    final isNew = existing == null;
+    final closedNow =
+        persisted.endedAt != null && (existing?.endedAt == null);
+
+    await _db.transaction(() async {
+      await _db
+          .into(_db.sleepSessions)
+          .insertOnConflictUpdate(ColonyMappers.fromSleepSession(persisted));
+      await _events.record(
+        aggregateType: AggregateType.health,
+        aggregateId: persisted.id,
+        eventType: isNew
+            ? EventType.sleepSessionCreated
+            : (closedNow
+                ? EventType.sleepSessionClosed
+                : EventType.sleepSessionUpdated),
+        payload: {
+          'source': persisted.source.name,
+          'started_at': persisted.startedAt.toIso8601String(),
+          if (persisted.endedAt != null)
+            'ended_at': persisted.endedAt!.toIso8601String(),
+          if (persisted.externalId != null) 'external_id': persisted.externalId,
+        },
+        sourceType: persisted.source == SleepSessionSource.healthConnect
+            ? SourceType.integration
+            : persisted.source == SleepSessionSource.detected
+                ? SourceType.derived
+                : SourceType.manual,
+      );
+    });
+    return persisted;
+  }
+
+  Future<SleepSession> openDetectedSleep({
+    required EntityId profileId,
+    required DateTime startedAt,
+    required ConfidenceLevel confidence,
+  }) async {
+    final open = await findOpenSleepSession(profileId);
+    if (open != null) {
+      final nextStart =
+          startedAt.isBefore(open.startedAt) ? startedAt : open.startedAt;
+      return upsertSleepSession(
+        open.copyWith(
+          startedAt: nextStart,
+          confidence: confidence,
+          updatedAt: _clock(),
+        ),
+      );
+    }
+    final now = _clock();
+    return upsertSleepSession(
+      SleepSession.create(
+        id: EntityId(_ids.newId()),
+        profileId: profileId,
+        startedAt: startedAt,
+        source: SleepSessionSource.detected,
+        confidence: confidence,
+        createdAt: now,
+      ),
+    );
+  }
+
+  Future<SleepSession> closeDetectedSleep({
+    required EntityId profileId,
+    required DateTime startedAt,
+    required DateTime endedAt,
+    required ConfidenceLevel confidence,
+  }) async {
+    final open = await findOpenSleepSession(profileId);
+    final now = _clock();
+    if (open != null) {
+      return upsertSleepSession(
+        open.copyWith(
+          startedAt: startedAt,
+          endedAt: endedAt,
+          confidence: confidence,
+          updatedAt: now,
+        ),
+      );
+    }
+    return upsertSleepSession(
+      SleepSession.create(
+        id: EntityId(_ids.newId()),
+        profileId: profileId,
+        startedAt: startedAt,
+        endedAt: endedAt,
+        source: SleepSessionSource.detected,
+        confidence: confidence,
+        createdAt: now,
+      ),
+    );
+  }
+
 }
 
 class InventoryRepository {

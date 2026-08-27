@@ -44,6 +44,7 @@ import '../../features/flashcards/presentation/knowledge_area_screen.dart';
 import '../../features/flashcards/presentation/study_session_screen.dart';
 import '../../features/finance/presentation/finance_ledger_screen.dart';
 import '../../features/health/presentation/health_screen.dart';
+import '../../features/health/presentation/sleep_history_screen.dart';
 import '../../features/inventory/presentation/inventory_screen.dart';
 import '../../features/relations/presentation/circle_detail_screen.dart';
 import '../../features/relations/presentation/circles_map_screen.dart';
@@ -341,6 +342,12 @@ final routerProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: '/resources/health',
             builder: (context, state) => const HealthScreen(),
+            routes: [
+              GoRoute(
+                path: 'sleep',
+                builder: (context, state) => const SleepHistoryScreen(),
+              ),
+            ],
           ),
           GoRoute(
             path: '/resources/inventory',

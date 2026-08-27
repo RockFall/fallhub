@@ -24,6 +24,7 @@ import 'financial_account.dart';
 import 'ledger_transaction.dart';
 import 'health_condition.dart';
 import 'health_appointment.dart';
+import 'sleep_session.dart';
 import 'symptom_entry.dart';
 import 'inventory_item.dart';
 import 'person.dart';
@@ -112,6 +113,7 @@ class ExportSnapshot extends Equatable {
     this.externalCalendarEvents = const [],
     this.zoneTripLinks = const [],
     this.healthAppointments = const [],
+    this.sleepSessions = const [],
     this.tripInventoryLinks = const [],
     this.knowledgeAreas = const [],
     this.flashcardDecks = const [],
@@ -186,6 +188,7 @@ class ExportSnapshot extends Equatable {
   final List<ExternalCalendarEvent> externalCalendarEvents;
   final List<ZoneTripLink> zoneTripLinks;
   final List<HealthAppointment> healthAppointments;
+  final List<SleepSession> sleepSessions;
   final List<TripInventoryLink> tripInventoryLinks;
   final List<KnowledgeArea> knowledgeAreas;
   final List<FlashcardDeck> flashcardDecks;
@@ -249,6 +252,7 @@ class ExportSnapshot extends Equatable {
         'external_calendar_events': externalCalendarEvents.length,
         'zone_trip_links': zoneTripLinks.length,
         'health_appointments': healthAppointments.length,
+        'sleep_sessions': sleepSessions.length,
         'trip_inventory_links': tripInventoryLinks.length,
         'knowledge_areas': knowledgeAreas.length,
         'flashcard_decks': flashcardDecks.length,
@@ -293,7 +297,7 @@ class ExportSnapshot extends Equatable {
 
   static ExportSnapshot fromJson(Map<String, dynamic> json) {
     final version = _requireInt(json, 'version');
-    if (version < 1 || version > 38) {
+    if (version < 1 || version > 39) {
       throw ExportSnapshotException('Versão de export não suportada: $version');
     }
 
@@ -572,6 +576,12 @@ class ExportSnapshot extends Equatable {
       activation: version >= 36
           ? _parseActivationBundle(json)
           : const ActivationExportBundle(),
+      sleepSessions: version >= 39
+          ? _parseList(
+              json['sleep_sessions'],
+              _parseSleepSession(profileId),
+            )
+          : <SleepSession>[],
       dayPlans: version >= 37
           ? _parseList(json['day_plans'], _parseDayPlan(profileId))
           : const [],
@@ -1749,6 +1759,27 @@ class ExportSnapshot extends Equatable {
     };
   }
 
+  static SleepSession Function(Map<String, dynamic>) _parseSleepSession(
+    EntityId profileId,
+  ) {
+    return (json) {
+      final endedRaw = json['ended_at'];
+      return SleepSession(
+        id: EntityId(_requireString(json, 'id')),
+        profileId: profileId,
+        startedAt: _parseDateTime(_requireString(json, 'started_at')),
+        endedAt: endedRaw is String ? _parseDateTime(endedRaw) : null,
+        source: SleepSessionSource.values.byName(_requireString(json, 'source')),
+        confidence:
+            ConfidenceLevel.values.byName(_requireString(json, 'confidence')),
+        externalId: json['external_id'] as String?,
+        notes: json['notes'] as String?,
+        createdAt: _parseDateTime(_requireString(json, 'created_at')),
+        updatedAt: _parseDateTime(_requireString(json, 'updated_at')),
+      );
+    };
+  }
+
   static WorkPriority Function(Map<String, dynamic>) _parseWorkPriority(
     EntityId profileId,
   ) {
@@ -1962,6 +1993,8 @@ class ExportSnapshot extends Equatable {
       'zone_trip_links': zoneTripLinks.map(_zoneTripLinkJson).toList(),
       'health_appointments':
           healthAppointments.map(_healthAppointmentJson).toList(),
+      if (version >= 39)
+        'sleep_sessions': sleepSessions.map(_sleepSessionJson).toList(),
       'trip_inventory_links':
           tripInventoryLinks.map(_tripInventoryLinkJson).toList(),
       'knowledge_areas': knowledgeAreas.map(_knowledgeAreaJson).toList(),
@@ -2650,6 +2683,18 @@ class ExportSnapshot extends Equatable {
         'document': import.document.toJson(),
       };
 
+
+  static Map<String, Object?> _sleepSessionJson(SleepSession s) => {
+        'id': s.id.value,
+        'started_at': s.startedAt.toUtc().toIso8601String(),
+        if (s.endedAt != null) 'ended_at': s.endedAt!.toUtc().toIso8601String(),
+        'source': s.source.name,
+        'confidence': s.confidence.name,
+        if (s.externalId != null) 'external_id': s.externalId,
+        if (s.notes != null) 'notes': s.notes,
+        'created_at': s.createdAt.toUtc().toIso8601String(),
+        'updated_at': s.updatedAt.toUtc().toIso8601String(),
+      };
   static Map<String, Object?> _healthAppointmentJson(HealthAppointment a) => {
         'id': a.id.value,
         'title': a.title,
@@ -2909,6 +2954,7 @@ class ExportSnapshot extends Equatable {
         externalCalendarEvents,
         zoneTripLinks,
         healthAppointments,
+        sleepSessions,
         tripInventoryLinks,
         knowledgeAreas,
         flashcardDecks,

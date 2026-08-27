@@ -1170,14 +1170,14 @@ void main() {
     expect(snapshot.tasks.first.projectId, isNull);
   });
 
-  test('rejects unsupported version 39', () {
-    final json = Map<String, dynamic>.from(baseJson)..['version'] = 39;
+  test('rejects unsupported version 40', () {
+    final json = Map<String, dynamic>.from(baseJson)..['version'] = 40;
 
     expect(
       () => ExportSnapshot.fromJson(json),
       throwsA(
         predicate<ExportSnapshotException>(
-          (e) => e.message.contains('39'),
+          (e) => e.message.contains('40'),
         ),
       ),
     );
