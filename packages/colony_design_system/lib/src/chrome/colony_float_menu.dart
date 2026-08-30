@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import '../tokens/colony_tokens.dart';
+import 'colony_pixel_icon.dart';
 import 'colony_surface.dart';
 
 class ColonyFloatMenuItem {
@@ -10,6 +11,7 @@ class ColonyFloatMenuItem {
     required this.label,
     required this.onSelected,
     this.icon,
+    this.iconName,
     this.destructive = false,
     this.enabled = true,
   });
@@ -17,6 +19,7 @@ class ColonyFloatMenuItem {
   final String label;
   final VoidCallback onSelected;
   final IconData? icon;
+  final String? iconName;
   final bool destructive;
   final bool enabled;
 }
@@ -39,11 +42,7 @@ Future<void> showColonyFloatMenu({
       anchorGlobal: anchorGlobal,
     );
   }
-  return _showSheetFloatMenu(
-    context: context,
-    items: items,
-    title: title,
-  );
+  return _showSheetFloatMenu(context: context, items: items, title: title);
 }
 
 Future<void> _showSheetFloatMenu({
@@ -78,8 +77,10 @@ Future<void> _showSheetFloatMenu({
                       ColonySpacing.sm,
                     ),
                     child: Text(
-                      title,
-                      style: Theme.of(context).textTheme.titleMedium,
+                      title.toUpperCase(),
+                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                        color: ColonyColors.textGold,
+                      ),
                     ),
                   ),
                 ConstrainedBox(
@@ -166,15 +167,14 @@ Future<void> _showAnchoredFloatMenu({
                           ColonySpacing.xs,
                         ),
                         child: Text(
-                          title,
-                          style: Theme.of(ctx).textTheme.titleSmall,
+                          title.toUpperCase(),
+                          style: Theme.of(ctx).textTheme.titleSmall?.copyWith(
+                            color: ColonyColors.textGold,
+                          ),
                         ),
                       ),
                     for (final item in items)
-                      _FloatMenuRow(
-                        item: item,
-                        onAfterSelect: dismiss,
-                      ),
+                      _FloatMenuRow(item: item, onAfterSelect: dismiss),
                   ],
                 ),
               ),
@@ -208,10 +208,10 @@ class _FloatMenuRowState extends State<_FloatMenuRow> {
     final color = !enabled
         ? ColonyColors.textDisabled
         : _hover
-            ? ColonyColors.textMouseover
-            : widget.item.destructive
-                ? ColonyColors.statusCritical
-                : ColonyColors.textOption;
+        ? ColonyColors.textMouseover
+        : widget.item.destructive
+        ? ColonyColors.statusCritical
+        : ColonyColors.textOption;
 
     return MouseRegion(
       onEnter: (_) => setState(() => _hover = true),
@@ -236,16 +236,24 @@ class _FloatMenuRowState extends State<_FloatMenuRow> {
           ),
           child: Row(
             children: [
-              if (widget.item.icon != null) ...[
+              if (widget.item.iconName != null) ...[
+                ColonyPixelIcon(
+                  widget.item.iconName!,
+                  size: 18,
+                  mono: true,
+                  color: color,
+                ),
+                const SizedBox(width: ColonySpacing.md),
+              ] else if (widget.item.icon != null) ...[
                 Icon(widget.item.icon, size: 18, color: color),
                 const SizedBox(width: ColonySpacing.md),
               ],
               Expanded(
                 child: Text(
                   widget.item.label,
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: color,
-                      ),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodyMedium?.copyWith(color: color),
                 ),
               ),
             ],

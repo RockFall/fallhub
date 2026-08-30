@@ -71,6 +71,7 @@ import '../../features/activation/presentation/environment_screen.dart';
 import '../../features/activation/presentation/shield_settings_screen.dart';
 import '../../features/activation/presentation/waypoint_editor_screen.dart';
 import '../../core/widgets/command_palette.dart';
+import '../navigation/colony_more_menu.dart';
 
 class _GoRouterRefresh extends ChangeNotifier {
   void ping() => notifyListeners();
@@ -514,26 +515,31 @@ class _AppShellState extends ConsumerState<AppShell> {
       label: AppStrings.colony,
       icon: Icons.home_work_outlined,
       route: '/colony',
+      iconName: 'people',
     ),
     ColonyDestination(
       label: AppStrings.pawn,
       icon: Icons.person_outline,
       route: '/pawn',
+      iconName: 'person',
     ),
     ColonyDestination(
       label: AppStrings.work,
       icon: Icons.grid_on_outlined,
       route: '/work',
+      iconName: 'briefcase',
     ),
     ColonyDestination(
       label: AppStrings.quests,
       icon: Icons.flag_outlined,
       route: '/quests',
+      iconName: 'flag',
     ),
     ColonyDestination(
       label: AppStrings.more,
       icon: Icons.more_horiz,
       route: '/more',
+      iconName: 'more',
     ),
   ];
 
@@ -573,12 +579,13 @@ class _AppShellState extends ConsumerState<AppShell> {
       compact: compact,
       onNavigate: (route) {
         if (route == '/more') {
-          _showMoreMenu(context);
+          showColonyMoreMenu(context);
           return;
         }
         context.go(route);
       },
       showCaptureFab: false,
+      hideAppBar: compact && _matchRoute(location) == '/colony',
       appBarTitle: compact ? AppStrings.appName : null,
       appBarActions: compact ? topActions : const [],
       desktopTopBar: compact
@@ -610,154 +617,6 @@ class _AppShellState extends ConsumerState<AppShell> {
   bool _isCompact(BuildContext context) =>
       MediaQuery.sizeOf(context).width < 840;
 
-  void _showMoreMenu(BuildContext context) {
-    showColonyFloatMenu(
-      context: context,
-      title: AppStrings.more,
-      items: [
-        ColonyFloatMenuItem(
-          icon: Icons.cottage_outlined,
-          label: AppStrings.habitatTitle,
-          onSelected: () => context.go('/colony/habitat'),
-        ),
-        ColonyFloatMenuItem(
-          icon: Icons.face_retouching_natural,
-          label: AppStrings.habitatCreateTitle,
-          onSelected: () => context.go('/colony/pawn-create'),
-        ),
-        ColonyFloatMenuItem(
-          icon: Icons.directions_walk_outlined,
-          label: AppStrings.activationTitle,
-          onSelected: () => context.go('/activation'),
-        ),
-        ColonyFloatMenuItem(
-          icon: Icons.wb_twilight_outlined,
-          label: AppStrings.planDayMiniApp,
-          onSelected: () => context.go('/today'),
-        ),
-        ColonyFloatMenuItem(
-          icon: Icons.inbox_outlined,
-          label: AppStrings.inbox,
-          onSelected: () => context.go('/inbox'),
-        ),
-        ColonyFloatMenuItem(
-          icon: Icons.task_alt_outlined,
-          label: AppStrings.tasksTitle,
-          onSelected: () => context.go('/tasks'),
-        ),
-        ColonyFloatMenuItem(
-          icon: Icons.history,
-          label: AppStrings.chronicle,
-          onSelected: () => context.go('/chronicle'),
-        ),
-        ColonyFloatMenuItem(
-          icon: Icons.account_balance_outlined,
-          label: AppStrings.financeLedgerTitle,
-          onSelected: () => context.go('/resources/finance'),
-        ),
-        ColonyFloatMenuItem(
-          icon: Icons.favorite_outline,
-          label: AppStrings.healthTitle,
-          onSelected: () => context.go('/resources/health'),
-        ),
-        ColonyFloatMenuItem(
-          icon: Icons.inventory_2_outlined,
-          label: AppStrings.inventoryTitle,
-          onSelected: () => context.go('/resources/inventory'),
-        ),
-        ColonyFloatMenuItem(
-          icon: Icons.luggage_outlined,
-          label: AppStrings.travelTitle,
-          onSelected: () => context.go('/resources/travel'),
-        ),
-        ColonyFloatMenuItem(
-          icon: Icons.home_repair_service_outlined,
-          label: AppStrings.homeMaintenanceTitle,
-          onSelected: () => context.go('/resources/home'),
-        ),
-        ColonyFloatMenuItem(
-          icon: Icons.place_outlined,
-          label: AppStrings.zonesTitle,
-          onSelected: () => context.go('/resources/zones'),
-        ),
-        ColonyFloatMenuItem(
-          icon: Icons.map_outlined,
-          label: AppStrings.relationsOpenHub,
-          onSelected: () => context.go('/relations'),
-        ),
-        ColonyFloatMenuItem(
-          icon: Icons.people_outline,
-          label: AppStrings.peopleTitle,
-          onSelected: () => context.go('/relations/people'),
-        ),
-        ColonyFloatMenuItem(
-          icon: Icons.favorite_outline,
-          label: AppStrings.friendshipsTitle,
-          onSelected: () => context.go('/relations/friendships'),
-        ),
-        ColonyFloatMenuItem(
-          icon: Icons.hub_outlined,
-          label: AppStrings.relationsCirclesTitle,
-          onSelected: () => context.go('/relations/circles'),
-        ),
-        ColonyFloatMenuItem(
-          icon: Icons.event_available_outlined,
-          label: AppStrings.relationsEncountersTitle,
-          onSelected: () => context.go('/relations/encounters'),
-        ),
-        ColonyFloatMenuItem(
-          icon: Icons.apartment_outlined,
-          label: AppStrings.organizationsTitle,
-          onSelected: () => context.go('/relations/organizations'),
-        ),
-        ColonyFloatMenuItem(
-          icon: Icons.handshake_outlined,
-          label: AppStrings.commitmentsTitle,
-          onSelected: () => context.go('/relations/commitments'),
-        ),
-        ColonyFloatMenuItem(
-          icon: Icons.style_outlined,
-          label: AppStrings.flashcardsTitle,
-          onSelected: () => context.go('/flashcards'),
-        ),
-        ColonyFloatMenuItem(
-          icon: Icons.science_outlined,
-          label: AppStrings.research,
-          onSelected: () => context.go('/research'),
-        ),
-        ColonyFloatMenuItem(
-          icon: Icons.album_outlined,
-          label: AppStrings.musicAtlasTitle,
-          onSelected: () => context.go('/research/music-atlas'),
-        ),
-        ColonyFloatMenuItem(
-          icon: Icons.folder_outlined,
-          label: AppStrings.projects,
-          onSelected: () => context.go('/projects'),
-        ),
-        ColonyFloatMenuItem(
-          icon: Icons.gavel_outlined,
-          label: AppStrings.decisions,
-          onSelected: () => context.go('/decisions'),
-        ),
-        ColonyFloatMenuItem(
-          icon: Icons.sync_outlined,
-          label: AppStrings.syncTitle,
-          onSelected: () => context.go('/settings/sync'),
-        ),
-        ColonyFloatMenuItem(
-          icon: Icons.extension_outlined,
-          label: AppStrings.integrationsTitle,
-          onSelected: () => context.go('/settings/integrations'),
-        ),
-        ColonyFloatMenuItem(
-          icon: Icons.settings_outlined,
-          label: AppStrings.settings,
-          onSelected: () => context.go('/settings'),
-        ),
-      ],
-    );
-  }
 
   String _matchRoute(String location) {
     // Habitat lives under /colony/* but is opened from Mais.

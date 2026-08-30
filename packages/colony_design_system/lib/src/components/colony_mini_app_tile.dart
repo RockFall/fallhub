@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../chrome/colony_frame.dart';
+import '../chrome/colony_pixel_icon.dart';
 import '../tokens/colony_tokens.dart';
 
 /// Colorful mini-program tile: generated/asset icon or tinted fallback glyph.
@@ -13,7 +15,8 @@ class ColonyMiniAppTile extends StatelessWidget {
     this.iconAssetPackage,
     this.backgroundColor = ColonyMiniAppColors.more,
     this.badgeCount,
-    this.iconSize = 52,
+    this.iconSize = 40,
+    this.iconName,
   });
 
   final String label;
@@ -24,6 +27,7 @@ class ColonyMiniAppTile extends StatelessWidget {
   final Color backgroundColor;
   final int? badgeCount;
   final double iconSize;
+  final String? iconName;
 
   @override
   Widget build(BuildContext context) {
@@ -75,6 +79,14 @@ class ColonyMiniAppTile extends StatelessWidget {
   }
 
   Widget _iconFace() {
+    if (iconName != null) {
+      return ColonyFrame(
+        variant: ColonyFrameVariant.tile,
+        padding: const EdgeInsets.all(6),
+        child: ColonyPixelIcon(iconName!, size: iconSize * 0.62),
+      );
+    }
+
     final fallback = DecoratedBox(
       decoration: BoxDecoration(
         color: backgroundColor,
@@ -98,7 +110,7 @@ class ColonyMiniAppTile extends StatelessWidget {
         asset,
         package: iconAssetPackage,
         fit: BoxFit.cover,
-        filterQuality: FilterQuality.medium,
+        filterQuality: FilterQuality.none,
         errorBuilder: (_, _, _) => fallback,
       ),
     );

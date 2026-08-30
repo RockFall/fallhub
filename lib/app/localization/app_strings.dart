@@ -337,6 +337,74 @@ abstract final class AppStrings {
   static const homeQuickStudy = 'Estudar';
   static const homeQuickInbox = 'Inbox';
   static const homeQuickHabitat = 'Habitat';
+  static const homeAgendaTitle = 'Agenda do dia';
+  static const homeTodayWorkTitle = 'Trabalho de hoje';
+  static const homeRest = 'Descanso';
+  static const homeMood = 'Humor';
+  static const homeNow = 'NOW';
+  static const homeActionOpen = 'Abrir';
+  static const homeActionRegister = 'Registrar';
+  static const homeActionReply = 'Responder';
+  static const homeLivre = 'Livre';
+  static const homeSleepCheckIn = 'Check-in sono';
+  static const homeAgendaEmpty = 'Nenhum bloco hoje.';
+  static const homeWorkEmpty = 'Nenhuma ordem para hoje.';
+  static const homeMenu = 'Menu';
+  static const homeOpenSchedule = 'Abrir agenda';
+
+  static String homeWeekdayDate(DateTime local) {
+    const days = [
+      'segunda-feira',
+      'terça-feira',
+      'quarta-feira',
+      'quinta-feira',
+      'sexta-feira',
+      'sábado',
+      'domingo',
+    ];
+    const months = [
+      'janeiro',
+      'fevereiro',
+      'março',
+      'abril',
+      'maio',
+      'junho',
+      'julho',
+      'agosto',
+      'setembro',
+      'outubro',
+      'novembro',
+      'dezembro',
+    ];
+    final day = days[(local.weekday - 1).clamp(0, 6)];
+    final month = months[(local.month - 1).clamp(0, 11)];
+    return '${day.toUpperCase()}, ${local.day} DE ${month.toUpperCase()}';
+  }
+
+  static String homeTimeRange(DateTime start, DateTime end) {
+    String hm(DateTime v) {
+      final l = v.toLocal();
+      return '${l.hour.toString().padLeft(2, '0')}:${l.minute.toString().padLeft(2, '0')}';
+    }
+    return '${hm(start)} - ${hm(end)}';
+  }
+
+  static String homeInboxCount(int n) => 'Inbox $n';
+
+  static String scheduleBlockShortLabel(ScheduleBlockMode mode) => switch (mode) {
+        ScheduleBlockMode.sleep => 'Sono',
+        ScheduleBlockMode.routine => 'Rotina',
+        ScheduleBlockMode.focus => 'Foco',
+        ScheduleBlockMode.meeting => 'Aula',
+        ScheduleBlockMode.flexible => 'Flexível',
+        ScheduleBlockMode.exercise => 'Exercício',
+        ScheduleBlockMode.commute => 'Deslocamento',
+        ScheduleBlockMode.social => 'Social',
+        ScheduleBlockMode.recreation => 'Jantar',
+        ScheduleBlockMode.recovery => 'Recuperação',
+        ScheduleBlockMode.free => 'Livre',
+        ScheduleBlockMode.unavailable => 'Indisponível',
+      };
   static const homeNowTitle = 'Agora';
   static const homeNext24hTitle = 'Próximas 24 horas';
   static const homeNext24hEmpty = 'Nada na agenda nas próximas 24 horas.';

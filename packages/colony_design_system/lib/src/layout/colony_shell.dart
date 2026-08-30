@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../chrome/colony_button.dart';
+import '../chrome/colony_frame.dart';
 import '../chrome/colony_main_tab_bar.dart';
-import '../chrome/colony_surface.dart';
 import '../tokens/colony_tokens.dart';
 
 class ColonyDestination {
@@ -10,17 +10,19 @@ class ColonyDestination {
     required this.label,
     required this.icon,
     required this.route,
+    this.iconName,
   });
 
   final String label;
   final IconData icon;
   final String route;
+  final String? iconName;
 
   ColonyMainTab toMainTab() =>
-      ColonyMainTab(label: label, icon: icon, route: route);
+      ColonyMainTab(label: label, icon: icon, route: route, iconName: iconName);
 }
 
-/// App chrome: workspace + RimWorld-style main tabs on the bottom edge.
+/// App chrome: workspace + terminal main tabs on the bottom edge.
 class ColonyShell extends StatelessWidget {
   const ColonyShell({
     super.key,
@@ -35,6 +37,7 @@ class ColonyShell extends StatelessWidget {
     this.floatingActionButton,
     this.showCaptureFab = false,
     this.onCapture,
+    this.hideAppBar = false,
   });
 
   final List<ColonyDestination> destinations;
@@ -48,6 +51,7 @@ class ColonyShell extends StatelessWidget {
   final Widget? floatingActionButton;
   final bool showCaptureFab;
   final VoidCallback? onCapture;
+  final bool hideAppBar;
 
   @override
   Widget build(BuildContext context) {
@@ -55,22 +59,28 @@ class ColonyShell extends StatelessWidget {
         .map((d) => d.toMainTab())
         .toList();
 
-    final capture = floatingActionButton ??
+    final capture =
+        floatingActionButton ??
         (showCaptureFab && onCapture != null
             ? _CaptureGizmo(onPressed: onCapture!)
             : null);
-    final tabBarHeight = compact ? 52.0 : 48.0;
+    final tabBarHeight = compact ? 64.0 : 56.0;
     final bottomInset = MediaQuery.viewPaddingOf(context).bottom;
+    final showBar =
+        !hideAppBar && (appBarTitle != null || desktopTopBar != null);
 
     return Scaffold(
       backgroundColor: ColonyColors.void_,
-      appBar: appBarTitle == null && desktopTopBar == null
+      appBar: !showBar
           ? null
           : PreferredSize(
               preferredSize: const Size.fromHeight(48),
-              child: ColonySurface(
-                kind: ColonySurfaceKind.panel,
-                padding: const EdgeInsets.symmetric(horizontal: ColonySpacing.md),
+              child: ColonyFrame(
+                variant: ColonyFrameVariant.panel,
+                grain: true,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: ColonySpacing.md,
+                ),
                 child: SafeArea(
                   bottom: false,
                   child: SizedBox(
@@ -82,8 +92,12 @@ class ColonyShell extends StatelessWidget {
                         else ...[
                           Expanded(
                             child: Text(
-                              appBarTitle ?? '',
-                              style: Theme.of(context).textTheme.titleMedium,
+                              (appBarTitle ?? '').toUpperCase(),
+                              style: Theme.of(context).textTheme.titleMedium
+                                  ?.copyWith(
+                                    color: ColonyColors.textGold,
+                                    letterSpacing: 1.0,
+                                  ),
                             ),
                           ),
                           ...appBarActions,
@@ -97,10 +111,8 @@ class ColonyShell extends StatelessWidget {
       body: Stack(
         children: [
           Positioned.fill(
-            child: SafeArea(
-              top: appBarTitle == null && desktopTopBar == null,
-              bottom: false,
-              child: body,
+            child: ColonyVoidBackdrop(
+              child: SafeArea(top: !showBar, bottom: false, child: body),
             ),
           ),
           if (capture != null)

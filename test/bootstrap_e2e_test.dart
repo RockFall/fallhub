@@ -153,9 +153,8 @@ void main() {
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 500));
 
-    expect(find.textContaining('Colônia E2E'), findsOneWidget);
-    expect(find.text(AppStrings.homeMiniAppsTitle), findsOneWidget);
-    expect(find.text(AppStrings.habitatTitle), findsWidgets);
+    expect(find.textContaining('CAIO'), findsWidgets);
+    expect(find.text(AppStrings.habitatTitle.toUpperCase()), findsWidgets);
 
     router.go('/resources/finance');
     await tester.pump();

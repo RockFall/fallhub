@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../chrome/colony_pixel_icon.dart';
 import '../tokens/colony_tokens.dart';
 
 class ColonyMainTab {
@@ -7,21 +8,23 @@ class ColonyMainTab {
     required this.label,
     required this.icon,
     required this.route,
+    this.iconName,
   });
 
   final String label;
   final IconData icon;
   final String route;
+  final String? iconName;
 }
 
-/// Bottom main-tab strip (RimWorld MainTabWindow language).
+/// Bottom main-tab strip (Fallhub Terminal).
 class ColonyMainTabBar extends StatelessWidget {
   const ColonyMainTabBar({
     super.key,
     required this.tabs,
     required this.currentRoute,
     required this.onSelect,
-    this.height = 48,
+    this.height = 64,
   });
 
   final List<ColonyMainTab> tabs;
@@ -35,24 +38,29 @@ class ColonyMainTabBar extends StatelessWidget {
       color: ColonyColors.tab,
       child: SafeArea(
         top: false,
-        child: Container(
-          height: height,
+        child: DecoratedBox(
           decoration: const BoxDecoration(
             border: Border(
-              top: BorderSide(color: ColonyColors.borderStandard, width: 1),
+              top: BorderSide(color: ColonyColors.borderStandard, width: 1.4),
             ),
           ),
-          child: Row(
-            children: [
-              for (final tab in tabs)
-                Expanded(
-                  child: _MainTabButton(
-                    tab: tab,
-                    selected: currentRoute == tab.route,
-                    onTap: () => onSelect(tab.route),
+          child: SizedBox(
+            height: height,
+            child: Row(
+              children: [
+                for (var i = 0; i < tabs.length; i++) ...[
+                  if (i > 0)
+                    Container(width: 1, color: ColonyColors.borderSeparator),
+                  Expanded(
+                    child: _MainTabButton(
+                      tab: tabs[i],
+                      selected: currentRoute == tabs[i].route,
+                      onTap: () => onSelect(tabs[i].route),
+                    ),
                   ),
-                ),
-            ],
+                ],
+              ],
+            ),
           ),
         ),
       ),
@@ -82,44 +90,64 @@ class _MainTabButtonState extends State<_MainTabButton> {
   Widget build(BuildContext context) {
     final selected = widget.selected;
     final fg = selected
-        ? ColonyColors.textPrimary
+        ? ColonyColors.textGoldHi
         : _hover
-            ? ColonyColors.textMouseover
-            : ColonyColors.textMuted;
+        ? ColonyColors.textMouseover
+        : ColonyColors.textMuted;
 
     return MouseRegion(
       onEnter: (_) => setState(() => _hover = true),
       onExit: (_) => setState(() => _hover = false),
       child: InkWell(
         onTap: widget.onTap,
-        child: Container(
-          alignment: Alignment.center,
-          decoration: BoxDecoration(
-            color: selected ? ColonyColors.raised : Colors.transparent,
-            border: Border(
-              top: BorderSide(
-                color: selected
-                    ? ColonyColors.borderSelected
-                    : Colors.transparent,
-                width: 2,
-              ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
+          child: AnimatedContainer(
+            duration: ColonyDurations.fast,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: selected ? ColonyColors.tabActive : Colors.transparent,
+              borderRadius: BorderRadius.circular(ColonyRadii.sm),
+              border: selected
+                  ? Border.all(
+                      color: ColonyColors.brass.withValues(alpha: 0.55),
+                    )
+                  : null,
+              boxShadow: selected
+                  ? const [
+                      BoxShadow(
+                        color: Color(0x55E8C86A),
+                        blurRadius: 8,
+                        offset: Offset(0, -1),
+                      ),
+                    ]
+                  : null,
             ),
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(widget.tab.icon, size: 20, color: fg),
-              const SizedBox(height: 2),
-              Text(
-                widget.tab.label,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                      color: fg,
-                      fontSize: 11,
-                    ),
-              ),
-            ],
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                if (widget.tab.iconName != null)
+                  ColonyPixelIcon(
+                    widget.tab.iconName!,
+                    size: 22,
+                    mono: true,
+                    color: fg,
+                  )
+                else
+                  Icon(widget.tab.icon, size: 20, color: fg),
+                const SizedBox(height: 3),
+                Text(
+                  widget.tab.label.toUpperCase(),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                    color: fg,
+                    fontSize: 9,
+                    letterSpacing: 0.5,
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
