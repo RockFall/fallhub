@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import '../../../app/localization/app_strings.dart';
 import '../application/flashcard_providers.dart';
 import 'widgets/create_flashcard_tag_sheet.dart';
+import 'widgets/flashcard_bulk_delete_button.dart';
 
 class FlashcardTagScreen extends ConsumerWidget {
   const FlashcardTagScreen({super.key, required this.tagId});
@@ -118,6 +119,12 @@ class FlashcardTagScreen extends ConsumerWidget {
               context.go('/flashcards/study?tagId=$tagId&mode=practice'),
           icon: const Icon(Icons.bolt_outlined),
           label: const Text(AppStrings.flashcardsPracticeTag),
+        ),
+        const SizedBox(height: ColonySpacing.sm),
+        FlashcardBulkDeleteButton(
+          cards: tagged,
+          label: AppStrings.flashcardsDeleteTagCards(tagged.length),
+          confirmBody: AppStrings.flashcardsDeleteTagConfirmBody,
         ),
         const SizedBox(height: ColonySpacing.md),
         ColonyPanel(

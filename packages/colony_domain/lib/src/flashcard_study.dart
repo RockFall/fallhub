@@ -148,6 +148,28 @@ abstract final class FlashcardAreaPolicy {
     ).contains(areaId);
   }
 
+  /// Cards whose effective area sits in [rootId] (including aliases / subareas).
+  static List<Flashcard> cardsInArea({
+    required List<Flashcard> cards,
+    required EntityId rootId,
+    required List<KnowledgeArea> areas,
+    List<KnowledgeAreaPlacement> placements = const [],
+    List<FlashcardDeck> decks = const [],
+  }) {
+    final decksById = {for (final deck in decks) deck.id: deck};
+    return [
+      for (final card in cards)
+        if (isVisibleInArea(
+          card: card,
+          rootId: rootId,
+          areas: areas,
+          placements: placements,
+          decksById: decksById,
+        ))
+          card,
+    ];
+  }
+
   static bool canSpecialize({
     required EntityId? deckAreaId,
     required EntityId cardAreaId,

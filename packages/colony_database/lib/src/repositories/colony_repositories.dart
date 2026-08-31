@@ -6512,6 +6512,43 @@ class FlashcardRepository {
     });
   }
 
+  /// Deletes [cards] and reverse/cloze siblings in one transaction.
+  Future<int> deleteCards(List<Flashcard> cards) async {
+    if (cards.isEmpty) return 0;
+    return _db.transaction(() async {
+      final seedIds = {for (final card in cards) card.id.value};
+      if (seedIds.isEmpty) return 0;
+      final related = await (_db.select(_db.flashcards)
+            ..where(
+              (t) => t.id.isIn(seedIds.toList()) | t.reverseOfId.isIn(seedIds.toList()),
+            ))
+          .get();
+      final ids = {for (final row in related) row.id};
+      if (ids.isEmpty) return 0;
+      final idList = ids.toList();
+      await (_db.delete(_db.flashcardTagLinks)
+            ..where((t) => t.cardId.isIn(idList)))
+          .go();
+      await (_db.delete(_db.flashcardReviewLogs)
+            ..where((t) => t.cardId.isIn(idList)))
+          .go();
+      await (_db.delete(_db.flashcardSrs)..where((t) => t.cardId.isIn(idList)))
+          .go();
+      await (_db.delete(_db.flashcards)..where((t) => t.id.isIn(idList))).go();
+      await _events.record(
+        aggregateType: AggregateType.flashcard,
+        aggregateId: EntityId(idList.first),
+        eventType: EventType.flashcardDeleted,
+        payload: {
+          'count': ids.length,
+          'bulk': true,
+        },
+        sourceType: SourceType.manual,
+      );
+      return ids.length;
+    });
+  }
+
   Future<FlashcardJsonImportResult> importJson({
     required EntityId profileId,
     String? source,

@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:colony_database/colony_database.dart';
 import 'package:colony_domain/colony_domain.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -20,11 +22,27 @@ final idGeneratorProvider = Provider<IdGenerator>(
 );
 
 final clockProvider = Provider<DateTime Function()>(
-  (ref) => () => DateTime.now().toUtc(),
+  (ref) =>
+      () => DateTime.now().toUtc(),
 );
 
 final databaseProvider = Provider<ColonyDatabase>((ref) {
   throw UnimplementedError('Database must be overridden in bootstrap');
+});
+
+/// Live SQLite snapshot export/restore (ADR-051). Overridden at app bootstrap.
+class SqliteBackupPort {
+  const SqliteBackupPort({
+    required this.exportBytes,
+    required this.restoreBytes,
+  });
+
+  final Future<Uint8List> Function() exportBytes;
+  final Future<void> Function(Uint8List bytes) restoreBytes;
+}
+
+final sqliteBackupPortProvider = Provider<SqliteBackupPort>((ref) {
+  throw UnimplementedError('SqliteBackupPort must be overridden in bootstrap');
 });
 
 final repositoriesProvider = Provider<ColonyRepositories>((ref) {

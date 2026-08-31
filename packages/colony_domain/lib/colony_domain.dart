@@ -106,4 +106,5 @@ export 'src/music_canon.dart';
 export 'src/music_genre_atlas.dart';
 export 'src/music_spotify.dart';
 export 'src/spotify_streaming_history.dart';
+export 'src/sqlite_backup.dart';
 

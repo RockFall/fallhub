@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'dart:typed_data';
+
 import 'package:colony_database/colony_database.dart';
 import 'package:colony_design_system/colony_design_system.dart';
 import 'package:colony_domain/colony_domain.dart';
@@ -8,7 +11,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:fallhub/app/localization/app_strings.dart';
 import 'package:fallhub/core/providers/app_providers.dart';
 import 'package:fallhub/core/providers/feature_controllers.dart';
+import 'package:fallhub/features/settings/presentation/settings_screen.dart';
 import 'package:fallhub/features/settings/presentation/widgets/restore_preview_sheet.dart';
+import 'package:fallhub/features/settings/presentation/widgets/sqlite_restore_preview_sheet.dart';
 
 void main() {
   testWidgets('RestorePreviewSheet shows counts and confirms', (tester) async {
@@ -260,5 +265,104 @@ void main() {
     final profile = await repos.profiles.getActive();
     expect(profile!.colonyName, 'New Colony');
     await db.close();
+  });
+
+  testWidgets('SqliteRestorePreviewSheet shows schema and size', (tester) async {
+    tester.view.physicalSize = const Size(800, 1200);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    final sqlite = Uint8List(200);
+    sqlite.setRange(0, 15, ascii.encode('SQLite format 3'));
+    final backup = ColonySqliteBackup(
+      manifest: ColonySqliteBackupManifest(
+        schemaVersion: 45,
+        exportedAt: DateTime.utc(2026, 8, 31, 12),
+      ),
+      sqlite: sqlite,
+    );
+
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: ColonyTheme.dark(),
+        localizationsDelegates: const [
+          DefaultMaterialLocalizations.delegate,
+          DefaultWidgetsLocalizations.delegate,
+        ],
+        home: Builder(
+          builder: (context) => Scaffold(
+            body: Center(
+              child: FilledButton(
+                onPressed: () => SqliteRestorePreviewSheet.show(
+                  context,
+                  backup: backup,
+                ),
+                child: const Text('open'),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    await tester.tap(find.text('open'));
+    await tester.pumpAndSettle();
+
+    expect(find.text(AppStrings.sqliteBackupPreviewTitle), findsOneWidget);
+    expect(find.textContaining('v45'), findsOneWidget);
+    expect(
+      find.textContaining(AppStrings.sqliteBackupSizeValue(200)),
+      findsOneWidget,
+    );
+
+    await tester.tap(find.text(AppStrings.restoreCancel));
+    await tester.pumpAndSettle();
+    expect(find.text(AppStrings.sqliteBackupPreviewTitle), findsNothing);
+  });
+
+  testWidgets('SettingsScreen offers sqlite backup and JSON export', (tester) async {
+    tester.view.physicalSize = const Size(800, 1600);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    final db = ColonyDatabase.inMemory();
+    addTearDown(db.close);
+    final repos = ColonyRepositories.create(
+      db,
+      idGenerator: FixedIdGenerator([
+        for (var i = 1; i <= 20; i++) 'id-$i',
+      ]),
+      clock: () => DateTime.utc(2026, 8, 31, 12),
+    );
+    await repos.profiles.create(
+      colonyName: 'Test',
+      displayName: 'Caio',
+      timezone: 'UTC',
+      locale: 'pt_BR',
+      baseCurrency: 'BRL',
+    );
+    await repos.preferences.save(
+      AppPreferences.defaults().copyWith(onboardingCompleted: true),
+    );
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [databaseProvider.overrideWithValue(db)],
+        child: MaterialApp(
+          theme: ColonyTheme.dark(),
+          home: const Scaffold(body: SettingsScreen()),
+        ),
+      ),
+    );
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+
+    expect(find.text(AppStrings.sqliteBackupTitle), findsOneWidget);
+    expect(find.text(AppStrings.sqliteBackupExport), findsOneWidget);
+    expect(find.text(AppStrings.restoreData), findsOneWidget);
+    expect(find.text(AppStrings.exportData), findsOneWidget);
+    expect(find.text(AppStrings.sqliteBackupHint), findsOneWidget);
   });
 }
