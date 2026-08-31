@@ -335,6 +335,13 @@ class _NeedRail extends StatelessWidget {
     required this.onRecord,
   });
 
+  static const _primarySlugs = {'sono', 'alimentacao', 'lazer'};
+  static const _primaryFlex = 5;
+  static const _compactFlex = 3;
+  static const _primaryMin = 38.0;
+  static const _compactMin = 22.0;
+  static const _ruleExtent = 10.0;
+
   final List<NeedSnapshot> snapshots;
   final EntityId? selectedId;
   final ValueChanged<NeedSnapshot> onSelect;
@@ -345,38 +352,73 @@ class _NeedRail extends StatelessWidget {
     if (snapshots.isEmpty) {
       return Center(child: Text(AppStrings.needsStable));
     }
+    final primary = [
+      for (final snapshot in snapshots)
+        if (_primarySlugs.contains(snapshot.definition.slug)) snapshot,
+    ];
+    final compact = [
+      for (final snapshot in snapshots)
+        if (!_primarySlugs.contains(snapshot.definition.slug)) snapshot,
+    ];
+
     return LayoutBuilder(
       builder: (context, constraints) {
-        const minRow = 32.0;
+        final needed =
+            primary.length * _primaryMin +
+            compact.length * _compactMin +
+            (primary.isNotEmpty && compact.isNotEmpty ? _ruleExtent : 0);
         final useFlex =
-            constraints.hasBoundedHeight &&
-            constraints.maxHeight >= snapshots.length * minRow;
-        final bars = [
-          for (final snapshot in snapshots)
-            NeedInspectBar(
-              label: snapshot.definition.name,
-              value: snapshot.normalizedValue,
-              selected: snapshot.definition.id == selectedId,
-              showPointer: snapshot.definition.id == selectedId,
-              fillSlot: true,
-              semanticId: 'pawn.need.${snapshot.definition.slug}',
-              onTap: () => onSelect(snapshot),
-              onLongPress: () => onRecord(snapshot),
-            ),
+            constraints.hasBoundedHeight && constraints.maxHeight >= needed;
+
+        Widget bar(NeedSnapshot snapshot, NeedInspectBarScale scale) {
+          return NeedInspectBar(
+            label: snapshot.definition.name,
+            value: snapshot.normalizedValue,
+            selected: snapshot.definition.id == selectedId,
+            scale: scale,
+            showChevron: true,
+            showPointer: snapshot.definition.id == selectedId,
+            fillSlot: true,
+            semanticId: 'pawn.need.${snapshot.definition.slug}',
+            onTap: () => onSelect(snapshot),
+            onLongPress: () => onRecord(snapshot),
+          );
+        }
+
+        final children = <Widget>[
+          for (final snapshot in primary)
+            useFlex
+                ? Expanded(
+                    flex: _primaryFlex,
+                    child: bar(snapshot, NeedInspectBarScale.primary),
+                  )
+                : SizedBox(
+                    height: _primaryMin,
+                    child: bar(snapshot, NeedInspectBarScale.primary),
+                  ),
+          if (primary.isNotEmpty && compact.isNotEmpty)
+            const NeedInspectGroupRule(),
+          for (final snapshot in compact)
+            useFlex
+                ? Expanded(
+                    flex: _compactFlex,
+                    child: bar(snapshot, NeedInspectBarScale.compact),
+                  )
+                : SizedBox(
+                    height: _compactMin,
+                    child: bar(snapshot, NeedInspectBarScale.compact),
+                  ),
         ];
+
         if (useFlex) {
           return Padding(
-            padding: const EdgeInsets.only(right: 6),
-            child: Column(
-              children: [for (final bar in bars) Expanded(child: bar)],
-            ),
+            padding: const EdgeInsets.only(right: 4),
+            child: Column(children: children),
           );
         }
         return ListView(
-          padding: const EdgeInsets.only(right: 6),
-          children: [
-            for (final bar in bars) SizedBox(height: minRow, child: bar),
-          ],
+          padding: const EdgeInsets.only(right: 4),
+          children: children,
         );
       },
     );
@@ -405,7 +447,7 @@ class _HumorPane extends StatelessWidget {
           NeedInspectBar(
             label: AppStrings.mood,
             value: checkIn?.mood,
-            prominent: true,
+            scale: NeedInspectBarScale.featured,
             showPointer: true,
             semanticId: 'pawn.need.humor',
             onTap: onOpenChart,

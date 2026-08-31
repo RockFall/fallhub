@@ -77,4 +77,36 @@ void main() {
     expect(tester.takeException(), isNull);
     expect(find.text('SONO'), findsOneWidget);
   });
+
+  testWidgets('NeedInspectBar primary label is larger than compact', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: ColonyTheme.dark(),
+        home: const Scaffold(
+          body: Column(
+            children: [
+              NeedInspectBar(
+                label: 'Sono',
+                value: 0.4,
+                scale: NeedInspectBarScale.primary,
+              ),
+              NeedInspectBar(
+                label: 'Foco',
+                value: 0.3,
+                scale: NeedInspectBarScale.compact,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+
+    final sono = tester.widget<Text>(find.text('SONO'));
+    final foco = tester.widget<Text>(find.text('FOCO'));
+    expect(sono.style!.fontSize, 11);
+    expect(foco.style!.fontSize, 8);
+    expect(sono.style!.fontSize, greaterThan(foco.style!.fontSize!));
+  });
 }

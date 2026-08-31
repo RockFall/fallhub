@@ -70,6 +70,10 @@ void main() {
     expect(find.text('ANSIEDADE'), findsOneWidget);
     expect(find.text('CAMINHADA'), findsOneWidget);
 
+    final sono = tester.widget<Text>(find.text('SONO'));
+    final anxiety = tester.widget<Text>(find.text('ANSIEDADE'));
+    expect(sono.style!.fontSize, greaterThan(anxiety.style!.fontSize!));
+
     await tester.tap(find.text('SONO'));
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 400));
