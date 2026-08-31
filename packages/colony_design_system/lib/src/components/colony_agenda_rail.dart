@@ -107,8 +107,9 @@ class ColonyAgendaRail extends StatelessWidget {
                   Text(
                     emptyLabel ?? '—',
                     textAlign: TextAlign.center,
-                    style: Theme.of(context).textTheme.bodySmall
-                        ?.copyWith(color: ColonyColors.textMuted),
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: ColonyColors.textMuted,
+                    ),
                   ),
                   if (emptyHint != null) ...[
                     const SizedBox(height: 6),
@@ -292,12 +293,12 @@ class _AllDayChip extends StatelessWidget {
         fill: block.color,
         grain: false,
         onTap: block.onTap,
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+        padding: const EdgeInsets.fromLTRB(5, 4, 8, 4),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             if (block.iconName != null) ...[
-              ColonyPixelIcon(block.iconName!, size: 14),
+              _AgendaIconMark(name: block.iconName!, size: 16, well: 22),
               const SizedBox(width: 6),
             ],
             Flexible(
@@ -381,58 +382,104 @@ class _BlockCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final stripe = Color.lerp(block.color, const Color(0xFFE8E0D4), 0.38);
+    final fill = Color.lerp(block.color, const Color(0xFF3A4048), 0.12);
     return Padding(
-      padding: const EdgeInsets.only(right: 2, bottom: 2),
+      padding: const EdgeInsets.only(right: 2, bottom: 3),
       child: ColonyFrame(
         variant: ColonyFrameVariant.block,
-        fill: block.color,
+        fill: fill,
         grain: false,
         onTap: block.onTap,
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        padding: EdgeInsets.zero,
         child: Row(
           children: [
-            if (block.iconName != null) ...[
-              ColonyPixelIcon(block.iconName!, size: 18),
-              const SizedBox(width: 8),
-            ],
+            Container(width: 4, color: stripe),
             Expanded(
-              child: FittedBox(
-                fit: BoxFit.scaleDown,
-                alignment: Alignment.centerLeft,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(6, 4, 8, 4),
+                child: Row(
                   children: [
-                    Text(
-                      block.title.toUpperCase(),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                        color: ColonyColors.textPrimary,
-                        fontSize: 12,
-                        letterSpacing: 0.7,
-                        height: 1.0,
+                    if (block.iconName != null) ...[
+                      _AgendaIconMark(name: block.iconName!),
+                      const SizedBox(width: 8),
+                    ],
+                    Expanded(
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        alignment: Alignment.centerLeft,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              block.title.toUpperCase(),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: Theme.of(context).textTheme.labelLarge
+                                  ?.copyWith(
+                                    color: ColonyColors.textPrimary,
+                                    fontSize: 12,
+                                    letterSpacing: 0.8,
+                                    height: 1.0,
+                                  ),
+                            ),
+                            const SizedBox(height: 3),
+                            Text(
+                              block.timeLabel,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: Theme.of(context).textTheme.labelSmall
+                                  ?.copyWith(
+                                    color: ColonyColors.textMuted,
+                                    fontSize: 9,
+                                    letterSpacing: 0.2,
+                                    height: 1.0,
+                                  ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
-                    const SizedBox(height: 2),
-                    Text(
-                      block.timeLabel,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                        color: ColonyColors.textSecondary,
-                        fontSize: 9,
-                        height: 1.0,
-                      ),
-                    ),
+                    if (block.warning) ...[
+                      const SizedBox(width: 4),
+                      const ColonyPixelIcon('warning', size: 14),
+                    ],
                   ],
                 ),
               ),
             ),
-            if (block.warning) const ColonyPixelIcon('warning', size: 14),
           ],
         ),
       ),
+    );
+  }
+}
+
+class _AgendaIconMark extends StatelessWidget {
+  const _AgendaIconMark({required this.name, this.size = 20, this.well = 26});
+
+  final String name;
+  final double size;
+  final double well;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: well,
+      height: well,
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        color: const Color(0xCC080A0E),
+        borderRadius: BorderRadius.circular(3),
+        border: const Border(
+          top: BorderSide(color: Color(0x99000000)),
+          left: BorderSide(color: Color(0x99000000)),
+          bottom: BorderSide(color: Color(0x55C8C4B8)),
+          right: BorderSide(color: Color(0x33C8C4B8)),
+        ),
+      ),
+      child: ColonyPixelIcon(name, size: size),
     );
   }
 }
@@ -453,57 +500,81 @@ class _NowOverlay extends StatelessWidget {
     final hh = clock.hour.toString().padLeft(2, '0');
     final mm = clock.minute.toString().padLeft(2, '0');
     return IgnorePointer(
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
+      child: Stack(
+        clipBehavior: Clip.none,
+        alignment: Alignment.centerLeft,
         children: [
-          SizedBox(
-            width: railWidth - 10,
-            child: CustomPaint(
-              painter: _GoldDashPainter(),
-              child: const SizedBox(height: 2, width: double.infinity),
+          Positioned(
+            left: railWidth - 13,
+            top: 9,
+            child: Container(
+              width: 10,
+              height: 10,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: ColonyColors.textGoldHi,
+                boxShadow: [
+                  BoxShadow(
+                    color: ColonyColors.textGoldHi.withValues(alpha: 0.55),
+                    blurRadius: 7,
+                  ),
+                ],
+              ),
             ),
           ),
-          Column(
-            mainAxisSize: MainAxisSize.min,
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              CustomPaint(
-                painter: _HexPainter(),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 3,
+              SizedBox(
+                width: railWidth - 10,
+                child: CustomPaint(
+                  painter: _GoldDashPainter(),
+                  child: const SizedBox(height: 2, width: double.infinity),
+                ),
+              ),
+              Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  CustomPaint(
+                    painter: _HexPainter(),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 3,
+                      ),
+                      child: Text(
+                        label,
+                        style: const TextStyle(
+                          fontFamily: 'Pixelify Sans',
+                          fontSize: 8,
+                          fontWeight: FontWeight.w700,
+                          color: Color(0xFF1A1408),
+                          letterSpacing: 0.7,
+                          height: 1,
+                        ),
+                      ),
+                    ),
                   ),
-                  child: Text(
-                    label,
+                  const SizedBox(height: 1),
+                  Text(
+                    '$hh:$mm',
                     style: const TextStyle(
                       fontFamily: 'Pixelify Sans',
-                      fontSize: 8,
-                      fontWeight: FontWeight.w700,
-                      color: Color(0xFF1A1408),
-                      letterSpacing: 0.7,
+                      fontSize: 9,
+                      color: ColonyColors.textGoldHi,
                       height: 1,
                     ),
                   ),
-                ),
+                ],
               ),
-              const SizedBox(height: 1),
-              Text(
-                '$hh:$mm',
-                style: const TextStyle(
-                  fontFamily: 'Pixelify Sans',
-                  fontSize: 9,
-                  color: ColonyColors.textGoldHi,
-                  height: 1,
+              const SizedBox(width: 2),
+              Expanded(
+                child: CustomPaint(
+                  painter: _GoldDashPainter(),
+                  child: const SizedBox(height: 2, width: double.infinity),
                 ),
               ),
             ],
-          ),
-          const SizedBox(width: 2),
-          Expanded(
-            child: CustomPaint(
-              painter: _GoldDashPainter(),
-              child: const SizedBox(height: 2, width: double.infinity),
-            ),
           ),
         ],
       ),

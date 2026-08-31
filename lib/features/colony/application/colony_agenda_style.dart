@@ -8,7 +8,7 @@ import '../../../app/localization/app_strings.dart';
   return switch (mode) {
     ScheduleBlockMode.sleep => (ColonyAgendaColors.sleep, 'moon'),
     ScheduleBlockMode.focus => (ColonyAgendaColors.focus, 'crosshair'),
-    ScheduleBlockMode.meeting => (ColonyAgendaColors.meeting, 'cap'),
+    ScheduleBlockMode.meeting => (ColonyAgendaColors.meeting, 'briefcase'),
     ScheduleBlockMode.recreation => (ColonyAgendaColors.meal, 'utensils'),
     ScheduleBlockMode.free => (ColonyAgendaColors.free, 'star'),
     ScheduleBlockMode.exercise => (ColonyAgendaColors.exercise, 'exercise'),
@@ -36,10 +36,14 @@ List<ColonyAgendaBlock> buildColonyAgendaBlocks({
           ScheduleTimelineItemKind.external => ScheduleBlockMode.meeting,
           ScheduleTimelineItemKind.block => ScheduleBlockMode.flexible,
         };
-    final style = agendaStyleFor(mode);
+    // Native blocks show the short mode label (Sono, Aula, Foco…). External
+    // calendar titles keep their own wording so "reunião" / "aula" can match.
     final title = item.block != null
         ? AppStrings.scheduleBlockShortLabel(mode)
         : item.label;
+    final hint = matchAgendaIcon(title);
+    final tinted = hint?.mode ?? mode;
+    final style = agendaStyleFor(tinted);
     final allDay = _isAllDayItem(item, day);
     blocks.add(
       ColonyAgendaBlock(
@@ -51,7 +55,7 @@ List<ColonyAgendaBlock> buildColonyAgendaBlocks({
         start: item.startAt,
         end: item.endAt,
         color: style.$1,
-        iconName: style.$2,
+        iconName: hint?.iconName ?? style.$2,
         warning: conflictIds.contains(item.id),
         onTap: onOpenSchedule,
         allDay: allDay,

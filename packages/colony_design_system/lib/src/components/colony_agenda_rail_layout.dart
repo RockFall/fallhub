@@ -34,7 +34,7 @@ class ColonyAgendaBlock {
 const kColonyAgendaRailPad = 8.0;
 
 /// Short meetings stay tappable on a tall day scale.
-const kColonyAgendaMinBlockHeight = 28.0;
+const kColonyAgendaMinBlockHeight = 38.0;
 
 const kColonyAgendaBlockGap = 3.0;
 

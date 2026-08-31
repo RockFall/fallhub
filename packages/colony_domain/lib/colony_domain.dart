@@ -20,6 +20,7 @@ export 'src/work_enums.dart';
 export 'src/work_priority.dart';
 export 'src/bill.dart';
 export 'src/schedule_block.dart';
+export 'src/agenda_icon_lexicon.dart';
 export 'src/schedule_day.dart';
 export 'src/schedule_conflict.dart';
 export 'src/project.dart';

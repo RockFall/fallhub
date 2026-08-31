@@ -29,6 +29,7 @@ void main() {
                 start: DateTime(2026, 8, 31),
                 end: DateTime(2026, 9, 1),
                 color: ColonyAgendaColors.social,
+                iconName: 'cake',
                 allDay: true,
               ),
               ColonyAgendaBlock(
@@ -38,6 +39,7 @@ void main() {
                 start: DateTime(2026, 8, 31, 10),
                 end: DateTime(2026, 8, 31, 11),
                 color: ColonyAgendaColors.meeting,
+                iconName: 'briefcase',
               ),
               ColonyAgendaBlock(
                 id: 'aula',
@@ -45,7 +47,9 @@ void main() {
                 timeLabel: '19:00 - 21:00',
                 start: DateTime(2026, 8, 31, 19),
                 end: DateTime(2026, 8, 31, 21),
-                color: ColonyAgendaColors.focus,
+                color: ColonyAgendaColors.meeting,
+                iconName: 'cap',
+                warning: true,
               ),
             ],
           ),
@@ -68,6 +72,20 @@ void main() {
     expect(
       tester.getRect(find.byKey(const ValueKey('agenda-allday-bday'))).bottom,
       lessThan(meet.top),
+    );
+    expect(
+      find.byWidgetPredicate((w) => w is ColonyPixelIcon && w.name == 'cake'),
+      findsOneWidget,
+    );
+    expect(
+      find.byWidgetPredicate(
+        (w) => w is ColonyPixelIcon && w.name == 'briefcase',
+      ),
+      findsOneWidget,
+    );
+    expect(
+      find.byWidgetPredicate((w) => w is ColonyPixelIcon && w.name == 'cap'),
+      findsOneWidget,
     );
   });
 }

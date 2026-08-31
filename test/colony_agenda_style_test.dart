@@ -86,5 +86,56 @@ void main() {
       blocks.singleWhere((b) => b.id == 'bday').timeLabel,
       AppStrings.homeAllDay,
     );
+    expect(blocks.singleWhere((b) => b.id == 'bday').iconName, 'cake');
+    expect(blocks.singleWhere((b) => b.id == 'aula').iconName, 'cap');
+  });
+
+  test('keyword lexicon maps reuniao to briefcase even with accents', () {
+    final day = DateTime(2026, 8, 31);
+    final blocks = buildColonyAgendaBlocks(
+      day: day,
+      items: [
+        ScheduleTimelineItem(
+          id: 'meet',
+          startAt: DateTime(2026, 8, 31, 10),
+          endAt: DateTime(2026, 8, 31, 11),
+          kind: ScheduleTimelineItemKind.external,
+          label: 'REUNIÃO rebond',
+        ),
+      ],
+      conflictIds: const {},
+    );
+    expect(blocks.single.iconName, 'briefcase');
+  });
+
+  test('native meeting blocks keep the Aula cap from the short label', () {
+    final day = DateTime(2026, 5, 19);
+    final blocks = buildColonyAgendaBlocks(
+      day: day,
+      items: [
+        ScheduleTimelineItem(
+          id: 'aula',
+          startAt: DateTime(2026, 5, 19, 14, 30),
+          endAt: DateTime(2026, 5, 19, 16),
+          kind: ScheduleTimelineItemKind.block,
+          label: 'Reunião',
+          block: ScheduleBlock(
+            id: EntityId('aula'),
+            profileId: EntityId('p'),
+            startAt: DateTime(2026, 5, 19, 14, 30),
+            endAt: DateTime(2026, 5, 19, 16),
+            mode: ScheduleBlockMode.meeting,
+            createdAt: DateTime(2026, 5, 19),
+            updatedAt: DateTime(2026, 5, 19),
+          ),
+        ),
+      ],
+      conflictIds: const {},
+    );
+    expect(
+      blocks.single.title,
+      AppStrings.scheduleBlockShortLabel(ScheduleBlockMode.meeting),
+    );
+    expect(blocks.single.iconName, 'cap');
   });
 }
