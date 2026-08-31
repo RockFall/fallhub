@@ -11,7 +11,7 @@ class NeedInspectBar extends StatelessWidget {
     this.value,
     this.selected = false,
     this.showTicks = true,
-    this.showPointer = true,
+    this.showPointer = false,
     this.prominent = false,
     this.fillSlot = false,
     this.onTap,
@@ -30,15 +30,15 @@ class NeedInspectBar extends StatelessWidget {
   final VoidCallback? onLongPress;
   final String? semanticId;
 
-  double get _railHeight => prominent ? 20 : 15;
-  double get _pointerGutter => showPointer ? 7 : 0;
-  double get _labelSize => prominent ? 11 : 10;
+  double get _railHeight => prominent ? 22 : 14;
+  double get _pointerGutter => showPointer ? 8 : 0;
+  double get _labelSize => prominent ? 11 : 9;
 
   @override
   Widget build(BuildContext context) {
     final labelColor = selected
         ? ColonyColors.textGoldHi
-        : ColonyColors.textGold;
+        : ColonyColors.textSecondary;
 
     final column = Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -61,7 +61,7 @@ class NeedInspectBar extends StatelessWidget {
             ),
           ),
         ),
-        SizedBox(height: prominent ? 4 : 2),
+        SizedBox(height: prominent ? 3 : 1),
         SizedBox(
           height: _railHeight + _pointerGutter,
           child: CustomPaint(
@@ -79,10 +79,10 @@ class NeedInspectBar extends StatelessWidget {
 
     final padded = Padding(
       padding: EdgeInsets.fromLTRB(
-        prominent ? 2 : 4,
-        fillSlot ? 0 : 2,
-        prominent ? 2 : 6,
-        fillSlot ? 0 : 2,
+        prominent ? 0 : 2,
+        0,
+        prominent ? 0 : 4,
+        0,
       ),
       child: column,
     );
@@ -92,7 +92,7 @@ class NeedInspectBar extends StatelessWidget {
             builder: (context, constraints) {
               return FittedBox(
                 fit: BoxFit.scaleDown,
-                alignment: Alignment.centerLeft,
+                alignment: Alignment.center,
                 child: SizedBox(width: constraints.maxWidth, child: padded),
               );
             },
@@ -156,7 +156,7 @@ class NeedInspectRailPainter extends CustomPainter {
 
     if (showTicks) {
       final tick = Paint()
-        ..color = const Color(0x66000000)
+        ..color = const Color(0x997A848C)
         ..strokeWidth = 1
         ..strokeCap = StrokeCap.square;
       for (final t in const [0.25, 0.5, 0.75]) {
@@ -184,8 +184,8 @@ class NeedInspectRailPainter extends CustomPainter {
       final top = rail.bottom + 1;
       final path = Path()
         ..moveTo(x, top)
-        ..lineTo(x - 4.5, top + 6)
-        ..lineTo(x + 4.5, top + 6)
+        ..lineTo(x - 3.5, top + 5)
+        ..lineTo(x + 3.5, top + 5)
         ..close();
       canvas.drawPath(path, Paint()..color = const Color(0xFFF4F0E8));
     }

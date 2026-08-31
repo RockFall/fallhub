@@ -91,9 +91,12 @@ class _NeedsInspectTabState extends ConsumerState<NeedsInspectTab> {
                               onRecord: widget.onRecordNeed,
                             ),
                           ),
-                          const ColoredBox(
-                            color: ColonyColors.borderSeparator,
-                            child: SizedBox(width: 1),
+                          const Padding(
+                            padding: EdgeInsets.symmetric(vertical: 6),
+                            child: ColoredBox(
+                              color: ColonyColors.borderSeparator,
+                              child: SizedBox(width: 1),
+                            ),
                           ),
                           Expanded(
                             child: AnimatedSwitcher(
@@ -344,7 +347,7 @@ class _NeedRail extends StatelessWidget {
     }
     return LayoutBuilder(
       builder: (context, constraints) {
-        const minRow = 38.0;
+        const minRow = 32.0;
         final useFlex =
             constraints.hasBoundedHeight &&
             constraints.maxHeight >= snapshots.length * minRow;
@@ -354,6 +357,7 @@ class _NeedRail extends StatelessWidget {
               label: snapshot.definition.name,
               value: snapshot.normalizedValue,
               selected: snapshot.definition.id == selectedId,
+              showPointer: snapshot.definition.id == selectedId,
               fillSlot: true,
               semanticId: 'pawn.need.${snapshot.definition.slug}',
               onTap: () => onSelect(snapshot),
@@ -402,10 +406,11 @@ class _HumorPane extends StatelessWidget {
             label: AppStrings.mood,
             value: checkIn?.mood,
             prominent: true,
+            showPointer: true,
             semanticId: 'pawn.need.humor',
             onTap: onOpenChart,
           ),
-          const SizedBox(height: ColonySpacing.sm),
+          const SizedBox(height: 10),
           Expanded(
             child: checkIn == null
                 ? Text(
