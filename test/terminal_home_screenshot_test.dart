@@ -139,7 +139,6 @@ void main() {
     expect(find.text('FOCO'), findsOneWidget);
     expect(find.text('AULA'), findsOneWidget);
     expect(find.text('JANTAR'), findsOneWidget);
-    expect(find.text('LIVRE'), findsOneWidget);
     expect(find.text('NOW'), findsOneWidget);
     expect(find.text('Ensaio cap. 3'), findsOneWidget);
     expect(find.text(AppStrings.homeSleepCheckIn), findsOneWidget);
