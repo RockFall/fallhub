@@ -55,6 +55,7 @@ class ColonyAgendaRail extends StatelessWidget {
       variant: ColonyFrameVariant.panel,
       padding: const EdgeInsets.fromLTRB(8, 8, 8, 8),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Row(
@@ -187,6 +188,7 @@ class _AgendaBody extends StatelessWidget {
     final nowY = nowHour == null || !nowInWindow ? null : layout.yAt(nowHour);
 
     return Column(
+      mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         if (layout.allDay.isNotEmpty) ...[
@@ -468,18 +470,20 @@ class _AgendaIconMark extends StatelessWidget {
     return Container(
       width: well,
       height: well,
-      alignment: Alignment.center,
+      padding: const EdgeInsets.all(1),
       decoration: BoxDecoration(
-        color: const Color(0xCC080A0E),
+        color: const Color(0x99000000),
         borderRadius: BorderRadius.circular(3),
-        border: const Border(
-          top: BorderSide(color: Color(0x99000000)),
-          left: BorderSide(color: Color(0x99000000)),
-          bottom: BorderSide(color: Color(0x55C8C4B8)),
-          right: BorderSide(color: Color(0x33C8C4B8)),
-        ),
+        border: Border.all(color: const Color(0xCC050608)),
       ),
-      child: ColonyPixelIcon(name, size: size),
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: const Color(0xCC080A0E),
+          borderRadius: BorderRadius.circular(2),
+          border: Border.all(color: const Color(0x33C8C4B8)),
+        ),
+        child: Center(child: ColonyPixelIcon(name, size: size)),
+      ),
     );
   }
 }

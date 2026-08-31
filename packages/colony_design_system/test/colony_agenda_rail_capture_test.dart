@@ -98,7 +98,7 @@ void main() {
     await _writePng(
       tester,
       find.byKey(const ValueKey('agenda-rail-shot')),
-      'agenda_icons_keywords.png',
+      'agenda_keyword_icons_rail.png',
     );
   });
 
@@ -183,7 +183,7 @@ void main() {
       await _writePng(
         tester,
         find.byKey(const ValueKey('agenda-rail-ref')),
-        'agenda_icons_reference_day.png',
+        'agenda_day_icons_reference.png',
       );
     },
   );
