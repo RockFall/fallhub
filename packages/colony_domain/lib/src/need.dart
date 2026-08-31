@@ -37,23 +37,50 @@ class NeedDefinition extends Equatable {
   final DateTime createdAt;
   final DateTime updatedAt;
 
+  NeedDefinition copyWith({
+    String? name,
+    String? slug,
+    NeedPrivacyClass? privacyClass,
+    bool? isEnabled,
+    bool? isSubjective,
+    int? sortOrder,
+    DateTime? updatedAt,
+  }) {
+    return NeedDefinition(
+      id: id,
+      profileId: profileId,
+      name: name ?? this.name,
+      slug: slug ?? this.slug,
+      calculationMode: calculationMode,
+      privacyClass: privacyClass ?? this.privacyClass,
+      createdAt: createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      preferredMin: preferredMin,
+      preferredMax: preferredMax,
+      validitySeconds: validitySeconds,
+      isEnabled: isEnabled ?? this.isEnabled,
+      isSubjective: isSubjective ?? this.isSubjective,
+      sortOrder: sortOrder ?? this.sortOrder,
+    );
+  }
+
   @override
   List<Object?> get props => [
-        id,
-        profileId,
-        name,
-        slug,
-        calculationMode,
-        preferredMin,
-        preferredMax,
-        validitySeconds,
-        privacyClass,
-        isEnabled,
-        isSubjective,
-        sortOrder,
-        createdAt,
-        updatedAt,
-      ];
+    id,
+    profileId,
+    name,
+    slug,
+    calculationMode,
+    preferredMin,
+    preferredMax,
+    validitySeconds,
+    privacyClass,
+    isEnabled,
+    isSubjective,
+    sortOrder,
+    createdAt,
+    updatedAt,
+  ];
 }
 
 class NeedReading extends Equatable {
@@ -105,18 +132,18 @@ class NeedReading extends Equatable {
 
   @override
   List<Object?> get props => [
-        id,
-        needId,
-        observedAt,
-        normalizedValue,
-        rawValue,
-        rawUnit,
-        sourceType,
-        sourceId,
-        confidence,
-        note,
-        createdAt,
-      ];
+    id,
+    needId,
+    observedAt,
+    normalizedValue,
+    rawValue,
+    rawUnit,
+    sourceType,
+    sourceId,
+    confidence,
+    note,
+    createdAt,
+  ];
 }
 
 class NeedSnapshot extends Equatable {
@@ -140,13 +167,13 @@ class NeedSnapshot extends Equatable {
 
   @override
   List<Object?> get props => [
-        definition,
-        latestReading,
-        freshness,
-        confidence,
-        sourceSummary,
-        statusText,
-      ];
+    definition,
+    latestReading,
+    freshness,
+    confidence,
+    sourceSummary,
+    statusText,
+  ];
 }
 
 abstract final class NeedSnapshotCalculator {
@@ -170,8 +197,8 @@ abstract final class NeedSnapshotCalculator {
     final freshness = age <= validity
         ? DataFreshness.current
         : age <= validity * 2
-            ? DataFreshness.recent
-            : DataFreshness.stale;
+        ? DataFreshness.recent
+        : DataFreshness.stale;
 
     final value = reading.normalizedValue;
     final statusText = value == null
@@ -185,8 +212,8 @@ abstract final class NeedSnapshotCalculator {
       confidence: reading.confidence >= 0.8
           ? ConfidenceLevel.high
           : reading.confidence >= 0.5
-              ? ConfidenceLevel.medium
-              : ConfidenceLevel.low,
+          ? ConfidenceLevel.medium
+          : ConfidenceLevel.low,
       sourceSummary: reading.sourceType == SourceType.manual
           ? 'Informado por você'
           : reading.sourceType.name,
@@ -202,13 +229,133 @@ abstract final class NeedSnapshotCalculator {
   }
 }
 
+class NeedSeed extends Equatable {
+  const NeedSeed({
+    required this.name,
+    required this.slug,
+    required this.subjective,
+    this.privacyClass = NeedPrivacyClass.standard,
+    this.aliases = const [],
+  });
+
+  final String name;
+  final String slug;
+  final bool subjective;
+  final NeedPrivacyClass privacyClass;
+  final List<String> aliases;
+
+  bool matchesSlug(String value) => value == slug || aliases.contains(value);
+
+  @override
+  List<Object?> get props => [name, slug, subjective, privacyClass, aliases];
+}
+
+/// Catalog of needs shown on the pawn inspect. Humor is tracked via check-in.
 abstract final class DefaultNeedSeeds {
-  static List<({String name, String slug, bool subjective})> get core => [
-        (name: 'Sono', slug: 'sono', subjective: false),
-        (name: 'Alimentação', slug: 'alimentacao', subjective: true),
-        (name: 'Movimento', slug: 'movimento', subjective: false),
-        (name: 'Conexão social', slug: 'conexao_social', subjective: true),
-        (name: 'Foco mental', slug: 'foco_mental', subjective: true),
-        (name: 'Descanso', slug: 'descanso', subjective: true),
-      ];
+  static const core = <NeedSeed>[
+    NeedSeed(name: 'Sono', slug: 'sono', subjective: false),
+    NeedSeed(name: 'Alimentação', slug: 'alimentacao', subjective: true),
+    NeedSeed(
+      name: 'Lazer',
+      slug: 'lazer',
+      subjective: true,
+      aliases: ['descanso'],
+    ),
+    NeedSeed(
+      name: 'Social',
+      slug: 'social',
+      subjective: true,
+      aliases: ['conexao_social'],
+    ),
+    NeedSeed(name: 'Higiene', slug: 'higiene', subjective: true),
+    NeedSeed(name: 'Organização', slug: 'organizacao', subjective: true),
+    NeedSeed(name: 'Ar livre', slug: 'ar_livre', subjective: true),
+    NeedSeed(
+      name: 'Sexo',
+      slug: 'sexo',
+      subjective: true,
+      privacyClass: NeedPrivacyClass.highlySensitive,
+    ),
+    NeedSeed(name: 'Realização', slug: 'realizacao', subjective: true),
+    NeedSeed(
+      name: 'Foco',
+      slug: 'foco',
+      subjective: true,
+      aliases: ['foco_mental'],
+    ),
+    NeedSeed(name: 'Movimento', slug: 'movimento', subjective: false),
+    NeedSeed(
+      name: 'Ansiedade',
+      slug: 'ansiedade',
+      subjective: true,
+      privacyClass: NeedPrivacyClass.sensitive,
+    ),
+  ];
+}
+
+class NeedHistorySample extends Equatable {
+  const NeedHistorySample({
+    required this.id,
+    required this.observedAt,
+    this.value,
+    this.note,
+  });
+
+  final EntityId id;
+  final DateTime observedAt;
+  final double? value;
+  final String? note;
+
+  @override
+  List<Object?> get props => [id, observedAt, value, note];
+}
+
+class NeedDayBucket extends Equatable {
+  const NeedDayBucket({
+    required this.day,
+    this.value,
+    this.sourceId,
+    this.note,
+  });
+
+  /// Local calendar day at 00:00.
+  final DateTime day;
+  final double? value;
+  final EntityId? sourceId;
+  final String? note;
+
+  @override
+  List<Object?> get props => [day, value, sourceId, note];
+}
+
+abstract final class NeedHistorySeries {
+  static List<NeedDayBucket> lastLocalDays({
+    required DateTime nowLocal,
+    required List<NeedHistorySample> samples,
+    int days = 7,
+  }) {
+    final today = DateTime(nowLocal.year, nowLocal.month, nowLocal.day);
+    final byDay = <DateTime, NeedHistorySample>{};
+    for (final sample in samples) {
+      final local = sample.observedAt.toLocal();
+      final key = DateTime(local.year, local.month, local.day);
+      final previous = byDay[key];
+      if (previous == null ||
+          sample.observedAt.isAfter(previous.observedAt) ||
+          sample.observedAt.isAtSameMomentAs(previous.observedAt)) {
+        byDay[key] = sample;
+      }
+    }
+
+    return List.generate(days, (i) {
+      final day = today.subtract(Duration(days: days - 1 - i));
+      final sample = byDay[day];
+      return NeedDayBucket(
+        day: day,
+        value: sample?.value,
+        sourceId: sample?.id,
+        note: sample?.note,
+      );
+    });
+  }
 }
