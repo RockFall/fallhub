@@ -408,6 +408,23 @@ abstract final class AppStrings {
     return '${day.toUpperCase()}, ${local.day} DE ${month.toUpperCase()}';
   }
 
+  static String weekdayInitial(DateTime local) {
+    const initials = ['S', 'T', 'Q', 'Q', 'S', 'S', 'D'];
+    return initials[(local.weekday - 1).clamp(0, 6)];
+  }
+
+  static String needChartTitle(String name) =>
+      '${name.toUpperCase()} · $needHistoryDays';
+
+  static String needDayHeadline(DateTime local, String scaleLabel) {
+    const short = ['SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SÁB', 'DOM'];
+    final weekday = short[(local.weekday - 1).clamp(0, 6)];
+    return '$weekday ${local.day} · $scaleLabel';
+  }
+
+  static String scaleFiveLabel(double normalized) =>
+      '${denormalizeScale5(normalized)}/5';
+
   static String homeTimeRange(DateTime start, DateTime end) {
     String hm(DateTime v) {
       final l = v.toLocal();
@@ -501,6 +518,9 @@ abstract final class AppStrings {
   static const pawnTabNeeds = 'Necessidades';
   static const pawnTabMind = 'Mente';
   static const mood = 'Humor';
+  static const needHistoryDays = '7 dias';
+  static const needNoHistory = 'Sem registros nestes 7 dias.';
+  static const needRecordToday = 'Registrar hoje';
   static const energy = 'Energia';
   static const tension = 'Tensão';
   static const focus = 'Foco';

@@ -1127,27 +1127,45 @@ class NeedRepository {
 
   Future<void> seedDefaults(EntityId profileId) async {
     final existing = await (_db.select(_db.needDefinitions)
-          ..where((t) => t.profileId.equals(profileId.value))
-          ..limit(1))
-        .getSingleOrNull();
-    if (existing != null) return;
-
+          ..where((t) => t.profileId.equals(profileId.value)))
+        .get();
+    final unmatched = [...existing];
     final now = _clock();
     var order = 0;
+
     for (final seed in DefaultNeedSeeds.core) {
-      final def = NeedDefinition(
-        id: EntityId(_ids.newId()),
-        profileId: profileId,
-        name: seed.name,
-        slug: seed.slug,
-        calculationMode: CalculationMode.manual,
-        privacyClass: NeedPrivacyClass.standard,
-        isSubjective: seed.subjective,
-        sortOrder: order++,
-        createdAt: now,
-        updatedAt: now,
-      );
-      await _db.into(_db.needDefinitions).insert(ColonyMappers.fromNeedDefinition(def));
+      final index = unmatched.indexWhere((row) => seed.matchesSlug(row.slug));
+      if (index >= 0) {
+        final row = unmatched.removeAt(index);
+        await (_db.update(_db.needDefinitions)
+              ..where((t) => t.id.equals(row.id)))
+            .write(
+          NeedDefinitionsCompanion(
+            name: Value(seed.name),
+            slug: Value(seed.slug),
+            privacyClass: Value(seed.privacyClass.name),
+            isSubjective: Value(seed.subjective),
+            sortOrder: Value(order),
+            isEnabled: const Value(true),
+            updatedAt: Value(now.millisecondsSinceEpoch),
+          ),
+        );
+      } else {
+        final def = NeedDefinition(
+          id: EntityId(_ids.newId()),
+          profileId: profileId,
+          name: seed.name,
+          slug: seed.slug,
+          calculationMode: CalculationMode.manual,
+          privacyClass: seed.privacyClass,
+          isSubjective: seed.subjective,
+          sortOrder: order,
+          createdAt: now,
+          updatedAt: now,
+        );
+        await _db.into(_db.needDefinitions).insert(ColonyMappers.fromNeedDefinition(def));
+      }
+      order++;
     }
   }
 
@@ -1161,8 +1179,19 @@ class NeedRepository {
         .map((rows) => rows.map(ColonyMappers.toNeedDefinition).toList());
   }
 
+  Future<List<NeedDefinition>> listEnabled(EntityId profileId) async {
+    final rows = await (_db.select(_db.needDefinitions)
+          ..where(
+            (t) =>
+                t.profileId.equals(profileId.value) & t.isEnabled.equals(true),
+          )
+          ..orderBy([(t) => OrderingTerm.asc(t.sortOrder)]))
+        .get();
+    return rows.map(ColonyMappers.toNeedDefinition).toList();
+  }
+
   Future<List<NeedSnapshot>> buildSnapshots(EntityId profileId) async {
-    final defs = await watchEnabled(profileId).first;
+    final defs = await listEnabled(profileId);
     final now = _clock();
     final snapshots = <NeedSnapshot>[];
     for (final def in defs) {
@@ -1173,9 +1202,26 @@ class NeedRepository {
   }
 
   Stream<List<NeedSnapshot>> watchSnapshots(EntityId profileId) async* {
-    await for (final _ in watchEnabled(profileId)) {
-      yield await buildSnapshots(profileId);
-    }
+    yield await buildSnapshots(profileId);
+    yield* watchEnabled(profileId).asyncMap((_) => buildSnapshots(profileId));
+  }
+
+  Future<List<NeedReading>> listReadings(
+    EntityId needId, {
+    DateTime? since,
+  }) async {
+    final rows = await (_db.select(_db.needReadings)
+          ..where((t) {
+            final byNeed = t.needId.equals(needId.value);
+            if (since == null) return byNeed;
+            return byNeed &
+                t.observedAt.isBiggerOrEqualValue(
+                  since.toUtc().millisecondsSinceEpoch,
+                );
+          })
+          ..orderBy([(t) => OrderingTerm.asc(t.observedAt)]))
+        .get();
+    return rows.map(ColonyMappers.toNeedReading).toList();
   }
 
   Future<NeedReading?> getLatestReading(EntityId needId) async {
@@ -1318,6 +1364,20 @@ class CheckInRepository {
     });
 
     return checkIn;
+  }
+
+  Future<List<CheckIn>> listSince(EntityId profileId, DateTime since) async {
+    final rows = await (_db.select(_db.checkIns)
+          ..where(
+            (t) =>
+                t.profileId.equals(profileId.value) &
+                t.observedAt.isBiggerOrEqualValue(
+                  since.toUtc().millisecondsSinceEpoch,
+                ),
+          )
+          ..orderBy([(t) => OrderingTerm.asc(t.observedAt)]))
+        .get();
+    return rows.map(ColonyMappers.toCheckIn).toList();
   }
 
   Future<List<CheckIn>> listAll(EntityId profileId) async {

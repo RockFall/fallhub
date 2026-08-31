@@ -29,6 +29,8 @@ export 'src/components/day_timeline.dart';
 export 'src/components/inspect_pane.dart';
 export 'src/components/modifier_list.dart';
 export 'src/components/need_bar.dart';
+export 'src/components/need_inspect_bar.dart';
+export 'src/components/need_sparkline.dart';
 export 'src/components/priority_cell.dart';
 export 'src/components/timeline_letter.dart';
 export 'src/layout/colony_shell.dart';

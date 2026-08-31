@@ -21,6 +21,12 @@ void main() {
         'need-4',
         'need-5',
         'need-6',
+        'need-7',
+        'need-8',
+        'need-9',
+        'need-10',
+        'need-11',
+        'need-12',
         'reading-1',
         'checkin-1',
         'factor-1',
@@ -94,7 +100,11 @@ void main() {
 
     await repos.needs.seedDefaults(profile.id);
     final snapshots = await repos.needs.buildSnapshots(profile.id);
-    expect(snapshots, hasLength(6));
+    expect(snapshots, hasLength(DefaultNeedSeeds.core.length));
+    expect(
+      snapshots.map((s) => s.definition.slug).toList(),
+      DefaultNeedSeeds.core.map((s) => s.slug).toList(),
+    );
 
     final checkIn = await repos.checkIns.save(
       profileId: profile.id,
@@ -108,6 +118,24 @@ void main() {
     expect(checkIn.moodLabel, isNotEmpty);
     final factors = await repos.checkIns.getFactors(checkIn.id);
     expect(factors, hasLength(1));
+
+    final sono = snapshots.firstWhere((s) => s.definition.slug == 'sono');
+    await repos.needs.recordReading(
+      needId: sono.definition.id,
+      normalizedValue: 0.4,
+    );
+    final history = await repos.needs.listReadings(sono.definition.id);
+    expect(history, hasLength(1));
+    expect(history.first.normalizedValue, 0.4);
+
+    final recent = await repos.checkIns.listSince(
+      profile.id,
+      DateTime.utc(2026, 8, 1),
+    );
+    expect(recent, hasLength(1));
+    await repos.needs.seedDefaults(profile.id);
+    final again = await repos.needs.buildSnapshots(profile.id);
+    expect(again, hasLength(DefaultNeedSeeds.core.length));
   });
 
   test('seeds work priorities and cycles level', () async {

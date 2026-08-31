@@ -12,6 +12,7 @@ import '../application/pawn_controllers.dart';
 import '../application/pawn_providers.dart';
 import 'widgets/check_in_sheet.dart';
 import 'widgets/need_reading_sheet.dart';
+import 'widgets/needs_inspect_tab.dart';
 
 class PawnScreen extends ConsumerStatefulWidget {
   const PawnScreen({super.key});
@@ -76,6 +77,8 @@ class _PawnScreenState extends ConsumerState<PawnScreen>
             ),
             TabBar(
               controller: _tabs,
+              isScrollable: true,
+              tabAlignment: TabAlignment.start,
               tabs: const [
                 Tab(text: AppStrings.pawnTabSummary),
                 Tab(text: AppStrings.pawnTabNeeds),
@@ -88,9 +91,11 @@ class _PawnScreenState extends ConsumerState<PawnScreen>
                 controller: _tabs,
                 children: [
                   _SummaryTab(profile: p, checkIn: checkIn),
-                  _NeedsTab(onRecord: (snapshot) {
-                    NeedReadingSheet.show(context, snapshot: snapshot);
-                  }),
+                  NeedsInspectTab(
+                    onRecordNeed: (snapshot) {
+                      NeedReadingSheet.show(context, snapshot: snapshot);
+                    },
+                  ),
                   _MindTab(checkIn: checkIn),
                   const _ActivationTab(),
                 ],
@@ -128,89 +133,46 @@ class _PawnHeader extends StatelessWidget {
         color: ColonyColors.raised,
         border: Border(bottom: BorderSide(color: ColonyColors.borderSubtle)),
       ),
-      child: compact
-          ? Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                _profileRow(context),
-                const SizedBox(height: ColonySpacing.sm),
-                Wrap(
-                  spacing: ColonySpacing.sm,
-                  runSpacing: ColonySpacing.sm,
-                  children: [
-                    OutlinedButton(
-                      onPressed: onWeeklyReview,
-                      child: const Text(AppStrings.weeklyReview),
-                    ),
-                    OutlinedButton(
-                      onPressed: onDailyReview,
-                      child: const Text(AppStrings.dailyReview),
-                    ),
-                    FilledButton(
-                      onPressed: onCheckIn,
-                      child: const Text(AppStrings.checkIn),
-                    ),
-                  ],
-                ),
-              ],
-            )
-          : Row(
-              children: [
-                Expanded(child: _profileRow(context)),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          _profileRow(context),
+          const SizedBox(height: ColonySpacing.sm),
+          Wrap(
+            spacing: ColonySpacing.sm,
+            runSpacing: ColonySpacing.sm,
+            children: [
+              if (!compact)
                 OutlinedButton(
                   onPressed: () => context.go('/colony/pawn-create'),
                   child: const Text(AppStrings.habitatEditPawn),
                 ),
-                const SizedBox(width: ColonySpacing.sm),
-                OutlinedButton(
-                  onPressed: onWeeklyReview,
-                  child: const Text(AppStrings.weeklyReview),
-                ),
-                const SizedBox(width: ColonySpacing.sm),
-                OutlinedButton(
-                  onPressed: onDailyReview,
-                  child: const Text(AppStrings.dailyReview),
-                ),
-                const SizedBox(width: ColonySpacing.sm),
-                FilledButton(
-                  onPressed: onCheckIn,
-                  child: const Text(AppStrings.checkIn),
-                ),
-              ],
-            ),
+              OutlinedButton(
+                onPressed: onWeeklyReview,
+                child: const Text(AppStrings.weeklyReview),
+              ),
+              OutlinedButton(
+                onPressed: onDailyReview,
+                child: const Text(AppStrings.dailyReview),
+              ),
+              FilledButton(
+                onPressed: onCheckIn,
+                child: const Text(AppStrings.checkIn),
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 
   Widget _profileRow(BuildContext context) {
-    return Row(
-      children: [
-        CircleAvatar(
-          radius: 28,
-          backgroundColor: ColonyColors.panel,
-          child: Text(
-            profile.displayName.isNotEmpty
-                ? profile.displayName[0].toUpperCase()
-                : '?',
-            style: Theme.of(context).textTheme.titleLarge,
-          ),
-        ),
-        const SizedBox(width: ColonySpacing.lg),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(profile.displayName,
-                  style: Theme.of(context).textTheme.titleLarge),
-              Text(
-                checkIn == null
-                    ? AppStrings.noCheckInYet
-                    : '${AppStrings.mood}: ${checkIn!.moodLabel} · ${AppStrings.energy}: ${checkIn!.energyLabel}',
-                style: Theme.of(context).textTheme.bodySmall,
-              ),
-            ],
-          ),
-        ),
-      ],
+    return ColonyPawnBanner(
+      name: profile.displayName,
+      restPips: ColonyPipMeter.countFor(checkIn?.energy),
+      moodPips: ColonyPipMeter.countFor(checkIn?.mood),
+      restLabel: AppStrings.homeRest,
+      moodLabel: AppStrings.homeMood,
     );
   }
 }
@@ -293,75 +255,6 @@ class _SummaryTab extends ConsumerWidget {
             error: (_, __) => const SizedBox.shrink(),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class _NeedsTab extends ConsumerWidget {
-  const _NeedsTab({required this.onRecord});
-
-  final void Function(NeedSnapshot snapshot) onRecord;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final needs = ref.watch(needSnapshotsProvider);
-
-    return needs.when(
-      loading: () => const Center(child: CircularProgressIndicator()),
-      error: (_, __) => Center(child: Text(AppStrings.errorGeneric)),
-      data: (snapshots) => ListView.separated(
-        padding: const EdgeInsets.all(ColonySpacing.lg),
-        itemCount: snapshots.length,
-        separatorBuilder: (_, __) => const SizedBox(height: ColonySpacing.md),
-        itemBuilder: (context, index) {
-          final s = snapshots[index];
-          return ColonyPanel(
-            title: s.definition.name,
-            actions: [
-              IconButton(
-                tooltip: AppStrings.recordNeed,
-                icon: const Icon(Icons.edit_outlined, size: 18),
-                onPressed: () => onRecord(s),
-              ),
-            ],
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                NeedBar(
-                  data: NeedBarData(
-                    label: s.definition.name,
-                    normalizedValue: s.normalizedValue,
-                    targetMin: s.definition.preferredMin,
-                    targetMax: s.definition.preferredMax,
-                    warningThreshold: s.definition.preferredMin,
-                    statusText: s.statusText,
-                    sourceSummary: '${s.sourceSummary} · ${s.freshness.name}',
-                  ),
-                ),
-                const SizedBox(height: ColonySpacing.sm),
-                Row(
-                  children: [
-                    DataProvenanceBadge(
-                      kind: ProvenanceDisplay.manual,
-                      compact: false,
-                    ),
-                    const SizedBox(width: ColonySpacing.sm),
-                    ConfidenceChip(
-                      level: switch (s.confidence) {
-                        ConfidenceLevel.high => ConfidenceDisplay.high,
-                        ConfidenceLevel.medium => ConfidenceDisplay.medium,
-                        ConfidenceLevel.low => ConfidenceDisplay.low,
-                        ConfidenceLevel.insufficient =>
-                          ConfidenceDisplay.insufficient,
-                      },
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          );
-        },
       ),
     );
   }
