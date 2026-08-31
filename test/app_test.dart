@@ -72,7 +72,8 @@ void main() {
 
     expect(find.text('CRIAR COLÔNIA'), findsNothing);
     expect(find.text(AppStrings.startColony), findsNothing);
-    expect(find.textContaining('Colônia Nova'), findsWidgets);
+    expect(find.textContaining('CAIO'), findsWidgets);
+    expect(find.textContaining(AppStrings.habitatTitle.toUpperCase()), findsWidgets);
     await _drainTimers(tester);
   });
 

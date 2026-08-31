@@ -247,7 +247,7 @@ void main() {
 
   testWidgets('home card shows empty prompt and composer', (tester) async {
     await pumpScreen(tester, home: const PlanDayHomeCard());
-    expect(find.text(AppStrings.planDayTitle), findsOneWidget);
+    expect(find.text(AppStrings.planDayTitle.toUpperCase()), findsOneWidget);
     expect(find.text(AppStrings.planDayHomeEmpty), findsOneWidget);
     expect(find.text(AppStrings.planDayHomeCta), findsOneWidget);
     await _drainTimers(tester);

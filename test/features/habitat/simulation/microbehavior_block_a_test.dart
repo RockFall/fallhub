@@ -175,21 +175,39 @@ void main() {
     });
 
     test('ambient slower than conversation', () {
-      final conv = ReactionLatency.compute(
-        const ReactionLatencyContext(
-          eventClass: ReactionEventClass.conversationBeat,
-          pawnId: 'a',
-          salt: 1,
-        ),
+      final (convLo, convHi) = ReactionLatencyRanges.forClass(
+        ReactionEventClass.conversationBeat,
       );
-      final amb = ReactionLatency.compute(
-        const ReactionLatencyContext(
-          eventClass: ReactionEventClass.ambientEvent,
-          pawnId: 'a',
-          salt: 1,
-        ),
+      final (ambLo, ambHi) = ReactionLatencyRanges.forClass(
+        ReactionEventClass.ambientEvent,
       );
-      expect(amb, greaterThan(conv));
+      expect(ambLo, greaterThan(convLo));
+      expect(ambHi, greaterThan(convHi));
+
+      // Class bands overlap (conversation 0.12–0.60, ambient 0.25–1.40),
+      // and HabitatRng uses Object.hash, which is not stable across Dart
+      // versions — so a single salt can invert. The design invariant is that
+      // ambient is slower on average.
+      var convSum = 0.0;
+      var ambSum = 0.0;
+      const n = 32;
+      for (var salt = 0; salt < n; salt++) {
+        convSum += ReactionLatency.compute(
+          ReactionLatencyContext(
+            eventClass: ReactionEventClass.conversationBeat,
+            pawnId: 'a',
+            salt: salt,
+          ),
+        );
+        ambSum += ReactionLatency.compute(
+          ReactionLatencyContext(
+            eventClass: ReactionEventClass.ambientEvent,
+            pawnId: 'a',
+            salt: salt,
+          ),
+        );
+      }
+      expect(ambSum / n, greaterThan(convSum / n));
     });
 
     test('same seed reproduces', () {

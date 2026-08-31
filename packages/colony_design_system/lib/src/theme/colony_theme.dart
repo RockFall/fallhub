@@ -23,7 +23,7 @@ abstract final class ColonyTheme {
       onSurfaceVariant: ColonyColors.textMuted,
       outline: ColonyColors.borderStandard,
       outlineVariant: ColonyColors.borderDark,
-      tertiary: ColonyColors.textOption,
+      tertiary: ColonyColors.textGold,
       onTertiary: ColonyColors.textInverse,
     );
 
@@ -56,11 +56,11 @@ abstract final class ColonyTheme {
         elevation: 0,
         scrolledUnderElevation: 0,
         centerTitle: false,
-        titleTextStyle: textTheme.titleMedium,
-        systemOverlayStyle: SystemUiOverlayStyle.light,
-        shape: const Border(
-          bottom: BorderSide(color: ColonyColors.borderStandard, width: 1),
+        titleTextStyle: textTheme.titleMedium?.copyWith(
+          color: ColonyColors.textGold,
+          letterSpacing: 0.8,
         ),
+        systemOverlayStyle: SystemUiOverlayStyle.light,
       ),
       cardTheme: CardThemeData(
         color: ColonyColors.panel,
@@ -68,7 +68,7 @@ abstract final class ColonyTheme {
         margin: EdgeInsets.zero,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(ColonyRadii.md),
-          side: const BorderSide(color: ColonyColors.borderHighlight),
+          side: const BorderSide(color: ColonyColors.borderOuter),
         ),
       ),
       chipTheme: ChipThemeData(
@@ -107,25 +107,21 @@ abstract final class ColonyTheme {
           borderRadius: BorderRadius.circular(ColonyRadii.md),
           side: const BorderSide(color: ColonyColors.borderStandard),
         ),
-        titleTextStyle: textTheme.titleLarge,
+        titleTextStyle: textTheme.titleLarge?.copyWith(
+          color: ColonyColors.textGold,
+        ),
         contentTextStyle: textTheme.bodyMedium,
       ),
       bottomSheetTheme: const BottomSheetThemeData(
-        backgroundColor: ColonyColors.window,
-        modalBackgroundColor: ColonyColors.window,
+        backgroundColor: Colors.transparent,
+        modalBackgroundColor: Colors.transparent,
         elevation: 0,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(
-            top: Radius.circular(ColonyRadii.md),
-          ),
-          side: BorderSide(color: ColonyColors.borderStandard),
-        ),
         showDragHandle: false,
       ),
       snackBarTheme: SnackBarThemeData(
         backgroundColor: ColonyColors.panel,
         contentTextStyle: textTheme.bodyMedium,
-        actionTextColor: ColonyColors.textMouseover,
+        actionTextColor: ColonyColors.textGoldHi,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(ColonyRadii.md),
           side: const BorderSide(color: ColonyColors.borderStandard),
@@ -134,7 +130,7 @@ abstract final class ColonyTheme {
       ),
       tabBarTheme: TabBarThemeData(
         indicatorColor: ColonyColors.borderSelected,
-        labelColor: ColonyColors.textPrimary,
+        labelColor: ColonyColors.textGoldHi,
         unselectedLabelColor: ColonyColors.textMuted,
         dividerColor: ColonyColors.borderSeparator,
         overlayColor: WidgetStateProperty.all(ColonyColors.hoverOverlay),
@@ -146,7 +142,7 @@ abstract final class ColonyTheme {
       outlinedButtonTheme: OutlinedButtonThemeData(style: _subtleButtonStyle()),
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
-          foregroundColor: ColonyColors.textOption,
+          foregroundColor: ColonyColors.textGold,
           textStyle: textTheme.labelLarge,
           overlayColor: ColonyColors.hoverOverlay,
         ),
@@ -183,7 +179,9 @@ abstract final class ColonyTheme {
           borderRadius: BorderRadius.circular(ColonyRadii.md),
           borderSide: const BorderSide(color: ColonyColors.borderFocus),
         ),
-        labelStyle: textTheme.bodySmall?.copyWith(color: ColonyColors.textMuted),
+        labelStyle: textTheme.bodySmall?.copyWith(
+          color: ColonyColors.textMuted,
+        ),
         hintStyle: textTheme.bodySmall?.copyWith(color: ColonyColors.textMuted),
       ),
       checkboxTheme: CheckboxThemeData(
@@ -204,7 +202,9 @@ abstract final class ColonyTheme {
           color: ColonyColors.window,
           border: Border.all(color: ColonyColors.borderStandard),
         ),
-        textStyle: textTheme.bodySmall?.copyWith(color: ColonyColors.textPrimary),
+        textStyle: textTheme.bodySmall?.copyWith(
+          color: ColonyColors.textPrimary,
+        ),
         waitDuration: const Duration(milliseconds: 350),
       ),
       progressIndicatorTheme: const ProgressIndicatorThemeData(
@@ -213,19 +213,19 @@ abstract final class ColonyTheme {
       ),
       navigationBarTheme: NavigationBarThemeData(
         backgroundColor: ColonyColors.tab,
-        indicatorColor: ColonyColors.raised,
+        indicatorColor: ColonyColors.tabActive,
         elevation: 0,
         labelTextStyle: WidgetStateProperty.resolveWith((states) {
           return textTheme.labelSmall?.copyWith(
             color: states.contains(WidgetState.selected)
-                ? ColonyColors.textPrimary
+                ? ColonyColors.textGoldHi
                 : ColonyColors.textMuted,
           );
         }),
         iconTheme: WidgetStateProperty.resolveWith((states) {
           return IconThemeData(
             color: states.contains(WidgetState.selected)
-                ? ColonyColors.textPrimary
+                ? ColonyColors.textGoldHi
                 : ColonyColors.textMuted,
             size: 20,
           );
@@ -233,16 +233,15 @@ abstract final class ColonyTheme {
       ),
       navigationRailTheme: const NavigationRailThemeData(
         backgroundColor: ColonyColors.tab,
-        selectedIconTheme: IconThemeData(color: ColonyColors.textPrimary),
+        selectedIconTheme: IconThemeData(color: ColonyColors.textGoldHi),
         unselectedIconTheme: IconThemeData(color: ColonyColors.textMuted),
-        selectedLabelTextStyle: TextStyle(color: ColonyColors.textPrimary),
+        selectedLabelTextStyle: TextStyle(color: ColonyColors.textGoldHi),
         unselectedLabelTextStyle: TextStyle(color: ColonyColors.textMuted),
-        indicatorColor: ColonyColors.raised,
+        indicatorColor: ColonyColors.tabActive,
       ),
     );
   }
 
-  /// Light is not a RimWorld target — keep dark chrome.
   static ThemeData light() => dark();
 
   static ButtonStyle _actionButtonStyle() {
@@ -268,20 +267,21 @@ abstract final class ColonyTheme {
       }),
       overlayColor: const WidgetStatePropertyAll(Colors.transparent),
       padding: const WidgetStatePropertyAll(
-        EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        EdgeInsets.symmetric(horizontal: 14, vertical: 8),
       ),
-      minimumSize: const WidgetStatePropertyAll(Size(120, 40)),
+      minimumSize: const WidgetStatePropertyAll(Size(88, 32)),
       shape: WidgetStatePropertyAll(
         RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(ColonyRadii.md),
+          borderRadius: BorderRadius.circular(ColonyRadii.sm),
           side: const BorderSide(color: ColonyColors.actionBorder),
         ),
       ),
       textStyle: WidgetStatePropertyAll(
         TextStyle(
           fontFamily: ColonyFonts.familyPrimary,
-          fontSize: 13,
+          fontSize: 12,
           fontWeight: FontWeight.w600,
+          letterSpacing: 0.8,
         ),
       ),
     );
@@ -322,48 +322,39 @@ abstract final class ColonyTheme {
   }
 
   static TextTheme _textTheme(Color primary, Color secondary) {
-    TextStyle tiny(Color c) => TextStyle(
-          fontFamily: ColonyFonts.familyTiny,
-          color: c,
-          fontSize: 11,
-          height: 1.10,
-          fontWeight: FontWeight.w400,
-        );
-    TextStyle small(Color c) => TextStyle(
+    TextStyle pixel(Color c, double size, {FontWeight w = FontWeight.w400}) =>
+        TextStyle(
           fontFamily: ColonyFonts.familyPrimary,
           color: c,
-          fontSize: 14,
-          height: ColonySizes.smallFontHeight / 14,
-          fontWeight: FontWeight.w400,
-        );
-    TextStyle medium(Color c) => TextStyle(
-          fontFamily: ColonyFonts.familyPrimary,
-          color: c,
-          fontSize: 18,
-          height: 1.14,
-          fontWeight: FontWeight.w500,
+          fontSize: size,
+          height: 1.15,
+          fontWeight: w,
+          letterSpacing: 0.3,
         );
 
     return TextTheme(
-      headlineMedium: medium(primary).copyWith(
-        fontSize: 22,
-        fontWeight: FontWeight.w600,
-        height: 1.08,
-      ),
-      titleLarge: medium(primary).copyWith(fontWeight: FontWeight.w600),
-      titleMedium: small(primary).copyWith(
-        fontSize: 16,
-        fontWeight: FontWeight.w500,
-      ),
-      bodyLarge: small(primary).copyWith(fontSize: 16),
-      bodyMedium: small(primary),
-      bodySmall: tiny(secondary),
-      labelLarge: small(primary).copyWith(
-        fontSize: 13,
-        fontWeight: FontWeight.w600,
-        letterSpacing: 0.2,
-      ),
-      labelSmall: tiny(secondary),
+      headlineMedium: pixel(
+        primary,
+        22,
+        w: FontWeight.w600,
+      ).copyWith(height: 1.08),
+      headlineSmall: pixel(primary, 20, w: FontWeight.w600),
+      titleLarge: pixel(primary, 18, w: FontWeight.w600),
+      titleMedium: pixel(primary, 16, w: FontWeight.w500),
+      titleSmall: pixel(
+        ColonyColors.textGold,
+        13,
+        w: FontWeight.w600,
+      ).copyWith(letterSpacing: 1.1),
+      bodyLarge: pixel(primary, 15),
+      bodyMedium: pixel(primary, 13),
+      bodySmall: pixel(secondary, 11),
+      labelLarge: pixel(
+        primary,
+        12,
+        w: FontWeight.w600,
+      ).copyWith(letterSpacing: 0.8),
+      labelSmall: pixel(secondary, 10).copyWith(letterSpacing: 0.6),
     );
   }
 }

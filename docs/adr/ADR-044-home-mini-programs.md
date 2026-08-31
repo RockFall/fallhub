@@ -20,5 +20,5 @@ Queremos uma superfície de primeiro nível no estilo de super-app (referência 
 - Teto de programas no menu Mais como única navegação.
 
 ## Consequências
-- A home passa a ser o índice de funcionalidades; o menu Mais permanece para o mesmo conjunto.
-- Testes da home afirmam grelha + nome da colônia, não o texto “Mapa operacional”.
+- A home móvel passou a ser o **Fallhub Terminal** (ADR-049): pawn + agenda + trabalho + grelha 3×2. O catálogo de mini-programas permanece no menu Mais / hamburger.
+- Testes da home afirmam o terminal (nome do pawn, agenda, grelha), não o texto “Programas”.

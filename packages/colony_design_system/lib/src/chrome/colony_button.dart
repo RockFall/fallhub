@@ -1,17 +1,19 @@
 import 'package:flutter/material.dart';
 
 import '../tokens/colony_tokens.dart';
-import 'colony_assets.dart';
 
 enum ColonyButtonVariant {
-  /// Ocre ButtonBG (confirmações / ações decisivas).
+  /// Copper plate, cream/gold label.
   action,
 
-  /// Grafite ButtonSubtle (ações comuns).
+  /// Copper plate, dark inscribed label (work-row CTAs).
+  inscribed,
+
+  /// Quiet metal plate.
   subtle,
 }
 
-/// Textured RimWorld-style button (atlas 9-slice + estados).
+/// Bevelled terminal button (physical switch: light top, dark base).
 class ColonyButton extends StatefulWidget {
   const ColonyButton({
     super.key,
@@ -19,9 +21,9 @@ class ColonyButton extends StatefulWidget {
     required this.child,
     this.variant = ColonyButtonVariant.action,
     this.expanded = false,
-    this.height = 40,
-    this.minWidth = 120,
-    this.padding = const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+    this.height = 32,
+    this.minWidth = 88,
+    this.padding = const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
   });
 
   final VoidCallback? onPressed;
@@ -42,25 +44,40 @@ class _ColonyButtonState extends State<ColonyButton> {
 
   bool get _enabled => widget.onPressed != null;
 
-  String get _atlas {
-    if (!_enabled) return ColonyAssets.buttonDisabled;
-    if (_pressed) return ColonyAssets.buttonPressed;
-    if (_hover) return ColonyAssets.buttonHover;
-    return widget.variant == ColonyButtonVariant.action
-        ? ColonyAssets.buttonNormal
-        : ColonyAssets.menuSection;
+  bool get _copper => widget.variant != ColonyButtonVariant.subtle;
+
+  Color get _fill {
+    if (!_enabled) return ColonyColors.actionDisabled;
+    if (widget.variant == ColonyButtonVariant.subtle) {
+      if (_pressed) return ColonyColors.optionSelected;
+      if (_hover) return ColonyColors.raised;
+      return ColonyColors.subtle;
+    }
+    if (_pressed) return ColonyColors.actionPressed;
+    if (_hover) return ColonyColors.actionHover;
+    return ColonyColors.actionBase;
+  }
+
+  Color get _labelColor {
+    if (!_enabled) return ColonyColors.textDisabled;
+    if (widget.variant == ColonyButtonVariant.inscribed) {
+      return ColonyColors.textInscribed;
+    }
+    if (widget.variant == ColonyButtonVariant.subtle) {
+      return ColonyColors.textPrimary;
+    }
+    return ColonyColors.textGoldHi;
   }
 
   @override
   Widget build(BuildContext context) {
     final labelStyle = Theme.of(context).textTheme.labelLarge?.copyWith(
-          color: _enabled
-              ? (widget.variant == ColonyButtonVariant.action
-                  ? ColonyColors.textButton
-                  : ColonyColors.textPrimary)
-              : ColonyColors.textDisabled,
-          fontWeight: FontWeight.w600,
-        );
+      color: _labelColor,
+      fontWeight: FontWeight.w700,
+      letterSpacing: 1.05,
+      fontSize: 11,
+      height: 1.0,
+    );
 
     final button = MouseRegion(
       onEnter: (_) => setState(() => _hover = true),
@@ -77,31 +94,31 @@ class _ColonyButtonState extends State<ColonyButton> {
               }
             : null,
         onTapCancel: () => setState(() => _pressed = false),
-        child: AnimatedContainer(
-          duration: ColonyDurations.fast,
-          height: widget.height,
-          constraints: BoxConstraints(minWidth: widget.minWidth),
-          padding: widget.padding,
-          alignment: Alignment.center,
-          decoration: BoxDecoration(
-            color: widget.variant == ColonyButtonVariant.subtle
-                ? ColonyColors.subtle
-                : ColonyColors.actionBase,
-            image: DecorationImage(
-              image: AssetImage(_atlas, package: ColonyAssets.package),
-              centerSlice: ColonyAssets.nineSliceCenter,
-              fit: BoxFit.fill,
-              filterQuality: FilterQuality.none,
-            ),
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            minWidth: widget.minWidth,
+            minHeight: widget.height,
+            maxHeight: widget.height,
           ),
-          child: DefaultTextStyle.merge(
-            style: labelStyle ?? const TextStyle(),
-            child: IconTheme.merge(
-              data: IconThemeData(
-                color: labelStyle?.color,
-                size: 18,
+          child: CustomPaint(
+            painter: ColonyBevelPainter(
+              fill: _fill,
+              pressed: _pressed,
+              copper: _copper,
+              enabled: _enabled,
+              radius: ColonyRadii.sm,
+            ),
+            child: Padding(
+              padding: widget.padding,
+              child: Center(
+                child: DefaultTextStyle.merge(
+                  style: labelStyle ?? const TextStyle(),
+                  child: IconTheme.merge(
+                    data: IconThemeData(color: _labelColor, size: 16),
+                    child: widget.child,
+                  ),
+                ),
               ),
-              child: widget.child,
             ),
           ),
         ),
@@ -112,5 +129,89 @@ class _ColonyButtonState extends State<ColonyButton> {
       return SizedBox(width: double.infinity, child: button);
     }
     return button;
+  }
+}
+
+/// Shared 3D plate bevel used by buttons and chrome icon buttons.
+class ColonyBevelPainter extends CustomPainter {
+  const ColonyBevelPainter({
+    required this.fill,
+    required this.pressed,
+    required this.copper,
+    required this.enabled,
+    required this.radius,
+  });
+
+  final Color fill;
+  final bool pressed;
+  final bool copper;
+  final bool enabled;
+  final double radius;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final rect = Offset.zero & size;
+    final rrect = RRect.fromRectAndRadius(
+      rect.deflate(0.5),
+      Radius.circular(radius),
+    );
+    canvas.drawRRect(rrect, Paint()..color = fill);
+
+    canvas.drawRRect(
+      rrect,
+      Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 1.2
+        ..color = copper
+            ? (enabled ? ColonyColors.actionBorder : ColonyColors.borderDark)
+            : ColonyColors.borderOuter,
+    );
+
+    final inner = rrect.deflate(1.2);
+    final hiColor = pressed
+        ? const Color(0x66000000)
+        : copper
+        ? const Color(0x88E0A878)
+        : const Color(0x55C8D0D4);
+    final shColor = pressed ? const Color(0x33FFFFFF) : const Color(0xAA000000);
+
+    final hi = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1
+      ..color = hiColor;
+    final sh = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.15
+      ..color = shColor;
+
+    final r = inner.tlRadiusX.clamp(1.0, 6.0);
+    final hiPath = Path()
+      ..moveTo(inner.left, inner.bottom - r)
+      ..lineTo(inner.left, inner.top + r)
+      ..arcToPoint(
+        Offset(inner.left + r, inner.top),
+        radius: Radius.circular(r),
+      )
+      ..lineTo(inner.right - r, inner.top);
+    canvas.drawPath(hiPath, hi);
+
+    final shPath = Path()
+      ..moveTo(inner.right, inner.top + r)
+      ..lineTo(inner.right, inner.bottom - r)
+      ..arcToPoint(
+        Offset(inner.right - r, inner.bottom),
+        radius: Radius.circular(r),
+      )
+      ..lineTo(inner.left + r, inner.bottom);
+    canvas.drawPath(shPath, sh);
+  }
+
+  @override
+  bool shouldRepaint(covariant ColonyBevelPainter oldDelegate) {
+    return fill != oldDelegate.fill ||
+        pressed != oldDelegate.pressed ||
+        copper != oldDelegate.copper ||
+        enabled != oldDelegate.enabled ||
+        radius != oldDelegate.radius;
   }
 }

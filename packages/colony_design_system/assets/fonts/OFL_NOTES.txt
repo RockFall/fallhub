@@ -1,3 +1,4 @@
-﻿Arimo and Carlito font files in this directory are licensed under the SIL Open Font License 1.1.
+﻿Fonts in this directory are licensed under the SIL Open Font License 1.1.
+- Pixelify Sans: https://github.com/googlefonts/pixelify
 - Arimo: https://github.com/googlefonts/Arimo
 - Carlito: https://github.com/googlefonts/carlito

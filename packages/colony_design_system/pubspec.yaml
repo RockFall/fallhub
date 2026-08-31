@@ -19,14 +19,21 @@ flutter:
   uses-material-design: true
   assets:
     - assets/ui/chrome/
+    - assets/ui/terminal/icons/
+    - assets/ui/terminal/chrome/
+    - assets/ui/terminal/portraits/
+    - assets/ui/terminal/textures/
   fonts:
-    # Metric-compatible with Arial (RimWorld GameFont.Small / Medium)
+    - family: Pixelify Sans
+      fonts:
+        - asset: assets/fonts/PixelifySans-Regular.ttf
+        - asset: assets/fonts/PixelifySans-Bold.ttf
+          weight: 700
     - family: Arimo
       fonts:
         - asset: assets/fonts/Arimo-Regular.ttf
         - asset: assets/fonts/Arimo-Bold.ttf
           weight: 700
-    # Metric-compatible with Calibri (RimWorld GameFont.Tiny)
     - family: Carlito
       fonts:
         - asset: assets/fonts/Carlito-Regular.ttf
