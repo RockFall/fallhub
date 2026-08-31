@@ -42,22 +42,23 @@ class NeedInspectBar extends StatelessWidget {
 
     final column = Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
-      mainAxisAlignment: fillSlot
-          ? MainAxisAlignment.center
-          : MainAxisAlignment.start,
-      mainAxisSize: fillSlot ? MainAxisSize.max : MainAxisSize.min,
+      mainAxisSize: MainAxisSize.min,
       children: [
-        Text(
-          label.toUpperCase(),
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          style: TextStyle(
-            fontFamily: ColonyFonts.familyTiny,
-            color: labelColor,
-            fontSize: _labelSize,
-            letterSpacing: 0.7,
-            height: 1.0,
-            fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
+        SizedBox(
+          height: _labelSize,
+          child: Text(
+            label.toUpperCase(),
+            maxLines: 1,
+            overflow: TextOverflow.clip,
+            style: TextStyle(
+              fontFamily: ColonyFonts.familyTiny,
+              color: labelColor,
+              fontSize: _labelSize,
+              letterSpacing: 0.7,
+              height: 1.0,
+              leadingDistribution: TextLeadingDistribution.even,
+              fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
+            ),
           ),
         ),
         SizedBox(height: prominent ? 4 : 2),
@@ -71,7 +72,6 @@ class NeedInspectBar extends StatelessWidget {
               selected: selected,
               railHeight: _railHeight,
             ),
-            child: const SizedBox.expand(),
           ),
         ),
       ],
@@ -80,12 +80,24 @@ class NeedInspectBar extends StatelessWidget {
     final padded = Padding(
       padding: EdgeInsets.fromLTRB(
         prominent ? 2 : 4,
-        fillSlot ? 1 : 2,
-        prominent ? 2 : 8,
-        fillSlot ? 1 : 2,
+        fillSlot ? 0 : 2,
+        prominent ? 2 : 6,
+        fillSlot ? 0 : 2,
       ),
       child: column,
     );
+
+    final slotted = fillSlot
+        ? LayoutBuilder(
+            builder: (context, constraints) {
+              return FittedBox(
+                fit: BoxFit.scaleDown,
+                alignment: Alignment.centerLeft,
+                child: SizedBox(width: constraints.maxWidth, child: padded),
+              );
+            },
+          )
+        : padded;
 
     return Semantics(
       button: onTap != null,
@@ -98,7 +110,7 @@ class NeedInspectBar extends StatelessWidget {
           onTap: onTap,
           onLongPress: onLongPress,
           overlayColor: WidgetStateProperty.all(ColonyColors.hoverOverlay),
-          child: fillSlot ? SizedBox.expand(child: padded) : padded,
+          child: fillSlot ? SizedBox.expand(child: slotted) : slotted,
         ),
       ),
     );
@@ -144,7 +156,7 @@ class NeedInspectRailPainter extends CustomPainter {
 
     if (showTicks) {
       final tick = Paint()
-        ..color = const Color(0xCC050608)
+        ..color = const Color(0x66000000)
         ..strokeWidth = 1
         ..strokeCap = StrokeCap.square;
       for (final t in const [0.25, 0.5, 0.75]) {

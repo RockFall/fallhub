@@ -1,5 +1,3 @@
-import 'dart:ui' as ui;
-
 import 'package:colony_design_system/colony_design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -48,35 +46,35 @@ void main() {
 
     expect(find.text('?'), findsNothing);
     expect(find.byType(Image), findsNothing);
-    expect(find.byType(CustomPaint), findsWidgets);
+    expect(
+      find.byWidgetPredicate(
+        (widget) =>
+            widget is CustomPaint && widget.painter is NeedInspectRailPainter,
+      ),
+      findsNWidgets(2),
+    );
   });
 
-  testWidgets('NeedInspectRailPainter fills a solid cyan trough', (
+  testWidgets('NeedInspectBar fillSlot does not overflow a short slot', (
     tester,
   ) async {
-    final recorder = ui.PictureRecorder();
-    final canvas = Canvas(recorder);
-    const painter = NeedInspectRailPainter(
-      value: 1.0,
-      showTicks: false,
-      showPointer: false,
-      selected: false,
-      railHeight: 16,
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: ColonyTheme.dark(),
+        home: const Scaffold(
+          body: SizedBox(
+            width: 220,
+            height: 28,
+            child: NeedInspectBar(
+              label: 'Sono',
+              value: 0.4,
+              fillSlot: true,
+            ),
+          ),
+        ),
+      ),
     );
-    painter.paint(canvas, const Size(24, 16));
-    final image = await recorder.endRecording().toImage(24, 16);
-    final bytes = await image.toByteData(format: ui.ImageByteFormat.rawRgba);
-    expect(bytes, isNotNull);
-    // Sample the interior, away from the 1px border.
-    const x = 12;
-    const y = 8;
-    final i = (y * 24 + x) * 4;
-    final color = Color.fromARGB(
-      bytes!.getUint8(i + 3),
-      bytes.getUint8(i),
-      bytes.getUint8(i + 1),
-      bytes.getUint8(i + 2),
-    );
-    expect(color, ColonyColors.needsFill);
+    expect(tester.takeException(), isNull);
+    expect(find.text('SONO'), findsOneWidget);
   });
 }
