@@ -110,8 +110,11 @@ class ColonyDatabase extends _$ColonyDatabase {
   /// App documents dir when opened from disk. Null for in-memory tests.
   final String? dataDirectory;
 
+  static const int currentSchemaVersion = 45;
+  static const String defaultFileName = 'colony.db';
+
   @override
-  int get schemaVersion => 45;
+  int get schemaVersion => currentSchemaVersion;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -628,14 +631,21 @@ class ColonyDatabase extends _$ColonyDatabase {
     }
   }
 
-  static Future<ColonyDatabase> open({String? fileName}) async {
-    final dir = await getApplicationDocumentsDirectory();
-    final file = File(p.join(dir.path, fileName ?? 'colony.db'));
-    final db = ColonyDatabase(NativeDatabase(file), dataDirectory: dir.path);
+  static Future<ColonyDatabase> openInDirectory(
+    String directory, {
+    String? fileName,
+  }) async {
+    final file = File(p.join(directory, fileName ?? defaultFileName));
+    final db = ColonyDatabase(NativeDatabase(file), dataDirectory: directory);
     // Force isolate + migrations before the first frame. Otherwise the UI
     // mounts the main shell while SQLite is still upgrading.
     await db.customSelect('SELECT 1').get();
     return db;
+  }
+
+  static Future<ColonyDatabase> open({String? fileName}) async {
+    final dir = await getApplicationDocumentsDirectory();
+    return openInDirectory(dir.path, fileName: fileName);
   }
 
   static ColonyDatabase inMemory() {

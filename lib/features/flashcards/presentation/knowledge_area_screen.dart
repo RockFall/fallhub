@@ -10,6 +10,7 @@ import '../application/flashcard_controllers.dart';
 import '../application/flashcard_providers.dart';
 import 'widgets/create_flashcard_deck_sheet.dart';
 import 'widgets/create_knowledge_area_sheet.dart';
+import 'widgets/flashcard_bulk_delete_button.dart';
 import 'widgets/flashcard_retention_chip.dart';
 import 'widgets/link_research_sheet.dart';
 import 'widgets/place_knowledge_area_sheet.dart';
@@ -31,6 +32,7 @@ class KnowledgeAreaScreen extends ConsumerWidget {
     final placements =
         ref.watch(knowledgePlacementsProvider).asData?.value ?? const [];
     final decks = ref.watch(flashcardDecksProvider).asData?.value ?? const [];
+    final cards = ref.watch(flashcardsProvider).asData?.value ?? const [];
     final heat = ref.watch(flashcardHeatProvider)[area?.id];
     final links =
         ref.watch(researchKnowledgeLinksProvider).asData?.value ?? const [];
@@ -78,6 +80,13 @@ class KnowledgeAreaScreen extends ConsumerWidget {
       placements: placements,
     );
     final linked = links.where((l) => l.areaId == area.id).toList();
+    final inArea = FlashcardAreaPolicy.cardsInArea(
+      cards: cards,
+      rootId: area.id,
+      areas: areas,
+      placements: placements,
+      decks: decks,
+    );
 
     return ListView(
       padding: const EdgeInsets.all(ColonySpacing.lg),
@@ -175,6 +184,12 @@ class KnowledgeAreaScreen extends ConsumerWidget {
               context.go('/flashcards/study?areaId=$areaId&mode=practice'),
           icon: const Icon(Icons.bolt_outlined),
           label: const Text(AppStrings.flashcardsPracticeArea),
+        ),
+        const SizedBox(height: ColonySpacing.sm),
+        FlashcardBulkDeleteButton(
+          cards: inArea,
+          label: AppStrings.flashcardsDeleteAreaCards(inArea.length),
+          confirmBody: AppStrings.flashcardsDeleteAreaConfirmBody,
         ),
         if (extraParents.isNotEmpty) ...[
           const SizedBox(height: ColonySpacing.md),

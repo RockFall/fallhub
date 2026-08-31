@@ -1,6 +1,7 @@
 library;
 
 export 'src/colony_database.dart' show ColonyDatabase, ColonyMappers;
+export 'src/sqlite_backup_store.dart';
 export 'src/repositories/activation_repository.dart';
 export 'src/repositories/colony_repositories.dart';
 export 'src/repositories/day_plan_repository.dart';

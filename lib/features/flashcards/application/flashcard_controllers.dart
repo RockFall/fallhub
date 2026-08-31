@@ -246,6 +246,12 @@ class FlashcardController extends AsyncNotifier<void> {
     });
   }
 
+  Future<int?> deleteCards(List<Flashcard> cards) {
+    return _run(() {
+      return ref.read(repositoriesProvider).flashcards.deleteCards(cards);
+    });
+  }
+
   Future<FlashcardReviewOutcome?> review({
     required Flashcard card,
     required FlashcardRating rating,

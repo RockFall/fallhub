@@ -5,11 +5,11 @@ import 'package:drift/native.dart';
 import 'package:path/path.dart' as p;
 import 'package:sqlite3/sqlite3.dart';
 
-/// Opens [ColonyDatabase] from a fixture at schema version [fromVersion].
-Future<ColonyDatabase> openMigratedFrom(
+/// Writes a SQLite file at [fromVersion] without running Drift migrations.
+File writeUnmigratedFixture(
   int fromVersion, {
   void Function(Database sqliteDb)? seed,
-}) async {
+}) {
   final file = File(
     p.join(
       Directory.systemTemp.path,
@@ -141,6 +141,15 @@ Future<ColonyDatabase> openMigratedFrom(
   seed?.call(sqliteDb);
   sqliteDb.dispose();
 
+  return file;
+}
+
+/// Opens [ColonyDatabase] from a fixture at schema version [fromVersion].
+Future<ColonyDatabase> openMigratedFrom(
+  int fromVersion, {
+  void Function(Database sqliteDb)? seed,
+}) async {
+  final file = writeUnmigratedFixture(fromVersion, seed: seed);
   return ColonyDatabase(NativeDatabase(file));
 }
 

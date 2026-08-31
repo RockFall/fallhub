@@ -369,4 +369,37 @@ void main() {
     expect(await repos.flashcards.listTagLinks(created.id), isEmpty);
     expect(await repos.flashcards.listTags(created.id), hasLength(1));
   });
+
+  test('deleteCards bulk-removes reverse pairs and keeps the tag', () async {
+    final created = await profile();
+    final deck = await repos.flashcards.createDeck(
+      profileId: created.id,
+      title: 'Pares',
+    );
+    await repos.flashcards.createTag(
+      profileId: created.id,
+      title: 'Jazz',
+    );
+    final pair = await repos.flashcards.createCard(
+      profileId: created.id,
+      deckId: deck.id,
+      front: 'cat',
+      back: 'gato',
+      tags: const ['Jazz'],
+      bidirectional: true,
+    );
+    final keep = await repos.flashcards.createCard(
+      profileId: created.id,
+      deckId: deck.id,
+      front: 'keep',
+      back: 'ficar',
+    );
+    expect(pair, hasLength(2));
+    final deleted = await repos.flashcards.deleteCards([pair.first]);
+    expect(deleted, 2);
+    final remaining = await repos.flashcards.listCards(created.id);
+    expect(remaining.map((c) => c.id), [keep.single.id]);
+    expect(await repos.flashcards.listTags(created.id), hasLength(1));
+    expect(await repos.flashcards.listTagLinks(created.id), isEmpty);
+  });
 }

@@ -244,6 +244,30 @@ abstract final class AppStrings {
   static const restoreCancel = 'Cancelar';
   static const restoreSuccess = 'Backup restaurado com sucesso';
   static const restoreInvalidFile = 'Arquivo de backup inválido';
+  static const sqliteBackupTitle = 'Backup do banco';
+  static const sqliteBackupHint =
+      'Cópia completa do SQLite local. Versões novas do app abrem este ficheiro e aplicam as migrações. Preferível ao JSON.';
+  static const sqliteBackupExport = 'Guardar backup do banco';
+  static const sqliteBackupShareSubject = 'fallhub-backup.colonybk';
+  static const sqliteBackupPreviewTitle = 'Prévia do backup SQLite';
+  static const sqliteBackupSchemaLabel = 'Schema do banco';
+  static const sqliteBackupSizeLabel = 'Tamanho';
+  static const sqliteBackupSidecarsLabel = 'Anexos';
+  static const sqliteBackupTooNew =
+      'Este backup é de uma versão mais nova do app. Atualize o Fallhub antes de restaurar.';
+  static const sqliteBackupJsonHint =
+      'O JSON é um subconjunto portátil e pode ficar atrás do schema do banco.';
+  static String sqliteBackupSchemaValue(int version) => 'v$version';
+  static String sqliteBackupSizeValue(int bytes) {
+    if (bytes < 1024) return '$bytes B';
+    if (bytes < 1024 * 1024) {
+      return '${(bytes / 1024).toStringAsFixed(1)} KB';
+    }
+    return '${(bytes / (1024 * 1024)).toStringAsFixed(1)} MB';
+  }
+
+  static String sqliteBackupSidecarsValue(int count) =>
+      count == 0 ? 'Nenhum' : '$count ficheiro(s)';
   static const sideloadBuildTitle = 'Build de teste';
   static const sideloadBuildLocal =
       'Build local — não veio do GitHub Actions.';
@@ -1161,6 +1185,21 @@ abstract final class AppStrings {
   static const flashcardsDelete = 'Deletar flashcard';
   static const flashcardsDeleteConfirm =
       'Este cartão sai do baralho e da fila de estudo. Não dá para desfazer.';
+  static const flashcardsDeleteCategoryTitle = 'Apagar cartões em massa?';
+  static const flashcardsDeleteCategoryAgain =
+      'Confirme outra vez. Os cartões serão apagados de verdade. Não dá para desfazer.';
+  static const flashcardsDeleteTagConfirmBody =
+      'Todos os cartões com esta tag e subtags serão apagados. A tag permanece. Pares inversos ligados também saem.';
+  static const flashcardsDeleteAreaConfirmBody =
+      'Todos os cartões desta área e subáreas serão apagados. A área e os baralhos permanecem. Pares inversos ligados também saem.';
+  static String flashcardsDeleteTagCards(int count) => count <= 0
+      ? 'Apagar cartões desta tag'
+      : 'Apagar $count cartões desta tag';
+  static String flashcardsDeleteAreaCards(int count) => count <= 0
+      ? 'Apagar cartões desta área'
+      : 'Apagar $count cartões desta área';
+  static String flashcardsDeleteCategoryDone(int count) =>
+      count == 1 ? '1 cartão apagado.' : '$count cartões apagados.';
   static const flashcardsSetPriority = 'Definir prioridade';
   static const flashcardsPriorityHigh = 'Alta';
   static const flashcardsPriorityLow = 'Baixa';

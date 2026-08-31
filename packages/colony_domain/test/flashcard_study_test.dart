@@ -488,6 +488,15 @@ void main() {
     ];
     final tropCard = card('trop', area: trop.id);
     expect(
+      FlashcardAreaPolicy.cardsInArea(
+        cards: [tropCard],
+        rootId: music.id,
+        areas: areas,
+        placements: placements,
+      ),
+      [tropCard],
+    );
+    expect(
       StudyQueuePolicy.cardsInArea(
         cards: [tropCard],
         rootId: music.id,
