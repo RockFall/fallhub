@@ -8,7 +8,7 @@ abstract final class ColonyColors {
   static const panel = Color(0xFF1A1E22);
   static const raised = Color(0xFF22262A);
   static const tab = Color(0xFF080A0E);
-  static const tabActive = Color(0xFF6A4A24);
+  static const tabActive = Color(0xFFC4A46A);
   static const subtle = Color(0xFF161A1E);
   static const optionUnselected = Color(0xFF2A2C2E);
   static const optionSelected = Color(0xFF4A3C28);
@@ -106,7 +106,7 @@ abstract final class ColonySpacing {
   static const footerRow = 64.0;
   static const listSeparator = 25.0;
   static const page = 12.0;
-  static const section = 10.0;
+  static const section = 8.0;
 }
 
 abstract final class ColonyRadii {
@@ -159,9 +159,9 @@ abstract final class ColonySizes {
   static const iconSmall = 24.0;
   static const iconLarge = 40.0;
   static const smallFontHeight = 18.0;
-  static const pawnPortrait = 72.0;
-  static const navTileMin = 88.0;
-  static const workButtonWidth = 100.0;
+  static const pawnPortrait = 64.0;
+  static const navTileMin = 84.0;
+  static const workButtonWidth = 92.0;
 }
 
 abstract final class ColonyDurations {

@@ -26,7 +26,7 @@ class ColonyNavTile extends StatelessWidget {
       child: ColonyFrame(
         variant: ColonyFrameVariant.tile,
         onTap: onPressed,
-        padding: const EdgeInsets.fromLTRB(4, 10, 4, 8),
+        padding: const EdgeInsets.fromLTRB(4, 8, 4, 6),
         child: Stack(
           clipBehavior: Clip.none,
           children: [

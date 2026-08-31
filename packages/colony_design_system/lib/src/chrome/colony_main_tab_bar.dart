@@ -90,10 +90,10 @@ class _MainTabButtonState extends State<_MainTabButton> {
   Widget build(BuildContext context) {
     final selected = widget.selected;
     final fg = selected
-        ? ColonyColors.textGoldHi
+        ? ColonyColors.textInscribed
         : _hover
-        ? ColonyColors.textMouseover
-        : ColonyColors.textMuted;
+            ? ColonyColors.textMouseover
+            : ColonyColors.textMuted;
 
     return MouseRegion(
       onEnter: (_) => setState(() => _hover = true),

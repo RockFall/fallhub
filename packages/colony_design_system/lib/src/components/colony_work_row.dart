@@ -25,7 +25,7 @@ class ColonyWorkRow extends StatelessWidget {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.symmetric(vertical: 7),
+      padding: const EdgeInsets.symmetric(vertical: 5),
           child: Row(
             children: [
               if (iconName != null) ...[
@@ -44,13 +44,21 @@ class ColonyWorkRow extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 8),
-              ColonyButton(
-                onPressed: onPressed,
-                variant: ColonyButtonVariant.inscribed,
-                height: 28,
-                minWidth: ColonySizes.workButtonWidth,
-                padding: const EdgeInsets.symmetric(horizontal: 10),
-                child: Text(actionLabel.toUpperCase()),
+              Flexible(
+                child: Align(
+                  alignment: Alignment.centerRight,
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: ColonyButton(
+                      onPressed: onPressed,
+                      variant: ColonyButtonVariant.inscribed,
+                      height: 28,
+                      minWidth: ColonySizes.workButtonWidth,
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                      child: Text(actionLabel.toUpperCase()),
+                    ),
+                  ),
+                ),
               ),
             ],
           ),

@@ -72,7 +72,7 @@ class ColonyTerminalHome extends ConsumerWidget {
               maxScaleFactor: 1.15,
             ),
           );
-          final agendaMax = (media.size.height * 0.38).clamp(250.0, 400.0);
+          final agendaMax = (media.size.height - 500).clamp(220.0, 340.0);
           return MediaQuery(
             data: scaled,
             child: ListView(
@@ -176,7 +176,7 @@ class ColonyTerminalHome extends ConsumerWidget {
                     crossAxisCount: 3,
                     mainAxisSpacing: ColonySpacing.sm,
                     crossAxisSpacing: ColonySpacing.sm,
-                    childAspectRatio: 1.02,
+                    childAspectRatio: 1.18,
                     children: [
                       ColonyNavTile(
                         label: AppStrings.pawn,

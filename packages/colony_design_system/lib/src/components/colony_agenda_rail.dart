@@ -63,7 +63,7 @@ class ColonyAgendaRail extends StatelessWidget {
   Widget build(BuildContext context) {
     return ColonyFrame(
       variant: ColonyFrameVariant.panel,
-      padding: const EdgeInsets.fromLTRB(10, 10, 10, 12),
+      padding: const EdgeInsets.fromLTRB(8, 8, 8, 8),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -91,7 +91,7 @@ class ColonyAgendaRail extends StatelessWidget {
               ],
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 8),
           if (blocks.isEmpty)
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 20),
@@ -162,9 +162,9 @@ class _AgendaBody extends StatelessWidget {
     }
 
     double occH(double hours) =>
-        (44.0 + (hours - 1).clamp(0, 8) * 6).clamp(42, 80).toDouble();
+        (34.0 + (hours - 1).clamp(0, 8) * 3.5).clamp(34, 56).toDouble();
     double gapH(double hours) =>
-        hours < 0.35 ? 6.0 : (hours * 9).clamp(20, 44).toDouble();
+        hours < 0.35 ? 4.0 : (hours * 6.5).clamp(14, 26).toDouble();
 
     for (final b in sorted) {
       final start = hourOf(b.start).clamp(0, 24).toDouble();
@@ -226,60 +226,62 @@ class _AgendaBody extends StatelessWidget {
     final nowHour = isToday ? nowLocal.hour + nowLocal.minute / 60.0 : null;
     final nowY = nowHour == null ? null : _yAt(spans, nowHour);
 
-    return SizedBox(
-      height: math.min(totalH, maxHeight),
-      child: SingleChildScrollView(
-        child: SizedBox(
-          height: totalH,
-          child: Stack(
-            clipBehavior: Clip.none,
-            children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
+    final body = Stack(
+      clipBehavior: Clip.none,
+      children: [
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SizedBox(
+              width: _railWidth,
+              height: totalH,
+              child: CustomPaint(
+                painter: _RailPainter(
+                  hours: ColonyAgendaRail.hours,
+                  yAt: (h) => _yAt(spans, h.toDouble()),
+                ),
+              ),
+            ),
+            const SizedBox(width: 6),
+            Expanded(
+              child: Stack(
                 children: [
-                  SizedBox(
-                    width: _railWidth,
-                    height: totalH,
-                    child: CustomPaint(
-                      painter: _RailPainter(
-                        hours: ColonyAgendaRail.hours,
-                        yAt: (h) => _yAt(spans, h.toDouble()),
+                  for (final s in spans)
+                    if (s.block != null)
+                      Positioned(
+                        top: _yAt(spans, s.startHour),
+                        left: 0,
+                        right: 0,
+                        height: s.height,
+                        child: _BlockCard(block: s.block!),
                       ),
-                    ),
-                  ),
-                  const SizedBox(width: 6),
-                  Expanded(
-                    child: Stack(
-                      children: [
-                        for (final s in spans)
-                          if (s.block != null)
-                            Positioned(
-                              top: _yAt(spans, s.startHour),
-                              left: 0,
-                              right: 0,
-                              height: s.height,
-                              child: _BlockCard(block: s.block!),
-                            ),
-                      ],
-                    ),
-                  ),
                 ],
               ),
-              if (nowY != null)
-                Positioned(
-                  top: nowY - 14,
-                  left: 0,
-                  right: 0,
-                  height: 28,
-                  child: _NowOverlay(
-                    label: nowLabel,
-                    clock: nowLocal!,
-                    railWidth: _railWidth,
-                  ),
-                ),
-            ],
-          ),
+            ),
+          ],
         ),
+        if (nowY != null)
+          Positioned(
+            top: nowY - 14,
+            left: 0,
+            right: 0,
+            height: 28,
+            child: _NowOverlay(
+              label: nowLabel,
+              clock: nowLocal!,
+              railWidth: _railWidth,
+            ),
+          ),
+      ],
+    );
+
+    if (totalH <= maxHeight) {
+      return SizedBox(height: totalH, child: body);
+    }
+    return SizedBox(
+      height: maxHeight,
+      child: SingleChildScrollView(
+        child: SizedBox(height: totalH, child: body),
       ),
     );
   }
@@ -347,45 +349,51 @@ class _BlockCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 5),
+      padding: const EdgeInsets.only(bottom: 3),
       child: ColonyFrame(
         variant: ColonyFrameVariant.block,
         fill: block.color,
         grain: false,
         onTap: block.onTap,
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
         child: Row(
           children: [
             if (block.iconName != null) ...[
-              ColonyPixelIcon(block.iconName!, size: 20),
+              ColonyPixelIcon(block.iconName!, size: 18),
               const SizedBox(width: 8),
             ],
             Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    block.title.toUpperCase(),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                      color: ColonyColors.textPrimary,
-                      fontSize: 12,
-                      letterSpacing: 0.7,
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                alignment: Alignment.centerLeft,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      block.title.toUpperCase(),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                            color: ColonyColors.textPrimary,
+                            fontSize: 12,
+                            letterSpacing: 0.7,
+                            height: 1.0,
+                          ),
                     ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    block.timeLabel,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                      color: ColonyColors.textSecondary,
-                      fontSize: 9,
+                    const SizedBox(height: 2),
+                    Text(
+                      block.timeLabel,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                            color: ColonyColors.textSecondary,
+                            fontSize: 9,
+                            height: 1.0,
+                          ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
             if (block.warning) const ColonyPixelIcon('warning', size: 14),

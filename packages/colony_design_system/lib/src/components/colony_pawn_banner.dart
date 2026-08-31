@@ -76,13 +76,15 @@ class ColonyPawnBanner extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 10),
-                Row(
+                Wrap(
+                  spacing: 10,
+                  runSpacing: 6,
+                  crossAxisAlignment: WrapCrossAlignment.center,
                   children: [
                     ColonyPipMeter(label: restLabel, filled: restPips),
                     Container(
                       width: 1,
                       height: 12,
-                      margin: const EdgeInsets.symmetric(horizontal: 10),
                       color: ColonyColors.borderSeparator,
                     ),
                     ColonyPipMeter(label: moodLabel, filled: moodPips),
