@@ -6,34 +6,11 @@ import '../chrome/colony_button.dart';
 import '../chrome/colony_frame.dart';
 import '../chrome/colony_pixel_icon.dart';
 import '../tokens/colony_tokens.dart';
+import 'colony_agenda_rail_layout.dart';
 
-class ColonyAgendaBlock {
-  const ColonyAgendaBlock({
-    required this.id,
-    required this.title,
-    required this.timeLabel,
-    required this.start,
-    required this.end,
-    required this.color,
-    this.iconName,
-    this.warning = false,
-    this.onTap,
-    this.visualOnly = false,
-  });
+export 'colony_agenda_rail_layout.dart';
 
-  final String id;
-  final String title;
-  final String timeLabel;
-  final DateTime start;
-  final DateTime end;
-  final Color color;
-  final String? iconName;
-  final bool warning;
-  final VoidCallback? onTap;
-  final bool visualOnly;
-}
-
-/// Compact 24h agenda: packed blocks + cyan rail + NOW hex.
+/// Compact day agenda: proportional first→last hour scale + cyan rail + NOW.
 class ColonyAgendaRail extends StatelessWidget {
   const ColonyAgendaRail({
     super.key,
@@ -78,6 +55,7 @@ class ColonyAgendaRail extends StatelessWidget {
       variant: ColonyFrameVariant.panel,
       padding: const EdgeInsets.fromLTRB(8, 8, 8, 8),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Row(
@@ -169,20 +147,6 @@ class ColonyAgendaRail extends StatelessWidget {
   }
 }
 
-class _Span {
-  const _Span({
-    required this.startHour,
-    required this.endHour,
-    required this.height,
-    this.block,
-  });
-
-  final double startHour;
-  final double endHour;
-  final double height;
-  final ColonyAgendaBlock? block;
-}
-
 class _AgendaBody extends StatelessWidget {
   const _AgendaBody({
     required this.blocks,
@@ -200,141 +164,160 @@ class _AgendaBody extends StatelessWidget {
 
   static const _railWidth = 44.0;
 
-  List<_Span> _spans() {
-    final sorted = [...blocks]..sort((a, b) => a.start.compareTo(b.start));
-    final spans = <_Span>[];
-    var cursor = 0.0;
-
-    double hourOf(DateTime t) {
-      final local = t.toLocal();
-      final dayStart = DateTime(day.year, day.month, day.day);
-      final dayEnd = dayStart.add(const Duration(days: 1));
-      if (local.isBefore(dayStart)) return 0;
-      if (!local.isBefore(dayEnd)) return 24;
-      return local.hour + local.minute / 60.0;
-    }
-
-    double occH(double hours) =>
-        (34.0 + (hours - 1).clamp(0, 8) * 3.5).clamp(34, 56).toDouble();
-    double gapH(double hours) =>
-        hours < 0.35 ? 4.0 : (hours * 6.5).clamp(14, 26).toDouble();
-
-    for (final b in sorted) {
-      final start = hourOf(b.start).clamp(0, 24).toDouble();
-      final end = hourOf(b.end).clamp(0, 24).toDouble();
-      if (end <= start) continue;
-      if (start > cursor + 0.05) {
-        spans.add(
-          _Span(
-            startHour: cursor,
-            endHour: start,
-            height: gapH(start - cursor),
-          ),
-        );
-      }
-      spans.add(
-        _Span(
-          startHour: start,
-          endHour: end,
-          height: occH(end - start),
-          block: b,
-        ),
-      );
-      cursor = end;
-    }
-    if (cursor < 23.9) {
-      spans.add(
-        _Span(startHour: cursor, endHour: 24, height: gapH(24 - cursor)),
-      );
-    }
-    return spans;
-  }
-
-  double _yAt(List<_Span> spans, double hour) {
-    var y = 0.0;
-    for (final s in spans) {
-      if (hour <= s.startHour) return y;
-      if (hour >= s.endHour) {
-        y += s.height;
-        continue;
-      }
-      final t =
-          (hour - s.startHour) /
-          (s.endHour - s.startHour).clamp(0.001, 24).toDouble();
-      return y + t * s.height;
-    }
-    return y;
-  }
-
   @override
   Widget build(BuildContext context) {
-    final spans = _spans();
-    final totalH = spans.fold<double>(0, (s, e) => s + e.height);
+    final layout = layoutColonyAgendaRail(
+      blocks: blocks,
+      day: day,
+      canvasHeight: maxHeight,
+      now: now,
+    );
     final nowLocal = now?.toLocal();
     final isToday =
         nowLocal != null &&
         nowLocal.year == day.year &&
         nowLocal.month == day.month &&
         nowLocal.day == day.day;
-    final nowHour = isToday ? nowLocal.hour + nowLocal.minute / 60.0 : null;
-    final nowY = nowHour == null ? null : _yAt(spans, nowHour);
+    final nowHour = isToday
+        ? nowLocal.hour + nowLocal.minute / 60.0 + nowLocal.second / 3600.0
+        : null;
+    final nowInWindow =
+        nowHour != null &&
+        nowHour >= layout.viewStartHour - 0.01 &&
+        nowHour <= layout.viewEndHour + 0.01;
+    final nowY = nowHour == null || !nowInWindow ? null : layout.yAt(nowHour);
 
-    final body = Stack(
-      clipBehavior: Clip.none,
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SizedBox(
-              width: _railWidth,
-              height: totalH,
-              child: CustomPaint(
-                painter: _RailPainter(
-                  hours: ColonyAgendaRail.hours,
-                  yAt: (h) => _yAt(spans, h.toDouble()),
-                ),
-              ),
-            ),
-            const SizedBox(width: 6),
-            Expanded(
-              child: Stack(
-                children: [
-                  for (final s in spans)
-                    if (s.block != null)
-                      Positioned(
-                        top: _yAt(spans, s.startHour),
-                        left: 0,
-                        right: 0,
-                        height: s.height,
-                        child: _BlockCard(block: s.block!),
+        if (layout.allDay.isNotEmpty) ...[
+          _AllDayStrip(blocks: layout.allDay),
+          const SizedBox(height: 8),
+        ],
+        if (layout.timed.isNotEmpty)
+          SizedBox(
+            height: layout.canvasHeight,
+            child: Stack(
+              clipBehavior: Clip.none,
+              children: [
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    SizedBox(
+                      width: _railWidth,
+                      child: CustomPaint(
+                        painter: _RailPainter(
+                          hours: layout.hourTicks,
+                          yAt: layout.yAt,
+                        ),
                       ),
-                ],
-              ),
-            ),
-          ],
-        ),
-        if (nowY != null)
-          Positioned(
-            top: nowY - 14,
-            left: 0,
-            right: 0,
-            height: 28,
-            child: _NowOverlay(
-              label: nowLabel,
-              clock: nowLocal!,
-              railWidth: _railWidth,
+                    ),
+                    const SizedBox(width: 6),
+                    Expanded(
+                      child: LayoutBuilder(
+                        builder: (context, constraints) {
+                          final width = constraints.maxWidth;
+                          return Stack(
+                            clipBehavior: Clip.hardEdge,
+                            children: [
+                              for (final placed in layout.timed)
+                                Positioned(
+                                  key: ValueKey(
+                                    'agenda-block-${placed.block.id}',
+                                  ),
+                                  top: placed.top,
+                                  left:
+                                      placed.lane * (width / placed.laneCount),
+                                  width: width / placed.laneCount,
+                                  height: placed.height,
+                                  child: _BlockCard(block: placed.block),
+                                ),
+                            ],
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+                if (nowY != null)
+                  Positioned(
+                    top: nowY - 14,
+                    left: 0,
+                    right: 0,
+                    height: 28,
+                    child: _NowOverlay(
+                      label: nowLabel,
+                      clock: nowLocal!,
+                      railWidth: _railWidth,
+                    ),
+                  ),
+              ],
             ),
           ),
       ],
     );
+  }
+}
 
-    if (totalH <= maxHeight) {
-      return SizedBox(height: totalH, child: body);
-    }
-    return SizedBox(
-      height: maxHeight,
-      child: SingleChildScrollView(
-        child: SizedBox(height: totalH, child: body),
+class _AllDayStrip extends StatelessWidget {
+  const _AllDayStrip({required this.blocks});
+
+  final List<ColonyAgendaBlock> blocks;
+
+  @override
+  Widget build(BuildContext context) {
+    return Wrap(
+      spacing: 6,
+      runSpacing: 6,
+      children: [
+        for (final block in blocks)
+          KeyedSubtree(
+            key: ValueKey('agenda-allday-${block.id}'),
+            child: _AllDayChip(block: block),
+          ),
+      ],
+    );
+  }
+}
+
+class _AllDayChip extends StatelessWidget {
+  const _AllDayChip({required this.block});
+
+  final ColonyAgendaBlock block;
+
+  @override
+  Widget build(BuildContext context) {
+    return ConstrainedBox(
+      constraints: const BoxConstraints(maxWidth: 240),
+      child: ColonyFrame(
+        variant: ColonyFrameVariant.block,
+        fill: block.color,
+        grain: false,
+        onTap: block.onTap,
+        padding: const EdgeInsets.fromLTRB(5, 4, 8, 4),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (block.iconName != null) ...[
+              _AgendaIconMark(name: block.iconName!, size: 16, well: 22),
+              const SizedBox(width: 6),
+            ],
+            Flexible(
+              child: Text(
+                block.title.toUpperCase(),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                  color: ColonyColors.textPrimary,
+                  fontSize: 11,
+                  letterSpacing: 0.6,
+                  height: 1.0,
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -344,7 +327,7 @@ class _RailPainter extends CustomPainter {
   const _RailPainter({required this.hours, required this.yAt});
 
   final List<int> hours;
-  final double Function(int hour) yAt;
+  final double Function(double hour) yAt;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -360,7 +343,7 @@ class _RailPainter extends CustomPainter {
 
     final tp = TextPainter(textDirection: TextDirection.ltr);
     for (final h in hours) {
-      final y = yAt(h).clamp(8, size.height - 8).toDouble();
+      final y = yAt(h.toDouble()).clamp(4.0, size.height - 4.0);
       canvas.drawCircle(
         Offset(lineX, y),
         5.2,
@@ -401,57 +384,105 @@ class _BlockCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final stripe = Color.lerp(block.color, const Color(0xFFE8E0D4), 0.38);
+    final fill = Color.lerp(block.color, const Color(0xFF3A4048), 0.12);
     return Padding(
-      padding: const EdgeInsets.only(bottom: 3),
+      padding: const EdgeInsets.only(right: 2, bottom: 3),
       child: ColonyFrame(
         variant: ColonyFrameVariant.block,
-        fill: block.color,
+        fill: fill,
         grain: false,
         onTap: block.onTap,
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        padding: EdgeInsets.zero,
         child: Row(
           children: [
-            if (block.iconName != null) ...[
-              ColonyPixelIcon(block.iconName!, size: 18),
-              const SizedBox(width: 8),
-            ],
+            Container(width: 4, color: stripe),
             Expanded(
-              child: FittedBox(
-                fit: BoxFit.scaleDown,
-                alignment: Alignment.centerLeft,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(6, 4, 8, 4),
+                child: Row(
                   children: [
-                    Text(
-                      block.title.toUpperCase(),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                        color: ColonyColors.textPrimary,
-                        fontSize: 12,
-                        letterSpacing: 0.7,
-                        height: 1.0,
+                    if (block.iconName != null) ...[
+                      _AgendaIconMark(name: block.iconName!),
+                      const SizedBox(width: 8),
+                    ],
+                    Expanded(
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        alignment: Alignment.centerLeft,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              block.title.toUpperCase(),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: Theme.of(context).textTheme.labelLarge
+                                  ?.copyWith(
+                                    color: ColonyColors.textPrimary,
+                                    fontSize: 12,
+                                    letterSpacing: 0.8,
+                                    height: 1.0,
+                                  ),
+                            ),
+                            const SizedBox(height: 3),
+                            Text(
+                              block.timeLabel,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: Theme.of(context).textTheme.labelSmall
+                                  ?.copyWith(
+                                    color: ColonyColors.textMuted,
+                                    fontSize: 9,
+                                    letterSpacing: 0.2,
+                                    height: 1.0,
+                                  ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
-                    const SizedBox(height: 2),
-                    Text(
-                      block.timeLabel,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                        color: ColonyColors.textSecondary,
-                        fontSize: 9,
-                        height: 1.0,
-                      ),
-                    ),
+                    if (block.warning) ...[
+                      const SizedBox(width: 4),
+                      const ColonyPixelIcon('warning', size: 14),
+                    ],
                   ],
                 ),
               ),
             ),
-            if (block.warning) const ColonyPixelIcon('warning', size: 14),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _AgendaIconMark extends StatelessWidget {
+  const _AgendaIconMark({required this.name, this.size = 20, this.well = 26});
+
+  final String name;
+  final double size;
+  final double well;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: well,
+      height: well,
+      padding: const EdgeInsets.all(1),
+      decoration: BoxDecoration(
+        color: const Color(0x99000000),
+        borderRadius: BorderRadius.circular(3),
+        border: Border.all(color: const Color(0xCC050608)),
+      ),
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: const Color(0xCC080A0E),
+          borderRadius: BorderRadius.circular(2),
+          border: Border.all(color: const Color(0x33C8C4B8)),
+        ),
+        child: Center(child: ColonyPixelIcon(name, size: size)),
       ),
     );
   }
@@ -473,57 +504,81 @@ class _NowOverlay extends StatelessWidget {
     final hh = clock.hour.toString().padLeft(2, '0');
     final mm = clock.minute.toString().padLeft(2, '0');
     return IgnorePointer(
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
+      child: Stack(
+        clipBehavior: Clip.none,
+        alignment: Alignment.centerLeft,
         children: [
-          SizedBox(
-            width: railWidth - 10,
-            child: CustomPaint(
-              painter: _GoldDashPainter(),
-              child: const SizedBox(height: 2, width: double.infinity),
+          Positioned(
+            left: railWidth - 13,
+            top: 9,
+            child: Container(
+              width: 10,
+              height: 10,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: ColonyColors.textGoldHi,
+                boxShadow: [
+                  BoxShadow(
+                    color: ColonyColors.textGoldHi.withValues(alpha: 0.55),
+                    blurRadius: 7,
+                  ),
+                ],
+              ),
             ),
           ),
-          Column(
-            mainAxisSize: MainAxisSize.min,
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              CustomPaint(
-                painter: _HexPainter(),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 3,
+              SizedBox(
+                width: railWidth - 10,
+                child: CustomPaint(
+                  painter: _GoldDashPainter(),
+                  child: const SizedBox(height: 2, width: double.infinity),
+                ),
+              ),
+              Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  CustomPaint(
+                    painter: _HexPainter(),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 3,
+                      ),
+                      child: Text(
+                        label,
+                        style: const TextStyle(
+                          fontFamily: 'Pixelify Sans',
+                          fontSize: 8,
+                          fontWeight: FontWeight.w700,
+                          color: Color(0xFF1A1408),
+                          letterSpacing: 0.7,
+                          height: 1,
+                        ),
+                      ),
+                    ),
                   ),
-                  child: Text(
-                    label,
+                  const SizedBox(height: 1),
+                  Text(
+                    '$hh:$mm',
                     style: const TextStyle(
                       fontFamily: 'Pixelify Sans',
-                      fontSize: 8,
-                      fontWeight: FontWeight.w700,
-                      color: Color(0xFF1A1408),
-                      letterSpacing: 0.7,
+                      fontSize: 9,
+                      color: ColonyColors.textGoldHi,
                       height: 1,
                     ),
                   ),
-                ),
+                ],
               ),
-              const SizedBox(height: 1),
-              Text(
-                '$hh:$mm',
-                style: const TextStyle(
-                  fontFamily: 'Pixelify Sans',
-                  fontSize: 9,
-                  color: ColonyColors.textGoldHi,
-                  height: 1,
+              const SizedBox(width: 2),
+              Expanded(
+                child: CustomPaint(
+                  painter: _GoldDashPainter(),
+                  child: const SizedBox(height: 2, width: double.infinity),
                 ),
               ),
             ],
-          ),
-          const SizedBox(width: 2),
-          Expanded(
-            child: CustomPaint(
-              painter: _GoldDashPainter(),
-              child: const SizedBox(height: 2, width: double.infinity),
-            ),
           ),
         ],
       ),

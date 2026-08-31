@@ -1,9 +1,11 @@
 import 'dart:async';
 
 import 'package:colony_domain/colony_domain.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/providers/app_providers.dart';
+import 'calendar_ics_auto_sync.dart';
 import 'ics_feed_client.dart';
 import 'integrations_providers.dart';
 import 'notification_capture_platform.dart';
@@ -288,13 +290,47 @@ final notificationIngestRuntimeProvider = Provider<void>((ref) {
   }, fireImmediately: true);
 });
 
-/// Pulls the saved Google iCal feed when the home/schedule screens open.
-final calendarIcsAutoRefreshProvider = FutureProvider<void>((ref) async {
-  try {
-    await ref
-        .read(integrationsControllerProvider.notifier)
-        .refreshFeedIfStale();
-  } catch (_) {
-    // Offline / missing plugin — agenda still works with local data.
-  }
+/// Pulls the saved Google iCal feed when the app opens or returns to
+/// the foreground (ADR-050). First process pull is eager; resumes use 15 min.
+final calendarIcsAutoSyncProvider = Provider<CalendarIcsAutoSync>((ref) {
+  return CalendarIcsAutoSync(
+    refresh: ({Duration maxAge = const Duration(minutes: 15)}) {
+      return ref
+          .read(integrationsControllerProvider.notifier)
+          .refreshFeedIfStale(maxAge: maxAge);
+    },
+  );
 });
+
+/// Wires [CalendarIcsAutoSync] to profile-ready + app lifecycle.
+final calendarIcsRuntimeProvider = Provider<void>((ref) {
+  final sync = ref.watch(calendarIcsAutoSyncProvider);
+
+  Future<void> pull({required bool resumed}) async {
+    try {
+      final profile = await ref.read(profileProvider.future);
+      if (profile == null) return;
+      if (resumed) {
+        await sync.onResumed();
+      } else {
+        await sync.onOpened();
+      }
+    } catch (_) {
+      // Offline / missing plugin — agenda still works with local data.
+    }
+  }
+
+  ref.listen(profileProvider, (previous, next) {
+    if (next.asData?.value != null) {
+      unawaited(pull(resumed: false));
+    }
+  }, fireImmediately: true);
+
+  final listener = AppLifecycleListener(
+    onResume: () => unawaited(pull(resumed: true)),
+  );
+  ref.onDispose(listener.dispose);
+});
+
+/// Back-compat alias used by home/schedule; prefers the lifecycle runtime.
+final calendarIcsAutoRefreshProvider = calendarIcsRuntimeProvider;
