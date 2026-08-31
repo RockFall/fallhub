@@ -135,6 +135,7 @@ ColonyAgendaRailLayout layoutColonyAgendaRail({
   required List<ColonyAgendaBlock> blocks,
   required DateTime day,
   required double canvasHeight,
+  DateTime? now,
 }) {
   final allDay = <ColonyAgendaBlock>[];
   final timedBlocks = <ColonyAgendaBlock>[];
@@ -181,14 +182,20 @@ ColonyAgendaRailLayout layoutColonyAgendaRail({
     );
   }
 
-  var viewStart = minHour;
-  var viewEnd = maxHour;
-  viewStart = (viewStart - 0.15).clamp(0.0, 24.0);
-  viewEnd = (viewEnd + 0.15).clamp(0.0, 24.0);
-  viewStart = viewStart.floorToDouble();
-  viewEnd = viewEnd.ceilToDouble();
+  var viewStart = minHour.floorToDouble();
+  var viewEnd = maxHour.ceilToDouble();
   if (viewEnd <= viewStart) {
     viewEnd = (viewStart + 1).clamp(0.0, 24.0);
+  }
+
+  final nowLocal = now?.toLocal();
+  if (nowLocal != null &&
+      nowLocal.year == day.year &&
+      nowLocal.month == day.month &&
+      nowLocal.day == day.day) {
+    final nowHour = colonyAgendaHourOf(nowLocal, day);
+    if (nowHour < viewStart) viewStart = nowHour.floorToDouble();
+    if (nowHour > viewEnd) viewEnd = nowHour.ceilToDouble();
   }
 
   final layout = ColonyAgendaRailLayout(

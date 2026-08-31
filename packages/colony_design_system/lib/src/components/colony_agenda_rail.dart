@@ -168,6 +168,7 @@ class _AgendaBody extends StatelessWidget {
       blocks: blocks,
       day: day,
       canvasHeight: maxHeight,
+      now: now,
     );
     final nowLocal = now?.toLocal();
     final isToday =

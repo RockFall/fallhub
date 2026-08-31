@@ -14,6 +14,7 @@ void main() {
       MaterialApp(
         theme: ColonyTheme.dark(),
         home: Scaffold(
+          backgroundColor: ColonyColors.void_,
           body: ColonyAgendaRail(
             day: day,
             now: DateTime(2026, 8, 31, 13, 25),

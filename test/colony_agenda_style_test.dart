@@ -6,7 +6,7 @@ import 'package:fallhub/app/localization/app_strings.dart';
 import 'package:fallhub/features/colony/application/colony_agenda_style.dart';
 
 void main() {
-  test('buildColonyAgendaBlocks maps modes and fills livre gaps', () {
+  test('buildColonyAgendaBlocks maps modes without synthetic Livre', () {
     final day = DateTime(2026, 5, 19);
     final items = [
       ScheduleTimelineItem(

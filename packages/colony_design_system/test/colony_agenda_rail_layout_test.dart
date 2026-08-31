@@ -51,6 +51,25 @@ void main() {
     expect(layout.yAt(10), closeTo(kColonyAgendaRailPad, 0.5));
   });
 
+  test('today NOW just after last event still sits on the rail', () {
+    final layout = layoutColonyAgendaRail(
+      blocks: [
+        _block(
+          id: 'focus',
+          start: DateTime(2026, 8, 31, 7, 30),
+          end: DateTime(2026, 8, 31, 12),
+        ),
+      ],
+      day: day,
+      canvasHeight: 280,
+      now: DateTime(2026, 8, 31, 12, 4),
+    );
+    expect(layout.viewEndHour, greaterThanOrEqualTo(13));
+    final nowY = layout.yAt(12 + 4 / 60.0);
+    expect(nowY, greaterThan(layout.yAt(12) - 1));
+    expect(nowY, lessThan(layout.yAt(layout.viewEndHour) + 1));
+  });
+
   test('all-day birthday does not collapse the hour scale', () {
     final layout = layoutColonyAgendaRail(
       blocks: [
