@@ -17,6 +17,7 @@ class ColonyApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     ref.watch(notificationIngestRuntimeProvider);
     ref.watch(spotifyDeepLinkRuntimeProvider);
+    ref.watch(calendarIcsRuntimeProvider);
     final router = ref.watch(routerProvider);
     final prefs = ref.watch(preferencesProvider);
 

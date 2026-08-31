@@ -6,34 +6,11 @@ import '../chrome/colony_button.dart';
 import '../chrome/colony_frame.dart';
 import '../chrome/colony_pixel_icon.dart';
 import '../tokens/colony_tokens.dart';
+import 'colony_agenda_rail_layout.dart';
 
-class ColonyAgendaBlock {
-  const ColonyAgendaBlock({
-    required this.id,
-    required this.title,
-    required this.timeLabel,
-    required this.start,
-    required this.end,
-    required this.color,
-    this.iconName,
-    this.warning = false,
-    this.onTap,
-    this.visualOnly = false,
-  });
+export 'colony_agenda_rail_layout.dart';
 
-  final String id;
-  final String title;
-  final String timeLabel;
-  final DateTime start;
-  final DateTime end;
-  final Color color;
-  final String? iconName;
-  final bool warning;
-  final VoidCallback? onTap;
-  final bool visualOnly;
-}
-
-/// Compact 24h agenda: packed blocks + cyan rail + NOW hex.
+/// Compact day agenda: proportional first→last hour scale + cyan rail + NOW.
 class ColonyAgendaRail extends StatelessWidget {
   const ColonyAgendaRail({
     super.key,
@@ -130,9 +107,8 @@ class ColonyAgendaRail extends StatelessWidget {
                   Text(
                     emptyLabel ?? '—',
                     textAlign: TextAlign.center,
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: ColonyColors.textMuted,
-                    ),
+                    style: Theme.of(context).textTheme.bodySmall
+                        ?.copyWith(color: ColonyColors.textMuted),
                   ),
                   if (emptyHint != null) ...[
                     const SizedBox(height: 6),
@@ -169,20 +145,6 @@ class ColonyAgendaRail extends StatelessWidget {
   }
 }
 
-class _Span {
-  const _Span({
-    required this.startHour,
-    required this.endHour,
-    required this.height,
-    this.block,
-  });
-
-  final double startHour;
-  final double endHour;
-  final double height;
-  final ColonyAgendaBlock? block;
-}
-
 class _AgendaBody extends StatelessWidget {
   const _AgendaBody({
     required this.blocks,
@@ -200,141 +162,158 @@ class _AgendaBody extends StatelessWidget {
 
   static const _railWidth = 44.0;
 
-  List<_Span> _spans() {
-    final sorted = [...blocks]..sort((a, b) => a.start.compareTo(b.start));
-    final spans = <_Span>[];
-    var cursor = 0.0;
-
-    double hourOf(DateTime t) {
-      final local = t.toLocal();
-      final dayStart = DateTime(day.year, day.month, day.day);
-      final dayEnd = dayStart.add(const Duration(days: 1));
-      if (local.isBefore(dayStart)) return 0;
-      if (!local.isBefore(dayEnd)) return 24;
-      return local.hour + local.minute / 60.0;
-    }
-
-    double occH(double hours) =>
-        (34.0 + (hours - 1).clamp(0, 8) * 3.5).clamp(34, 56).toDouble();
-    double gapH(double hours) =>
-        hours < 0.35 ? 4.0 : (hours * 6.5).clamp(14, 26).toDouble();
-
-    for (final b in sorted) {
-      final start = hourOf(b.start).clamp(0, 24).toDouble();
-      final end = hourOf(b.end).clamp(0, 24).toDouble();
-      if (end <= start) continue;
-      if (start > cursor + 0.05) {
-        spans.add(
-          _Span(
-            startHour: cursor,
-            endHour: start,
-            height: gapH(start - cursor),
-          ),
-        );
-      }
-      spans.add(
-        _Span(
-          startHour: start,
-          endHour: end,
-          height: occH(end - start),
-          block: b,
-        ),
-      );
-      cursor = end;
-    }
-    if (cursor < 23.9) {
-      spans.add(
-        _Span(startHour: cursor, endHour: 24, height: gapH(24 - cursor)),
-      );
-    }
-    return spans;
-  }
-
-  double _yAt(List<_Span> spans, double hour) {
-    var y = 0.0;
-    for (final s in spans) {
-      if (hour <= s.startHour) return y;
-      if (hour >= s.endHour) {
-        y += s.height;
-        continue;
-      }
-      final t =
-          (hour - s.startHour) /
-          (s.endHour - s.startHour).clamp(0.001, 24).toDouble();
-      return y + t * s.height;
-    }
-    return y;
-  }
-
   @override
   Widget build(BuildContext context) {
-    final spans = _spans();
-    final totalH = spans.fold<double>(0, (s, e) => s + e.height);
+    final layout = layoutColonyAgendaRail(
+      blocks: blocks,
+      day: day,
+      canvasHeight: maxHeight,
+    );
     final nowLocal = now?.toLocal();
     final isToday =
         nowLocal != null &&
         nowLocal.year == day.year &&
         nowLocal.month == day.month &&
         nowLocal.day == day.day;
-    final nowHour = isToday ? nowLocal.hour + nowLocal.minute / 60.0 : null;
-    final nowY = nowHour == null ? null : _yAt(spans, nowHour);
+    final nowHour = isToday
+        ? nowLocal.hour + nowLocal.minute / 60.0 + nowLocal.second / 3600.0
+        : null;
+    final nowInWindow =
+        nowHour != null &&
+        nowHour >= layout.viewStartHour - 0.01 &&
+        nowHour <= layout.viewEndHour + 0.01;
+    final nowY = nowHour == null || !nowInWindow ? null : layout.yAt(nowHour);
 
-    final body = Stack(
-      clipBehavior: Clip.none,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SizedBox(
-              width: _railWidth,
-              height: totalH,
-              child: CustomPaint(
-                painter: _RailPainter(
-                  hours: ColonyAgendaRail.hours,
-                  yAt: (h) => _yAt(spans, h.toDouble()),
-                ),
-              ),
-            ),
-            const SizedBox(width: 6),
-            Expanded(
-              child: Stack(
-                children: [
-                  for (final s in spans)
-                    if (s.block != null)
-                      Positioned(
-                        top: _yAt(spans, s.startHour),
-                        left: 0,
-                        right: 0,
-                        height: s.height,
-                        child: _BlockCard(block: s.block!),
+        if (layout.allDay.isNotEmpty) ...[
+          _AllDayStrip(blocks: layout.allDay),
+          const SizedBox(height: 8),
+        ],
+        if (layout.timed.isNotEmpty)
+          SizedBox(
+            height: layout.canvasHeight,
+            child: Stack(
+              clipBehavior: Clip.none,
+              children: [
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    SizedBox(
+                      width: _railWidth,
+                      child: CustomPaint(
+                        painter: _RailPainter(
+                          hours: layout.hourTicks,
+                          yAt: layout.yAt,
+                        ),
                       ),
-                ],
-              ),
-            ),
-          ],
-        ),
-        if (nowY != null)
-          Positioned(
-            top: nowY - 14,
-            left: 0,
-            right: 0,
-            height: 28,
-            child: _NowOverlay(
-              label: nowLabel,
-              clock: nowLocal!,
-              railWidth: _railWidth,
+                    ),
+                    const SizedBox(width: 6),
+                    Expanded(
+                      child: LayoutBuilder(
+                        builder: (context, constraints) {
+                          final width = constraints.maxWidth;
+                          return Stack(
+                            clipBehavior: Clip.hardEdge,
+                            children: [
+                              for (final placed in layout.timed)
+                                Positioned(
+                                  key: ValueKey(
+                                    'agenda-block-${placed.block.id}',
+                                  ),
+                                  top: placed.top,
+                                  left:
+                                      placed.lane * (width / placed.laneCount),
+                                  width: width / placed.laneCount,
+                                  height: placed.height,
+                                  child: _BlockCard(block: placed.block),
+                                ),
+                            ],
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+                if (nowY != null)
+                  Positioned(
+                    top: nowY - 14,
+                    left: 0,
+                    right: 0,
+                    height: 28,
+                    child: _NowOverlay(
+                      label: nowLabel,
+                      clock: nowLocal!,
+                      railWidth: _railWidth,
+                    ),
+                  ),
+              ],
             ),
           ),
       ],
     );
+  }
+}
 
-    if (totalH <= maxHeight) {
-      return SizedBox(height: totalH, child: body);
-    }
-    return SizedBox(
-      height: maxHeight,
-      child: SingleChildScrollView(
-        child: SizedBox(height: totalH, child: body),
+class _AllDayStrip extends StatelessWidget {
+  const _AllDayStrip({required this.blocks});
+
+  final List<ColonyAgendaBlock> blocks;
+
+  @override
+  Widget build(BuildContext context) {
+    return Wrap(
+      spacing: 6,
+      runSpacing: 6,
+      children: [
+        for (final block in blocks)
+          KeyedSubtree(
+            key: ValueKey('agenda-allday-${block.id}'),
+            child: _AllDayChip(block: block),
+          ),
+      ],
+    );
+  }
+}
+
+class _AllDayChip extends StatelessWidget {
+  const _AllDayChip({required this.block});
+
+  final ColonyAgendaBlock block;
+
+  @override
+  Widget build(BuildContext context) {
+    return ConstrainedBox(
+      constraints: const BoxConstraints(maxWidth: 240),
+      child: ColonyFrame(
+        variant: ColonyFrameVariant.block,
+        fill: block.color,
+        grain: false,
+        onTap: block.onTap,
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (block.iconName != null) ...[
+              ColonyPixelIcon(block.iconName!, size: 14),
+              const SizedBox(width: 6),
+            ],
+            Flexible(
+              child: Text(
+                block.title.toUpperCase(),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                  color: ColonyColors.textPrimary,
+                  fontSize: 11,
+                  letterSpacing: 0.6,
+                  height: 1.0,
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -344,7 +323,7 @@ class _RailPainter extends CustomPainter {
   const _RailPainter({required this.hours, required this.yAt});
 
   final List<int> hours;
-  final double Function(int hour) yAt;
+  final double Function(double hour) yAt;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -360,7 +339,7 @@ class _RailPainter extends CustomPainter {
 
     final tp = TextPainter(textDirection: TextDirection.ltr);
     for (final h in hours) {
-      final y = yAt(h).clamp(8, size.height - 8).toDouble();
+      final y = yAt(h.toDouble()).clamp(4.0, size.height - 4.0);
       canvas.drawCircle(
         Offset(lineX, y),
         5.2,
@@ -402,7 +381,7 @@ class _BlockCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 3),
+      padding: const EdgeInsets.only(right: 2, bottom: 2),
       child: ColonyFrame(
         variant: ColonyFrameVariant.block,
         fill: block.color,

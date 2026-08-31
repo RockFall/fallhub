@@ -40,55 +40,37 @@ List<ColonyAgendaBlock> buildColonyAgendaBlocks({
     final title = item.block != null
         ? AppStrings.scheduleBlockShortLabel(mode)
         : item.label;
+    final allDay = _isAllDayItem(item, day);
     blocks.add(
       ColonyAgendaBlock(
         id: item.id,
         title: title,
-        timeLabel: AppStrings.homeTimeRange(item.startAt, item.endAt),
+        timeLabel: allDay
+            ? AppStrings.homeAllDay
+            : AppStrings.homeTimeRange(item.startAt, item.endAt),
         start: item.startAt,
         end: item.endAt,
         color: style.$1,
         iconName: style.$2,
         warning: conflictIds.contains(item.id),
         onTap: onOpenSchedule,
+        allDay: allDay,
       ),
     );
   }
 
   blocks.sort((a, b) => a.start.compareTo(b.start));
-  return _fillTrailingLivre(day, blocks, onOpenSchedule);
+  return blocks;
 }
 
-/// Midday holes stay empty (NOW marker breathes). Evening free time is a
-/// visual "Livre" block, matching the home terminal reference.
-List<ColonyAgendaBlock> _fillTrailingLivre(
-  DateTime day,
-  List<ColonyAgendaBlock> occupied,
-  VoidCallback? onTap,
-) {
-  if (occupied.isEmpty) return occupied;
+bool _isAllDayItem(ScheduleTimelineItem item, DateTime day) {
   final startDay = DateTime(day.year, day.month, day.day);
   final endDay = startDay.add(const Duration(days: 1));
-  var lastEnd = startDay;
-  for (final b in occupied) {
-    final end = b.end.isAfter(endDay) ? endDay : b.end;
-    if (end.isAfter(lastEnd)) lastEnd = end;
-  }
-  if (endDay.difference(lastEnd) < const Duration(minutes: 45)) {
-    return occupied;
-  }
-  return [
-    ...occupied,
-    ColonyAgendaBlock(
-      id: 'livre-end',
-      title: AppStrings.homeLivre,
-      timeLabel: AppStrings.homeTimeRange(lastEnd, endDay),
-      start: lastEnd,
-      end: endDay,
-      color: ColonyAgendaColors.free,
-      iconName: 'star',
-      onTap: onTap,
-      visualOnly: true,
-    ),
-  ];
+  final start = item.startAt.toLocal();
+  final end = item.endAt.toLocal();
+  final visibleStart = start.isBefore(startDay) ? startDay : start;
+  final visibleEnd = end.isAfter(endDay) ? endDay : end;
+  return !visibleEnd.isAfter(visibleStart)
+      ? false
+      : visibleEnd.difference(visibleStart) >= const Duration(hours: 20);
 }

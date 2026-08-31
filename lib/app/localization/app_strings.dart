@@ -370,6 +370,7 @@ abstract final class AppStrings {
   static const homeActionRegister = 'Registrar';
   static const homeActionReply = 'Responder';
   static const homeLivre = 'Livre';
+  static const homeAllDay = 'Dia todo';
   static const homeSleepCheckIn = 'Check-in sono';
   static const homeAgendaEmpty = 'Nenhum compromisso hoje.';
   static const homeAgendaEmptyHint =
