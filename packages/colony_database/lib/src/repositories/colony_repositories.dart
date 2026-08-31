@@ -5147,6 +5147,93 @@ class IntegrationRepository {
     return created;
   }
 
+  /// Upsert ICS previews by `externalUid` and drop UID'd rows that vanished
+  /// from the feed (Google iCal refresh). Events without UID are left in place.
+  Future<List<ExternalCalendarEvent>> syncCalendarPreviews({
+    required EntityId profileId,
+    required List<IcsEventPreview> previews,
+  }) async {
+    final consent = await ensureConsent(
+      profileId: profileId,
+      kind: IntegrationKind.calendarIcs,
+    );
+    if (!consent.enabled) {
+      throw StateError('Integração ICS desativada; conceda opt-in primeiro');
+    }
+    final now = _clock();
+    final existing = await listCalendarEvents(profileId);
+    final byUid = <String, ExternalCalendarEvent>{
+      for (final event in existing)
+        if (event.externalUid != null && event.externalUid!.isNotEmpty)
+          event.externalUid!: event,
+    };
+    final upserted = <ExternalCalendarEvent>[];
+    final keepIds = <String>{};
+
+    await _db.transaction(() async {
+      for (final preview in previews) {
+        final uid = preview.uid?.trim();
+        if (uid != null && uid.isNotEmpty && byUid.containsKey(uid)) {
+          final previous = byUid[uid]!;
+          final updated = previous.copyWith(
+            title: preview.summary.trim().isEmpty
+                ? previous.title
+                : preview.summary.trim(),
+            startAt: preview.startAt.toUtc(),
+            endAt: preview.endAt.toUtc(),
+            importedAt: now,
+            updatedAt: now,
+          );
+          await _db.into(_db.externalCalendarEvents).insertOnConflictUpdate(
+                ColonyMappers.fromExternalCalendarEvent(updated),
+              );
+          upserted.add(updated);
+          keepIds.add(updated.id.value);
+        } else {
+          final event = ExternalCalendarEvent.fromPreview(
+            id: EntityId(_ids.newId()),
+            profileId: profileId,
+            preview: preview,
+            importedAt: now,
+          );
+          await _db
+              .into(_db.externalCalendarEvents)
+              .insert(ColonyMappers.fromExternalCalendarEvent(event));
+          upserted.add(event);
+          keepIds.add(event.id.value);
+          final newUid = event.externalUid;
+          if (newUid != null && newUid.isNotEmpty) {
+            byUid[newUid] = event;
+          }
+        }
+      }
+
+      for (final event in existing) {
+        final uid = event.externalUid;
+        if (uid == null || uid.isEmpty) continue;
+        if (keepIds.contains(event.id.value)) continue;
+        await (_db.delete(_db.externalCalendarEvents)
+              ..where((t) => t.id.equals(event.id.value)))
+            .go();
+      }
+
+      if (upserted.isNotEmpty) {
+        await _events.record(
+          aggregateType: AggregateType.externalCalendarEvent,
+          aggregateId: upserted.first.id,
+          eventType: EventType.externalCalendarEventsImported,
+          payload: {
+            'count': upserted.length,
+            'sync': true,
+            'titles': upserted.map((e) => e.title).take(5).toList(),
+          },
+          sourceType: SourceType.integration,
+        );
+      }
+    });
+    return upserted;
+  }
+
   Stream<List<CapturedNotification>> watchCapturedNotifications(
     EntityId profileId,
   ) {

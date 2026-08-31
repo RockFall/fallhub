@@ -4,6 +4,7 @@ import 'package:colony_domain/colony_domain.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/providers/app_providers.dart';
+import 'ics_feed_client.dart';
 import 'integrations_providers.dart';
 import 'notification_capture_platform.dart';
 
@@ -25,7 +26,10 @@ class IntegrationsController extends AsyncNotifier<void> {
   Future<void> ensureCalendarConsent() async {
     final profile = await ref.read(profileProvider.future);
     if (profile == null) return;
-    await ref.read(repositoriesProvider).integrations.ensureConsent(
+    await ref
+        .read(repositoriesProvider)
+        .integrations
+        .ensureConsent(
           profileId: profile.id,
           kind: IntegrationKind.calendarIcs,
         );
@@ -35,7 +39,10 @@ class IntegrationsController extends AsyncNotifier<void> {
   Future<void> ensureNotificationConsent() async {
     final profile = await ref.read(profileProvider.future);
     if (profile == null) return;
-    await ref.read(repositoriesProvider).integrations.ensureConsent(
+    await ref
+        .read(repositoriesProvider)
+        .integrations
+        .ensureConsent(
           profileId: profile.id,
           kind: IntegrationKind.notificationListener,
         );
@@ -49,7 +56,10 @@ class IntegrationsController extends AsyncNotifier<void> {
       if (profile == null) {
         throw StateError('Perfil não encontrado');
       }
-      await ref.read(repositoriesProvider).integrations.setConsentEnabled(
+      await ref
+          .read(repositoriesProvider)
+          .integrations
+          .setConsentEnabled(
             profileId: profile.id,
             kind: IntegrationKind.calendarIcs,
             enabled: enabled,
@@ -65,7 +75,10 @@ class IntegrationsController extends AsyncNotifier<void> {
       if (profile == null) {
         throw StateError('Perfil não encontrado');
       }
-      await ref.read(repositoriesProvider).integrations.setConsentEnabled(
+      await ref
+          .read(repositoriesProvider)
+          .integrations
+          .setConsentEnabled(
             profileId: profile.id,
             kind: IntegrationKind.notificationListener,
             enabled: enabled,
@@ -120,10 +133,10 @@ class IntegrationsController extends AsyncNotifier<void> {
     NotificationCapturePayload payload,
   ) async {
     try {
-      await ref.read(repositoriesProvider).integrations.ingestCapturedNotification(
-            profileId: profileId,
-            payload: payload,
-          );
+      await ref
+          .read(repositoriesProvider)
+          .integrations
+          .ingestCapturedNotification(profileId: profileId, payload: payload);
     } catch (_) {
       // Inbox item may arrive after revoke; ignore.
     }
@@ -164,25 +177,124 @@ class IntegrationsController extends AsyncNotifier<void> {
       }
     });
     ref.invalidate(externalCalendarEventsProvider);
+    ref.invalidate(calendarOverlayEventsProvider);
     ref.invalidate(integrationConsentsProvider);
     return state.hasError ? 0 : count;
+  }
+
+  Future<int> syncIcsFeed(String rawUrl, {bool persistUrl = true}) async {
+    var count = 0;
+    state = const AsyncLoading();
+    state = await AsyncValue.guard(() async {
+      final uri = IcsFeedPolicy.normalize(rawUrl);
+      if (uri == null) {
+        throw const IcsFeedFetchException('URL inválida');
+      }
+      await ensureCalendarConsent();
+      final profile = await ref.read(profileProvider.future);
+      if (profile == null) {
+        throw StateError('Perfil não encontrado');
+      }
+      final consents = await ref
+          .read(repositoriesProvider)
+          .integrations
+          .listConsents(profile.id);
+      final enabled = consents.any(
+        (c) => c.kind == IntegrationKind.calendarIcs && c.enabled,
+      );
+      if (!enabled) {
+        await ref
+            .read(repositoriesProvider)
+            .integrations
+            .setConsentEnabled(
+              profileId: profile.id,
+              kind: IntegrationKind.calendarIcs,
+              enabled: true,
+            );
+      }
+      final body = await ref.read(icsFeedClientProvider).get(uri);
+      final now = ref.read(clockProvider)();
+      final previews = IcsCodec.parsePreview(
+        body,
+        windowStart: now.toUtc().subtract(const Duration(days: 30)),
+        windowEnd: now.toUtc().add(const Duration(days: 400)),
+      );
+      final created = await ref
+          .read(repositoriesProvider)
+          .integrations
+          .syncCalendarPreviews(profileId: profile.id, previews: previews);
+      count = created.length;
+      final store = ref.read(calendarIcsFeedStoreProvider);
+      if (persistUrl) {
+        await store.writeUrl(uri.toString());
+      }
+      await store.writeLastFetchedAt(now.toUtc());
+    });
+    ref.invalidate(externalCalendarEventsProvider);
+    ref.invalidate(calendarOverlayEventsProvider);
+    ref.invalidate(integrationConsentsProvider);
+    ref.invalidate(calendarIcsFeedUrlProvider);
+    if (state.hasError) {
+      final err = state.error;
+      if (err is IcsFeedFetchException || err is FormatException) {
+        throw err!;
+      }
+      throw IcsFeedFetchException(err.toString());
+    }
+    return count;
+  }
+
+  Future<int?> refreshFeedIfStale({
+    Duration maxAge = const Duration(minutes: 15),
+  }) async {
+    final store = ref.read(calendarIcsFeedStoreProvider);
+    final url = await store.readUrl();
+    if (url == null || url.isEmpty) return null;
+    final last = await store.readLastFetchedAt();
+    final now = ref.read(clockProvider)();
+    if (last != null && now.toUtc().difference(last) < maxAge) {
+      return null;
+    }
+    try {
+      return await syncIcsFeed(url, persistUrl: false);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  Future<void> unlinkIcsFeed() async {
+    await ref.read(calendarIcsFeedStoreProvider).clear();
+    ref.invalidate(calendarIcsFeedUrlProvider);
+    ref.invalidate(calendarOverlayEventsProvider);
   }
 }
 
 final integrationsControllerProvider =
     AsyncNotifierProvider<IntegrationsController, void>(
-  IntegrationsController.new,
-);
+      IntegrationsController.new,
+    );
 
 /// Starts inbox drain + live listen while in-app opt-in is on.
 final notificationIngestRuntimeProvider = Provider<void>((ref) {
-  ref.listen<IntegrationConsent?>(
-    notificationListenerConsentProvider,
-    (previous, next) {
-      if (next?.enabled == true) {
-        ref.read(integrationsControllerProvider.notifier).syncNotificationIngest();
-      }
-    },
-    fireImmediately: true,
-  );
+  ref.listen<IntegrationConsent?>(notificationListenerConsentProvider, (
+    previous,
+    next,
+  ) {
+    if (next?.enabled == true) {
+      ref
+          .read(integrationsControllerProvider.notifier)
+          .syncNotificationIngest();
+    }
+  }, fireImmediately: true);
+});
+
+/// Pulls the saved Google iCal feed when the home/schedule screens open.
+final calendarIcsAutoRefreshProvider = FutureProvider<void>((ref) async {
+  try {
+    await ref
+        .read(integrationsControllerProvider.notifier)
+        .refreshFeedIfStale();
+  } catch (_) {
+    // Offline / missing plugin — agenda still works with local data.
+  }
 });

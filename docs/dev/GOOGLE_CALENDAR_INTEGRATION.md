@@ -6,7 +6,7 @@ ADR de decisão: [ADR-043](../adr/ADR-043-google-calendar.md).
 
 ## Resumo para merge
 
-Entrega **só documentação**. Nenhum pacote Dart, schema, UI ou dependência muda. O stub ICS continua a ser o único conector de calendário no código.
+Entrega **só documentação** para OAuth. O stub ICS continua; **ADR-050** adicionou o feed iCal secreto do Google Agenda (read-only) na UI.
 
 ### O que foi feito
 

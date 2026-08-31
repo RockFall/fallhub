@@ -49,9 +49,8 @@ class ScheduleDayTimeline extends ConsumerWidget {
           day: day,
           hourHeight: compact ? 24 : 48,
           minEntryHeight: compact ? 14 : 20,
-          timeLabelBuilder: (hour) => timeFormat.format(
-            DateTime(day.year, day.month, day.day, hour),
-          ),
+          timeLabelBuilder: (hour) =>
+              timeFormat.format(DateTime(day.year, day.month, day.day, hour)),
           entries: [
             for (final item in items)
               DayTimelineEntry(
@@ -63,10 +62,10 @@ class ScheduleDayTimeline extends ConsumerWidget {
                 hasConflict: conflictIds.contains(item.id),
                 onTap: item.block != null
                     ? () => ScheduleBlockSheet.showEdit(
-                          context,
-                          block: item.block!,
-                          day: day,
-                        )
+                        context,
+                        block: item.block!,
+                        day: day,
+                      )
                     : null,
               ),
           ],
@@ -85,6 +84,9 @@ class ScheduleDayTimeline extends ConsumerWidget {
         ScheduleBlockMode.unavailable => ColonyColors.statusUnknown,
         _ => ColonyColors.accentSand,
       };
+    }
+    if (item.kind == ScheduleTimelineItemKind.external) {
+      return ColonyColors.accentOrange;
     }
     return ColonyColors.statusInfo;
   }

@@ -43,6 +43,12 @@ void showColonyMoreMenu(BuildContext context) {
         onSelected: () => context.go('/today'),
       ),
       ColonyFloatMenuItem(
+        icon: Icons.event_available_outlined,
+        iconName: 'calendar',
+        label: AppStrings.integrationsGoogleCalendar,
+        onSelected: () => context.go('/settings/integrations?focus=calendar'),
+      ),
+      ColonyFloatMenuItem(
         icon: Icons.inbox_outlined,
         iconName: 'inbox',
         label: AppStrings.inbox,

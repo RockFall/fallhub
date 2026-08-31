@@ -8,6 +8,7 @@ import 'package:intl/intl.dart';
 import '../../../app/localization/app_locale.dart';
 import '../../../app/localization/app_strings.dart';
 import '../../../core/providers/app_providers.dart';
+import '../../integrations/application/integrations_controllers.dart';
 import '../application/work_controllers.dart';
 import '../application/work_providers.dart';
 import 'widgets/schedule_block_sheet.dart';
@@ -69,9 +70,9 @@ class _ScheduleScreenState extends ConsumerState<ScheduleScreen> {
         final message = next.error is ScheduleBlockTimeRangeException
             ? AppStrings.scheduleBlockInvalidTime
             : AppStrings.errorGeneric;
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(message)),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(message)));
       }
     });
 
@@ -82,6 +83,7 @@ class _ScheduleScreenState extends ConsumerState<ScheduleScreen> {
     final tasks = ref.watch(scheduledTasksDayProvider(selectedDay));
     final profile = ref.watch(profileProvider).asData?.value;
     final prefs = ref.watch(preferencesProvider).asData?.value;
+    ref.watch(calendarIcsAutoRefreshProvider);
 
     final locale = profile?.locale ?? 'pt_BR';
     final use24Hour = prefs?.use24HourFormat ?? true;
@@ -96,7 +98,9 @@ class _ScheduleScreenState extends ConsumerState<ScheduleScreen> {
           padding: const EdgeInsets.all(ColonySpacing.lg),
           decoration: const BoxDecoration(
             color: ColonyColors.raised,
-            border: Border(bottom: BorderSide(color: ColonyColors.borderSubtle)),
+            border: Border(
+              bottom: BorderSide(color: ColonyColors.borderSubtle),
+            ),
           ),
           child: Row(
             children: [
@@ -140,7 +144,9 @@ class _ScheduleScreenState extends ConsumerState<ScheduleScreen> {
                           onPressed: () {
                             ref
                                 .read(scheduleSelectedDayProvider.notifier)
-                                .select(selectedDay.subtract(const Duration(days: 1)));
+                                .select(
+                                  selectedDay.subtract(const Duration(days: 1)),
+                                );
                           },
                         ),
                         Expanded(
@@ -158,7 +164,9 @@ class _ScheduleScreenState extends ConsumerState<ScheduleScreen> {
                           onPressed: () {
                             ref
                                 .read(scheduleSelectedDayProvider.notifier)
-                                .select(selectedDay.add(const Duration(days: 1)));
+                                .select(
+                                  selectedDay.add(const Duration(days: 1)),
+                                );
                           },
                         ),
                       ],
@@ -167,9 +175,16 @@ class _ScheduleScreenState extends ConsumerState<ScheduleScreen> {
                 ),
               ),
               IconButton(
+                tooltip: AppStrings.scheduleLinkGoogleCalendar,
+                icon: const Icon(Icons.event_available_outlined),
+                onPressed: () =>
+                    context.go('/settings/integrations?focus=calendar'),
+              ),
+              IconButton(
                 tooltip: AppStrings.addScheduleBlock,
                 icon: const Icon(Icons.add),
-                onPressed: () => ScheduleBlockSheet.showAdd(context, selectedDay),
+                onPressed: () =>
+                    ScheduleBlockSheet.showAdd(context, selectedDay),
               ),
             ],
           ),
@@ -199,7 +214,9 @@ class _ScheduleScreenState extends ConsumerState<ScheduleScreen> {
                       use24Hour: use24Hour,
                       locale: locale,
                     ),
-                    if (ref.watch(scheduleConflictsProvider(selectedDay)).maybeWhen(
+                    if (ref
+                        .watch(scheduleConflictsProvider(selectedDay))
+                        .maybeWhen(
                           data: (conflicts) => conflicts.isNotEmpty,
                           orElse: () => false,
                         ))
@@ -208,7 +225,8 @@ class _ScheduleScreenState extends ConsumerState<ScheduleScreen> {
                       title: AppStrings.scheduleBlocks,
                       icon: Icons.view_timeline_outlined,
                       child: blocks.when(
-                        loading: () => const Center(child: CircularProgressIndicator()),
+                        loading: () =>
+                            const Center(child: CircularProgressIndicator()),
                         error: (_, __) => Text(AppStrings.errorGeneric),
                         data: (items) {
                           if (items.isEmpty) {
@@ -233,7 +251,8 @@ class _ScheduleScreenState extends ConsumerState<ScheduleScreen> {
                       title: AppStrings.scheduledTasks,
                       icon: Icons.task_outlined,
                       child: tasks.when(
-                        loading: () => const Center(child: CircularProgressIndicator()),
+                        loading: () =>
+                            const Center(child: CircularProgressIndicator()),
                         error: (_, __) => Text(AppStrings.errorGeneric),
                         data: (items) {
                           if (items.isEmpty) {
@@ -241,7 +260,10 @@ class _ScheduleScreenState extends ConsumerState<ScheduleScreen> {
                           }
                           return Column(
                             children: items
-                                .map((task) => _ScheduledTaskTile(task, timeFormat))
+                                .map(
+                                  (task) =>
+                                      _ScheduledTaskTile(task, timeFormat),
+                                )
                                 .toList(),
                           );
                         },

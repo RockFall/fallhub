@@ -834,6 +834,53 @@ void main() {
     expect(blocks.single.startAt, start);
   });
 
+  test('syncCalendarPreviews upserts by uid and drops vanished events', () async {
+    final profile = await repos.profiles.create(
+      colonyName: 'IcsSync',
+      displayName: 'Caio',
+      timezone: 'UTC',
+      locale: 'pt_BR',
+      baseCurrency: 'BRL',
+    );
+    await repos.integrations.setConsentEnabled(
+      profileId: profile.id,
+      kind: IntegrationKind.calendarIcs,
+      enabled: true,
+    );
+    await repos.integrations.syncCalendarPreviews(
+      profileId: profile.id,
+      previews: [
+        IcsEventPreview(
+          uid: 'keep',
+          summary: 'Old',
+          startAt: DateTime.utc(2026, 8, 7, 10),
+          endAt: DateTime.utc(2026, 8, 7, 11),
+        ),
+        IcsEventPreview(
+          uid: 'gone',
+          summary: 'Drop me',
+          startAt: DateTime.utc(2026, 8, 7, 12),
+          endAt: DateTime.utc(2026, 8, 7, 13),
+        ),
+      ],
+    );
+    await repos.integrations.syncCalendarPreviews(
+      profileId: profile.id,
+      previews: [
+        IcsEventPreview(
+          uid: 'keep',
+          summary: 'Updated',
+          startAt: DateTime.utc(2026, 8, 7, 10),
+          endAt: DateTime.utc(2026, 8, 7, 11, 30),
+        ),
+      ],
+    );
+    final events = await repos.integrations.listCalendarEvents(profile.id);
+    expect(events, hasLength(1));
+    expect(events.single.title, 'Updated');
+    expect(events.single.externalUid, 'keep');
+  });
+
   test('trip and zone create enqueue sync outbox', () async {
     final profile = await repos.profiles.create(
       colonyName: 'SyncExpand',

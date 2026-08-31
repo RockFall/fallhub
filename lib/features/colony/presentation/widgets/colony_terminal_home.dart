@@ -9,6 +9,7 @@ import '../../../../app/navigation/colony_more_menu.dart';
 import '../../../../core/providers/app_providers.dart';
 import '../../../../core/widgets/command_palette.dart';
 import '../../../flashcards/application/flashcard_providers.dart';
+import '../../../integrations/application/integrations_controllers.dart';
 import '../../../pawn/application/pawn_providers.dart';
 import '../../../pawn/presentation/widgets/check_in_sheet.dart';
 import '../../../plan_day/application/plan_day_providers.dart';
@@ -30,6 +31,7 @@ class ColonyTerminalHome extends ConsumerWidget {
     final timeline = ref.watch(scheduleTimelineItemsProvider(day));
     final conflicts = ref.watch(scheduleConflictsProvider(day));
     final digest = ref.watch(flashcardTodayDigestProvider);
+    ref.watch(calendarIcsAutoRefreshProvider);
 
     final rest = ColonyPipMeter.countFor(checkIn?.energy);
     final mood = ColonyPipMeter.countFor(checkIn?.mood);
@@ -106,12 +108,19 @@ class ColonyTerminalHome extends ConsumerWidget {
                   child: ColonyAgendaRail(
                     title: AppStrings.homeAgendaTitle,
                     emptyLabel: AppStrings.homeAgendaEmpty,
+                    emptyHint: AppStrings.homeAgendaEmptyHint,
+                    emptyActionLabel: AppStrings.homeLinkGoogleCalendar,
+                    onEmptyAction: () =>
+                        context.go('/settings/integrations?focus=calendar'),
                     nowLabel: AppStrings.homeNow,
                     day: day,
                     now: now,
                     blocks: agendaBlocks,
                     maxHeight: agendaMax,
                     onHeaderTap: () => context.go('/work/schedule'),
+                    onAction: () =>
+                        context.go('/settings/integrations?focus=calendar'),
+                    actionSemanticLabel: AppStrings.homeLinkGoogleCalendar,
                   ),
                 ),
                 const SizedBox(height: ColonySpacing.section),

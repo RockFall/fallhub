@@ -3,15 +3,20 @@ import 'package:colony_domain/colony_domain.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../app/localization/app_strings.dart';
 import '../../music_atlas/application/music_atlas_providers.dart';
 import '../../music_atlas/presentation/widgets/spotify_integration_panel.dart';
+import '../application/ics_feed_client.dart';
 import '../application/integrations_controllers.dart';
 import '../application/integrations_providers.dart';
 
 class IntegrationsScreen extends ConsumerStatefulWidget {
-  const IntegrationsScreen({super.key});
+  const IntegrationsScreen({super.key, this.focus});
+
+  /// `calendar` scrolls to the Google Agenda panel.
+  final String? focus;
 
   @override
   ConsumerState<IntegrationsScreen> createState() => _IntegrationsScreenState();
@@ -20,22 +25,39 @@ class IntegrationsScreen extends ConsumerStatefulWidget {
 class _IntegrationsScreenState extends ConsumerState<IntegrationsScreen>
     with WidgetsBindingObserver {
   bool _androidListenerEnabled = false;
+  final _calendarKey = GlobalKey();
+  final _feedUrl = TextEditingController();
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
       final controller = ref.read(integrationsControllerProvider.notifier);
       controller.ensureCalendarConsent();
       controller.ensureNotificationConsent();
       _refreshAndroidPermission();
+      final stored = await ref.read(calendarIcsFeedStoreProvider).readUrl();
+      if (stored != null && stored.isNotEmpty && mounted) {
+        _feedUrl.text = stored;
+      }
+      if (widget.focus == 'calendar' && mounted) {
+        final ctx = _calendarKey.currentContext;
+        if (ctx != null && ctx.mounted) {
+          await Scrollable.ensureVisible(
+            ctx,
+            duration: const Duration(milliseconds: 280),
+            alignment: 0.05,
+          );
+        }
+      }
     });
   }
 
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    _feedUrl.dispose();
     super.dispose();
   }
 
@@ -43,7 +65,9 @@ class _IntegrationsScreenState extends ConsumerState<IntegrationsScreen>
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
       _refreshAndroidPermission();
-      ref.read(integrationsControllerProvider.notifier).syncNotificationIngest();
+      ref
+          .read(integrationsControllerProvider.notifier)
+          .syncNotificationIngest();
     }
   }
 
@@ -53,6 +77,55 @@ class _IntegrationsScreenState extends ConsumerState<IntegrationsScreen>
         .isAndroidListenerEnabled();
     if (!mounted) return;
     setState(() => _androidListenerEnabled = enabled);
+  }
+
+  Future<void> _syncGoogleFeed() async {
+    final raw = _feedUrl.text;
+    if (IcsFeedPolicy.normalize(raw) == null) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(AppStrings.integrationsGoogleCalendarInvalidUrl),
+        ),
+      );
+      return;
+    }
+    try {
+      final count = await ref
+          .read(integrationsControllerProvider.notifier)
+          .syncIcsFeed(raw);
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(AppStrings.integrationsGoogleCalendarSynced(count)),
+        ),
+      );
+    } on IcsFeedFetchException {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(AppStrings.integrationsGoogleCalendarFetchError),
+        ),
+      );
+    } on FormatException {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text(AppStrings.integrationsIcsParseError)),
+      );
+    }
+  }
+
+  Future<void> _unlinkGoogleFeed() async {
+    await ref.read(integrationsControllerProvider.notifier).unlinkIcsFeed();
+    if (!mounted) return;
+    _feedUrl.clear();
+  }
+
+  Future<void> _openGoogleCalendar() {
+    return launchUrl(
+      Uri.parse('https://calendar.google.com/calendar/u/0/r/settings'),
+      mode: LaunchMode.externalApplication,
+    );
   }
 
   Future<void> _importIcs() async {
@@ -123,8 +196,9 @@ class _IntegrationsScreenState extends ConsumerState<IntegrationsScreen>
   Future<void> _previewAndConfirm(String source) async {
     final List<IcsEventPreview> previews;
     try {
-      previews =
-          ref.read(integrationsControllerProvider.notifier).previewIcs(source);
+      previews = ref
+          .read(integrationsControllerProvider.notifier)
+          .previewIcs(source);
     } on FormatException catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -167,8 +241,7 @@ class _IntegrationsScreenState extends ConsumerState<IntegrationsScreen>
                   title: Text(AppStrings.integrationsAlsoSchedule),
                   subtitle: Text(AppStrings.integrationsAlsoScheduleHint),
                   value: alsoSchedule,
-                  onChanged: (v) =>
-                      setLocal(() => alsoSchedule = v ?? false),
+                  onChanged: (v) => setLocal(() => alsoSchedule = v ?? false),
                 ),
               ],
             ),
@@ -190,10 +263,7 @@ class _IntegrationsScreenState extends ConsumerState<IntegrationsScreen>
 
     final count = await ref
         .read(integrationsControllerProvider.notifier)
-        .confirmIcsImport(
-          previews,
-          alsoCreateScheduleBlocks: alsoSchedule,
-        );
+        .confirmIcsImport(previews, alsoCreateScheduleBlocks: alsoSchedule);
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -214,6 +284,8 @@ class _IntegrationsScreenState extends ConsumerState<IntegrationsScreen>
     final capturesAsync = ref.watch(capturedNotificationsProvider);
     final busy = ref.watch(integrationsControllerProvider).isLoading;
     final platform = ref.watch(notificationCapturePlatformProvider);
+    final feedUrl = ref.watch(calendarIcsFeedUrlProvider).asData?.value;
+    final linked = feedUrl != null && feedUrl.isNotEmpty;
     final appOn = notifConsent?.enabled == true;
     final androidOn = _androidListenerEnabled;
     final ready = appOn && androidOn;
@@ -233,6 +305,140 @@ class _IntegrationsScreenState extends ConsumerState<IntegrationsScreen>
           Text(
             AppStrings.integrationsDisclaimer,
             style: Theme.of(context).textTheme.bodySmall,
+          ),
+          const SizedBox(height: ColonySpacing.lg),
+          KeyedSubtree(
+            key: _calendarKey,
+            child: ColonyPanel(
+              title: AppStrings.integrationsGoogleCalendar,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Text(
+                    AppStrings.integrationsGoogleCalendarHint,
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
+                  const SizedBox(height: ColonySpacing.md),
+                  _SetupStep(
+                    number: '1',
+                    title: AppStrings.integrationsGoogleCalendarStep1,
+                    subtitle: '',
+                    done: true,
+                  ),
+                  _SetupStep(
+                    number: '2',
+                    title: AppStrings.integrationsGoogleCalendarStep2,
+                    subtitle: '',
+                    done: true,
+                  ),
+                  _SetupStep(
+                    number: '3',
+                    title: AppStrings.integrationsGoogleCalendarStep3,
+                    subtitle: linked
+                        ? AppStrings.integrationsGoogleCalendarLinked
+                        : AppStrings.integrationsGoogleCalendarNotLinked,
+                    done: linked,
+                  ),
+                  TextField(
+                    controller: _feedUrl,
+                    enabled: !busy,
+                    decoration: const InputDecoration(
+                      labelText: AppStrings.integrationsGoogleCalendarUrlLabel,
+                      hintText: AppStrings.integrationsGoogleCalendarUrlHint,
+                    ),
+                    keyboardType: TextInputType.url,
+                    autocorrect: false,
+                  ),
+                  const SizedBox(height: ColonySpacing.sm),
+                  SizedBox(
+                    width: double.infinity,
+                    child: Semantics(
+                      button: true,
+                      identifier: 'integrations.sync_google_calendar',
+                      label: AppStrings.integrationsGoogleCalendarSaveAndSync,
+                      child: FilledButton.icon(
+                        onPressed: busy ? null : _syncGoogleFeed,
+                        icon: const Icon(Icons.sync),
+                        label: const Text(
+                          AppStrings.integrationsGoogleCalendarSaveAndSync,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: ColonySpacing.sm),
+                  SizedBox(
+                    width: double.infinity,
+                    child: OutlinedButton.icon(
+                      onPressed: busy ? null : _openGoogleCalendar,
+                      icon: const Icon(Icons.open_in_new),
+                      label: const Text(
+                        AppStrings.integrationsGoogleCalendarOpen,
+                      ),
+                    ),
+                  ),
+                  if (linked)
+                    TextButton(
+                      onPressed: busy ? null : _unlinkGoogleFeed,
+                      child: const Text(
+                        AppStrings.integrationsGoogleCalendarUnlink,
+                      ),
+                    ),
+                  const SizedBox(height: ColonySpacing.md),
+                  Semantics(
+                    label: AppStrings.integrationsOptIn,
+                    toggled: icsConsent?.enabled ?? false,
+                    child: SwitchListTile(
+                      contentPadding: EdgeInsets.zero,
+                      title: Text(AppStrings.integrationsOptIn),
+                      subtitle: Text(
+                        icsConsent?.enabled == true
+                            ? AppStrings.integrationsEnabled
+                            : AppStrings.integrationsDisabled,
+                      ),
+                      value: icsConsent?.enabled ?? false,
+                      onChanged: busy
+                          ? null
+                          : (v) => ref
+                                .read(integrationsControllerProvider.notifier)
+                                .setCalendarIcsEnabled(v),
+                    ),
+                  ),
+                  Text(
+                    AppStrings.integrationsGoogleCalendarFileFallback,
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
+                  const SizedBox(height: ColonySpacing.sm),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Semantics(
+                          button: true,
+                          identifier: 'integrations.import_ics',
+                          label: AppStrings.integrationsImportIcs,
+                          child: FilledButton.tonalIcon(
+                            onPressed: busy ? null : _importIcs,
+                            icon: const Icon(Icons.upload_file_outlined),
+                            label: const Text(AppStrings.integrationsImportIcs),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: ColonySpacing.sm),
+                      Expanded(
+                        child: Semantics(
+                          button: true,
+                          label: AppStrings.integrationsPasteIcs,
+                          child: OutlinedButton.icon(
+                            onPressed: busy ? null : _pasteIcs,
+                            icon: const Icon(Icons.content_paste_outlined),
+                            label: const Text(AppStrings.integrationsPasteIcs),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
           ),
           const SizedBox(height: ColonySpacing.lg),
           ColonyPanel(
@@ -272,8 +478,8 @@ class _IntegrationsScreenState extends ConsumerState<IntegrationsScreen>
                         onChanged: busy
                             ? null
                             : (v) => ref
-                                .read(integrationsControllerProvider.notifier)
-                                .setNotificationListenerEnabled(v),
+                                  .read(integrationsControllerProvider.notifier)
+                                  .setNotificationListenerEnabled(v),
                       ),
                     ),
                   ),
@@ -351,8 +557,8 @@ class _IntegrationsScreenState extends ConsumerState<IntegrationsScreen>
                           item.bookedAsFinance
                               ? AppStrings.integrationsNotificationsBooked
                               : (item.text.isEmpty
-                                  ? item.packageName
-                                  : item.text),
+                                    ? item.packageName
+                                    : item.text),
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -389,58 +595,6 @@ class _IntegrationsScreenState extends ConsumerState<IntegrationsScreen>
                 ),
               ],
             ),
-          ),
-          const SizedBox(height: ColonySpacing.lg),
-          ColonyPanel(
-            title: AppStrings.integrationsCalendarIcs,
-            child: Semantics(
-              label: AppStrings.integrationsOptIn,
-              toggled: icsConsent?.enabled ?? false,
-              child: SwitchListTile(
-                contentPadding: EdgeInsets.zero,
-                title: Text(AppStrings.integrationsOptIn),
-                subtitle: Text(
-                  icsConsent?.enabled == true
-                      ? AppStrings.integrationsEnabled
-                      : AppStrings.integrationsDisabled,
-                ),
-                value: icsConsent?.enabled ?? false,
-                onChanged: busy
-                    ? null
-                    : (v) => ref
-                        .read(integrationsControllerProvider.notifier)
-                        .setCalendarIcsEnabled(v),
-              ),
-            ),
-          ),
-          const SizedBox(height: ColonySpacing.md),
-          Row(
-            children: [
-              Expanded(
-                child: Semantics(
-                  button: true,
-                  identifier: 'integrations.import_ics',
-                  label: AppStrings.integrationsImportIcs,
-                  child: FilledButton.icon(
-                    onPressed: busy ? null : _importIcs,
-                    icon: const Icon(Icons.upload_file_outlined),
-                    label: const Text(AppStrings.integrationsImportIcs),
-                  ),
-                ),
-              ),
-              const SizedBox(width: ColonySpacing.sm),
-              Expanded(
-                child: Semantics(
-                  button: true,
-                  label: AppStrings.integrationsPasteIcs,
-                  child: OutlinedButton.icon(
-                    onPressed: busy ? null : _pasteIcs,
-                    icon: const Icon(Icons.content_paste_outlined),
-                    label: const Text(AppStrings.integrationsPasteIcs),
-                  ),
-                ),
-              ),
-            ],
           ),
           const SizedBox(height: ColonySpacing.lg),
           Text(
@@ -525,7 +679,8 @@ class _SetupStep extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(title, style: Theme.of(context).textTheme.titleSmall),
-                Text(subtitle, style: Theme.of(context).textTheme.bodySmall),
+                if (subtitle.isNotEmpty)
+                  Text(subtitle, style: Theme.of(context).textTheme.bodySmall),
               ],
             ),
           ),

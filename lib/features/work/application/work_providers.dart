@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../app/localization/app_strings.dart';
 import '../../../core/providers/app_providers.dart';
+import '../../integrations/application/integrations_providers.dart';
 
 final workPrioritiesProvider = StreamProvider<List<WorkPriority>>((ref) async* {
   final profile = await ref.watch(profileProvider.future);
@@ -24,27 +25,32 @@ final billsProvider = StreamProvider<List<Bill>>((ref) async* {
 
 final scheduleDayProvider =
     StreamProvider.family<List<ScheduleBlock>, DateTime>((ref, day) async* {
-  final profile = await ref.watch(profileProvider.future);
-  if (profile == null) {
-    yield [];
-    return;
-  }
-  yield* ref.watch(repositoriesProvider).schedule.watchForDay(profile.id, day);
-});
+      final profile = await ref.watch(profileProvider.future);
+      if (profile == null) {
+        yield [];
+        return;
+      }
+      yield* ref
+          .watch(repositoriesProvider)
+          .schedule
+          .watchForDay(profile.id, day);
+    });
 
 final scheduledTasksDayProvider =
     StreamProvider.family<List<ColonyTask>, DateTime>((ref, day) async* {
-  final profile = await ref.watch(profileProvider.future);
-  if (profile == null) {
-    yield [];
-    return;
-  }
-  yield* ref.watch(repositoriesProvider).tasks.watchScheduledForDay(profile.id, day);
-});
+      final profile = await ref.watch(profileProvider.future);
+      if (profile == null) {
+        yield [];
+        return;
+      }
+      yield* ref
+          .watch(repositoriesProvider)
+          .tasks
+          .watchScheduledForDay(profile.id, day);
+    });
 
-final scheduleSelectedDayProvider = NotifierProvider<ScheduleSelectedDay, DateTime>(
-  ScheduleSelectedDay.new,
-);
+final scheduleSelectedDayProvider =
+    NotifierProvider<ScheduleSelectedDay, DateTime>(ScheduleSelectedDay.new);
 
 class ScheduleSelectedDay extends Notifier<DateTime> {
   @override
@@ -55,10 +61,7 @@ class ScheduleSelectedDay extends Notifier<DateTime> {
   }
 }
 
-enum ScheduleViewMode {
-  day,
-  threeDay,
-}
+enum ScheduleViewMode { day, threeDay }
 
 class ScheduleViewModeNotifier extends Notifier<ScheduleViewMode> {
   @override
@@ -71,8 +74,8 @@ class ScheduleViewModeNotifier extends Notifier<ScheduleViewMode> {
 
 final scheduleViewModeProvider =
     NotifierProvider<ScheduleViewModeNotifier, ScheduleViewMode>(
-  ScheduleViewModeNotifier.new,
-);
+      ScheduleViewModeNotifier.new,
+    );
 
 final scheduleThreeDayRangeProvider = Provider<List<DateTime>>((ref) {
   final anchor = ref.watch(scheduleSelectedDayProvider);
@@ -82,6 +85,8 @@ final scheduleThreeDayRangeProvider = Provider<List<DateTime>>((ref) {
 List<ScheduleTimelineItem> buildScheduleTimelineItems({
   required List<ScheduleBlock> blocks,
   required List<ColonyTask> tasks,
+  List<ExternalCalendarEvent> externalEvents = const [],
+  DateTime? day,
 }) {
   final items = <ScheduleTimelineItem>[
     for (final block in blocks)
@@ -90,38 +95,60 @@ List<ScheduleTimelineItem> buildScheduleTimelineItems({
         AppStrings.scheduleBlockModeLabel(block.mode),
       ),
     for (final task in tasks)
-      if (task.scheduledStart != null)
-        ScheduleTimelineItem.fromTask(task),
+      if (task.scheduledStart != null) ScheduleTimelineItem.fromTask(task),
   ];
+  for (final event in externalEvents) {
+    if (day != null &&
+        !scheduleIntervalOverlapsLocalDay(event.startAt, event.endAt, day)) {
+      continue;
+    }
+    final duplicate = blocks.any(
+      (block) =>
+          block.startAt.difference(event.startAt).abs() <
+              const Duration(minutes: 2) &&
+          block.endAt.difference(event.endAt).abs() <
+              const Duration(minutes: 2),
+    );
+    if (duplicate) continue;
+    items.add(ScheduleTimelineItem.fromExternal(event));
+  }
   items.sort((a, b) => a.startAt.compareTo(b.startAt));
   return items;
 }
 
 final scheduleTimelineItemsProvider =
-    Provider.family<AsyncValue<List<ScheduleTimelineItem>>, DateTime>((ref, day) {
-  final blocks = ref.watch(scheduleDayProvider(day));
-  final tasks = ref.watch(scheduledTasksDayProvider(day));
+    Provider.family<AsyncValue<List<ScheduleTimelineItem>>, DateTime>((
+      ref,
+      day,
+    ) {
+      final blocks = ref.watch(scheduleDayProvider(day));
+      final tasks = ref.watch(scheduledTasksDayProvider(day));
+      final events =
+          ref.watch(calendarOverlayEventsProvider).asData?.value ??
+          const <ExternalCalendarEvent>[];
 
-  if (blocks.isLoading || tasks.isLoading) {
-    return const AsyncLoading();
-  }
-  if (blocks.hasError) {
-    return AsyncError(blocks.error!, blocks.stackTrace!);
-  }
-  if (tasks.hasError) {
-    return AsyncError(tasks.error!, tasks.stackTrace!);
-  }
+      if (blocks.isLoading || tasks.isLoading) {
+        return const AsyncLoading();
+      }
+      if (blocks.hasError) {
+        return AsyncError(blocks.error!, blocks.stackTrace!);
+      }
+      if (tasks.hasError) {
+        return AsyncError(tasks.error!, tasks.stackTrace!);
+      }
 
-  return AsyncData(
-    buildScheduleTimelineItems(
-      blocks: blocks.requireValue,
-      tasks: tasks.requireValue,
-    ),
-  );
-});
+      return AsyncData(
+        buildScheduleTimelineItems(
+          blocks: blocks.requireValue,
+          tasks: tasks.requireValue,
+          externalEvents: events,
+          day: day,
+        ),
+      );
+    });
 
 final scheduleConflictsProvider =
     Provider.family<AsyncValue<List<ScheduleConflict>>, DateTime>((ref, day) {
-  final items = ref.watch(scheduleTimelineItemsProvider(day));
-  return items.whenData(detectScheduleConflicts);
-});
+      final items = ref.watch(scheduleTimelineItemsProvider(day));
+      return items.whenData(detectScheduleConflicts);
+    });

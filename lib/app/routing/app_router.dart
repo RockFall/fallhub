@@ -230,7 +230,8 @@ final routerProvider = Provider<GoRouter>((ref) {
           ),
           GoRoute(
             path: '/settings/integrations',
-            builder: (context, state) => const IntegrationsScreen(),
+            builder: (context, state) =>
+                IntegrationsScreen(focus: state.uri.queryParameters['focus']),
           ),
           GoRoute(
             path: '/decisions',

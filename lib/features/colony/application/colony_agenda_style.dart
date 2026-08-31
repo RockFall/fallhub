@@ -31,9 +31,11 @@ List<ColonyAgendaBlock> buildColonyAgendaBlocks({
   for (final item in items) {
     final mode =
         item.block?.mode ??
-        (item.kind == ScheduleTimelineItemKind.task
-            ? ScheduleBlockMode.focus
-            : ScheduleBlockMode.flexible);
+        switch (item.kind) {
+          ScheduleTimelineItemKind.task => ScheduleBlockMode.focus,
+          ScheduleTimelineItemKind.external => ScheduleBlockMode.meeting,
+          ScheduleTimelineItemKind.block => ScheduleBlockMode.flexible,
+        };
     final style = agendaStyleFor(mode);
     final title = item.block != null
         ? AppStrings.scheduleBlockShortLabel(mode)

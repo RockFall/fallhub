@@ -8,6 +8,8 @@ import 'app/bootstrap/colony_app.dart';
 import 'app/localization/app_locale.dart';
 import 'app/localization/app_strings.dart';
 import 'core/providers/app_providers.dart';
+import 'features/integrations/application/calendar_ics_feed_store.dart';
+import 'features/integrations/application/integrations_providers.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -24,6 +26,9 @@ Future<void> main() async {
       ProviderScope(
         overrides: [
           databaseProvider.overrideWithValue(database),
+          calendarIcsFeedStoreProvider.overrideWithValue(
+            PrefsCalendarIcsFeedStore(),
+          ),
         ],
         child: const ColonyApp(),
       ),
