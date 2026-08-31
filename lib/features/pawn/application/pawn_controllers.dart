@@ -95,8 +95,9 @@ class CheckInController extends AsyncNotifier<void> {
   }
 
   int? _impactFor(String label) {
-    if (label.contains('Sono curto') || label.contains('Preocupação'))
+    if (label.contains('Sono curto') || label.contains('Preocupação')) {
       return -8;
+    }
     if (label.contains('Descanso') ||
         label.contains('Interação') ||
         label.contains('Avanço') ||

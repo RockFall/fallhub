@@ -74,10 +74,12 @@ void main() {
     expect(find.text('SONO'), findsOneWidget);
     expect(find.text('ANSIEDADE'), findsOneWidget);
     expect(find.text('DESCANSO'), findsOneWidget);
-    expect(find.byType(NeedInspectBar), findsWidgets);
+    expect(find.byType(NeedInspectBar), findsNWidgets(13));
     expect(find.byType(NeedInspectSlider), findsOneWidget);
     expect(find.byType(FilterChip), findsNothing);
     expect(find.byType(FilledButton), findsNothing);
+    expect(find.text(AppStrings.energy), findsNothing);
+    expect(find.text(AppStrings.tension), findsNothing);
 
     await tester.drag(find.byType(Slider), const Offset(280, 0));
     await tester.pump();
@@ -99,5 +101,10 @@ void main() {
     expect(latest.tension, 0.25);
     final factors = await repos.checkIns.getFactors(latest.id);
     expect(factors.map((f) => f.label), contains('Descanso'));
+
+    await tester.pumpWidget(const SizedBox.shrink());
+    for (var i = 0; i < 40; i++) {
+      await tester.pump(const Duration(milliseconds: 1));
+    }
   });
 }
