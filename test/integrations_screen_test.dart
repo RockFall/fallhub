@@ -19,8 +19,9 @@ Future<void> _drainTimers(WidgetTester tester) async {
 }
 
 void main() {
-  testWidgets('IntegrationsScreen shows disclaimer and empty events',
-      (tester) async {
+  testWidgets('IntegrationsScreen shows disclaimer and empty events', (
+    tester,
+  ) async {
     tester.view.physicalSize = const Size(800, 1800);
     tester.view.devicePixelRatio = 1.0;
     addTearDown(tester.view.resetPhysicalSize);
@@ -41,9 +42,9 @@ void main() {
       locale: 'pt_BR',
       baseCurrency: 'BRL',
     );
-    await repos.preferences.save(AppPreferences.defaults().copyWith(
-      onboardingCompleted: true,
-    ));
+    await repos.preferences.save(
+      AppPreferences.defaults().copyWith(onboardingCompleted: true),
+    );
 
     await tester.pumpWidget(
       ProviderScope(
@@ -64,6 +65,14 @@ void main() {
     await tester.pump(const Duration(milliseconds: 300));
 
     expect(find.text(AppStrings.integrationsTitle), findsOneWidget);
+    expect(
+      find.text(AppStrings.integrationsGoogleCalendar.toUpperCase()),
+      findsOneWidget,
+    );
+    expect(
+      find.text(AppStrings.integrationsGoogleCalendarSaveAndSync),
+      findsOneWidget,
+    );
     expect(find.text(AppStrings.integrationsDisclaimer), findsOneWidget);
     expect(
       find.text(AppStrings.integrationsNotificationsWarning),
@@ -77,8 +86,9 @@ void main() {
     await _drainTimers(tester);
   });
 
-  testWidgets('IntegrationsScreen shows numbered notification setup',
-      (tester) async {
+  testWidgets('IntegrationsScreen shows numbered notification setup', (
+    tester,
+  ) async {
     tester.view.physicalSize = const Size(800, 1800);
     tester.view.devicePixelRatio = 1.0;
     addTearDown(tester.view.resetPhysicalSize);
@@ -98,9 +108,9 @@ void main() {
       locale: 'pt_BR',
       baseCurrency: 'BRL',
     );
-    await repos.preferences.save(AppPreferences.defaults().copyWith(
-      onboardingCompleted: true,
-    ));
+    await repos.preferences.save(
+      AppPreferences.defaults().copyWith(onboardingCompleted: true),
+    );
 
     await tester.pumpWidget(
       ProviderScope(

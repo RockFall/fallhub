@@ -77,6 +77,8 @@ export 'src/context_zone.dart';
 export 'src/zone_trip.dart';
 export 'src/integration.dart';
 export 'src/ics_codec.dart';
+export 'src/ics_rrule.dart';
+export 'src/ics_feed_policy.dart';
 export 'src/ics_schedule_policy.dart';
 export 'src/captured_notification.dart';
 export 'src/notification_extractor.dart';
@@ -107,4 +109,3 @@ export 'src/music_genre_atlas.dart';
 export 'src/music_spotify.dart';
 export 'src/spotify_streaming_history.dart';
 export 'src/sqlite_backup.dart';
-

@@ -24,10 +24,20 @@ DateTime scheduleCalendarDay(DateTime instant) {
   required int endHour,
   required int endMinute,
 }) {
-  final startAt = DateTime(day.year, day.month, day.day, startHour, startMinute)
-      .toUtc();
-  final endAt =
-      DateTime(day.year, day.month, day.day, endHour, endMinute).toUtc();
+  final startAt = DateTime(
+    day.year,
+    day.month,
+    day.day,
+    startHour,
+    startMinute,
+  ).toUtc();
+  final endAt = DateTime(
+    day.year,
+    day.month,
+    day.day,
+    endHour,
+    endMinute,
+  ).toUtc();
   return (startAt: startAt, endAt: endAt);
 }
 
@@ -62,4 +72,14 @@ DateTime? parseScheduleDateParam(String value) {
   final m = int.parse(match.group(2)!);
   final d = int.parse(match.group(3)!);
   return scheduleCalendarDay(DateTime(y, m, d));
+}
+
+/// True when `[startAt, endAt)` overlaps the local calendar [day].
+bool scheduleIntervalOverlapsLocalDay(
+  DateTime startAt,
+  DateTime endAt,
+  DateTime day,
+) {
+  final bounds = scheduleDayUtcBounds(day);
+  return startAt.isBefore(bounds.end) && endAt.isAfter(bounds.start);
 }

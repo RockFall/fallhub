@@ -48,6 +48,41 @@ END:VEVENT
       expect(events.first.endAt, DateTime.utc(2026, 8, 9, 13));
     });
 
+    test('floating DTSTART uses local timezone', () {
+      const ics = '''
+BEGIN:VEVENT
+SUMMARY:Local
+DTSTART:20260831T140000
+DTEND:20260831T150000
+END:VEVENT
+''';
+      final events = IcsCodec.parsePreview(ics);
+      expect(events.first.startAt, DateTime(2026, 8, 31, 14).toUtc());
+      expect(events.first.endAt, DateTime(2026, 8, 31, 15).toUtc());
+    });
+
+    test('expands RRULE weekly occurrences', () {
+      const ics = '''
+BEGIN:VCALENDAR
+BEGIN:VEVENT
+UID:rec@google
+SUMMARY:Aula
+DTSTART:20260831T140000Z
+DTEND:20260831T150000Z
+RRULE:FREQ=WEEKLY;BYDAY=MO;COUNT=2
+END:VEVENT
+END:VCALENDAR
+''';
+      final events = IcsCodec.parsePreview(
+        ics,
+        windowStart: DateTime.utc(2026, 8, 31),
+        windowEnd: DateTime.utc(2026, 9, 15),
+      );
+      expect(events, hasLength(2));
+      expect(events.first.summary, 'Aula');
+      expect(events[1].startAt, DateTime.utc(2026, 9, 7, 14));
+    });
+
     test('throws on empty or no VEVENT', () {
       expect(() => IcsCodec.parsePreview(''), throwsFormatException);
       expect(

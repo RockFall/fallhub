@@ -1,7 +1,9 @@
 # ADR-043: Google Calendar — conector local-first
 
 ## Status
-Proposto (pesquisa em [`docs/dev/GOOGLE_CALENDAR_INTEGRATION.md`](../dev/GOOGLE_CALENDAR_INTEGRATION.md); sem código produto nesta iter)
+Proposto (pesquisa em [`docs/dev/GOOGLE_CALENDAR_INTEGRATION.md`](../dev/GOOGLE_CALENDAR_INTEGRATION.md); OAuth ainda sem código produto)
+
+**Interino em produção:** [ADR-050](ADR-050-google-agenda-ical.md) liga o Google Agenda por feed iCal secreto (read-only, no dispositivo) até existir o slice C deste ADR.
 
 ## Contexto
 Spec §37.2 lista Google Calendar, EventKit, calendários locais e ICS. ADR-032 entregou o stub ICS read-only e **deferiu** OAuth e write-back. O modelo `ExternalCalendarEvent` (título + intervalo + UID) não suporta réplica fiável nem criação de eventos.

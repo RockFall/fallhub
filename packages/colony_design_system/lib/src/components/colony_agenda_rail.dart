@@ -2,6 +2,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
+import '../chrome/colony_button.dart';
 import '../chrome/colony_frame.dart';
 import '../chrome/colony_pixel_icon.dart';
 import '../tokens/colony_tokens.dart';
@@ -44,6 +45,12 @@ class ColonyAgendaRail extends StatelessWidget {
     this.emptyLabel,
     this.headerIcon = 'calendar',
     this.onHeaderTap,
+    this.onAction,
+    this.actionIcon = 'plug',
+    this.actionSemanticLabel,
+    this.emptyHint,
+    this.emptyActionLabel,
+    this.onEmptyAction,
     this.maxHeight = 360,
   });
 
@@ -55,6 +62,12 @@ class ColonyAgendaRail extends StatelessWidget {
   final String? emptyLabel;
   final String? headerIcon;
   final VoidCallback? onHeaderTap;
+  final VoidCallback? onAction;
+  final String? actionIcon;
+  final String? actionSemanticLabel;
+  final String? emptyHint;
+  final String? emptyActionLabel;
+  final VoidCallback? onEmptyAction;
   final double maxHeight;
 
   static const hours = [0, 4, 8, 12, 16, 20, 24];
@@ -67,11 +80,11 @@ class ColonyAgendaRail extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          InkWell(
-            onTap: onHeaderTap,
-            child: Row(
-              children: [
-                Expanded(
+          Row(
+            children: [
+              Expanded(
+                child: InkWell(
+                  onTap: onHeaderTap,
                   child: Text(
                     title.toUpperCase(),
                     style: Theme.of(context).textTheme.titleSmall?.copyWith(
@@ -81,25 +94,65 @@ class ColonyAgendaRail extends StatelessWidget {
                     ),
                   ),
                 ),
-                if (headerIcon != null)
-                  ColonyPixelIcon(
-                    headerIcon!,
-                    size: 16,
-                    mono: true,
-                    color: ColonyColors.textMuted,
+              ),
+              if (onAction != null)
+                Semantics(
+                  button: true,
+                  label: actionSemanticLabel,
+                  child: InkWell(
+                    onTap: onAction,
+                    child: Padding(
+                      padding: const EdgeInsets.all(4),
+                      child: ColonyPixelIcon(
+                        actionIcon ?? 'plug',
+                        size: 16,
+                        mono: true,
+                        color: ColonyColors.textGold,
+                      ),
+                    ),
                   ),
-              ],
-            ),
+                )
+              else if (headerIcon != null)
+                ColonyPixelIcon(
+                  headerIcon!,
+                  size: 16,
+                  mono: true,
+                  color: ColonyColors.textMuted,
+                ),
+            ],
           ),
           const SizedBox(height: 8),
           if (blocks.isEmpty)
             Padding(
-              padding: const EdgeInsets.symmetric(vertical: 20),
-              child: Text(
-                emptyLabel ?? '—',
-                style: Theme.of(
-                  context,
-                ).textTheme.bodySmall?.copyWith(color: ColonyColors.textMuted),
+              padding: const EdgeInsets.symmetric(vertical: 12),
+              child: Column(
+                children: [
+                  Text(
+                    emptyLabel ?? '—',
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: ColonyColors.textMuted,
+                    ),
+                  ),
+                  if (emptyHint != null) ...[
+                    const SizedBox(height: 6),
+                    Text(
+                      emptyHint!,
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: ColonyColors.textMuted,
+                        fontSize: 11,
+                      ),
+                    ),
+                  ],
+                  if (onEmptyAction != null && emptyActionLabel != null) ...[
+                    const SizedBox(height: 12),
+                    ColonyButton(
+                      onPressed: onEmptyAction,
+                      child: Text(emptyActionLabel!.toUpperCase()),
+                    ),
+                  ],
+                ],
               ),
             )
           else
@@ -375,11 +428,11 @@ class _BlockCard extends StatelessWidget {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                            color: ColonyColors.textPrimary,
-                            fontSize: 12,
-                            letterSpacing: 0.7,
-                            height: 1.0,
-                          ),
+                        color: ColonyColors.textPrimary,
+                        fontSize: 12,
+                        letterSpacing: 0.7,
+                        height: 1.0,
+                      ),
                     ),
                     const SizedBox(height: 2),
                     Text(
@@ -387,10 +440,10 @@ class _BlockCard extends StatelessWidget {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                            color: ColonyColors.textSecondary,
-                            fontSize: 9,
-                            height: 1.0,
-                          ),
+                        color: ColonyColors.textSecondary,
+                        fontSize: 9,
+                        height: 1.0,
+                      ),
                     ),
                   ],
                 ),

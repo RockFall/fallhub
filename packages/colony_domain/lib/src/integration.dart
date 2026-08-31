@@ -85,15 +85,15 @@ class IntegrationConsent extends Equatable {
 
   @override
   List<Object?> get props => [
-        id,
-        profileId,
-        kind,
-        enabled,
-        grantedAt,
-        revokedAt,
-        createdAt,
-        updatedAt,
-      ];
+    id,
+    profileId,
+    kind,
+    enabled,
+    grantedAt,
+    revokedAt,
+    createdAt,
+    updatedAt,
+  ];
 }
 
 /// Parsed ICS VEVENT preview (ADR-032). Not persisted until confirm.
@@ -168,17 +168,39 @@ class ExternalCalendarEvent extends Equatable {
     );
   }
 
+  ExternalCalendarEvent copyWith({
+    String? externalUid,
+    String? title,
+    DateTime? startAt,
+    DateTime? endAt,
+    DateTime? importedAt,
+    DateTime? updatedAt,
+  }) {
+    return ExternalCalendarEvent(
+      id: id,
+      profileId: profileId,
+      externalUid: externalUid ?? this.externalUid,
+      title: title ?? this.title,
+      startAt: startAt ?? this.startAt,
+      endAt: endAt ?? this.endAt,
+      sourceType: sourceType,
+      importedAt: importedAt ?? this.importedAt,
+      createdAt: createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+    );
+  }
+
   @override
   List<Object?> get props => [
-        id,
-        profileId,
-        externalUid,
-        title,
-        startAt,
-        endAt,
-        sourceType,
-        importedAt,
-        createdAt,
-        updatedAt,
-      ];
+    id,
+    profileId,
+    externalUid,
+    title,
+    startAt,
+    endAt,
+    sourceType,
+    importedAt,
+    createdAt,
+    updatedAt,
+  ];
 }

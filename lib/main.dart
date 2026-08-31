@@ -9,6 +9,8 @@ import 'app/bootstrap/colony_app.dart';
 import 'app/localization/app_locale.dart';
 import 'app/localization/app_strings.dart';
 import 'core/providers/app_providers.dart';
+import 'features/integrations/application/calendar_ics_feed_store.dart';
+import 'features/integrations/application/integrations_providers.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -84,6 +86,9 @@ class _ColonyRootState extends State<ColonyRoot> {
         databaseProvider.overrideWithValue(_database),
         sqliteBackupPortProvider.overrideWithValue(
           SqliteBackupPort(exportBytes: _export, restoreBytes: _restore),
+        ),
+        calendarIcsFeedStoreProvider.overrideWithValue(
+          PrefsCalendarIcsFeedStore(),
         ),
       ],
       child: const ColonyApp(),

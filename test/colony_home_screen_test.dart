@@ -18,8 +18,9 @@ Future<void> _flushDisposeTimers(WidgetTester tester) async {
 }
 
 void main() {
-  testWidgets('colony terminal home shows pawn, agenda, work and nav grid',
-      (tester) async {
+  testWidgets('colony terminal home shows pawn, agenda, work and nav grid', (
+    tester,
+  ) async {
     tester.view.physicalSize = const Size(390, 1200);
     tester.view.devicePixelRatio = 1.0;
     addTearDown(tester.view.resetPhysicalSize);
@@ -82,7 +83,9 @@ void main() {
       ProviderScope(
         overrides: [
           databaseProvider.overrideWithValue(db),
-          clockProvider.overrideWithValue(() => DateTime.utc(2026, 5, 19, 12, 4)),
+          clockProvider.overrideWithValue(
+            () => DateTime.utc(2026, 5, 19, 12, 4),
+          ),
         ],
         child: MaterialApp.router(
           theme: ColonyTheme.dark(),
@@ -94,14 +97,20 @@ void main() {
     await tester.pump(const Duration(milliseconds: 500));
 
     expect(find.textContaining('CAIO'), findsWidgets);
-    expect(find.textContaining(AppStrings.homeAgendaTitle.toUpperCase()), findsOneWidget);
+    expect(
+      find.textContaining(AppStrings.homeAgendaTitle.toUpperCase()),
+      findsOneWidget,
+    );
     expect(
       find.textContaining(AppStrings.homeTodayWorkTitle.toUpperCase()),
       findsOneWidget,
     );
     expect(find.text(AppStrings.pawn.toUpperCase()), findsWidgets);
     expect(find.text(AppStrings.habitatTitle.toUpperCase()), findsWidgets);
-    expect(find.text(AppStrings.financeLedgerTitle.toUpperCase()), findsWidgets);
+    expect(
+      find.text(AppStrings.financeLedgerTitle.toUpperCase()),
+      findsWidgets,
+    );
     expect(find.text('SONO'), findsOneWidget);
     expect(find.text('FOCO'), findsOneWidget);
     expect(find.text('Ensaio cap. 3'), findsOneWidget);
@@ -111,6 +120,72 @@ void main() {
     await tester.pump();
     expect(tester.takeException(), isNull);
     expect(find.textContaining('CAIO'), findsWidgets);
+
+    await _flushDisposeTimers(tester);
+  });
+
+  testWidgets('empty agenda shows Google Calendar connect button', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(390, 1200);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    final db = ColonyDatabase.inMemory();
+    addTearDown(db.close);
+    final repos = ColonyRepositories.create(
+      db,
+      idGenerator: FixedIdGenerator(List.generate(40, (i) => 'empty-$i')),
+      clock: () => DateTime.utc(2026, 5, 19, 12, 4),
+    );
+    await repos.profiles.create(
+      colonyName: 'Colônia Nova',
+      displayName: 'Caio',
+      timezone: 'UTC',
+      locale: 'pt_BR',
+      baseCurrency: 'BRL',
+    );
+    await repos.preferences.save(
+      AppPreferences.defaults().copyWith(onboardingCompleted: true),
+    );
+
+    final router = GoRouter(
+      initialLocation: '/colony',
+      routes: [
+        GoRoute(
+          path: '/colony',
+          builder: (_, _) => const Scaffold(body: ColonyScreen()),
+        ),
+        GoRoute(
+          path: '/settings/integrations',
+          builder: (_, _) => const Scaffold(body: Text('integrations-stub')),
+        ),
+      ],
+    );
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          databaseProvider.overrideWithValue(db),
+          clockProvider.overrideWithValue(
+            () => DateTime.utc(2026, 5, 19, 12, 4),
+          ),
+        ],
+        child: MaterialApp.router(
+          theme: ColonyTheme.dark(),
+          routerConfig: router,
+        ),
+      ),
+    );
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+
+    expect(find.text(AppStrings.homeAgendaEmpty), findsOneWidget);
+    expect(
+      find.text(AppStrings.homeLinkGoogleCalendar.toUpperCase()),
+      findsOneWidget,
+    );
 
     await _flushDisposeTimers(tester);
   });

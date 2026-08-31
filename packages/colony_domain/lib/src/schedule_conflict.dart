@@ -2,9 +2,10 @@ import 'package:equatable/equatable.dart';
 
 import 'schedule_block.dart';
 import 'task.dart';
+import 'integration.dart';
 
 /// Kind of item rendered on the day schedule timeline.
-enum ScheduleTimelineItemKind { block, task }
+enum ScheduleTimelineItemKind { block, task, external }
 
 /// A timed entry on the schedule day view (block or task with times).
 class ScheduleTimelineItem extends Equatable {
@@ -37,7 +38,10 @@ class ScheduleTimelineItem extends Equatable {
     );
   }
 
-  factory ScheduleTimelineItem.fromTask(ColonyTask task, {Duration? displayDuration}) {
+  factory ScheduleTimelineItem.fromTask(
+    ColonyTask task, {
+    Duration? displayDuration,
+  }) {
     final start = task.scheduledStart!;
     final duration = task.estimatedMinutes != null
         ? Duration(minutes: task.estimatedMinutes!)
@@ -52,10 +56,21 @@ class ScheduleTimelineItem extends Equatable {
     );
   }
 
+  factory ScheduleTimelineItem.fromExternal(ExternalCalendarEvent event) {
+    return ScheduleTimelineItem(
+      id: event.id.value,
+      startAt: event.startAt,
+      endAt: event.endAt,
+      kind: ScheduleTimelineItemKind.external,
+      label: event.title,
+    );
+  }
+
   /// Tasks without [ColonyTask.estimatedMinutes] appear on the timeline but
   /// are excluded from overlap detection (spec: sparse task durations).
   bool get isConflictEligible =>
       kind == ScheduleTimelineItemKind.block ||
+      kind == ScheduleTimelineItemKind.external ||
       (task?.estimatedMinutes != null);
 
   @override
@@ -115,7 +130,9 @@ DateTime? scheduleOverlapEnd(
 }
 
 /// Detects pairwise overlaps among [items] using half-open interval semantics.
-List<ScheduleConflict> detectScheduleConflicts(List<ScheduleTimelineItem> items) {
+List<ScheduleConflict> detectScheduleConflicts(
+  List<ScheduleTimelineItem> items,
+) {
   final eligible = items.where((item) => item.isConflictEligible).toList();
   final conflicts = <ScheduleConflict>[];
 

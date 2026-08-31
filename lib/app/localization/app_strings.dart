@@ -371,7 +371,10 @@ abstract final class AppStrings {
   static const homeActionReply = 'Responder';
   static const homeLivre = 'Livre';
   static const homeSleepCheckIn = 'Check-in sono';
-  static const homeAgendaEmpty = 'Nenhum bloco hoje.';
+  static const homeAgendaEmpty = 'Nenhum compromisso hoje.';
+  static const homeAgendaEmptyHint =
+      'Ligue o Google Agenda para ver reuniões e eventos aqui.';
+  static const homeLinkGoogleCalendar = 'Ligar Google Agenda';
   static const homeWorkEmpty = 'Nenhuma ordem para hoje.';
   static const homeMenu = 'Menu';
   static const homeOpenSchedule = 'Abrir agenda';
@@ -633,6 +636,7 @@ abstract final class AppStrings {
       'Nenhuma prioridade configurada. Toque em recarregar.';
   static const reload = 'Recarregar';
   static const schedule = 'Agenda';
+  static const scheduleLinkGoogleCalendar = 'Ligar Google Agenda';
   static const scheduleDayView = 'Visão do dia';
   static const scheduleThreeDayView = 'Visão de 3 dias';
   static const scheduleViewDay = 'Dia';
@@ -2160,7 +2164,7 @@ abstract final class AppStrings {
 
   static const integrationsTitle = 'Integrações';
   static const integrationsDisclaimer =
-      'Tudo local neste aparelho: leitor de notificações (gastos e outros sinais) e importação ICS. Sem conta, sem nuvem, sem write-back.';
+      'Tudo local neste aparelho: Google Agenda (link iCal), leitor de notificações e importação ICS. Sem conta Colony, sem nuvem, sem escrever de volta no Google.';
   static const integrationsNotificationsTitle = 'Leitor de notificações';
   static const integrationsNotificationsWarning =
       'Com a permissão ligada, o Colony passa a ver todas as notificações deste celular — não só as do banco. O conteúdo fica só aqui, para extrair gastos agora e outros sinais depois. Códigos de verificação são ignorados. Dá para desligar a qualquer momento; o extrato já lançado permanece.';
@@ -2192,7 +2196,32 @@ abstract final class AppStrings {
   static const integrationsNotificationsEmpty =
       'Nenhuma notificação capturada ainda. Com os dois passos verdes, a próxima aparece aqui.';
   static const integrationsNotificationsBooked = 'Virou lançamento no ledger';
-  static const integrationsCalendarIcs = 'Calendário ICS';
+  static const integrationsCalendarIcs = 'Arquivo .ics';
+  static const integrationsGoogleCalendar = 'Google Agenda';
+  static const integrationsGoogleCalendarHint =
+      'A agenda da Colônia lê o seu Google Agenda por um link iCal secreto, só neste aparelho. Não cria nem altera eventos no Google.';
+  static const integrationsGoogleCalendarStep1 =
+      'No computador, abra o Google Agenda → Configurações (engrenagem).';
+  static const integrationsGoogleCalendarStep2 =
+      'À esquerda, clique no seu calendário → Integração de calendário.';
+  static const integrationsGoogleCalendarStep3 =
+      'Copie o "Endereço secreto no formato iCal" e cole abaixo.';
+  static const integrationsGoogleCalendarUrlLabel = 'Link iCal secreto';
+  static const integrationsGoogleCalendarUrlHint =
+      'https://calendar.google.com/calendar/ical/…/basic.ics';
+  static const integrationsGoogleCalendarSaveAndSync = 'Sincronizar';
+  static const integrationsGoogleCalendarLinked =
+      'Ligada — a agenda do dia mostra os eventos. Atualiza ao abrir o app.';
+  static const integrationsGoogleCalendarNotLinked =
+      'Cole o link para ver os compromissos na agenda da Colônia.';
+  static const integrationsGoogleCalendarInvalidUrl =
+      'Esse texto não parece um link iCal.';
+  static const integrationsGoogleCalendarFetchError =
+      'Não foi possível baixar o calendário. Confira o link e a rede.';
+  static const integrationsGoogleCalendarUnlink = 'Parar de sincronizar';
+  static const integrationsGoogleCalendarOpen = 'Abrir Google Agenda';
+  static const integrationsGoogleCalendarFileFallback =
+      'Ou importe um arquivo .ics exportado';
   static const integrationsOptIn = 'Permitir importação ICS';
   static const integrationsEnabled = 'Ativa — pode importar arquivos .ics';
   static const integrationsDisabled = 'Desligada — histórico local permanece';
@@ -2218,6 +2247,10 @@ abstract final class AppStrings {
       'Pré-visualização ($n evento${n == 1 ? '' : 's'})';
   static String integrationsImportDone(int n) =>
       '$n evento${n == 1 ? '' : 's'} importado${n == 1 ? '' : 's'}.';
+
+  static String integrationsGoogleCalendarSynced(int n) => n == 1
+      ? '1 evento do Google Agenda na agenda local.'
+      : '$n eventos do Google Agenda na agenda local.';
 
   static const commitmentsTitle = 'Compromissos';
   static const commitmentsDisclaimer =

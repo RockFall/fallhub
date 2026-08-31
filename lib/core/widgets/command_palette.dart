@@ -137,6 +137,11 @@ class _CommandPaletteState extends ConsumerState<CommandPalette> {
     _PaletteCommand('Ir para Configurações', '/settings', Icons.settings_outlined),
     _PaletteCommand('Sincronização', '/settings/sync', Icons.sync_outlined),
     _PaletteCommand(
+      AppStrings.integrationsGoogleCalendar,
+      '/settings/integrations?focus=calendar',
+      Icons.event_available_outlined,
+    ),
+    _PaletteCommand(
       'Integrações',
       '/settings/integrations',
       Icons.extension_outlined,
