@@ -47,7 +47,7 @@ class ModifierList extends StatelessWidget {
       children: [
         for (final entry in entries)
           Padding(
-            padding: EdgeInsets.symmetric(vertical: compact ? 3 : ColonySpacing.xs),
+            padding: EdgeInsets.symmetric(vertical: compact ? 4 : ColonySpacing.xs),
             child: Row(
               children: [
                 Expanded(
@@ -61,7 +61,7 @@ class ModifierList extends StatelessWidget {
                             color: ColonyColors.textSecondary,
                             fontSize: 11,
                             letterSpacing: 0.5,
-                            height: 1.25,
+                            height: 1.3,
                           )
                         : Theme.of(context).textTheme.bodyMedium,
                   ),

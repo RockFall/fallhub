@@ -15,6 +15,7 @@ class ColonyPawnBanner extends StatelessWidget {
     this.moodPips = 0,
     this.restLabel = 'Descanso',
     this.moodLabel = 'Humor',
+    this.trailing,
     this.onTap,
   });
 
@@ -25,6 +26,7 @@ class ColonyPawnBanner extends StatelessWidget {
   final int moodPips;
   final String restLabel;
   final String moodLabel;
+  final Widget? trailing;
   final VoidCallback? onTap;
 
   @override
@@ -71,7 +73,7 @@ class ColonyPawnBanner extends StatelessWidget {
                     color: ColonyColors.textGoldHi,
                     fontWeight: FontWeight.w700,
                     letterSpacing: 1.6,
-                    fontSize: 22,
+                    fontSize: trailing != null ? 18 : 22,
                     height: 1.0,
                   ),
                 ),
@@ -93,6 +95,7 @@ class ColonyPawnBanner extends StatelessWidget {
               ],
             ),
           ),
+          if (trailing != null) ...[const SizedBox(width: 8), trailing!],
         ],
       ),
     );

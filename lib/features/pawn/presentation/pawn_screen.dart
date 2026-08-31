@@ -57,33 +57,25 @@ class _PawnScreenState extends ConsumerState<PawnScreen>
                 profile: p,
                 checkIn: c,
                 onCheckIn: () => CheckInSheet.show(context),
-                onDailyReview: () => context.go('/pawn/review'),
-                onWeeklyReview: () => context.go('/pawn/review/weekly'),
               ),
               loading: () => _PawnHeader(
                 profile: p,
                 checkIn: null,
                 onCheckIn: () => CheckInSheet.show(context),
-                onDailyReview: () => context.go('/pawn/review'),
-                onWeeklyReview: () => context.go('/pawn/review/weekly'),
               ),
               error: (_, __) => _PawnHeader(
                 profile: p,
                 checkIn: null,
                 onCheckIn: () => CheckInSheet.show(context),
-                onDailyReview: () => context.go('/pawn/review'),
-                onWeeklyReview: () => context.go('/pawn/review/weekly'),
               ),
             ),
-            TabBar(
+            _PawnTabStrip(
               controller: _tabs,
-              isScrollable: true,
-              tabAlignment: TabAlignment.start,
-              tabs: const [
-                Tab(text: AppStrings.pawnTabSummary),
-                Tab(text: AppStrings.pawnTabNeeds),
-                Tab(text: AppStrings.pawnTabMind),
-                Tab(text: AppStrings.pawnTabActivation),
+              labels: const [
+                AppStrings.pawnTabSummary,
+                AppStrings.pawnTabNeeds,
+                AppStrings.pawnTabMind,
+                AppStrings.pawnTabActivation,
               ],
             ),
             Expanded(
@@ -113,66 +105,99 @@ class _PawnHeader extends StatelessWidget {
     required this.profile,
     required this.checkIn,
     required this.onCheckIn,
-    required this.onDailyReview,
-    required this.onWeeklyReview,
   });
 
   final ColonyProfile profile;
   final CheckIn? checkIn;
   final VoidCallback onCheckIn;
-  final VoidCallback onDailyReview;
-  final VoidCallback onWeeklyReview;
 
   @override
   Widget build(BuildContext context) {
-    final compact = MediaQuery.sizeOf(context).width < 600;
-
-    return Container(
-      padding: const EdgeInsets.all(ColonySpacing.lg),
-      decoration: const BoxDecoration(
-        color: ColonyColors.raised,
-        border: Border(bottom: BorderSide(color: ColonyColors.borderSubtle)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          _profileRow(context),
-          const SizedBox(height: ColonySpacing.sm),
-          Wrap(
-            spacing: ColonySpacing.sm,
-            runSpacing: ColonySpacing.sm,
-            children: [
-              if (!compact)
-                OutlinedButton(
-                  onPressed: () => context.go('/colony/pawn-create'),
-                  child: const Text(AppStrings.habitatEditPawn),
-                ),
-              OutlinedButton(
-                onPressed: onWeeklyReview,
-                child: const Text(AppStrings.weeklyReview),
-              ),
-              OutlinedButton(
-                onPressed: onDailyReview,
-                child: const Text(AppStrings.dailyReview),
-              ),
-              FilledButton(
-                onPressed: onCheckIn,
-                child: const Text(AppStrings.checkIn),
-              ),
-            ],
-          ),
-        ],
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(8, 8, 8, 6),
+      child: ColonyPawnBanner(
+        name: profile.displayName,
+        restPips: ColonyPipMeter.countFor(checkIn?.energy),
+        moodPips: ColonyPipMeter.countFor(checkIn?.mood),
+        restLabel: AppStrings.homeRest,
+        moodLabel: AppStrings.homeMood,
+        trailing: ColonyButton(
+          onPressed: onCheckIn,
+          height: 28,
+          minWidth: 84,
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+          child: const Text(AppStrings.checkIn),
+        ),
       ),
     );
   }
+}
 
-  Widget _profileRow(BuildContext context) {
-    return ColonyPawnBanner(
-      name: profile.displayName,
-      restPips: ColonyPipMeter.countFor(checkIn?.energy),
-      moodPips: ColonyPipMeter.countFor(checkIn?.mood),
-      restLabel: AppStrings.homeRest,
-      moodLabel: AppStrings.homeMood,
+class _PawnTabStrip extends StatelessWidget {
+  const _PawnTabStrip({required this.controller, required this.labels});
+
+  final TabController controller;
+  final List<String> labels;
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: controller,
+      builder: (context, _) {
+        return Padding(
+          padding: const EdgeInsets.fromLTRB(8, 0, 8, 6),
+          child: SizedBox(
+            height: 34,
+            child: Row(
+              children: [
+                for (var i = 0; i < labels.length; i++) ...[
+                  if (i > 0) const SizedBox(width: 4),
+                  Expanded(
+                    child: LayoutBuilder(
+                      builder: (context, constraints) {
+                        return ColonyFrame(
+                          variant: ColonyFrameVariant.tile,
+                          selected: controller.index == i,
+                          grain: false,
+                          width: constraints.maxWidth,
+                          height: 34,
+                          fill: controller.index == i
+                              ? ColonyColors.actionHover
+                              : ColonyColors.actionBase,
+                          onTap: () => controller.animateTo(i),
+                          child: Center(
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 2,
+                              ),
+                              child: Text(
+                                labels[i].toUpperCase(),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontFamily: ColonyFonts.familyTiny,
+                                  fontSize: 9,
+                                  letterSpacing: 0.45,
+                                  height: 1.0,
+                                  fontWeight: FontWeight.w700,
+                                  color: controller.index == i
+                                      ? ColonyColors.textGoldHi
+                                      : ColonyColors.textButton,
+                                ),
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }
@@ -192,6 +217,25 @@ class _SummaryTab extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          Wrap(
+            spacing: ColonySpacing.sm,
+            runSpacing: ColonySpacing.sm,
+            children: [
+              ColonyButton(
+                onPressed: () => context.go('/pawn/review/weekly'),
+                variant: ColonyButtonVariant.subtle,
+                height: 30,
+                child: const Text(AppStrings.weeklyReview),
+              ),
+              ColonyButton(
+                onPressed: () => context.go('/pawn/review'),
+                variant: ColonyButtonVariant.subtle,
+                height: 30,
+                child: const Text(AppStrings.dailyReview),
+              ),
+            ],
+          ),
+          const SizedBox(height: ColonySpacing.lg),
           Text(AppStrings.pawnSummaryIntro,
               style: Theme.of(context).textTheme.bodyMedium),
           const SizedBox(height: ColonySpacing.lg),

@@ -105,8 +105,8 @@ void main() {
 
     final sono = tester.widget<Text>(find.text('SONO'));
     final foco = tester.widget<Text>(find.text('FOCO'));
-    expect(sono.style!.fontSize, 11);
-    expect(foco.style!.fontSize, 8);
+    expect(sono.style!.fontSize, 12);
+    expect(foco.style!.fontSize, 9);
     expect(sono.style!.fontSize, greaterThan(foco.style!.fontSize!));
   });
 }

@@ -41,25 +41,25 @@ class NeedInspectBar extends StatelessWidget {
   final String? semanticId;
 
   double get _railHeight => switch (scale) {
-    NeedInspectBarScale.featured => 22,
-    NeedInspectBarScale.primary => 17,
-    NeedInspectBarScale.compact => 11,
+    NeedInspectBarScale.featured => 24,
+    NeedInspectBarScale.primary => 18,
+    NeedInspectBarScale.compact => 12,
   };
 
   double get _labelSize => switch (scale) {
     NeedInspectBarScale.featured => 12,
-    NeedInspectBarScale.primary => 11,
-    NeedInspectBarScale.compact => 8,
+    NeedInspectBarScale.primary => 12,
+    NeedInspectBarScale.compact => 9,
   };
 
   double get _labelGap => switch (scale) {
-    NeedInspectBarScale.featured => 3,
-    NeedInspectBarScale.primary => 2,
-    NeedInspectBarScale.compact => 1,
+    NeedInspectBarScale.featured => 4,
+    NeedInspectBarScale.primary => 3,
+    NeedInspectBarScale.compact => 2,
   };
 
-  double get _pointerGutter => showPointer ? 7 : 0;
-  double get _chevronSize => scale == NeedInspectBarScale.primary ? 7 : 5;
+  double get _pointerGutter => showPointer ? 8 : 0;
+  double get _chevronSize => scale == NeedInspectBarScale.primary ? 6 : 5;
 
   @override
   Widget build(BuildContext context) {
@@ -176,7 +176,7 @@ class NeedInspectGroupRule extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const Padding(
-      padding: EdgeInsets.symmetric(vertical: 3, horizontal: 6),
+      padding: EdgeInsets.symmetric(vertical: 6, horizontal: 4),
       child: SizedBox(
         height: 1,
         child: CustomPaint(
@@ -209,30 +209,74 @@ class NeedInspectRailPainter extends CustomPainter {
     if (size.width < 4 || railHeight < 4) return;
 
     final rail = Rect.fromLTWH(0, 0, size.width, railHeight);
-    canvas.drawRect(rail, Paint()..color = ColonyColors.void_);
+    canvas.drawRect(rail, Paint()..color = const Color(0xFF07090C));
 
-    final inner = rail.deflate(1);
+    final hi = Paint()
+      ..color = const Color(0x99000000)
+      ..strokeWidth = 1
+      ..isAntiAlias = false;
+    canvas.drawLine(
+      Offset(rail.left + 0.5, rail.top + 0.5),
+      Offset(rail.right - 0.5, rail.top + 0.5),
+      hi,
+    );
+    canvas.drawLine(
+      Offset(rail.left + 0.5, rail.top + 0.5),
+      Offset(rail.left + 0.5, rail.bottom - 0.5),
+      hi,
+    );
+    final lift = Paint()
+      ..color = const Color(0x28FFFFFF)
+      ..strokeWidth = 1
+      ..isAntiAlias = false;
+    canvas.drawLine(
+      Offset(rail.left + 1, rail.bottom - 0.5),
+      Offset(rail.right - 0.5, rail.bottom - 0.5),
+      lift,
+    );
+
+    final inner = rail.deflate(1.5);
     final fraction = value?.clamp(0.0, 1.0);
     if (fraction != null && fraction > 0) {
-      canvas.drawRect(
-        Rect.fromLTWH(
-          inner.left,
-          inner.top,
-          inner.width * fraction,
-          inner.height,
-        ),
-        Paint()..color = ColonyColors.needsFill,
+      final fill = Rect.fromLTWH(
+        inner.left,
+        inner.top,
+        inner.width * fraction,
+        inner.height,
+      );
+      canvas.drawRect(fill, Paint()..color = ColonyColors.needsFill);
+      canvas.drawLine(
+        Offset(fill.left, fill.top + 0.5),
+        Offset(fill.right, fill.top + 0.5),
+        Paint()
+          ..color = const Color(0x66E8FFFF)
+          ..strokeWidth = 1
+          ..isAntiAlias = false,
+      );
+      canvas.drawLine(
+        Offset(fill.left, fill.bottom - 0.5),
+        Offset(fill.right, fill.bottom - 0.5),
+        Paint()
+          ..color = const Color(0x33000C18)
+          ..strokeWidth = 1
+          ..isAntiAlias = false,
       );
     }
 
     if (showTicks) {
-      final tick = Paint()
-        ..color = const Color(0x997A848C)
-        ..strokeWidth = 1
-        ..strokeCap = StrokeCap.square;
       for (final t in const [0.25, 0.5, 0.75]) {
         final x = (inner.left + inner.width * t).floorToDouble() + 0.5;
-        canvas.drawLine(Offset(x, inner.top), Offset(x, inner.bottom), tick);
+        final overFill = fraction != null && t <= fraction;
+        canvas.drawLine(
+          Offset(x, inner.top),
+          Offset(x, inner.bottom),
+          Paint()
+            ..color = overFill
+                ? const Color(0x99050A10)
+                : const Color(0x8A7A848C)
+            ..strokeWidth = 1
+            ..isAntiAlias = false,
+        );
       }
     }
 
@@ -241,6 +285,7 @@ class NeedInspectRailPainter extends CustomPainter {
       Paint()
         ..style = PaintingStyle.stroke
         ..strokeWidth = 1
+        ..isAntiAlias = false
         ..color = selected
             ? ColonyColors.borderSelected
             : ColonyColors.borderStandard,
@@ -254,7 +299,14 @@ class NeedInspectRailPainter extends CustomPainter {
         ..lineTo(x - 3.5, top + 5)
         ..lineTo(x + 3.5, top + 5)
         ..close();
-      canvas.drawPath(path, Paint()..color = const Color(0xFFF4F0E8));
+      canvas.drawPath(path, Paint()..color = const Color(0xFFE8E0D4));
+      canvas.drawPath(
+        path,
+        Paint()
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 0.8
+          ..color = const Color(0xAA050608),
+      );
     }
   }
 
@@ -273,12 +325,23 @@ class _NeedChevronPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final path = Path()
-      ..moveTo(0, 0)
-      ..lineTo(size.width, size.height / 2)
-      ..lineTo(0, size.height)
-      ..close();
-    canvas.drawPath(path, Paint()..color = ColonyColors.accentOrange);
+    final paint = Paint()
+      ..color = const Color(0xFFC47B48)
+      ..isAntiAlias = false;
+    final u = (size.height / 5).clamp(1.0, 1.6);
+    void px(int x, int y) {
+      canvas.drawRect(Rect.fromLTWH(x * u, y * u, u, u), paint);
+    }
+
+    px(0, 0);
+    px(0, 1);
+    px(0, 2);
+    px(0, 3);
+    px(0, 4);
+    px(1, 1);
+    px(1, 2);
+    px(1, 3);
+    px(2, 2);
   }
 
   @override

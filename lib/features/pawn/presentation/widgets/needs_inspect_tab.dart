@@ -62,17 +62,16 @@ class _NeedsInspectTabState extends ConsumerState<NeedsInspectTab> {
       data: (snapshots) {
         final catalog = _catalog(snapshots);
         return Padding(
-          padding: const EdgeInsets.fromLTRB(8, 6, 8, 8),
+          padding: const EdgeInsets.fromLTRB(6, 4, 6, 6),
           child: LayoutBuilder(
             builder: (context, outer) {
               return SizedBox(
                 width: outer.maxWidth,
                 height: outer.maxHeight,
                 child: ColonyFrame(
-                  variant: ColonyFrameVariant.inset,
+                  variant: ColonyFrameVariant.panel,
                   grain: false,
-                  fill: ColonyColors.void_,
-                  padding: const EdgeInsets.fromLTRB(8, 8, 8, 8),
+                  padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
                   child: LayoutBuilder(
                     builder: (context, constraints) {
                       final leftFraction = _chartMode ? 0.38 : 0.54;
@@ -338,9 +337,9 @@ class _NeedRail extends StatelessWidget {
   static const _primarySlugs = {'sono', 'alimentacao', 'lazer'};
   static const _primaryFlex = 5;
   static const _compactFlex = 3;
-  static const _primaryMin = 38.0;
-  static const _compactMin = 22.0;
-  static const _ruleExtent = 10.0;
+  static const _primaryMin = 44.0;
+  static const _compactMin = 26.0;
+  static const _ruleExtent = 14.0;
 
   final List<NeedSnapshot> snapshots;
   final EntityId? selectedId;
