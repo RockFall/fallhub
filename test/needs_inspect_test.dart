@@ -68,7 +68,7 @@ void main() {
 
     expect(find.text('SONO'), findsOneWidget);
     expect(find.text('ANSIEDADE'), findsOneWidget);
-    expect(find.text('Caminhada'), findsOneWidget);
+    expect(find.text('CAMINHADA'), findsOneWidget);
 
     await tester.tap(find.text('SONO'));
     await tester.pump();
@@ -82,7 +82,7 @@ void main() {
     await tester.pump(const Duration(milliseconds: 400));
 
     expect(find.text(AppStrings.needChartTitle('Sono')), findsNothing);
-    expect(find.text('Caminhada'), findsOneWidget);
+    expect(find.text('CAMINHADA'), findsOneWidget);
 
     await tester.pumpWidget(const SizedBox.shrink());
     for (var i = 0; i < 40; i++) {

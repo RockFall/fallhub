@@ -62,23 +62,20 @@ class _NeedsInspectTabState extends ConsumerState<NeedsInspectTab> {
       data: (snapshots) {
         final catalog = _catalog(snapshots);
         return Padding(
-          padding: const EdgeInsets.fromLTRB(
-            ColonySpacing.sm,
-            ColonySpacing.sm,
-            ColonySpacing.sm,
-            ColonySpacing.md,
-          ),
+          padding: const EdgeInsets.fromLTRB(8, 6, 8, 8),
           child: LayoutBuilder(
             builder: (context, outer) {
               return SizedBox(
                 width: outer.maxWidth,
                 height: outer.maxHeight,
                 child: ColonyFrame(
-                  variant: ColonyFrameVariant.panel,
-                  padding: const EdgeInsets.all(8),
+                  variant: ColonyFrameVariant.inset,
+                  grain: false,
+                  fill: ColonyColors.void_,
+                  padding: const EdgeInsets.fromLTRB(8, 8, 8, 8),
                   child: LayoutBuilder(
                     builder: (context, constraints) {
-                      final leftFraction = _chartMode ? 0.36 : 0.50;
+                      final leftFraction = _chartMode ? 0.38 : 0.54;
                       final leftWidth = constraints.maxWidth * leftFraction;
                       return Row(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -345,18 +342,37 @@ class _NeedRail extends StatelessWidget {
     if (snapshots.isEmpty) {
       return Center(child: Text(AppStrings.needsStable));
     }
-    return ListView.builder(
-      padding: const EdgeInsets.only(right: 4),
-      itemCount: snapshots.length,
-      itemBuilder: (context, index) {
-        final snapshot = snapshots[index];
-        return NeedInspectBar(
-          label: snapshot.definition.name,
-          value: snapshot.normalizedValue,
-          selected: snapshot.definition.id == selectedId,
-          semanticId: 'pawn.need.${snapshot.definition.slug}',
-          onTap: () => onSelect(snapshot),
-          onLongPress: () => onRecord(snapshot),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        const minRow = 38.0;
+        final useFlex =
+            constraints.hasBoundedHeight &&
+            constraints.maxHeight >= snapshots.length * minRow;
+        final bars = [
+          for (final snapshot in snapshots)
+            NeedInspectBar(
+              label: snapshot.definition.name,
+              value: snapshot.normalizedValue,
+              selected: snapshot.definition.id == selectedId,
+              fillSlot: true,
+              semanticId: 'pawn.need.${snapshot.definition.slug}',
+              onTap: () => onSelect(snapshot),
+              onLongPress: () => onRecord(snapshot),
+            ),
+        ];
+        if (useFlex) {
+          return Padding(
+            padding: const EdgeInsets.only(right: 6),
+            child: Column(
+              children: [for (final bar in bars) Expanded(child: bar)],
+            ),
+          );
+        }
+        return ListView(
+          padding: const EdgeInsets.only(right: 6),
+          children: [
+            for (final bar in bars) SizedBox(height: minRow, child: bar),
+          ],
         );
       },
     );
@@ -378,13 +394,14 @@ class _HumorPane extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(left: 8),
+      padding: const EdgeInsets.only(left: 10, right: 2),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           NeedInspectBar(
             label: AppStrings.mood,
             value: checkIn?.mood,
+            prominent: true,
             semanticId: 'pawn.need.humor',
             onTap: onOpenChart,
           ),
@@ -395,11 +412,15 @@ class _HumorPane extends StatelessWidget {
                     AppStrings.noCheckInYet,
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
                       color: ColonyColors.textMuted,
+                      fontFamily: ColonyFonts.familyTiny,
+                      fontSize: 10,
+                      letterSpacing: 0.4,
                     ),
                   )
                 : ListView(
                     children: [
                       ModifierList(
+                        compact: true,
                         entries: [
                           for (final factor in factors)
                             ModifierEntry(
@@ -414,7 +435,9 @@ class _HumorPane extends StatelessWidget {
                         const SizedBox(height: ColonySpacing.md),
                         Text(
                           checkIn!.note!,
-                          style: Theme.of(context).textTheme.bodySmall,
+                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: ColonyColors.textSecondary,
+                          ),
                         ),
                       ],
                     ],
@@ -463,7 +486,7 @@ class _ChartPane extends StatelessWidget {
     final hasData = buckets.any((b) => b.value != null);
 
     return Padding(
-      padding: const EdgeInsets.only(left: 8),
+      padding: const EdgeInsets.only(left: 10, right: 2),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -471,8 +494,10 @@ class _ChartPane extends StatelessWidget {
             title,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: Theme.of(context).textTheme.labelLarge?.copyWith(
+            style: const TextStyle(
+              fontFamily: ColonyFonts.familyTiny,
               color: ColonyColors.textGoldHi,
+              fontSize: 12,
               letterSpacing: 0.8,
             ),
           ),
@@ -512,6 +537,7 @@ class _ChartPane extends StatelessWidget {
                     if (dayFactors.isNotEmpty) ...[
                       const SizedBox(height: ColonySpacing.sm),
                       ModifierList(
+                        compact: true,
                         entries: [
                           for (final factor in dayFactors)
                             ModifierEntry(
