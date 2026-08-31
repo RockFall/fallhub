@@ -532,9 +532,9 @@ abstract final class AppStrings {
   static const needsAttention = 'Necessidades em atenção';
   static const needsStable = 'Necessidades estáveis ou sem dados recentes.';
   static const lastCheckIn = 'Último check-in';
-  static const recordNeed = 'Registrar';
   static const moodDeclared = 'Humor declarado';
   static const moodFactors = 'Fatores mencionados';
+  static const checkInFactors = 'Fatores';
   static const noFactorsYet = 'Nenhum fator registrado no último check-in.';
   static const dailyReviewIntro =
       'Revisão diária em 2–5 minutos. Fatos, estado atual e amanhã.';

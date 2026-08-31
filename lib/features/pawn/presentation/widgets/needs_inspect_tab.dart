@@ -9,9 +9,7 @@ import '../../application/pawn_controllers.dart';
 import '../../application/pawn_providers.dart';
 
 class NeedsInspectTab extends ConsumerStatefulWidget {
-  const NeedsInspectTab({super.key, required this.onRecordNeed});
-
-  final void Function(NeedSnapshot snapshot) onRecordNeed;
+  const NeedsInspectTab({super.key});
 
   @override
   ConsumerState<NeedsInspectTab> createState() => _NeedsInspectTabState();
@@ -87,7 +85,6 @@ class _NeedsInspectTabState extends ConsumerState<NeedsInspectTab> {
                               snapshots: catalog,
                               selectedId: _selectedNeedId,
                               onSelect: _openNeedChart,
-                              onRecord: widget.onRecordNeed,
                             ),
                           ),
                           const Padding(
@@ -113,10 +110,11 @@ class _NeedsInspectTabState extends ConsumerState<NeedsInspectTab> {
                                           ? _dayFactors
                                           : const [],
                                       dayNote: _selectedBucket()?.note,
-                                      showRecordSlider: _selectedNeedId != null,
-                                      currentValue: _selectedSnapshot(
-                                        catalog,
-                                      )?.normalizedValue,
+                                      currentValue: _humorChart
+                                          ? latest?.mood
+                                          : _selectedSnapshot(
+                                              catalog,
+                                            )?.normalizedValue,
                                       onRecordToday: _recordToday,
                                       onBackToHumor: _backToHumor,
                                     )
@@ -125,6 +123,7 @@ class _NeedsInspectTabState extends ConsumerState<NeedsInspectTab> {
                                       checkIn: latest,
                                       factors: _latestFactors,
                                       onOpenChart: _openHumorChart,
+                                      onRecordMood: _recordHumorToday,
                                     ),
                             ),
                           ),
@@ -317,12 +316,23 @@ class _NeedsInspectTabState extends ConsumerState<NeedsInspectTab> {
   }
 
   Future<void> _recordToday(double normalized) async {
+    if (_humorChart) {
+      await _recordHumorToday(normalized);
+      return;
+    }
     final needId = _selectedNeedId;
     if (needId == null) return;
     await ref
         .read(needReadingControllerProvider.notifier)
         .record(needId: needId, scaleValue: denormalizeScale5(normalized));
     await _loadNeedHistory(needId);
+  }
+
+  Future<void> _recordHumorToday(double mood) async {
+    await ref.read(checkInControllerProvider.notifier).recordMood(mood);
+    if (_humorChart) {
+      await _loadHumorHistory();
+    }
   }
 }
 
@@ -331,7 +341,6 @@ class _NeedRail extends StatelessWidget {
     required this.snapshots,
     required this.selectedId,
     required this.onSelect,
-    required this.onRecord,
   });
 
   static const _primarySlugs = {'sono', 'alimentacao', 'lazer'};
@@ -344,7 +353,6 @@ class _NeedRail extends StatelessWidget {
   final List<NeedSnapshot> snapshots;
   final EntityId? selectedId;
   final ValueChanged<NeedSnapshot> onSelect;
-  final void Function(NeedSnapshot snapshot) onRecord;
 
   @override
   Widget build(BuildContext context) {
@@ -380,7 +388,6 @@ class _NeedRail extends StatelessWidget {
             fillSlot: true,
             semanticId: 'pawn.need.${snapshot.definition.slug}',
             onTap: () => onSelect(snapshot),
-            onLongPress: () => onRecord(snapshot),
           );
         }
 
@@ -430,11 +437,13 @@ class _HumorPane extends StatelessWidget {
     required this.checkIn,
     required this.factors,
     required this.onOpenChart,
+    required this.onRecordMood,
   });
 
   final CheckIn? checkIn;
   final List<MoodFactor> factors;
   final VoidCallback onOpenChart;
+  final ValueChanged<double> onRecordMood;
 
   @override
   Widget build(BuildContext context) {
@@ -450,6 +459,7 @@ class _HumorPane extends StatelessWidget {
             showPointer: true,
             semanticId: 'pawn.need.humor',
             onTap: onOpenChart,
+            onValueCommit: onRecordMood,
           ),
           const SizedBox(height: 10),
           Expanded(
@@ -481,9 +491,8 @@ class _HumorPane extends StatelessWidget {
                         const SizedBox(height: ColonySpacing.md),
                         Text(
                           checkIn!.note!,
-                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: ColonyColors.textSecondary,
-                          ),
+                          style: Theme.of(context).textTheme.bodySmall
+                              ?.copyWith(color: ColonyColors.textSecondary),
                         ),
                       ],
                     ],
@@ -504,7 +513,6 @@ class _ChartPane extends StatelessWidget {
     required this.onSelectDay,
     required this.dayFactors,
     required this.dayNote,
-    required this.showRecordSlider,
     required this.currentValue,
     required this.onRecordToday,
     required this.onBackToHumor,
@@ -516,7 +524,6 @@ class _ChartPane extends StatelessWidget {
   final ValueChanged<int> onSelectDay;
   final List<MoodFactor> dayFactors;
   final String? dayNote;
-  final bool showRecordSlider;
   final double? currentValue;
   final ValueChanged<double> onRecordToday;
   final VoidCallback onBackToHumor;
@@ -602,16 +609,19 @@ class _ChartPane extends StatelessWidget {
                       ),
                     ],
                   ],
-                  if (showRecordSlider) ...[
-                    const SizedBox(height: ColonySpacing.sm),
-                    Text(
-                      AppStrings.needRecordToday,
-                      style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                        color: ColonyColors.textMuted,
-                      ),
+                  const SizedBox(height: ColonySpacing.sm),
+                  Text(
+                    AppStrings.needRecordToday,
+                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                      color: ColonyColors.textMuted,
                     ),
-                    _TodaySlider(value: currentValue, onCommit: onRecordToday),
-                  ],
+                  ),
+                  NeedInspectSlider(
+                    value: currentValue,
+                    onCommit: onRecordToday,
+                    labelOf: AppStrings.scaleFiveLabel,
+                    semanticId: 'pawn.needs.recordToday',
+                  ),
                 ],
               ),
             ),
@@ -626,55 +636,6 @@ class _ChartPane extends StatelessWidget {
             ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class _TodaySlider extends StatefulWidget {
-  const _TodaySlider({required this.value, required this.onCommit});
-
-  final double? value;
-  final ValueChanged<double> onCommit;
-
-  @override
-  State<_TodaySlider> createState() => _TodaySliderState();
-}
-
-class _TodaySliderState extends State<_TodaySlider> {
-  late double _value;
-
-  @override
-  void initState() {
-    super.initState();
-    _value = widget.value ?? 0.5;
-  }
-
-  @override
-  void didUpdateWidget(covariant _TodaySlider oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.value != widget.value && widget.value != null) {
-      _value = widget.value!;
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return SliderTheme(
-      data: SliderTheme.of(context).copyWith(
-        activeTrackColor: ColonyColors.needsFill,
-        inactiveTrackColor: ColonyColors.borderSeparator,
-        thumbColor: ColonyColors.textGoldHi,
-        overlayColor: ColonyColors.needsFill.withValues(alpha: 0.16),
-      ),
-      child: Slider(
-        value: _value.clamp(0, 1),
-        min: 0,
-        max: 1,
-        divisions: 4,
-        label: AppStrings.scaleFiveLabel(_value),
-        onChanged: (v) => setState(() => _value = v),
-        onChangeEnd: widget.onCommit,
       ),
     );
   }

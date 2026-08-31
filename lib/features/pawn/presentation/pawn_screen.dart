@@ -11,7 +11,6 @@ import '../../activation/presentation/widgets/stuck_now_sheet.dart';
 import '../application/pawn_controllers.dart';
 import '../application/pawn_providers.dart';
 import 'widgets/check_in_sheet.dart';
-import 'widgets/need_reading_sheet.dart';
 import 'widgets/needs_inspect_tab.dart';
 
 class PawnScreen extends ConsumerStatefulWidget {
@@ -83,11 +82,7 @@ class _PawnScreenState extends ConsumerState<PawnScreen>
                 controller: _tabs,
                 children: [
                   _SummaryTab(profile: p, checkIn: checkIn),
-                  NeedsInspectTab(
-                    onRecordNeed: (snapshot) {
-                      NeedReadingSheet.show(context, snapshot: snapshot);
-                    },
-                  ),
+                  const NeedsInspectTab(),
                   _MindTab(checkIn: checkIn),
                   const _ActivationTab(),
                 ],
@@ -236,8 +231,10 @@ class _SummaryTab extends ConsumerWidget {
             ],
           ),
           const SizedBox(height: ColonySpacing.lg),
-          Text(AppStrings.pawnSummaryIntro,
-              style: Theme.of(context).textTheme.bodyMedium),
+          Text(
+            AppStrings.pawnSummaryIntro,
+            style: Theme.of(context).textTheme.bodyMedium,
+          ),
           const SizedBox(height: ColonySpacing.lg),
           needs.when(
             loading: () => const LinearProgressIndicator(),
@@ -265,7 +262,9 @@ class _SummaryTab extends ConsumerWidget {
                   children: relevant
                       .map(
                         (s) => Padding(
-                          padding: const EdgeInsets.only(bottom: ColonySpacing.md),
+                          padding: const EdgeInsets.only(
+                            bottom: ColonySpacing.md,
+                          ),
                           child: NeedBar(
                             data: NeedBarData(
                               label: s.definition.name,
@@ -342,8 +341,10 @@ class _MindTabState extends ConsumerState<_MindTab> {
       });
       return;
     }
-    final factors =
-        await ref.read(repositoriesProvider).checkIns.getFactors(checkIn.id);
+    final factors = await ref
+        .read(repositoriesProvider)
+        .checkIns
+        .getFactors(checkIn.id);
     if (mounted) {
       setState(() {
         _factors = factors;
@@ -397,10 +398,7 @@ class _MindTabState extends ConsumerState<_MindTab> {
             ),
             if (checkIn.note != null && checkIn.note!.isNotEmpty) ...[
               const SizedBox(height: ColonySpacing.lg),
-              ColonyPanel(
-                title: AppStrings.note,
-                child: Text(checkIn.note!),
-              ),
+              ColonyPanel(title: AppStrings.note, child: Text(checkIn.note!)),
             ],
           ],
         ],
@@ -444,8 +442,10 @@ class _ActivationTab extends ConsumerWidget {
           child: const Text(AppStrings.activationStuckNow),
         ),
         const SizedBox(height: ColonySpacing.lg),
-        Text(AppStrings.activationProtocols,
-            style: Theme.of(context).textTheme.titleMedium),
+        Text(
+          AppStrings.activationProtocols,
+          style: Theme.of(context).textTheme.titleMedium,
+        ),
         protocols.when(
           loading: () => const LinearProgressIndicator(),
           error: (_, _) => Text(AppStrings.errorGeneric),
@@ -455,11 +455,11 @@ class _ActivationTab extends ConsumerWidget {
                 Padding(
                   padding: const EdgeInsets.only(bottom: ColonySpacing.sm),
                   child: ColonyJourneyCard(
-                    assetPath:
-                        ActivationVisualCatalog.artForProtocol(protocol),
+                    assetPath: ActivationVisualCatalog.artForProtocol(protocol),
                     title: protocol.name,
-                    subtitle: ActivationVisualCatalog.forProtocol(protocol)
-                        .journeyLabel,
+                    subtitle: ActivationVisualCatalog.forProtocol(
+                      protocol,
+                    ).journeyLabel,
                     height: 104,
                     onTap: () => context.go(
                       '/activation/protocols/${protocol.id.value}',
@@ -470,8 +470,10 @@ class _ActivationTab extends ConsumerWidget {
           ),
         ),
         const SizedBox(height: ColonySpacing.md),
-        Text(AppStrings.activationEpisodes,
-            style: Theme.of(context).textTheme.titleMedium),
+        Text(
+          AppStrings.activationEpisodes,
+          style: Theme.of(context).textTheme.titleMedium,
+        ),
         episodes.when(
           loading: () => const SizedBox.shrink(),
           error: (_, _) => const SizedBox.shrink(),

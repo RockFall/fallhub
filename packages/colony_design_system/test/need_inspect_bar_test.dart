@@ -65,11 +65,7 @@ void main() {
           body: SizedBox(
             width: 220,
             height: 28,
-            child: NeedInspectBar(
-              label: 'Sono',
-              value: 0.4,
-              fillSlot: true,
-            ),
+            child: NeedInspectBar(label: 'Sono', value: 0.4, fillSlot: true),
           ),
         ),
       ),
@@ -108,5 +104,32 @@ void main() {
     expect(sono.style!.fontSize, 12);
     expect(foco.style!.fontSize, 9);
     expect(sono.style!.fontSize, greaterThan(foco.style!.fontSize!));
+  });
+
+  testWidgets('NeedInspectBar drag commits snapped scale', (tester) async {
+    double? committed;
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: ColonyTheme.dark(),
+        home: Scaffold(
+          body: Center(
+            child: SizedBox(
+              width: 240,
+              child: NeedInspectBar(
+                label: 'Humor',
+                value: 0.5,
+                showPointer: true,
+                onValueCommit: (v) => committed = v,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    await tester.drag(find.byType(NeedInspectBar), const Offset(120, 0));
+    await tester.pumpAndSettle();
+    expect(committed, isNotNull);
+    expect(committed, greaterThan(0.5));
   });
 }

@@ -7,13 +7,13 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'package:fallhub/app/localization/app_strings.dart';
 import 'package:fallhub/core/providers/app_providers.dart';
-import 'package:fallhub/features/pawn/presentation/widgets/needs_inspect_tab.dart';
+import 'package:fallhub/features/pawn/presentation/widgets/check_in_sheet.dart';
 
 void main() {
-  testWidgets('Needs inspect opens a need chart and Humor returns', (
+  testWidgets('Check-in sheet uses inspect rails and saves mood factors', (
     tester,
   ) async {
-    tester.view.physicalSize = const Size(800, 1400);
+    tester.view.physicalSize = const Size(800, 1600);
     tester.view.devicePixelRatio = 1.0;
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
@@ -48,7 +48,7 @@ void main() {
       profileId: profile.id,
       mood: 0.5,
       energy: 0.5,
-      tension: 0.5,
+      tension: 0.25,
       focus: 0.5,
       factors: [(label: 'Caminhada', impact: 6, uncertain: false)],
     );
@@ -61,60 +61,43 @@ void main() {
         ],
         child: MaterialApp(
           theme: ColonyTheme.dark(),
-          home: const Scaffold(body: NeedsInspectTab()),
+          home: const Scaffold(
+            body: SizedBox(height: 1200, child: CheckInSheet()),
+          ),
         ),
       ),
     );
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 400));
 
+    expect(find.text('HUMOR'), findsOneWidget);
     expect(find.text('SONO'), findsOneWidget);
     expect(find.text('ANSIEDADE'), findsOneWidget);
-    expect(find.text('CAMINHADA'), findsOneWidget);
-
-    final sono = tester.widget<Text>(find.text('SONO'));
-    final anxiety = tester.widget<Text>(find.text('ANSIEDADE'));
-    expect(sono.style!.fontSize, greaterThan(anxiety.style!.fontSize!));
-
-    await tester.tap(find.text('SONO'));
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 400));
-
-    expect(find.text(AppStrings.needChartTitle('Sono')), findsOneWidget);
-    expect(find.text(AppStrings.needRecordToday), findsOneWidget);
-
-    await tester.tap(find.widgetWithText(ColonyButton, AppStrings.mood));
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 400));
-
-    expect(find.text(AppStrings.needChartTitle('Sono')), findsNothing);
-    expect(find.text('CAMINHADA'), findsOneWidget);
-
-    await tester.tap(find.text('HUMOR'));
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 400));
-
-    expect(
-      find.text(AppStrings.needChartTitle(AppStrings.mood)),
-      findsOneWidget,
-    );
-    expect(find.text(AppStrings.needRecordToday), findsOneWidget);
+    expect(find.text('DESCANSO'), findsOneWidget);
+    expect(find.byType(NeedInspectBar), findsWidgets);
     expect(find.byType(NeedInspectSlider), findsOneWidget);
-    expect(find.byType(Slider), findsOneWidget);
+    expect(find.byType(FilterChip), findsNothing);
+    expect(find.byType(FilledButton), findsNothing);
 
     await tester.drag(find.byType(Slider), const Offset(280, 0));
     await tester.pump();
+
+    await tester.ensureVisible(find.text('DESCANSO'));
+    await tester.tap(find.text('DESCANSO'));
+    await tester.pump();
+
+    await tester.ensureVisible(
+      find.widgetWithText(ColonyButton, AppStrings.checkIn),
+    );
+    await tester.tap(find.widgetWithText(ColonyButton, AppStrings.checkIn));
+    await tester.pump();
     await tester.pump(const Duration(milliseconds: 400));
 
-    final after = await repos.checkIns.getLatest(profile.id);
-    expect(after, isNotNull);
-    expect(after!.mood, greaterThan(0.5));
-    final factors = await repos.checkIns.getFactors(after.id);
-    expect(factors.map((f) => f.label), contains('Caminhada'));
-
-    await tester.pumpWidget(const SizedBox.shrink());
-    for (var i = 0; i < 40; i++) {
-      await tester.pump(const Duration(milliseconds: 1));
-    }
+    final latest = await repos.checkIns.getLatest(profile.id);
+    expect(latest, isNotNull);
+    expect(latest!.mood, greaterThan(0.5));
+    expect(latest.tension, 0.25);
+    final factors = await repos.checkIns.getFactors(latest.id);
+    expect(factors.map((f) => f.label), contains('Descanso'));
   });
 }

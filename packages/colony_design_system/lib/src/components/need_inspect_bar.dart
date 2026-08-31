@@ -12,7 +12,10 @@ enum NeedInspectBarScale {
 
 /// Dense inspect rail: label above a solid cyan trough, quarter ticks,
 /// optional white pointer under the current value.
-class NeedInspectBar extends StatelessWidget {
+///
+/// When [onValueCommit] is set, a horizontal drag snaps the fill to the
+/// 1–5 scale (0, 0.25, 0.5, 0.75, 1) and reports the value.
+class NeedInspectBar extends StatefulWidget {
   const NeedInspectBar({
     super.key,
     required this.label,
@@ -25,6 +28,8 @@ class NeedInspectBar extends StatelessWidget {
     this.fillSlot = false,
     this.onTap,
     this.onLongPress,
+    this.onValueChanged,
+    this.onValueCommit,
     this.semanticId,
   });
 
@@ -38,31 +43,88 @@ class NeedInspectBar extends StatelessWidget {
   final bool fillSlot;
   final VoidCallback? onTap;
   final VoidCallback? onLongPress;
+  final ValueChanged<double>? onValueChanged;
+  final ValueChanged<double>? onValueCommit;
   final String? semanticId;
 
-  double get _railHeight => switch (scale) {
+  static double snapScale5(double value) =>
+      (value.clamp(0.0, 1.0) * 4).round() / 4.0;
+
+  @override
+  State<NeedInspectBar> createState() => _NeedInspectBarState();
+}
+
+class _NeedInspectBarState extends State<NeedInspectBar> {
+  final _trackKey = GlobalKey();
+  var _dragging = false;
+  double? _dragValue;
+
+  bool get _interactive =>
+      widget.onValueChanged != null || widget.onValueCommit != null;
+
+  double get _railHeight => switch (widget.scale) {
     NeedInspectBarScale.featured => 24,
     NeedInspectBarScale.primary => 18,
     NeedInspectBarScale.compact => 12,
   };
 
-  double get _labelSize => switch (scale) {
+  double get _labelSize => switch (widget.scale) {
     NeedInspectBarScale.featured => 12,
     NeedInspectBarScale.primary => 12,
     NeedInspectBarScale.compact => 9,
   };
 
-  double get _labelGap => switch (scale) {
+  double get _labelGap => switch (widget.scale) {
     NeedInspectBarScale.featured => 4,
     NeedInspectBarScale.primary => 3,
     NeedInspectBarScale.compact => 2,
   };
 
-  double get _pointerGutter => showPointer ? 8 : 0;
-  double get _chevronSize => scale == NeedInspectBarScale.primary ? 6 : 5;
+  bool get _showPointer => widget.showPointer;
+  double get _pointerGutter => _showPointer ? 8 : 0;
+  double get _chevronSize =>
+      widget.scale == NeedInspectBarScale.primary ? 6 : 5;
+
+  double? get _shown => _dragValue ?? widget.value;
+
+  @override
+  void didUpdateWidget(covariant NeedInspectBar oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (!_dragging && widget.value != oldWidget.value) {
+      _dragValue = null;
+    }
+  }
+
+  void _applyGlobal(Offset global) {
+    final box = _trackKey.currentContext?.findRenderObject() as RenderBox?;
+    if (box == null || !box.hasSize || box.size.width <= 0) return;
+    final snapped = NeedInspectBar.snapScale5(
+      box.globalToLocal(global).dx / box.size.width,
+    );
+    setState(() {
+      _dragging = true;
+      _dragValue = snapped;
+    });
+    widget.onValueChanged?.call(snapped);
+  }
+
+  void _endDrag() {
+    final committed = _dragValue;
+    setState(() => _dragging = false);
+    if (committed != null) widget.onValueCommit?.call(committed);
+  }
+
+  void _cancelDrag() {
+    setState(() {
+      _dragging = false;
+      _dragValue = null;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
+    final selected = widget.selected;
+    final scale = widget.scale;
     final labelColor = selected
         ? ColonyColors.textGoldHi
         : scale == NeedInspectBarScale.compact
@@ -70,19 +132,20 @@ class NeedInspectBar extends StatelessWidget {
         : ColonyColors.textSecondary;
 
     final rail = SizedBox(
+      key: _trackKey,
       height: _railHeight + _pointerGutter,
       child: CustomPaint(
         painter: NeedInspectRailPainter(
-          value: value,
-          showTicks: showTicks,
-          showPointer: showPointer && value != null,
+          value: _shown,
+          showTicks: widget.showTicks,
+          showPointer: _showPointer && _shown != null,
           selected: selected,
           railHeight: _railHeight,
         ),
       ),
     );
 
-    final track = showChevron
+    final track = widget.showChevron
         ? Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -108,7 +171,7 @@ class NeedInspectBar extends StatelessWidget {
         SizedBox(
           height: _labelSize,
           child: Text(
-            label.toUpperCase(),
+            widget.label.toUpperCase(),
             maxLines: 1,
             overflow: TextOverflow.clip,
             style: TextStyle(
@@ -139,7 +202,7 @@ class NeedInspectBar extends StatelessWidget {
       child: column,
     );
 
-    final slotted = fillSlot
+    final slotted = widget.fillSlot
         ? LayoutBuilder(
             builder: (context, constraints) {
               return FittedBox(
@@ -151,20 +214,41 @@ class NeedInspectBar extends StatelessWidget {
           )
         : padded;
 
-    return Semantics(
-      button: onTap != null,
-      selected: selected,
-      identifier: semanticId,
-      label: label,
-      child: Material(
+    final hitChild = widget.fillSlot
+        ? SizedBox.expand(child: slotted)
+        : slotted;
+
+    final Widget body;
+    if (_interactive) {
+      body = GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: widget.onTap,
+        onLongPress: widget.onLongPress,
+        onHorizontalDragStart: (details) => _applyGlobal(details.globalPosition),
+        onHorizontalDragUpdate: (details) =>
+            _applyGlobal(details.globalPosition),
+        onHorizontalDragEnd: (_) => _endDrag(),
+        onHorizontalDragCancel: _cancelDrag,
+        child: hitChild,
+      );
+    } else {
+      body = Material(
         color: Colors.transparent,
         child: InkWell(
-          onTap: onTap,
-          onLongPress: onLongPress,
+          onTap: widget.onTap,
+          onLongPress: widget.onLongPress,
           overlayColor: WidgetStateProperty.all(ColonyColors.hoverOverlay),
-          child: fillSlot ? SizedBox.expand(child: slotted) : slotted,
+          child: hitChild,
         ),
-      ),
+      );
+    }
+
+    return Semantics(
+      button: widget.onTap != null || _interactive,
+      selected: selected,
+      identifier: widget.semanticId,
+      label: widget.label,
+      child: body,
     );
   }
 }
@@ -185,6 +269,71 @@ class NeedInspectGroupRule extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+/// Cyan/gold 1–5 slider used under inspect charts and the check-in window.
+class NeedInspectSlider extends StatefulWidget {
+  const NeedInspectSlider({
+    super.key,
+    required this.value,
+    required this.onCommit,
+    this.onChanged,
+    this.labelOf,
+    this.semanticId,
+  });
+
+  final double? value;
+  final ValueChanged<double> onCommit;
+  final ValueChanged<double>? onChanged;
+  final String Function(double value)? labelOf;
+  final String? semanticId;
+
+  @override
+  State<NeedInspectSlider> createState() => _NeedInspectSliderState();
+}
+
+class _NeedInspectSliderState extends State<NeedInspectSlider> {
+  late double _value;
+
+  @override
+  void initState() {
+    super.initState();
+    _value = widget.value ?? 0.5;
+  }
+
+  @override
+  void didUpdateWidget(covariant NeedInspectSlider oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.value != widget.value && widget.value != null) {
+      _value = widget.value!;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final slider = SliderTheme(
+      data: SliderTheme.of(context).copyWith(
+        activeTrackColor: ColonyColors.needsFill,
+        inactiveTrackColor: ColonyColors.borderSeparator,
+        thumbColor: ColonyColors.textGoldHi,
+        overlayColor: ColonyColors.needsFill.withValues(alpha: 0.16),
+      ),
+      child: Slider(
+        value: _value.clamp(0, 1),
+        min: 0,
+        max: 1,
+        divisions: 4,
+        label: widget.labelOf?.call(_value),
+        onChanged: (v) {
+          setState(() => _value = v);
+          widget.onChanged?.call(v);
+        },
+        onChangeEnd: widget.onCommit,
+      ),
+    );
+    if (widget.semanticId == null) return slider;
+    return Semantics(identifier: widget.semanticId, child: slider);
   }
 }
 
