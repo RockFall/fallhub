@@ -530,12 +530,63 @@ abstract final class AppStrings {
   static const noCheckInYet = 'Nenhum check-in registrado hoje.';
   static const pawnSummaryIntro =
       'Visão do que está acontecendo — sem reduzir você a números.';
+  static const pawnSituation = 'Situação';
+  static const pawnNext = 'Próximo';
+  static const pawnNextEmpty = 'Nada na fila imediata.';
+  static const pawnReviewPending = 'Pendente';
+  static const pawnReviewLogged = 'Registrada';
+  static const pawnSitrepNoCheckIn = 'Ainda sem check-in.';
+  static const pawnSitrepMoodTodayPrefix = 'Humor';
+  static const pawnSitrepMoodStalePrefix = 'Último humor';
+  static const pawnSitrepMoodNotToday = 'não é de hoje';
+  static const pawnSitrepNoReadings =
+      'Ainda sem leituras de necessidades.';
+  static const pawnSitrepNeedsQuiet =
+      'Nenhuma necessidade pedindo atenção agora.';
+  static const pawnSitrepOpenRoute = 'Uma rota de mobilização está aberta.';
+  static const pawnMindPrompts = 'Orientação';
+  static const pawnMindPromptHint =
+      'Perguntas opcionais. Não diagnosticam e não substituem o humor declarado.';
+  static const pawnMindLift = 'O que empurrou para cima';
+  static const pawnMindDrag = 'O que puxou para baixo';
+  static const pawnMindNamed = 'Mencionado, sem peso';
+  static const pawnOrder = 'Ordem atual';
+  static const pawnEpisodeLog = 'Episódios';
+  static const pawnNoEpisodes = 'Nenhum episódio ainda.';
+  static const pawnOpenRoutes = 'Ver rotas';
+
+  static String pawnSitrepNeedCount(int count) => count == 1
+      ? '1 necessidade pede atualização ou está abaixo da faixa.'
+      : '$count necessidades pedem atualização ou estão abaixo da faixa.';
+
+  static String pawnSitrepLine({
+    required bool hasCheckIn,
+    required bool checkInIsToday,
+    required String? moodLabel,
+    required bool hasNeedReadings,
+    required int attentionCount,
+    required bool openRoute,
+  }) {
+    final mood = !hasCheckIn
+        ? pawnSitrepNoCheckIn
+        : checkInIsToday
+            ? '$pawnSitrepMoodTodayPrefix ${moodLabel ?? '—'}.'
+            : '$pawnSitrepMoodStalePrefix: ${moodLabel ?? '—'} ($pawnSitrepMoodNotToday).';
+    final needs = !hasNeedReadings
+        ? pawnSitrepNoReadings
+        : attentionCount == 0
+            ? pawnSitrepNeedsQuiet
+            : pawnSitrepNeedCount(attentionCount);
+    final route = openRoute ? ' $pawnSitrepOpenRoute' : '';
+    return '$mood $needs$route';
+  }
+
   static const needsAttention = 'Necessidades em atenção';
   static const needsStable = 'Necessidades estáveis ou sem dados recentes.';
   static const lastCheckIn = 'Último check-in';
-  static const recordNeed = 'Registrar';
   static const moodDeclared = 'Humor declarado';
   static const moodFactors = 'Fatores mencionados';
+  static const checkInFactors = 'Fatores';
   static const noFactorsYet = 'Nenhum fator registrado no último check-in.';
   static const dailyReviewIntro =
       'Revisão diária em 2–5 minutos. Fatos, estado atual e amanhã.';

@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 
 import '../tokens/colony_tokens.dart';
@@ -9,7 +11,7 @@ class NeedSparkline extends StatelessWidget {
     required this.labels,
     this.selectedIndex,
     this.onSelect,
-    this.height = 92,
+    this.height = 108,
   });
 
   /// Normalized 0–1, null = no sample that day.
@@ -69,11 +71,12 @@ class NeedSparkline extends StatelessWidget {
                 child: Text(
                   labels[i],
                   textAlign: TextAlign.center,
-                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                  style: TextStyle(
+                    fontFamily: ColonyFonts.familyTiny,
                     color: i == selectedIndex
                         ? ColonyColors.textGoldHi
                         : ColonyColors.textMuted,
-                    fontSize: 9,
+                    fontSize: 10,
                     letterSpacing: 0.4,
                   ),
                 ),
@@ -97,7 +100,7 @@ class _NeedSparklinePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     if (values.isEmpty) return;
-    const pad = 8.0;
+    const pad = 10.0;
     final chart = Rect.fromLTWH(
       pad,
       pad,
@@ -122,7 +125,7 @@ class _NeedSparklinePainter extends CustomPainter {
 
     final line = Paint()
       ..color = ColonyColors.needsFill
-      ..strokeWidth = 1.6
+      ..strokeWidth = 1.8
       ..style = PaintingStyle.stroke
       ..strokeCap = StrokeCap.square;
 
@@ -143,15 +146,21 @@ class _NeedSparklinePainter extends CustomPainter {
       if (v == null) continue;
       final p = pointFor(i, v);
       final selected = i == selectedIndex;
-      canvas.drawRect(
-        Rect.fromCenter(
-          center: p,
-          width: selected ? 7 : 5,
-          height: selected ? 7 : 5,
-        ),
-        Paint()
-          ..color = selected ? ColonyColors.textGoldHi : ColonyColors.needsFill,
-      );
+      if (selected) {
+        canvas.save();
+        canvas.translate(p.dx, p.dy);
+        canvas.rotate(math.pi / 4);
+        canvas.drawRect(
+          Rect.fromCenter(center: Offset.zero, width: 8, height: 8),
+          Paint()..color = ColonyColors.textGoldHi,
+        );
+        canvas.restore();
+      } else {
+        canvas.drawRect(
+          Rect.fromCenter(center: p, width: 5, height: 5),
+          Paint()..color = ColonyColors.needsFill,
+        );
+      }
     }
   }
 

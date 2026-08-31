@@ -9,9 +9,7 @@ import '../../application/pawn_controllers.dart';
 import '../../application/pawn_providers.dart';
 
 class NeedsInspectTab extends ConsumerStatefulWidget {
-  const NeedsInspectTab({super.key, required this.onRecordNeed});
-
-  final void Function(NeedSnapshot snapshot) onRecordNeed;
+  const NeedsInspectTab({super.key});
 
   @override
   ConsumerState<NeedsInspectTab> createState() => _NeedsInspectTabState();
@@ -62,12 +60,7 @@ class _NeedsInspectTabState extends ConsumerState<NeedsInspectTab> {
       data: (snapshots) {
         final catalog = _catalog(snapshots);
         return Padding(
-          padding: const EdgeInsets.fromLTRB(
-            ColonySpacing.sm,
-            ColonySpacing.sm,
-            ColonySpacing.sm,
-            ColonySpacing.md,
-          ),
+          padding: const EdgeInsets.fromLTRB(6, 4, 6, 6),
           child: LayoutBuilder(
             builder: (context, outer) {
               return SizedBox(
@@ -75,10 +68,11 @@ class _NeedsInspectTabState extends ConsumerState<NeedsInspectTab> {
                 height: outer.maxHeight,
                 child: ColonyFrame(
                   variant: ColonyFrameVariant.panel,
-                  padding: const EdgeInsets.all(8),
+                  grain: false,
+                  padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
                   child: LayoutBuilder(
                     builder: (context, constraints) {
-                      final leftFraction = _chartMode ? 0.36 : 0.50;
+                      final leftFraction = _chartMode ? 0.38 : 0.54;
                       final leftWidth = constraints.maxWidth * leftFraction;
                       return Row(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -91,12 +85,14 @@ class _NeedsInspectTabState extends ConsumerState<NeedsInspectTab> {
                               snapshots: catalog,
                               selectedId: _selectedNeedId,
                               onSelect: _openNeedChart,
-                              onRecord: widget.onRecordNeed,
                             ),
                           ),
-                          const ColoredBox(
-                            color: ColonyColors.borderSeparator,
-                            child: SizedBox(width: 1),
+                          const Padding(
+                            padding: EdgeInsets.symmetric(vertical: 6),
+                            child: ColoredBox(
+                              color: ColonyColors.borderSeparator,
+                              child: SizedBox(width: 1),
+                            ),
                           ),
                           Expanded(
                             child: AnimatedSwitcher(
@@ -114,10 +110,11 @@ class _NeedsInspectTabState extends ConsumerState<NeedsInspectTab> {
                                           ? _dayFactors
                                           : const [],
                                       dayNote: _selectedBucket()?.note,
-                                      showRecordSlider: _selectedNeedId != null,
-                                      currentValue: _selectedSnapshot(
-                                        catalog,
-                                      )?.normalizedValue,
+                                      currentValue: _humorChart
+                                          ? latest?.mood
+                                          : _selectedSnapshot(
+                                              catalog,
+                                            )?.normalizedValue,
                                       onRecordToday: _recordToday,
                                       onBackToHumor: _backToHumor,
                                     )
@@ -126,6 +123,7 @@ class _NeedsInspectTabState extends ConsumerState<NeedsInspectTab> {
                                       checkIn: latest,
                                       factors: _latestFactors,
                                       onOpenChart: _openHumorChart,
+                                      onRecordMood: _recordHumorToday,
                                     ),
                             ),
                           ),
@@ -318,12 +316,23 @@ class _NeedsInspectTabState extends ConsumerState<NeedsInspectTab> {
   }
 
   Future<void> _recordToday(double normalized) async {
+    if (_humorChart) {
+      await _recordHumorToday(normalized);
+      return;
+    }
     final needId = _selectedNeedId;
     if (needId == null) return;
     await ref
         .read(needReadingControllerProvider.notifier)
         .record(needId: needId, scaleValue: denormalizeScale5(normalized));
     await _loadNeedHistory(needId);
+  }
+
+  Future<void> _recordHumorToday(double mood) async {
+    await ref.read(checkInControllerProvider.notifier).recordMood(mood);
+    if (_humorChart) {
+      await _loadHumorHistory();
+    }
   }
 }
 
@@ -332,31 +341,90 @@ class _NeedRail extends StatelessWidget {
     required this.snapshots,
     required this.selectedId,
     required this.onSelect,
-    required this.onRecord,
   });
+
+  static const _primarySlugs = {'sono', 'alimentacao', 'lazer'};
+  static const _primaryFlex = 5;
+  static const _compactFlex = 3;
+  static const _primaryMin = 44.0;
+  static const _compactMin = 26.0;
+  static const _ruleExtent = 14.0;
 
   final List<NeedSnapshot> snapshots;
   final EntityId? selectedId;
   final ValueChanged<NeedSnapshot> onSelect;
-  final void Function(NeedSnapshot snapshot) onRecord;
 
   @override
   Widget build(BuildContext context) {
     if (snapshots.isEmpty) {
       return Center(child: Text(AppStrings.needsStable));
     }
-    return ListView.builder(
-      padding: const EdgeInsets.only(right: 4),
-      itemCount: snapshots.length,
-      itemBuilder: (context, index) {
-        final snapshot = snapshots[index];
-        return NeedInspectBar(
-          label: snapshot.definition.name,
-          value: snapshot.normalizedValue,
-          selected: snapshot.definition.id == selectedId,
-          semanticId: 'pawn.need.${snapshot.definition.slug}',
-          onTap: () => onSelect(snapshot),
-          onLongPress: () => onRecord(snapshot),
+    final primary = [
+      for (final snapshot in snapshots)
+        if (_primarySlugs.contains(snapshot.definition.slug)) snapshot,
+    ];
+    final compact = [
+      for (final snapshot in snapshots)
+        if (!_primarySlugs.contains(snapshot.definition.slug)) snapshot,
+    ];
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final needed =
+            primary.length * _primaryMin +
+            compact.length * _compactMin +
+            (primary.isNotEmpty && compact.isNotEmpty ? _ruleExtent : 0);
+        final useFlex =
+            constraints.hasBoundedHeight && constraints.maxHeight >= needed;
+
+        Widget bar(NeedSnapshot snapshot, NeedInspectBarScale scale) {
+          return NeedInspectBar(
+            label: snapshot.definition.name,
+            value: snapshot.normalizedValue,
+            selected: snapshot.definition.id == selectedId,
+            scale: scale,
+            showChevron: true,
+            showPointer: snapshot.definition.id == selectedId,
+            fillSlot: true,
+            semanticId: 'pawn.need.${snapshot.definition.slug}',
+            onTap: () => onSelect(snapshot),
+          );
+        }
+
+        final children = <Widget>[
+          for (final snapshot in primary)
+            useFlex
+                ? Expanded(
+                    flex: _primaryFlex,
+                    child: bar(snapshot, NeedInspectBarScale.primary),
+                  )
+                : SizedBox(
+                    height: _primaryMin,
+                    child: bar(snapshot, NeedInspectBarScale.primary),
+                  ),
+          if (primary.isNotEmpty && compact.isNotEmpty)
+            const NeedInspectGroupRule(),
+          for (final snapshot in compact)
+            useFlex
+                ? Expanded(
+                    flex: _compactFlex,
+                    child: bar(snapshot, NeedInspectBarScale.compact),
+                  )
+                : SizedBox(
+                    height: _compactMin,
+                    child: bar(snapshot, NeedInspectBarScale.compact),
+                  ),
+        ];
+
+        if (useFlex) {
+          return Padding(
+            padding: const EdgeInsets.only(right: 4),
+            child: Column(children: children),
+          );
+        }
+        return ListView(
+          padding: const EdgeInsets.only(right: 4),
+          children: children,
         );
       },
     );
@@ -369,37 +437,46 @@ class _HumorPane extends StatelessWidget {
     required this.checkIn,
     required this.factors,
     required this.onOpenChart,
+    required this.onRecordMood,
   });
 
   final CheckIn? checkIn;
   final List<MoodFactor> factors;
   final VoidCallback onOpenChart;
+  final ValueChanged<double> onRecordMood;
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(left: 8),
+      padding: const EdgeInsets.only(left: 10, right: 2),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           NeedInspectBar(
             label: AppStrings.mood,
             value: checkIn?.mood,
+            scale: NeedInspectBarScale.featured,
+            showPointer: true,
             semanticId: 'pawn.need.humor',
             onTap: onOpenChart,
+            onValueCommit: onRecordMood,
           ),
-          const SizedBox(height: ColonySpacing.sm),
+          const SizedBox(height: 10),
           Expanded(
             child: checkIn == null
                 ? Text(
                     AppStrings.noCheckInYet,
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
                       color: ColonyColors.textMuted,
+                      fontFamily: ColonyFonts.familyTiny,
+                      fontSize: 10,
+                      letterSpacing: 0.4,
                     ),
                   )
                 : ListView(
                     children: [
                       ModifierList(
+                        compact: true,
                         entries: [
                           for (final factor in factors)
                             ModifierEntry(
@@ -414,7 +491,8 @@ class _HumorPane extends StatelessWidget {
                         const SizedBox(height: ColonySpacing.md),
                         Text(
                           checkIn!.note!,
-                          style: Theme.of(context).textTheme.bodySmall,
+                          style: Theme.of(context).textTheme.bodySmall
+                              ?.copyWith(color: ColonyColors.textSecondary),
                         ),
                       ],
                     ],
@@ -435,7 +513,6 @@ class _ChartPane extends StatelessWidget {
     required this.onSelectDay,
     required this.dayFactors,
     required this.dayNote,
-    required this.showRecordSlider,
     required this.currentValue,
     required this.onRecordToday,
     required this.onBackToHumor,
@@ -447,7 +524,6 @@ class _ChartPane extends StatelessWidget {
   final ValueChanged<int> onSelectDay;
   final List<MoodFactor> dayFactors;
   final String? dayNote;
-  final bool showRecordSlider;
   final double? currentValue;
   final ValueChanged<double> onRecordToday;
   final VoidCallback onBackToHumor;
@@ -463,7 +539,7 @@ class _ChartPane extends StatelessWidget {
     final hasData = buckets.any((b) => b.value != null);
 
     return Padding(
-      padding: const EdgeInsets.only(left: 8),
+      padding: const EdgeInsets.only(left: 10, right: 2),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -471,8 +547,10 @@ class _ChartPane extends StatelessWidget {
             title,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: Theme.of(context).textTheme.labelLarge?.copyWith(
+            style: const TextStyle(
+              fontFamily: ColonyFonts.familyTiny,
               color: ColonyColors.textGoldHi,
+              fontSize: 12,
               letterSpacing: 0.8,
             ),
           ),
@@ -512,6 +590,7 @@ class _ChartPane extends StatelessWidget {
                     if (dayFactors.isNotEmpty) ...[
                       const SizedBox(height: ColonySpacing.sm),
                       ModifierList(
+                        compact: true,
                         entries: [
                           for (final factor in dayFactors)
                             ModifierEntry(
@@ -530,16 +609,19 @@ class _ChartPane extends StatelessWidget {
                       ),
                     ],
                   ],
-                  if (showRecordSlider) ...[
-                    const SizedBox(height: ColonySpacing.sm),
-                    Text(
-                      AppStrings.needRecordToday,
-                      style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                        color: ColonyColors.textMuted,
-                      ),
+                  const SizedBox(height: ColonySpacing.sm),
+                  Text(
+                    AppStrings.needRecordToday,
+                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                      color: ColonyColors.textMuted,
                     ),
-                    _TodaySlider(value: currentValue, onCommit: onRecordToday),
-                  ],
+                  ),
+                  NeedInspectSlider(
+                    value: currentValue,
+                    onCommit: onRecordToday,
+                    labelOf: AppStrings.scaleFiveLabel,
+                    semanticId: 'pawn.needs.recordToday',
+                  ),
                 ],
               ),
             ),
@@ -554,55 +636,6 @@ class _ChartPane extends StatelessWidget {
             ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class _TodaySlider extends StatefulWidget {
-  const _TodaySlider({required this.value, required this.onCommit});
-
-  final double? value;
-  final ValueChanged<double> onCommit;
-
-  @override
-  State<_TodaySlider> createState() => _TodaySliderState();
-}
-
-class _TodaySliderState extends State<_TodaySlider> {
-  late double _value;
-
-  @override
-  void initState() {
-    super.initState();
-    _value = widget.value ?? 0.5;
-  }
-
-  @override
-  void didUpdateWidget(covariant _TodaySlider oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.value != widget.value && widget.value != null) {
-      _value = widget.value!;
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return SliderTheme(
-      data: SliderTheme.of(context).copyWith(
-        activeTrackColor: ColonyColors.needsFill,
-        inactiveTrackColor: ColonyColors.borderSeparator,
-        thumbColor: ColonyColors.textGoldHi,
-        overlayColor: ColonyColors.needsFill.withValues(alpha: 0.16),
-      ),
-      child: Slider(
-        value: _value.clamp(0, 1),
-        min: 0,
-        max: 1,
-        divisions: 4,
-        label: AppStrings.scaleFiveLabel(_value),
-        onChanged: (v) => setState(() => _value = v),
-        onChangeEnd: widget.onCommit,
       ),
     );
   }
