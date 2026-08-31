@@ -9,6 +9,7 @@ import 'package:fallhub/app/localization/app_strings.dart';
 import 'package:fallhub/core/providers/app_providers.dart';
 import 'package:fallhub/features/flashcards/presentation/flashcard_tag_screen.dart';
 import 'package:fallhub/features/flashcards/presentation/knowledge_area_screen.dart';
+import 'package:fallhub/features/flashcards/presentation/widgets/flashcard_bulk_delete_button.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 Future<void> _flush(WidgetTester tester) async {
@@ -85,11 +86,15 @@ void main() {
     );
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 500));
-
-    expect(find.text(AppStrings.flashcardsDeleteTagCards(1)), findsOneWidget);
-    await tester.tap(find.text(AppStrings.flashcardsDeleteTagCards(1)));
     await tester.pumpAndSettle();
-    await tester.tap(find.text(AppStrings.flashcardsDeleteTagCards(1)).last);
+
+    final deleteTag = find.text(AppStrings.flashcardsDeleteTagCards(1));
+    expect(deleteTag, findsOneWidget);
+    await tester.ensureVisible(deleteTag);
+    await tester.tap(find.byType(FlashcardBulkDeleteButton));
+    await tester.pumpAndSettle();
+    expect(find.text(AppStrings.flashcardsDeleteCategoryTitle), findsOneWidget);
+    await tester.tap(find.text(AppStrings.delete));
     await tester.pumpAndSettle();
     await tester.tap(find.text(AppStrings.delete));
     await tester.pumpAndSettle();
@@ -178,14 +183,15 @@ void main() {
     );
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 500));
-
-    expect(find.text(AppStrings.flashcardsDeleteAreaCards(1)), findsOneWidget);
-    await tester.ensureVisible(
-      find.text(AppStrings.flashcardsDeleteAreaCards(1)),
-    );
-    await tester.tap(find.text(AppStrings.flashcardsDeleteAreaCards(1)));
     await tester.pumpAndSettle();
-    await tester.tap(find.text(AppStrings.flashcardsDeleteAreaCards(1)).last);
+
+    final deleteArea = find.text(AppStrings.flashcardsDeleteAreaCards(1));
+    expect(deleteArea, findsOneWidget);
+    await tester.ensureVisible(deleteArea);
+    await tester.tap(find.byType(FlashcardBulkDeleteButton));
+    await tester.pumpAndSettle();
+    expect(find.text(AppStrings.flashcardsDeleteCategoryTitle), findsOneWidget);
+    await tester.tap(find.text(AppStrings.delete));
     await tester.pumpAndSettle();
     await tester.tap(find.text(AppStrings.delete));
     await tester.pumpAndSettle();

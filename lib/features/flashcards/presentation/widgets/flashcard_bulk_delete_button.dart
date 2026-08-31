@@ -20,8 +20,7 @@ class FlashcardBulkDeleteButton extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final busy = ref.watch(flashcardControllerProvider).isLoading;
-    final enabled = cards.isNotEmpty && !busy;
+    final enabled = cards.isNotEmpty;
     return OutlinedButton.icon(
       style: OutlinedButton.styleFrom(
         foregroundColor: ColonyColors.statusCritical,
@@ -49,7 +48,7 @@ class FlashcardBulkDeleteButton extends ConsumerWidget {
               foregroundColor: Colors.white,
             ),
             onPressed: () => Navigator.pop(ctx, true),
-            child: Text(label),
+            child: const Text(AppStrings.delete),
           ),
         ],
       ),

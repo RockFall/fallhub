@@ -203,6 +203,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       }
       return;
     }
+    if (!context.mounted) return;
 
     switch (ColonySqliteBackupCodec.sniff(bytes)) {
       case ColonyBackupKind.sqliteContainer || ColonyBackupKind.sqliteRaw:

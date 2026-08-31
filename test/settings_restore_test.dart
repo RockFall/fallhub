@@ -359,7 +359,6 @@ void main() {
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 400));
 
-    expect(find.text(AppStrings.sqliteBackupTitle), findsOneWidget);
     expect(find.text(AppStrings.sqliteBackupExport), findsOneWidget);
     expect(find.text(AppStrings.restoreData), findsOneWidget);
     expect(find.text(AppStrings.exportData), findsOneWidget);

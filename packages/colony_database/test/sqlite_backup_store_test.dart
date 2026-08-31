@@ -55,9 +55,6 @@ void main() {
       );
       final sidecarName = 'google_timeline_${profile.id.value}.json';
       await File(p.join(dir.path, sidecarName)).writeAsString('{"visits":[1]}');
-      await File(
-        p.join(dir.path, 'google_timeline_stale.json'),
-      ).writeAsString('{"stale":true}');
 
       final bytes = await SqliteBackupStore.export(db);
       expect(ColonySqliteBackupCodec.looksLikeContainer(bytes), isTrue);
@@ -74,6 +71,9 @@ void main() {
 
       await file.delete();
       await File(p.join(dir.path, sidecarName)).delete();
+      await File(
+        p.join(dir.path, 'google_timeline_stale.json'),
+      ).writeAsString('{"stale":true}');
 
       await SqliteBackupStore.install(
         directory: dir.path,
