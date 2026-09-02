@@ -4,13 +4,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../app/localization/app_strings.dart';
+import '../../../../core/providers/app_providers.dart';
 import '../../application/pawn_controllers.dart';
 import '../../application/pawn_providers.dart';
 
 class CheckInSheet extends ConsumerStatefulWidget {
-  const CheckInSheet({super.key});
+  const CheckInSheet({super.key, this.initialDay});
 
-  static Future<void> show(BuildContext context) {
+  /// Local calendar day for the check-in. Defaults to today.
+  final DateTime? initialDay;
+
+  static Future<void> show(BuildContext context, {DateTime? initialDay}) {
     return showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
@@ -23,7 +27,10 @@ class CheckInSheet extends ConsumerStatefulWidget {
           padding: EdgeInsets.fromLTRB(8, 0, 8, 8 + bottom),
           child: Align(
             alignment: Alignment.bottomCenter,
-            child: SizedBox(height: height, child: const CheckInSheet()),
+            child: SizedBox(
+              height: height,
+              child: CheckInSheet(initialDay: initialDay),
+            ),
           ),
         );
       },
@@ -45,11 +52,42 @@ class _CheckInSheetState extends ConsumerState<CheckInSheet> {
   final _touchedNeeds = <String>{};
   final _selectedFactors = <String>{};
   final _noteController = TextEditingController();
+  late DateTime _observedDay;
+
+  @override
+  void initState() {
+    super.initState();
+    final nowLocal = ref.read(clockProvider)().toLocal();
+    final initial = widget.initialDay?.toLocal() ?? nowLocal;
+    _observedDay = DateTime(initial.year, initial.month, initial.day);
+  }
 
   @override
   void dispose() {
     _noteController.dispose();
     super.dispose();
+  }
+
+  DateTime get _todayLocal {
+    final nowLocal = ref.read(clockProvider)().toLocal();
+    return DateTime(nowLocal.year, nowLocal.month, nowLocal.day);
+  }
+
+  bool get _isToday => isSameLocalCalendarDay(_observedDay, _todayLocal);
+
+  Future<void> _pickDay() async {
+    final today = _todayLocal;
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: _observedDay.isAfter(today) ? today : _observedDay,
+      firstDate: DateTime(today.year - 5, today.month, today.day),
+      lastDate: today,
+      helpText: AppStrings.checkInPickDate,
+    );
+    if (picked == null || !mounted) return;
+    setState(() {
+      _observedDay = DateTime(picked.year, picked.month, picked.day);
+    });
   }
 
   Future<void> _submit() async {
@@ -77,6 +115,10 @@ class _CheckInSheetState extends ConsumerState<CheckInSheet> {
               ? null
               : _noteController.text.trim(),
           selectedFactors: _selectedFactors.toList(),
+          observedAt: checkInObservedAt(
+            selectedLocalDay: _observedDay,
+            nowUtc: ref.read(clockProvider)(),
+          ),
           needReadings: {
             for (final slug in _touchedNeeds)
               if (_needValues[slug] != null) slug: _needValues[slug]!,
@@ -122,6 +164,15 @@ class _CheckInSheetState extends ConsumerState<CheckInSheet> {
                   ),
                 ),
               ),
+              _CheckInDayButton(
+                label: AppStrings.checkInDayLabel(
+                  _observedDay,
+                  isToday: _isToday,
+                ),
+                showLabel: !_isToday,
+                onPressed: _pickDay,
+              ),
+              const SizedBox(width: 4),
               ColonyButton(
                 variant: ColonyButtonVariant.subtle,
                 height: 28,
@@ -301,6 +352,63 @@ class _SectionLabel extends StatelessWidget {
         fontSize: 11,
         letterSpacing: 0.8,
         fontWeight: FontWeight.w700,
+      ),
+    );
+  }
+}
+
+class _CheckInDayButton extends StatelessWidget {
+  const _CheckInDayButton({
+    required this.label,
+    required this.showLabel,
+    required this.onPressed,
+  });
+
+  final String label;
+  final bool showLabel;
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      button: true,
+      identifier: 'pawn.checkin.pickDate',
+      label: AppStrings.checkInPickDate,
+      value: label,
+      child: Tooltip(
+        message: AppStrings.checkInPickDate,
+        child: InkWell(
+          onTap: onPressed,
+          borderRadius: BorderRadius.circular(ColonyRadii.sm),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  Icons.calendar_today_outlined,
+                  size: 16,
+                  color: showLabel
+                      ? ColonyColors.textGoldHi
+                      : ColonyColors.textSecondary,
+                ),
+                if (showLabel) ...[
+                  const SizedBox(width: 4),
+                  Text(
+                    label,
+                    style: const TextStyle(
+                      fontFamily: ColonyFonts.familyTiny,
+                      fontSize: 10,
+                      letterSpacing: 0.5,
+                      fontWeight: FontWeight.w700,
+                      color: ColonyColors.textGoldHi,
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }

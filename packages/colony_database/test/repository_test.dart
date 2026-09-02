@@ -138,6 +138,32 @@ void main() {
     expect(again, hasLength(DefaultNeedSeeds.core.length));
   });
 
+  test('records check-in for an explicit past observed day', () async {
+    final profile = await repos.profiles.create(
+      colonyName: 'Test',
+      displayName: 'Caio',
+      timezone: 'UTC',
+      locale: 'pt_BR',
+      baseCurrency: 'BRL',
+    );
+
+    final observed = DateTime.utc(2026, 8, 4, 21, 15);
+    final checkIn = await repos.checkIns.save(
+      profileId: profile.id,
+      mood: 0.4,
+      energy: 0.5,
+      tension: 0.5,
+      focus: 0.5,
+      observedAt: observed,
+    );
+
+    expect(checkIn.observedAt, observed);
+    expect(checkIn.createdAt, DateTime.utc(2026, 8, 6, 12));
+
+    final listed = await repos.checkIns.listAll(profile.id);
+    expect(listed.single.observedAt, observed);
+  });
+
   test('seeds work priorities and cycles level', () async {
     final profile = await repos.profiles.create(
       colonyName: 'Test',
