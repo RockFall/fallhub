@@ -1321,6 +1321,7 @@ class CheckInRepository {
     required double tension,
     required double focus,
     String? note,
+    DateTime? observedAt,
     List<String> contextTags = const [],
     List<({String label, int? impact, bool uncertain})> factors = const [],
   }) async {
@@ -1328,7 +1329,7 @@ class CheckInRepository {
     final checkIn = CheckIn(
       id: EntityId(_ids.newId()),
       profileId: profileId,
-      observedAt: now,
+      observedAt: (observedAt ?? now).toUtc(),
       createdAt: now,
       mood: mood.clamp(0, 1),
       energy: energy.clamp(0, 1),
