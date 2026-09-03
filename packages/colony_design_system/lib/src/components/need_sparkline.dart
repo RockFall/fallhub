@@ -4,6 +4,15 @@ import 'package:flutter/material.dart';
 
 import '../tokens/colony_tokens.dart';
 
+/// Consecutive recorded samples to connect. Missing days do not break the line.
+List<(int from, int to)> needSparklineLinePairs(List<double?> values) {
+  final hits = <int>[
+    for (var i = 0; i < values.length; i++)
+      if (values[i] != null) i,
+  ];
+  return [for (var i = 0; i < hits.length - 1; i++) (hits[i], hits[i + 1])];
+}
+
 class NeedSparkline extends StatelessWidget {
   const NeedSparkline({
     super.key,
@@ -129,16 +138,12 @@ class _NeedSparklinePainter extends CustomPainter {
       ..style = PaintingStyle.stroke
       ..strokeCap = StrokeCap.square;
 
-    Offset? prev;
-    for (var i = 0; i < values.length; i++) {
-      final v = values[i];
-      if (v == null) {
-        prev = null;
-        continue;
-      }
-      final p = pointFor(i, v);
-      if (prev != null) canvas.drawLine(prev, p, line);
-      prev = p;
+    for (final (from, to) in needSparklineLinePairs(values)) {
+      canvas.drawLine(
+        pointFor(from, values[from]!),
+        pointFor(to, values[to]!),
+        line,
+      );
     }
 
     for (var i = 0; i < values.length; i++) {
