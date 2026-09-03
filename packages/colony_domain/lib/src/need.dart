@@ -310,52 +310,82 @@ class NeedHistorySample extends Equatable {
   List<Object?> get props => [id, observedAt, value, note];
 }
 
-class NeedDayBucket extends Equatable {
-  const NeedDayBucket({
+class NeedHistoryPoint extends Equatable {
+  const NeedHistoryPoint({
+    required this.id,
+    required this.observedAt,
     required this.day,
-    this.value,
-    this.sourceId,
+    required this.value,
+    required this.x,
     this.note,
   });
 
+  final EntityId id;
+  final DateTime observedAt;
+
   /// Local calendar day at 00:00.
   final DateTime day;
-  final double? value;
-  final EntityId? sourceId;
+  final double value;
+
+  /// 0–1 across the window. Same-day samples sit closer than adjacent days.
+  final double x;
   final String? note;
 
   @override
-  List<Object?> get props => [day, value, sourceId, note];
+  List<Object?> get props => [id, observedAt, day, value, x, note];
+}
+
+class NeedHistoryWindow extends Equatable {
+  const NeedHistoryWindow({
+    required this.days,
+    required this.points,
+  });
+
+  final List<DateTime> days;
+  final List<NeedHistoryPoint> points;
+
+  @override
+  List<Object?> get props => [days, points];
 }
 
 abstract final class NeedHistorySeries {
-  static List<NeedDayBucket> lastLocalDays({
+  /// Last [days] local calendar days, keeping every sample (several per day).
+  static NeedHistoryWindow lastLocalDays({
     required DateTime nowLocal,
     required List<NeedHistorySample> samples,
     int days = 7,
   }) {
     final today = DateTime(nowLocal.year, nowLocal.month, nowLocal.day);
-    final byDay = <DateTime, NeedHistorySample>{};
-    for (final sample in samples) {
-      final local = sample.observedAt.toLocal();
-      final key = DateTime(local.year, local.month, local.day);
-      final previous = byDay[key];
-      if (previous == null ||
-          sample.observedAt.isAfter(previous.observedAt) ||
-          sample.observedAt.isAtSameMomentAs(previous.observedAt)) {
-        byDay[key] = sample;
-      }
-    }
+    final start = today.subtract(Duration(days: days - 1));
+    final end = today.add(const Duration(days: 1));
+    final spanMs = end.difference(start).inMilliseconds;
+    final dayList = List<DateTime>.generate(
+      days,
+      (i) => DateTime(start.year, start.month, start.day + i),
+    );
 
-    return List.generate(days, (i) {
-      final day = today.subtract(Duration(days: days - 1 - i));
-      final sample = byDay[day];
-      return NeedDayBucket(
-        day: day,
-        value: sample?.value,
-        sourceId: sample?.id,
-        note: sample?.note,
+    final points = <NeedHistoryPoint>[];
+    for (final sample in samples) {
+      final value = sample.value;
+      if (value == null) continue;
+      final local = sample.observedAt.toLocal();
+      if (local.isBefore(start) || !local.isBefore(end)) continue;
+      final day = DateTime(local.year, local.month, local.day);
+      final x = spanMs <= 0
+          ? 0.0
+          : (local.difference(start).inMilliseconds / spanMs).clamp(0.0, 1.0);
+      points.add(
+        NeedHistoryPoint(
+          id: sample.id,
+          observedAt: sample.observedAt,
+          day: day,
+          value: value,
+          x: x,
+          note: sample.note,
+        ),
       );
-    });
+    }
+    points.sort((a, b) => a.observedAt.compareTo(b.observedAt));
+    return NeedHistoryWindow(days: dayList, points: points);
   }
 }
