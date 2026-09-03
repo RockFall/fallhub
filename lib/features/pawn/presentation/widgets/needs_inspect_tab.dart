@@ -21,6 +21,7 @@ class _NeedsInspectTabState extends ConsumerState<NeedsInspectTab> {
   EntityId? _selectedNeedId;
   var _humorChart = false;
   int? _selectedDayIndex;
+  int? _selectedPointIndex;
   var _historyToken = 0;
   List<NeedHistorySample> _samples = const [];
   List<MoodFactor> _latestFactors = const [];
@@ -103,13 +104,15 @@ class _NeedsInspectTabState extends ConsumerState<NeedsInspectTab> {
                                         _selectedNeedId?.value ?? 'humor-chart',
                                       ),
                                       title: _chartTitle(catalog),
-                                      buckets: _buckets(),
+                                      window: _window(),
                                       selectedDayIndex: _selectedDayIndex,
-                                      onSelectDay: _selectDay,
+                                      selectedPointIndex: _selectedPointIndex,
+                                      onSelectPoint: _selectPoint,
+                                      onSelectDay: _selectEmptyDay,
                                       dayFactors: _humorChart
                                           ? _dayFactors
                                           : const [],
-                                      dayNote: _selectedBucket()?.note,
+                                      dayNote: _selectedPoint()?.note,
                                       currentValue: _humorChart
                                           ? latest?.mood
                                           : _selectedSnapshot(
@@ -164,16 +167,16 @@ class _NeedsInspectTabState extends ConsumerState<NeedsInspectTab> {
     return AppStrings.needChartTitle(selected?.definition.name ?? '');
   }
 
-  List<NeedDayBucket> _buckets() {
+  NeedHistoryWindow _window() {
     final now = ref.read(clockProvider)().toLocal();
     return NeedHistorySeries.lastLocalDays(nowLocal: now, samples: _samples);
   }
 
-  NeedDayBucket? _selectedBucket() {
-    final buckets = _buckets();
-    final index = _selectedDayIndex;
-    if (index == null || index < 0 || index >= buckets.length) return null;
-    return buckets[index];
+  NeedHistoryPoint? _selectedPoint() {
+    final points = _window().points;
+    final index = _selectedPointIndex;
+    if (index == null || index < 0 || index >= points.length) return null;
+    return points[index];
   }
 
   Future<void> _openNeedChart(NeedSnapshot snapshot) async {
@@ -181,6 +184,7 @@ class _NeedsInspectTabState extends ConsumerState<NeedsInspectTab> {
       _selectedNeedId = snapshot.definition.id;
       _humorChart = false;
       _selectedDayIndex = null;
+      _selectedPointIndex = null;
       _samples = const [];
       _dayFactors = const [];
     });
@@ -192,6 +196,7 @@ class _NeedsInspectTabState extends ConsumerState<NeedsInspectTab> {
       _selectedNeedId = null;
       _humorChart = true;
       _selectedDayIndex = null;
+      _selectedPointIndex = null;
       _samples = const [];
       _dayFactors = const [];
     });
@@ -203,17 +208,30 @@ class _NeedsInspectTabState extends ConsumerState<NeedsInspectTab> {
       _selectedNeedId = null;
       _humorChart = false;
       _selectedDayIndex = null;
+      _selectedPointIndex = null;
       _samples = const [];
       _dayFactors = const [];
     });
   }
 
-  Future<void> _selectDay(int index) async {
-    setState(() => _selectedDayIndex = index);
+  Future<void> _selectPoint(int index) async {
+    final window = _window();
+    if (index < 0 || index >= window.points.length) return;
+    final point = window.points[index];
+    setState(() {
+      _selectedPointIndex = index;
+      _selectedDayIndex = window.days.indexOf(point.day);
+    });
     if (!_humorChart) return;
-    final buckets = _buckets();
-    if (index < 0 || index >= buckets.length) return;
-    await _loadDayFactors(buckets[index].sourceId);
+    await _loadDayFactors(point.id);
+  }
+
+  Future<void> _selectEmptyDay(int index) async {
+    setState(() {
+      _selectedPointIndex = null;
+      _selectedDayIndex = index;
+      _dayFactors = const [];
+    });
   }
 
   Future<void> _loadLatestFactors(CheckIn? checkIn) async {
@@ -250,13 +268,18 @@ class _NeedsInspectTabState extends ConsumerState<NeedsInspectTab> {
           note: reading.note,
         ),
     ];
-    final buckets = NeedHistorySeries.lastLocalDays(
+    final window = NeedHistorySeries.lastLocalDays(
       nowLocal: now,
       samples: samples,
     );
     setState(() {
       _samples = samples;
-      _selectedDayIndex = _indexWithData(buckets) ?? buckets.length - 1;
+      _selectedPointIndex = window.points.isEmpty
+          ? null
+          : window.points.length - 1;
+      _selectedDayIndex = window.points.isEmpty
+          ? window.days.length - 1
+          : window.days.indexOf(window.points.last.day);
     });
   }
 
@@ -284,16 +307,21 @@ class _NeedsInspectTabState extends ConsumerState<NeedsInspectTab> {
           note: checkIn.note,
         ),
     ];
-    final buckets = NeedHistorySeries.lastLocalDays(
+    final window = NeedHistorySeries.lastLocalDays(
       nowLocal: now,
       samples: samples,
     );
-    final selected = _indexWithData(buckets) ?? buckets.length - 1;
+    final selected = window.points.isEmpty ? null : window.points.length - 1;
     setState(() {
       _samples = samples;
-      _selectedDayIndex = selected;
+      _selectedPointIndex = selected;
+      _selectedDayIndex = selected == null
+          ? window.days.length - 1
+          : window.days.indexOf(window.points[selected].day);
     });
-    await _loadDayFactors(buckets[selected].sourceId);
+    await _loadDayFactors(
+      selected == null ? null : window.points[selected].id,
+    );
   }
 
   Future<void> _loadDayFactors(EntityId? checkInId) async {
@@ -306,13 +334,6 @@ class _NeedsInspectTabState extends ConsumerState<NeedsInspectTab> {
         .checkIns
         .getFactors(checkInId);
     if (mounted) setState(() => _dayFactors = factors);
-  }
-
-  int? _indexWithData(List<NeedDayBucket> buckets) {
-    for (var i = buckets.length - 1; i >= 0; i--) {
-      if (buckets[i].value != null) return i;
-    }
-    return null;
   }
 
   Future<void> _recordToday(double normalized) async {
@@ -508,8 +529,10 @@ class _ChartPane extends StatelessWidget {
   const _ChartPane({
     super.key,
     required this.title,
-    required this.buckets,
+    required this.window,
     required this.selectedDayIndex,
+    required this.selectedPointIndex,
+    required this.onSelectPoint,
     required this.onSelectDay,
     required this.dayFactors,
     required this.dayNote,
@@ -519,8 +542,10 @@ class _ChartPane extends StatelessWidget {
   });
 
   final String title;
-  final List<NeedDayBucket> buckets;
+  final NeedHistoryWindow window;
   final int? selectedDayIndex;
+  final int? selectedPointIndex;
+  final ValueChanged<int> onSelectPoint;
   final ValueChanged<int> onSelectDay;
   final List<MoodFactor> dayFactors;
   final String? dayNote;
@@ -530,13 +555,20 @@ class _ChartPane extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final selected =
+    final points = window.points;
+    final selectedPoint =
+        (selectedPointIndex != null &&
+            selectedPointIndex! >= 0 &&
+            selectedPointIndex! < points.length)
+        ? points[selectedPointIndex!]
+        : null;
+    final selectedDay =
         (selectedDayIndex != null &&
             selectedDayIndex! >= 0 &&
-            selectedDayIndex! < buckets.length)
-        ? buckets[selectedDayIndex!]
+            selectedDayIndex! < window.days.length)
+        ? window.days[selectedDayIndex!]
         : null;
-    final hasData = buckets.any((b) => b.value != null);
+    final hasData = points.isNotEmpty;
 
     return Padding(
       padding: const EdgeInsets.only(left: 10, right: 2),
@@ -561,13 +593,18 @@ class _ChartPane extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   NeedSparkline(
-                    values: [for (final bucket in buckets) bucket.value],
-                    labels: [
-                      for (final bucket in buckets)
-                        AppStrings.weekdayInitial(bucket.day),
+                    points: [
+                      for (final point in points)
+                        NeedSparklinePoint(x: point.x, value: point.value),
                     ],
-                    selectedIndex: selectedDayIndex,
-                    onSelect: onSelectDay,
+                    labels: [
+                      for (final day in window.days)
+                        AppStrings.weekdayInitial(day),
+                    ],
+                    selectedIndex: selectedPointIndex,
+                    highlightedDayIndex: selectedDayIndex,
+                    onSelectPoint: onSelectPoint,
+                    onSelectDay: onSelectDay,
                   ),
                   const SizedBox(height: ColonySpacing.sm),
                   if (!hasData)
@@ -577,13 +614,11 @@ class _ChartPane extends StatelessWidget {
                         color: ColonyColors.textMuted,
                       ),
                     )
-                  else if (selected != null) ...[
+                  else if (selectedPoint != null) ...[
                     Text(
-                      AppStrings.needDayHeadline(
-                        selected.day,
-                        selected.value == null
-                            ? '—'
-                            : AppStrings.scaleFiveLabel(selected.value!),
+                      AppStrings.needSampleHeadline(
+                        selectedPoint.observedAt,
+                        AppStrings.scaleFiveLabel(selectedPoint.value),
                       ),
                       style: Theme.of(context).textTheme.bodySmall,
                     ),
@@ -608,6 +643,11 @@ class _ChartPane extends StatelessWidget {
                         style: Theme.of(context).textTheme.bodySmall,
                       ),
                     ],
+                  ] else if (selectedDay != null) ...[
+                    Text(
+                      AppStrings.needDayHeadline(selectedDay, '—'),
+                      style: Theme.of(context).textTheme.bodySmall,
+                    ),
                   ],
                   const SizedBox(height: ColonySpacing.sm),
                   Text(

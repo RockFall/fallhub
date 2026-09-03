@@ -4,27 +4,87 @@ import 'package:flutter/material.dart';
 
 import '../tokens/colony_tokens.dart';
 
+const needSparklinePad = 10.0;
+
+class NeedSparklinePoint {
+  const NeedSparklinePoint({required this.x, required this.value});
+
+  /// 0–1 across the visible window.
+  final double x;
+  final double value;
+
+  @override
+  bool operator ==(Object other) =>
+      other is NeedSparklinePoint && other.x == x && other.value == value;
+
+  @override
+  int get hashCode => Object.hash(x, value);
+}
+
+class NeedSparklineHit {
+  const NeedSparklineHit({this.pointIndex, required this.dayIndex});
+
+  final int? pointIndex;
+  final int dayIndex;
+}
+
+/// Maps a 0–1 chart x to a day column and, when present, a sample in that day.
+NeedSparklineHit needSparklineHitAt({
+  required double x,
+  required List<NeedSparklinePoint> points,
+  required int dayCount,
+}) {
+  final n = dayCount <= 0 ? 1 : dayCount;
+  final clamped = x.clamp(0.0, 0.999999);
+  final dayIndex = (clamped * n).floor().clamp(0, n - 1);
+  final start = dayIndex / n;
+  final end = (dayIndex + 1) / n;
+
+  int? best;
+  var bestD = double.infinity;
+  for (var i = 0; i < points.length; i++) {
+    final px = points[i].x.clamp(0.0, 1.0);
+    final inDay = dayIndex == n - 1
+        ? px >= start
+        : px >= start && px < end;
+    if (!inDay) continue;
+    final d = (px - clamped).abs();
+    if (d < bestD) {
+      best = i;
+      bestD = d;
+    }
+  }
+  return NeedSparklineHit(pointIndex: best, dayIndex: dayIndex);
+}
+
+double needSparklineTapX(double localDx, double width) {
+  final chartW = width - needSparklinePad * 2;
+  if (chartW <= 0) return 0;
+  return ((localDx - needSparklinePad) / chartW).clamp(0.0, 1.0);
+}
+
 class NeedSparkline extends StatelessWidget {
   const NeedSparkline({
     super.key,
-    required this.values,
+    required this.points,
     required this.labels,
     this.selectedIndex,
-    this.onSelect,
+    this.highlightedDayIndex,
+    this.onSelectPoint,
+    this.onSelectDay,
     this.height = 108,
   });
 
-  /// Normalized 0–1, null = no sample that day.
-  final List<double?> values;
+  final List<NeedSparklinePoint> points;
   final List<String> labels;
   final int? selectedIndex;
-  final ValueChanged<int>? onSelect;
+  final int? highlightedDayIndex;
+  final ValueChanged<int>? onSelectPoint;
+  final ValueChanged<int>? onSelectDay;
   final double height;
 
   @override
   Widget build(BuildContext context) {
-    assert(values.length == labels.length);
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -39,21 +99,26 @@ class NeedSparkline extends StatelessWidget {
               builder: (context, constraints) {
                 return GestureDetector(
                   behavior: HitTestBehavior.opaque,
-                  onTapDown: onSelect == null
+                  onTapDown: (onSelectPoint == null && onSelectDay == null)
                       ? null
                       : (details) {
-                          if (values.isEmpty) return;
-                          final i =
-                              (details.localPosition.dx /
-                                      constraints.maxWidth *
-                                      values.length)
-                                  .floor()
-                                  .clamp(0, values.length - 1);
-                          onSelect!(i);
+                          final hit = needSparklineHitAt(
+                            x: needSparklineTapX(
+                              details.localPosition.dx,
+                              constraints.maxWidth,
+                            ),
+                            points: points,
+                            dayCount: labels.length,
+                          );
+                          if (hit.pointIndex != null) {
+                            onSelectPoint?.call(hit.pointIndex!);
+                          } else {
+                            onSelectDay?.call(hit.dayIndex);
+                          }
                         },
                   child: CustomPaint(
                     painter: _NeedSparklinePainter(
-                      values: values,
+                      points: points,
                       selectedIndex: selectedIndex,
                     ),
                     child: const SizedBox.expand(),
@@ -73,7 +138,7 @@ class NeedSparkline extends StatelessWidget {
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontFamily: ColonyFonts.familyTiny,
-                    color: i == selectedIndex
+                    color: i == highlightedDayIndex
                         ? ColonyColors.textGoldHi
                         : ColonyColors.textMuted,
                     fontSize: 10,
@@ -90,22 +155,20 @@ class NeedSparkline extends StatelessWidget {
 
 class _NeedSparklinePainter extends CustomPainter {
   const _NeedSparklinePainter({
-    required this.values,
+    required this.points,
     required this.selectedIndex,
   });
 
-  final List<double?> values;
+  final List<NeedSparklinePoint> points;
   final int? selectedIndex;
 
   @override
   void paint(Canvas canvas, Size size) {
-    if (values.isEmpty) return;
-    const pad = 10.0;
     final chart = Rect.fromLTWH(
-      pad,
-      pad,
-      size.width - pad * 2,
-      size.height - pad * 2,
+      needSparklinePad,
+      needSparklinePad,
+      size.width - needSparklinePad * 2,
+      size.height - needSparklinePad * 2,
     );
 
     final grid = Paint()
@@ -116,12 +179,13 @@ class _NeedSparklinePainter extends CustomPainter {
       canvas.drawLine(Offset(chart.left, y), Offset(chart.right, y), grid);
     }
 
-    Offset pointFor(int i, double value) {
-      final t = values.length == 1 ? 0.5 : i / (values.length - 1);
-      final x = chart.left + chart.width * t;
-      final y = chart.bottom - chart.height * value.clamp(0.0, 1.0);
+    Offset pointFor(NeedSparklinePoint point) {
+      final x = chart.left + chart.width * point.x.clamp(0.0, 1.0);
+      final y = chart.bottom - chart.height * point.value.clamp(0.0, 1.0);
       return Offset(x, y);
     }
+
+    if (points.isEmpty) return;
 
     final line = Paint()
       ..color = ColonyColors.needsFill
@@ -129,22 +193,12 @@ class _NeedSparklinePainter extends CustomPainter {
       ..style = PaintingStyle.stroke
       ..strokeCap = StrokeCap.square;
 
-    Offset? prev;
-    for (var i = 0; i < values.length; i++) {
-      final v = values[i];
-      if (v == null) {
-        prev = null;
-        continue;
-      }
-      final p = pointFor(i, v);
-      if (prev != null) canvas.drawLine(prev, p, line);
-      prev = p;
+    for (var i = 0; i < points.length - 1; i++) {
+      canvas.drawLine(pointFor(points[i]), pointFor(points[i + 1]), line);
     }
 
-    for (var i = 0; i < values.length; i++) {
-      final v = values[i];
-      if (v == null) continue;
-      final p = pointFor(i, v);
+    for (var i = 0; i < points.length; i++) {
+      final p = pointFor(points[i]);
       final selected = i == selectedIndex;
       if (selected) {
         canvas.save();
@@ -166,7 +220,7 @@ class _NeedSparklinePainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant _NeedSparklinePainter oldDelegate) {
-    return oldDelegate.values != values ||
+    return oldDelegate.points != points ||
         oldDelegate.selectedIndex != selectedIndex;
   }
 }
