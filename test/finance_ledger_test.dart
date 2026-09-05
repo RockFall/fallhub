@@ -238,7 +238,7 @@ void main() {
     await repos.finance.createTransaction(
       profileId: profile.id,
       accountId: account.id,
-      occurredAt: DateTime.utc(2026, 8, 5),
+      occurredAt: DateTime.now().toUtc().subtract(const Duration(days: 1)),
       descriptionOriginal: 'Mercado',
       amountMinor: 8500,
       currency: 'BRL',
@@ -454,7 +454,7 @@ void main() {
     await repos.finance.createTransaction(
       profileId: profile.id,
       accountId: account.id,
-      occurredAt: DateTime.utc(2026, 8, 6),
+      occurredAt: DateTime.now().toUtc().subtract(const Duration(days: 1)),
       descriptionOriginal: 'Recente',
       amountMinor: 1000,
       currency: 'BRL',
@@ -463,7 +463,7 @@ void main() {
     await repos.finance.createTransaction(
       profileId: profile.id,
       accountId: account.id,
-      occurredAt: DateTime.utc(2026, 5, 1),
+      occurredAt: DateTime.now().toUtc().subtract(const Duration(days: 60)),
       descriptionOriginal: 'Antiga',
       amountMinor: 2000,
       currency: 'BRL',
