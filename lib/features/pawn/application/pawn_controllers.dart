@@ -14,6 +14,7 @@ class CheckInController extends AsyncNotifier<void> {
     required double tension,
     required double focus,
     String? note,
+    DateTime? observedAt,
     List<String> selectedFactors = const [],
     Map<String, double> needReadings = const {},
   }) async {
@@ -39,6 +40,7 @@ class CheckInController extends AsyncNotifier<void> {
         tension: tension.clamp(0, 1),
         focus: focus.clamp(0, 1),
         note: note,
+        observedAt: observedAt,
         factors: factors,
       );
 
@@ -51,6 +53,7 @@ class CheckInController extends AsyncNotifier<void> {
           await repos.needs.recordReading(
             needId: def.id,
             normalizedValue: entry.value.clamp(0, 1),
+            observedAt: observedAt,
           );
         }
       }

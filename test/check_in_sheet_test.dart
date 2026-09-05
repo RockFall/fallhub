@@ -99,8 +99,155 @@ void main() {
     expect(latest, isNotNull);
     expect(latest!.mood, greaterThan(0.5));
     expect(latest.tension, 0.25);
+    expect(isSameLocalCalendarDay(latest.observedAt, clock()), isTrue);
     final factors = await repos.checkIns.getFactors(latest.id);
     expect(factors.map((f) => f.label), contains('Descanso'));
+    expect(find.byIcon(Icons.calendar_today_outlined), findsOneWidget);
+    expect(find.text(AppStrings.checkInToday), findsNothing);
+
+    await tester.pumpWidget(const SizedBox.shrink());
+    for (var i = 0; i < 40; i++) {
+      await tester.pump(const Duration(milliseconds: 1));
+    }
+  });
+
+  testWidgets('Check-in sheet can record another local day', (tester) async {
+    tester.view.physicalSize = const Size(800, 1600);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    final db = ColonyDatabase.inMemory();
+    addTearDown(db.close);
+
+    var tick = 0;
+    DateTime clock() {
+      tick += 1;
+      return DateTime.utc(2026, 8, 31, 14, 20).add(Duration(seconds: tick));
+    }
+
+    final repos = ColonyRepositories.create(
+      db,
+      idGenerator: FixedIdGenerator([for (var i = 0; i < 200; i++) 'id-$i']),
+      clock: clock,
+    );
+
+    final profile = await repos.profiles.create(
+      colonyName: 'Test',
+      displayName: 'Caio',
+      timezone: 'UTC',
+      locale: 'pt_BR',
+      baseCurrency: 'BRL',
+    );
+    await repos.preferences.save(
+      AppPreferences.defaults().copyWith(onboardingCompleted: true),
+    );
+    await repos.needs.seedDefaults(profile.id);
+
+    final nowLocal = clock().toLocal();
+    final yesterday = DateTime(nowLocal.year, nowLocal.month, nowLocal.day - 1);
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          databaseProvider.overrideWithValue(db),
+          clockProvider.overrideWithValue(clock),
+        ],
+        child: MaterialApp(
+          theme: ColonyTheme.dark(),
+          home: Scaffold(
+            body: SizedBox(
+              height: 1200,
+              child: CheckInSheet(initialDay: yesterday),
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+
+    expect(
+      find.text(AppStrings.checkInDayLabel(yesterday, isToday: false)),
+      findsOneWidget,
+    );
+
+    await tester.ensureVisible(
+      find.widgetWithText(ColonyButton, AppStrings.checkIn),
+    );
+    await tester.tap(find.widgetWithText(ColonyButton, AppStrings.checkIn));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+
+    final latest = await repos.checkIns.getLatest(profile.id);
+    expect(latest, isNotNull);
+    expect(isSameLocalCalendarDay(latest!.observedAt, yesterday), isTrue);
+    expect(isSameLocalCalendarDay(latest.observedAt, clock()), isFalse);
+
+    await tester.pumpWidget(const SizedBox.shrink());
+    for (var i = 0; i < 40; i++) {
+      await tester.pump(const Duration(milliseconds: 1));
+    }
+  });
+
+  testWidgets('Check-in calendar icon opens the date picker', (tester) async {
+    tester.view.physicalSize = const Size(800, 1600);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    final db = ColonyDatabase.inMemory();
+    addTearDown(db.close);
+
+    var tick = 0;
+    DateTime clock() {
+      tick += 1;
+      return DateTime.utc(2026, 8, 31, 14, 20).add(Duration(seconds: tick));
+    }
+
+    final repos = ColonyRepositories.create(
+      db,
+      idGenerator: FixedIdGenerator([for (var i = 0; i < 200; i++) 'id-$i']),
+      clock: clock,
+    );
+    final profile = await repos.profiles.create(
+      colonyName: 'Test',
+      displayName: 'Caio',
+      timezone: 'UTC',
+      locale: 'pt_BR',
+      baseCurrency: 'BRL',
+    );
+    await repos.preferences.save(
+      AppPreferences.defaults().copyWith(onboardingCompleted: true),
+    );
+    await repos.needs.seedDefaults(profile.id);
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          databaseProvider.overrideWithValue(db),
+          clockProvider.overrideWithValue(clock),
+        ],
+        child: MaterialApp(
+          theme: ColonyTheme.dark(),
+          home: const Scaffold(
+            body: SizedBox(height: 1200, child: CheckInSheet()),
+          ),
+        ),
+      ),
+    );
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+
+    await tester.tap(find.byIcon(Icons.calendar_today_outlined));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(DatePickerDialog), findsOneWidget);
+    expect(find.text(AppStrings.checkInPickDate), findsOneWidget);
+
+    await tester.tap(find.text('OK'));
+    await tester.pumpAndSettle();
+    expect(find.byType(DatePickerDialog), findsNothing);
 
     await tester.pumpWidget(const SizedBox.shrink());
     for (var i = 0; i < 40; i++) {

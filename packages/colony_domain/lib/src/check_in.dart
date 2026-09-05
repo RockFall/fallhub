@@ -9,6 +9,38 @@ double normalizeScale5(int value) => (value.clamp(1, 5) - 1) / 4;
 /// Converts normalized 0–1 back to 1–5 for display.
 int denormalizeScale5(double value) => (value * 4).round().clamp(1, 5) + 1;
 
+/// Instant stored as [CheckIn.observedAt] for a chosen local calendar day.
+///
+/// Today (local) uses [nowUtc] as-is so a same-day check-in stays "now".
+/// Another day keeps the current local clock time on that date.
+DateTime checkInObservedAt({
+  required DateTime selectedLocalDay,
+  required DateTime nowUtc,
+}) {
+  final nowLocal = nowUtc.toLocal();
+  if (_sameLocalCalendarDay(selectedLocalDay, nowLocal)) {
+    return nowUtc;
+  }
+  return DateTime(
+    selectedLocalDay.year,
+    selectedLocalDay.month,
+    selectedLocalDay.day,
+    nowLocal.hour,
+    nowLocal.minute,
+    nowLocal.second,
+    nowLocal.millisecond,
+    nowLocal.microsecond,
+  ).toUtc();
+}
+
+bool isSameLocalCalendarDay(DateTime a, DateTime b) {
+  return _sameLocalCalendarDay(a.toLocal(), b.toLocal());
+}
+
+bool _sameLocalCalendarDay(DateTime a, DateTime b) {
+  return a.year == b.year && a.month == b.month && a.day == b.day;
+}
+
 class CheckIn extends Equatable {
   const CheckIn({
     required this.id,

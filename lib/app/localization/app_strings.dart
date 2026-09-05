@@ -514,6 +514,16 @@ abstract final class AppStrings {
   static const offlineReady = 'Local · offline';
   static const comingSoon = 'Em breve nesta fase';
   static const checkIn = 'Check-in';
+  static const checkInPickDate = 'Escolher dia do check-in';
+  static const checkInToday = 'Hoje';
+
+  static String checkInDayLabel(DateTime day, {required bool isToday}) {
+    if (isToday) return checkInToday;
+    final local = day.toLocal();
+    final d = local.day.toString().padLeft(2, '0');
+    final m = local.month.toString().padLeft(2, '0');
+    return '$d/$m/${local.year}';
+  }
   static const dailyReview = 'Revisão diária';
   static const pawnTabSummary = 'Resumo';
   static const pawnTabNeeds = 'Necessidades';
