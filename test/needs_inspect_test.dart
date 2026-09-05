@@ -117,4 +117,90 @@ void main() {
       await tester.pump(const Duration(milliseconds: 1));
     }
   });
+
+  testWidgets('Humor chart keeps two check-ins on the same local day', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(800, 1400);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    final db = ColonyDatabase.inMemory();
+    addTearDown(db.close);
+
+    var now = DateTime.utc(2026, 8, 31, 8, 5);
+    DateTime clock() => now;
+
+    final repos = ColonyRepositories.create(
+      db,
+      idGenerator: FixedIdGenerator([for (var i = 0; i < 200; i++) 'id-$i']),
+      clock: clock,
+    );
+
+    final profile = await repos.profiles.create(
+      colonyName: 'Test',
+      displayName: 'Caio',
+      timezone: 'UTC',
+      locale: 'pt_BR',
+      baseCurrency: 'BRL',
+    );
+    await repos.preferences.save(
+      AppPreferences.defaults().copyWith(onboardingCompleted: true),
+    );
+    await repos.needs.seedDefaults(profile.id);
+    await repos.checkIns.save(
+      profileId: profile.id,
+      mood: 0.25,
+      energy: 0.5,
+      tension: 0.5,
+      focus: 0.5,
+    );
+    now = DateTime.utc(2026, 8, 31, 20, 15);
+    await repos.checkIns.save(
+      profileId: profile.id,
+      mood: 0.75,
+      energy: 0.5,
+      tension: 0.5,
+      focus: 0.5,
+    );
+
+    final stored = await repos.checkIns.listAll(profile.id);
+    expect(stored, hasLength(2));
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          databaseProvider.overrideWithValue(db),
+          clockProvider.overrideWithValue(clock),
+        ],
+        child: MaterialApp(
+          theme: ColonyTheme.dark(),
+          home: const Scaffold(body: NeedsInspectTab()),
+        ),
+      ),
+    );
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+
+    await tester.tap(find.text('HUMOR'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+
+    expect(find.byType(NeedSparkline), findsOneWidget);
+    expect(
+      find.text(
+        AppStrings.needSampleHeadline(
+          DateTime.utc(2026, 8, 31, 20, 15),
+          AppStrings.scaleFiveLabel(0.75),
+        ),
+      ),
+      findsOneWidget,
+    );
+
+    await tester.pumpWidget(const SizedBox.shrink());
+    for (var i = 0; i < 40; i++) {
+      await tester.pump(const Duration(milliseconds: 1));
+    }
+  });
 }

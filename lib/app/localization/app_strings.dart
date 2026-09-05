@@ -423,6 +423,15 @@ abstract final class AppStrings {
     return '$weekday ${local.day} · $scaleLabel';
   }
 
+  static String needSampleHeadline(DateTime observedAt, String scaleLabel) {
+    final local = observedAt.toLocal();
+    const short = ['SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SÁB', 'DOM'];
+    final weekday = short[(local.weekday - 1).clamp(0, 6)];
+    final hh = local.hour.toString().padLeft(2, '0');
+    final mm = local.minute.toString().padLeft(2, '0');
+    return '$weekday ${local.day} $hh:$mm · $scaleLabel';
+  }
+
   static String scaleFiveLabel(double normalized) =>
       '${denormalizeScale5(normalized)}/5';
 

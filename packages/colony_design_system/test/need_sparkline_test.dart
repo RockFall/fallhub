@@ -3,31 +3,47 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  test('needSparklineLinePairs spans missing days', () {
-    expect(needSparklineLinePairs(const [0.2, null, null, 0.8]), [(0, 3)]);
-    expect(needSparklineLinePairs(const [0.1, 0.2, null, 0.9, null, 0.4]), [
-      (0, 1),
-      (1, 3),
-      (3, 5),
-    ]);
+  test('needSparklineHitAt prefers a sample inside the tapped day', () {
+    const points = [
+      NeedSparklinePoint(x: 5.5 / 7, value: 0.2),
+      NeedSparklinePoint(x: 5.7 / 7, value: 0.8),
+      NeedSparklinePoint(x: 6.5 / 7, value: 0.4),
+    ];
+
+    final morning = needSparklineHitAt(
+      x: 5.2 / 7,
+      points: points,
+      dayCount: 7,
+    );
+    expect(morning.dayIndex, 5);
+    expect(morning.pointIndex, 0);
+
+    final evening = needSparklineHitAt(
+      x: 5.8 / 7,
+      points: points,
+      dayCount: 7,
+    );
+    expect(evening.dayIndex, 5);
+    expect(evening.pointIndex, 1);
+
+    final empty = needSparklineHitAt(x: 1.4 / 7, points: points, dayCount: 7);
+    expect(empty.dayIndex, 1);
+    expect(empty.pointIndex, isNull);
   });
 
-  test('needSparklineLinePairs needs two samples to draw', () {
-    expect(needSparklineLinePairs(const [null, 0.5, null]), isEmpty);
-    expect(needSparklineLinePairs(const [null, null]), isEmpty);
-    expect(needSparklineLinePairs(const [0.4]), isEmpty);
-  });
-
-  testWidgets('NeedSparkline paints gapped history without throwing', (
-    tester,
-  ) async {
+  testWidgets('NeedSparkline paints several same-day points', (tester) async {
     await tester.pumpWidget(
       const MaterialApp(
         home: Scaffold(
           body: NeedSparkline(
-            values: [0.2, null, null, 0.8, 0.5],
-            labels: ['S', 'T', 'Q', 'Q', 'S'],
-            selectedIndex: 3,
+            points: [
+              NeedSparklinePoint(x: 0.10, value: 0.2),
+              NeedSparklinePoint(x: 0.16, value: 0.8),
+              NeedSparklinePoint(x: 0.72, value: 0.5),
+            ],
+            labels: ['S', 'T', 'Q', 'Q', 'S', 'S', 'D'],
+            selectedIndex: 1,
+            highlightedDayIndex: 1,
           ),
         ),
       ),
@@ -35,6 +51,6 @@ void main() {
 
     expect(find.byType(NeedSparkline), findsOneWidget);
     expect(find.byType(CustomPaint), findsWidgets);
-    expect(find.text('S'), findsNWidgets(2));
+    expect(find.text('S'), findsNWidgets(3));
   });
 }

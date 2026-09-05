@@ -1314,6 +1314,7 @@ class CheckInRepository {
     return rows.map(ColonyMappers.toMoodFactor).toList();
   }
 
+  /// Inserts a new check-in. Several rows on the same local day are allowed.
   Future<CheckIn> save({
     required EntityId profileId,
     required double mood,
