@@ -46,9 +46,8 @@ class CheckInController extends AsyncNotifier<void> {
 
       if (needReadings.isNotEmpty) {
         final defs = await repos.needs.listEnabled(profile.id);
-        final bySlug = {for (final def in defs) def.slug: def};
         for (final entry in needReadings.entries) {
-          final def = bySlug[entry.key];
+          final def = DefaultNeedSeeds.definitionFor(entry.key, defs);
           if (def == null) continue;
           await repos.needs.recordReading(
             needId: def.id,

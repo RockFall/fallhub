@@ -44,9 +44,7 @@ NeedSparklineHit needSparklineHitAt({
   var bestD = double.infinity;
   for (var i = 0; i < points.length; i++) {
     final px = points[i].x.clamp(0.0, 1.0);
-    final inDay = dayIndex == n - 1
-        ? px >= start
-        : px >= start && px < end;
+    final inDay = dayIndex == n - 1 ? px >= start : px >= start && px < end;
     if (!inDay) continue;
     final d = (px - clamped).abs();
     if (d < bestD) {
@@ -129,24 +127,9 @@ class NeedSparkline extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 6),
-        Row(
-          children: [
-            for (var i = 0; i < labels.length; i++)
-              Expanded(
-                child: Text(
-                  labels[i],
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontFamily: ColonyFonts.familyTiny,
-                    color: i == highlightedDayIndex
-                        ? ColonyColors.textGoldHi
-                        : ColonyColors.textMuted,
-                    fontSize: 10,
-                    letterSpacing: 0.4,
-                  ),
-                ),
-              ),
-          ],
+        _NeedSparklineLabels(
+          labels: labels,
+          highlightedDayIndex: highlightedDayIndex,
         ),
       ],
     );
@@ -222,5 +205,71 @@ class _NeedSparklinePainter extends CustomPainter {
   bool shouldRepaint(covariant _NeedSparklinePainter oldDelegate) {
     return oldDelegate.points != points ||
         oldDelegate.selectedIndex != selectedIndex;
+  }
+}
+
+class _NeedSparklineLabels extends StatelessWidget {
+  const _NeedSparklineLabels({required this.labels, this.highlightedDayIndex});
+
+  final List<String> labels;
+  final int? highlightedDayIndex;
+
+  @override
+  Widget build(BuildContext context) {
+    if (labels.length <= 31) {
+      return Row(
+        children: [
+          for (var i = 0; i < labels.length; i++)
+            Expanded(
+              child: Text(
+                labels[i],
+                textAlign: TextAlign.center,
+                maxLines: 1,
+                overflow: TextOverflow.clip,
+                style: _style(i),
+              ),
+            ),
+        ],
+      );
+    }
+
+    return SizedBox(
+      height: 12,
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final width = constraints.maxWidth;
+          final n = labels.length;
+          return Stack(
+            clipBehavior: Clip.hardEdge,
+            children: [
+              for (var i = 0; i < n; i++)
+                if (labels[i].isNotEmpty)
+                  Positioned(
+                    left: ((i + 0.5) / n * width) - 18,
+                    width: 36,
+                    child: Text(
+                      labels[i],
+                      textAlign: TextAlign.center,
+                      maxLines: 1,
+                      overflow: TextOverflow.clip,
+                      style: _style(i),
+                    ),
+                  ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+
+  TextStyle _style(int index) {
+    return TextStyle(
+      fontFamily: ColonyFonts.familyTiny,
+      color: index == highlightedDayIndex
+          ? ColonyColors.textGoldHi
+          : ColonyColors.textMuted,
+      fontSize: 10,
+      letterSpacing: 0.4,
+    );
   }
 }

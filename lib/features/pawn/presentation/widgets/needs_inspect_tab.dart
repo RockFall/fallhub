@@ -7,6 +7,7 @@ import '../../../../app/localization/app_strings.dart';
 import '../../../../core/providers/app_providers.dart';
 import '../../application/pawn_controllers.dart';
 import '../../application/pawn_providers.dart';
+import 'check_in_sheet.dart';
 
 class NeedsInspectTab extends ConsumerStatefulWidget {
   const NeedsInspectTab({super.key});
@@ -20,6 +21,7 @@ class _NeedsInspectTabState extends ConsumerState<NeedsInspectTab> {
 
   EntityId? _selectedNeedId;
   var _humorChart = false;
+  var _range = NeedHistoryRange.all;
   int? _selectedDayIndex;
   int? _selectedPointIndex;
   var _historyToken = 0;
@@ -104,11 +106,13 @@ class _NeedsInspectTabState extends ConsumerState<NeedsInspectTab> {
                                         _selectedNeedId?.value ?? 'humor-chart',
                                       ),
                                       title: _chartTitle(catalog),
+                                      range: _range,
                                       window: _window(),
                                       selectedDayIndex: _selectedDayIndex,
                                       selectedPointIndex: _selectedPointIndex,
                                       onSelectPoint: _selectPoint,
                                       onSelectDay: _selectEmptyDay,
+                                      onSelectRange: _selectRange,
                                       dayFactors: _humorChart
                                           ? _dayFactors
                                           : const [],
@@ -127,6 +131,7 @@ class _NeedsInspectTabState extends ConsumerState<NeedsInspectTab> {
                                       factors: _latestFactors,
                                       onOpenChart: _openHumorChart,
                                       onRecordMood: _recordHumorToday,
+                                      onCheckIn: _openCheckIn,
                                     ),
                             ),
                           ),
@@ -144,12 +149,16 @@ class _NeedsInspectTabState extends ConsumerState<NeedsInspectTab> {
   }
 
   List<NeedSnapshot> _catalog(List<NeedSnapshot> snapshots) {
-    final bySlug = {
-      for (final snapshot in snapshots) snapshot.definition.slug: snapshot,
-    };
+    NeedSnapshot? match(NeedSeed seed) {
+      for (final snapshot in snapshots) {
+        if (seed.matchesSlug(snapshot.definition.slug)) return snapshot;
+      }
+      return null;
+    }
+
     return [
       for (final seed in DefaultNeedSeeds.core)
-        if (bySlug[seed.slug] != null) bySlug[seed.slug]!,
+        if (match(seed) != null) match(seed)!,
     ];
   }
 
@@ -162,14 +171,23 @@ class _NeedsInspectTabState extends ConsumerState<NeedsInspectTab> {
   }
 
   String _chartTitle(List<NeedSnapshot> catalog) {
-    if (_humorChart) return AppStrings.needChartTitle(AppStrings.mood);
+    if (_humorChart) {
+      return AppStrings.needChartTitle(AppStrings.mood, range: _range);
+    }
     final selected = _selectedSnapshot(catalog);
-    return AppStrings.needChartTitle(selected?.definition.name ?? '');
+    return AppStrings.needChartTitle(
+      selected?.definition.name ?? '',
+      range: _range,
+    );
   }
 
   NeedHistoryWindow _window() {
     final now = ref.read(clockProvider)().toLocal();
-    return NeedHistorySeries.lastLocalDays(nowLocal: now, samples: _samples);
+    return NeedHistorySeries.forRange(
+      nowLocal: now,
+      samples: _samples,
+      range: _range,
+    );
   }
 
   NeedHistoryPoint? _selectedPoint() {
@@ -214,6 +232,30 @@ class _NeedsInspectTabState extends ConsumerState<NeedsInspectTab> {
     });
   }
 
+  void _selectRange(NeedHistoryRange range) {
+    if (range == _range) return;
+    final now = ref.read(clockProvider)().toLocal();
+    final window = NeedHistorySeries.forRange(
+      nowLocal: now,
+      samples: _samples,
+      range: range,
+    );
+    setState(() {
+      _range = range;
+      if (window.points.isEmpty) {
+        _selectedPointIndex = null;
+        _selectedDayIndex = window.days.isEmpty ? null : window.days.length - 1;
+        _dayFactors = const [];
+      } else {
+        _selectedPointIndex = window.points.length - 1;
+        _selectedDayIndex = window.days.indexOf(window.points.last.day);
+      }
+    });
+    if (_humorChart && window.points.isNotEmpty) {
+      _loadDayFactors(window.points.last.id);
+    }
+  }
+
   Future<void> _selectPoint(int index) async {
     final window = _window();
     if (index < 0 || index >= window.points.length) return;
@@ -249,15 +291,10 @@ class _NeedsInspectTabState extends ConsumerState<NeedsInspectTab> {
   Future<void> _loadNeedHistory(EntityId needId) async {
     final token = ++_historyToken;
     final now = ref.read(clockProvider)().toLocal();
-    final since = DateTime(
-      now.year,
-      now.month,
-      now.day,
-    ).subtract(const Duration(days: 6));
     final readings = await ref
         .read(repositoriesProvider)
         .needs
-        .listReadings(needId, since: since);
+        .listReadings(needId);
     if (!mounted || token != _historyToken) return;
     final samples = [
       for (final reading in readings)
@@ -268,9 +305,10 @@ class _NeedsInspectTabState extends ConsumerState<NeedsInspectTab> {
           note: reading.note,
         ),
     ];
-    final window = NeedHistorySeries.lastLocalDays(
+    final window = NeedHistorySeries.forRange(
       nowLocal: now,
       samples: samples,
+      range: _range,
     );
     setState(() {
       _samples = samples;
@@ -288,15 +326,10 @@ class _NeedsInspectTabState extends ConsumerState<NeedsInspectTab> {
     final profile = await ref.read(profileProvider.future);
     if (profile == null || !mounted || token != _historyToken) return;
     final now = ref.read(clockProvider)().toLocal();
-    final since = DateTime(
-      now.year,
-      now.month,
-      now.day,
-    ).subtract(const Duration(days: 6));
     final checkIns = await ref
         .read(repositoriesProvider)
         .checkIns
-        .listSince(profile.id, since);
+        .listAll(profile.id);
     if (!mounted || token != _historyToken) return;
     final samples = [
       for (final checkIn in checkIns)
@@ -307,9 +340,10 @@ class _NeedsInspectTabState extends ConsumerState<NeedsInspectTab> {
           note: checkIn.note,
         ),
     ];
-    final window = NeedHistorySeries.lastLocalDays(
+    final window = NeedHistorySeries.forRange(
       nowLocal: now,
       samples: samples,
+      range: _range,
     );
     final selected = window.points.isEmpty ? null : window.points.length - 1;
     setState(() {
@@ -319,9 +353,7 @@ class _NeedsInspectTabState extends ConsumerState<NeedsInspectTab> {
           ? window.days.length - 1
           : window.days.indexOf(window.points[selected].day);
     });
-    await _loadDayFactors(
-      selected == null ? null : window.points[selected].id,
-    );
+    await _loadDayFactors(selected == null ? null : window.points[selected].id);
   }
 
   Future<void> _loadDayFactors(EntityId? checkInId) async {
@@ -353,6 +385,18 @@ class _NeedsInspectTabState extends ConsumerState<NeedsInspectTab> {
     await ref.read(checkInControllerProvider.notifier).recordMood(mood);
     if (_humorChart) {
       await _loadHumorHistory();
+    }
+  }
+
+  Future<void> _openCheckIn() async {
+    await CheckInSheet.show(context);
+    if (!mounted) return;
+    final checkIn = ref.read(latestCheckInProvider).asData?.value;
+    await _loadLatestFactors(checkIn);
+    if (_humorChart) {
+      await _loadHumorHistory();
+    } else if (_selectedNeedId != null) {
+      await _loadNeedHistory(_selectedNeedId!);
     }
   }
 }
@@ -459,12 +503,14 @@ class _HumorPane extends StatelessWidget {
     required this.factors,
     required this.onOpenChart,
     required this.onRecordMood,
+    required this.onCheckIn,
   });
 
   final CheckIn? checkIn;
   final List<MoodFactor> factors;
   final VoidCallback onOpenChart;
   final ValueChanged<double> onRecordMood;
+  final VoidCallback onCheckIn;
 
   @override
   Widget build(BuildContext context) {
@@ -519,6 +565,15 @@ class _HumorPane extends StatelessWidget {
                     ],
                   ),
           ),
+          Semantics(
+            identifier: 'pawn.needs.checkIn',
+            button: true,
+            child: ColonyButton(
+              onPressed: onCheckIn,
+              expanded: true,
+              child: const Text(AppStrings.checkIn),
+            ),
+          ),
         ],
       ),
     );
@@ -529,11 +584,13 @@ class _ChartPane extends StatelessWidget {
   const _ChartPane({
     super.key,
     required this.title,
+    required this.range,
     required this.window,
     required this.selectedDayIndex,
     required this.selectedPointIndex,
     required this.onSelectPoint,
     required this.onSelectDay,
+    required this.onSelectRange,
     required this.dayFactors,
     required this.dayNote,
     required this.currentValue,
@@ -542,11 +599,13 @@ class _ChartPane extends StatelessWidget {
   });
 
   final String title;
+  final NeedHistoryRange range;
   final NeedHistoryWindow window;
   final int? selectedDayIndex;
   final int? selectedPointIndex;
   final ValueChanged<int> onSelectPoint;
   final ValueChanged<int> onSelectDay;
+  final ValueChanged<NeedHistoryRange> onSelectRange;
   final List<MoodFactor> dayFactors;
   final String? dayNote;
   final double? currentValue;
@@ -586,6 +645,8 @@ class _ChartPane extends StatelessWidget {
               letterSpacing: 0.8,
             ),
           ),
+          const SizedBox(height: ColonySpacing.xs),
+          _NeedHistoryRangeToggle(range: range, onSelect: onSelectRange),
           const SizedBox(height: ColonySpacing.sm),
           Expanded(
             child: SingleChildScrollView(
@@ -597,10 +658,7 @@ class _ChartPane extends StatelessWidget {
                       for (final point in points)
                         NeedSparklinePoint(x: point.x, value: point.value),
                     ],
-                    labels: [
-                      for (final day in window.days)
-                        AppStrings.weekdayInitial(day),
-                    ],
+                    labels: AppStrings.needHistoryAxisLabels(window.days),
                     selectedIndex: selectedPointIndex,
                     highlightedDayIndex: selectedDayIndex,
                     onSelectPoint: onSelectPoint,
@@ -609,7 +667,7 @@ class _ChartPane extends StatelessWidget {
                   const SizedBox(height: ColonySpacing.sm),
                   if (!hasData)
                     Text(
-                      AppStrings.needNoHistory,
+                      AppStrings.needNoHistoryFor(range),
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
                         color: ColonyColors.textMuted,
                       ),
@@ -676,6 +734,90 @@ class _ChartPane extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _NeedHistoryRangeToggle extends StatelessWidget {
+  const _NeedHistoryRangeToggle({required this.range, required this.onSelect});
+
+  final NeedHistoryRange range;
+  final ValueChanged<NeedHistoryRange> onSelect;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        for (final option in NeedHistoryRange.values) ...[
+          if (option != NeedHistoryRange.values.first) const SizedBox(width: 4),
+          Expanded(
+            child: _NeedHistoryRangeChip(
+              range: option,
+              selected: option == range,
+              onTap: () => onSelect(option),
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+}
+
+class _NeedHistoryRangeChip extends StatelessWidget {
+  const _NeedHistoryRangeChip({
+    required this.range,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final NeedHistoryRange range;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final label = AppStrings.needHistoryRangeLabel(range);
+    return Semantics(
+      button: true,
+      selected: selected,
+      identifier: 'pawn.needs.range.${range.name}',
+      label: label,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(ColonyRadii.sm),
+          child: Container(
+            height: 22,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: selected
+                  ? ColonyColors.optionSelected
+                  : ColonyColors.optionUnselected,
+              border: Border.all(
+                color: selected
+                    ? ColonyColors.borderSelected
+                    : ColonyColors.borderStandard,
+              ),
+              borderRadius: BorderRadius.circular(ColonyRadii.sm),
+            ),
+            child: Text(
+              label.toUpperCase(),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontFamily: ColonyFonts.familyTiny,
+                fontSize: 9,
+                letterSpacing: 0.4,
+                fontWeight: FontWeight.w700,
+                color: selected
+                    ? ColonyColors.textGoldHi
+                    : ColonyColors.textSecondary,
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }

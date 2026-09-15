@@ -52,6 +52,22 @@ void main() {
     );
     expect(DefaultNeedSeeds.core.any((s) => s.matchesSlug('descanso')), isTrue);
     expect(DefaultNeedSeeds.core.any((s) => s.slug == 'humor'), isFalse);
+    expect(DefaultNeedSeeds.seedFor('conexao_social')?.slug, 'social');
+    expect(
+      DefaultNeedSeeds.definitionFor('sexo', [
+        NeedDefinition(
+          id: EntityId('n-sex'),
+          profileId: EntityId('p1'),
+          name: 'Sexo',
+          slug: 'sexo',
+          calculationMode: CalculationMode.manual,
+          privacyClass: NeedPrivacyClass.highlySensitive,
+          createdAt: DateTime.utc(2026, 8, 6),
+          updatedAt: DateTime.utc(2026, 8, 6),
+        ),
+      ])?.id.value,
+      'n-sex',
+    );
   });
 
   test('NeedHistorySeries keeps every sample in the local window', () {
@@ -117,5 +133,51 @@ void main() {
     final nextDay = window.points[2].x - window.points[1].x;
     expect(sameDay, greaterThan(0));
     expect(sameDay, lessThan(nextDay / 2));
+  });
+
+  test('NeedHistorySeries all keeps samples older than 7 days', () {
+    final window = NeedHistorySeries.forRange(
+      nowLocal: DateTime(2026, 8, 31, 18),
+      samples: [
+        NeedHistorySample(
+          id: EntityId('old'),
+          observedAt: DateTime(2026, 8, 1, 12),
+          value: 0.2,
+        ),
+        NeedHistorySample(
+          id: EntityId('new'),
+          observedAt: DateTime(2026, 8, 31, 9),
+          value: 0.8,
+        ),
+      ],
+      range: NeedHistoryRange.all,
+    );
+
+    expect(window.days.first, DateTime(2026, 8, 1));
+    expect(window.days.last, DateTime(2026, 8, 31));
+    expect(window.points.map((p) => p.id.value), ['old', 'new']);
+  });
+
+  test('NeedHistorySeries 30 days drops samples older than the window', () {
+    final window = NeedHistorySeries.forRange(
+      nowLocal: DateTime(2026, 8, 31, 18),
+      samples: [
+        NeedHistorySample(
+          id: EntityId('old'),
+          observedAt: DateTime(2026, 7, 20, 12),
+          value: 0.2,
+        ),
+        NeedHistorySample(
+          id: EntityId('kept'),
+          observedAt: DateTime(2026, 8, 10, 12),
+          value: 0.6,
+        ),
+      ],
+      range: NeedHistoryRange.days30,
+    );
+
+    expect(window.days, hasLength(30));
+    expect(window.days.first, DateTime(2026, 8, 2));
+    expect(window.points.map((p) => p.id.value), ['kept']);
   });
 }
