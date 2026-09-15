@@ -7,6 +7,7 @@ import '../../../../app/localization/app_strings.dart';
 import '../../../../core/providers/app_providers.dart';
 import '../../application/pawn_controllers.dart';
 import '../../application/pawn_providers.dart';
+import 'check_in_sheet.dart';
 
 class NeedsInspectTab extends ConsumerStatefulWidget {
   const NeedsInspectTab({super.key});
@@ -130,6 +131,7 @@ class _NeedsInspectTabState extends ConsumerState<NeedsInspectTab> {
                                       factors: _latestFactors,
                                       onOpenChart: _openHumorChart,
                                       onRecordMood: _recordHumorToday,
+                                      onCheckIn: _openCheckIn,
                                     ),
                             ),
                           ),
@@ -385,6 +387,18 @@ class _NeedsInspectTabState extends ConsumerState<NeedsInspectTab> {
       await _loadHumorHistory();
     }
   }
+
+  Future<void> _openCheckIn() async {
+    await CheckInSheet.show(context);
+    if (!mounted) return;
+    final checkIn = ref.read(latestCheckInProvider).asData?.value;
+    await _loadLatestFactors(checkIn);
+    if (_humorChart) {
+      await _loadHumorHistory();
+    } else if (_selectedNeedId != null) {
+      await _loadNeedHistory(_selectedNeedId!);
+    }
+  }
 }
 
 class _NeedRail extends StatelessWidget {
@@ -489,12 +503,14 @@ class _HumorPane extends StatelessWidget {
     required this.factors,
     required this.onOpenChart,
     required this.onRecordMood,
+    required this.onCheckIn,
   });
 
   final CheckIn? checkIn;
   final List<MoodFactor> factors;
   final VoidCallback onOpenChart;
   final ValueChanged<double> onRecordMood;
+  final VoidCallback onCheckIn;
 
   @override
   Widget build(BuildContext context) {
@@ -548,6 +564,15 @@ class _HumorPane extends StatelessWidget {
                       ],
                     ],
                   ),
+          ),
+          Semantics(
+            identifier: 'pawn.needs.checkIn',
+            button: true,
+            child: ColonyButton(
+              onPressed: onCheckIn,
+              expanded: true,
+              child: const Text(AppStrings.checkIn),
+            ),
           ),
         ],
       ),
