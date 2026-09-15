@@ -84,7 +84,10 @@ void main() {
     expect(find.text(AppStrings.needRecordToday), findsOneWidget);
     expect(find.text(AppStrings.needHistoryAll.toUpperCase()), findsWidgets);
     expect(find.text(AppStrings.needHistoryDays.toUpperCase()), findsOneWidget);
-    expect(find.text(AppStrings.needHistoryDays30.toUpperCase()), findsOneWidget);
+    expect(
+      find.text(AppStrings.needHistoryDays30.toUpperCase()),
+      findsOneWidget,
+    );
 
     await tester.tap(find.widgetWithText(ColonyButton, AppStrings.mood));
     await tester.pump();
@@ -272,10 +275,7 @@ void main() {
     );
     expect(
       find.text(
-        AppStrings.needSampleHeadline(
-          oldAt,
-          AppStrings.scaleFiveLabel(0.25),
-        ),
+        AppStrings.needSampleHeadline(oldAt, AppStrings.scaleFiveLabel(0.25)),
       ),
       findsOneWidget,
     );

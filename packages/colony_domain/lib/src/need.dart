@@ -369,10 +369,7 @@ class NeedHistoryPoint extends Equatable {
 }
 
 class NeedHistoryWindow extends Equatable {
-  const NeedHistoryWindow({
-    required this.days,
-    required this.points,
-  });
+  const NeedHistoryWindow({required this.days, required this.points});
 
   final List<DateTime> days;
   final List<NeedHistoryPoint> points;

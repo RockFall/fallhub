@@ -242,9 +242,7 @@ class _NeedsInspectTabState extends ConsumerState<NeedsInspectTab> {
       _range = range;
       if (window.points.isEmpty) {
         _selectedPointIndex = null;
-        _selectedDayIndex = window.days.isEmpty
-            ? null
-            : window.days.length - 1;
+        _selectedDayIndex = window.days.isEmpty ? null : window.days.length - 1;
         _dayFactors = const [];
       } else {
         _selectedPointIndex = window.points.length - 1;
@@ -353,9 +351,7 @@ class _NeedsInspectTabState extends ConsumerState<NeedsInspectTab> {
           ? window.days.length - 1
           : window.days.indexOf(window.points[selected].day);
     });
-    await _loadDayFactors(
-      selected == null ? null : window.points[selected].id,
-    );
+    await _loadDayFactors(selected == null ? null : window.points[selected].id);
   }
 
   Future<void> _loadDayFactors(EntityId? checkInId) async {
@@ -625,10 +621,7 @@ class _ChartPane extends StatelessWidget {
             ),
           ),
           const SizedBox(height: ColonySpacing.xs),
-          _NeedHistoryRangeToggle(
-            range: range,
-            onSelect: onSelectRange,
-          ),
+          _NeedHistoryRangeToggle(range: range, onSelect: onSelectRange),
           const SizedBox(height: ColonySpacing.sm),
           Expanded(
             child: SingleChildScrollView(
@@ -722,10 +715,7 @@ class _ChartPane extends StatelessWidget {
 }
 
 class _NeedHistoryRangeToggle extends StatelessWidget {
-  const _NeedHistoryRangeToggle({
-    required this.range,
-    required this.onSelect,
-  });
+  const _NeedHistoryRangeToggle({required this.range, required this.onSelect});
 
   final NeedHistoryRange range;
   final ValueChanged<NeedHistoryRange> onSelect;

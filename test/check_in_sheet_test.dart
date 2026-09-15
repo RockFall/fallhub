@@ -311,7 +311,8 @@ void main() {
 
     final sexoBar = find.byWidgetPredicate(
       (widget) =>
-          widget is NeedInspectBar && widget.semanticId == 'pawn.checkin.need.sexo',
+          widget is NeedInspectBar &&
+          widget.semanticId == 'pawn.checkin.need.sexo',
     );
     await tester.ensureVisible(sexoBar);
     await tester.tap(sexoBar);

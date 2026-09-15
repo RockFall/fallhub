@@ -4,11 +4,7 @@ import '../tokens/colony_tokens.dart';
 
 /// Visual weight of an inspect rail. Primary needs sit above a dotted rule;
 /// the rest stay compact so a long catalog still fits.
-enum NeedInspectBarScale {
-  compact,
-  primary,
-  featured,
-}
+enum NeedInspectBarScale { compact, primary, featured }
 
 /// Dense inspect rail: label above a solid cyan trough, quarter ticks,
 /// optional white pointer under the current value.
@@ -227,9 +223,12 @@ class _NeedInspectBarState extends State<NeedInspectBar> {
       body = GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTap: widget.onTap,
-        onTapUp: (details) => _commitAt(details.globalPosition),
+        onTapUp: widget.onTap == null
+            ? (details) => _commitAt(details.globalPosition)
+            : null,
         onLongPress: widget.onLongPress,
-        onHorizontalDragStart: (details) => _applyGlobal(details.globalPosition),
+        onHorizontalDragStart: (details) =>
+            _applyGlobal(details.globalPosition),
         onHorizontalDragUpdate: (details) =>
             _applyGlobal(details.globalPosition),
         onHorizontalDragEnd: (_) => _endDrag(),

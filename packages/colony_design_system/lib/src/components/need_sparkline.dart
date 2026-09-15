@@ -44,9 +44,7 @@ NeedSparklineHit needSparklineHitAt({
   var bestD = double.infinity;
   for (var i = 0; i < points.length; i++) {
     final px = points[i].x.clamp(0.0, 1.0);
-    final inDay = dayIndex == n - 1
-        ? px >= start
-        : px >= start && px < end;
+    final inDay = dayIndex == n - 1 ? px >= start : px >= start && px < end;
     if (!inDay) continue;
     final d = (px - clamped).abs();
     if (d < bestD) {
@@ -211,10 +209,7 @@ class _NeedSparklinePainter extends CustomPainter {
 }
 
 class _NeedSparklineLabels extends StatelessWidget {
-  const _NeedSparklineLabels({
-    required this.labels,
-    this.highlightedDayIndex,
-  });
+  const _NeedSparklineLabels({required this.labels, this.highlightedDayIndex});
 
   final List<String> labels;
   final int? highlightedDayIndex;

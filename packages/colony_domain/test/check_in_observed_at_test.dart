@@ -30,11 +30,17 @@ void main() {
 
   test('isSameLocalCalendarDay ignores clock time', () {
     expect(
-      isSameLocalCalendarDay(DateTime(2026, 8, 31, 3), DateTime(2026, 8, 31, 22)),
+      isSameLocalCalendarDay(
+        DateTime(2026, 8, 31, 3),
+        DateTime(2026, 8, 31, 22),
+      ),
       isTrue,
     );
     expect(
-      isSameLocalCalendarDay(DateTime(2026, 8, 30, 12), DateTime(2026, 8, 31, 12)),
+      isSameLocalCalendarDay(
+        DateTime(2026, 8, 30, 12),
+        DateTime(2026, 8, 31, 12),
+      ),
       isFalse,
     );
   });

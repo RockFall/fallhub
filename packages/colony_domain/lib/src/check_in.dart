@@ -75,18 +75,18 @@ class CheckIn extends Equatable {
 
   @override
   List<Object?> get props => [
-        id,
-        profileId,
-        observedAt,
-        createdAt,
-        mood,
-        energy,
-        tension,
-        focus,
-        note,
-        contextTags,
-        moodScale,
-      ];
+    id,
+    profileId,
+    observedAt,
+    createdAt,
+    mood,
+    energy,
+    tension,
+    focus,
+    note,
+    contextTags,
+    moodScale,
+  ];
 }
 
 class MoodFactor extends Equatable {
@@ -133,15 +133,15 @@ class DailyReview extends Equatable {
 
   @override
   List<Object?> get props => [
-        id,
-        profileId,
-        reviewDate,
-        createdAt,
-        whatHappened,
-        currentState,
-        tomorrowCommitments,
-        routeCorrection,
-      ];
+    id,
+    profileId,
+    reviewDate,
+    createdAt,
+    whatHappened,
+    currentState,
+    tomorrowCommitments,
+    routeCorrection,
+  ];
 }
 
 abstract final class CheckInPrompts {

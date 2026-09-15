@@ -95,7 +95,8 @@ abstract final class AppStrings {
   static const habitatLocationOffice = 'Escritório';
   static const habitatLocationKitchen = 'Cozinha';
   static const habitatLocationTerrace = 'Terraço';
-  static const habitatLocationHint = 'Trocar de local (cosmético — sem viagem).';
+  static const habitatLocationHint =
+      'Trocar de local (cosmético — sem viagem).';
   static const habitatSelectLocation = 'Local';
   static const habitatRosterHint =
       'Colonistas no habitat — toque para priorizar, editar para personalizar.';
@@ -145,11 +146,8 @@ abstract final class AppStrings {
     'Papelada mental.',
     'Foco na superfície plana.',
   ];
-  static const habitatBubbleArrived = [
-    'Cheguei.',
-    'Aqui está bem.',
-    'Ok.',
-  ];
+  static const habitatBubbleArrived = ['Cheguei.', 'Aqui está bem.', 'Ok.'];
+
   /// Soft idle thoughts (common). Keep quiet / observational.
   static const habitatBubbleIdleSoft = [
     '…',
@@ -171,12 +169,7 @@ abstract final class AppStrings {
     ...habitatBubbleIdleSoft,
     ...habitatBubbleIdleRare,
   ];
-  static const habitatBubbleTap = [
-    'Sim?',
-    'Estou aqui.',
-    'Ordens?',
-    'Oi.',
-  ];
+  static const habitatBubbleTap = ['Sim?', 'Estou aqui.', 'Ordens?', 'Oi.'];
   static const habitatBubbleRoomNice = [
     'Bonito aqui.',
     'Gosto deste cômodo.',
@@ -187,21 +180,13 @@ abstract final class AppStrings {
     'Falta espaço.',
     'Cabine apertada.',
   ];
-  static const habitatBubbleArt = [
-    'Hmm.',
-    'Bonito.',
-    'Interessante…',
-  ];
+  static const habitatBubbleArt = ['Hmm.', 'Bonito.', 'Interessante…'];
   static const habitatBubbleClean = [
     'Limpar isso.',
     'Sujeira…',
     'Vassoura mental.',
   ];
-  static const habitatBubbleRecreate = [
-    'Hora de relaxar.',
-    'Boa.',
-    '…',
-  ];
+  static const habitatBubbleRecreate = ['Hora de relaxar.', 'Boa.', '…'];
   static const habitatBubbleTooDark = 'Escuro demais.';
   static const habitatBubbleOrderDenied = 'Não.';
   static const habitatPropQuality = 'Qualidade';
@@ -269,15 +254,15 @@ abstract final class AppStrings {
   static String sqliteBackupSidecarsValue(int count) =>
       count == 0 ? 'Nenhum' : '$count ficheiro(s)';
   static const sideloadBuildTitle = 'Build de teste';
-  static const sideloadBuildLocal =
-      'Build local — não veio do GitHub Actions.';
+  static const sideloadBuildLocal = 'Build local — não veio do GitHub Actions.';
   static const sideloadBuildCommit = 'Commit';
   static const sideloadBuildRef = 'Ref';
   static const sideloadBuildTime = 'Gerado em';
   static const restoreVersionLabel = 'Versão do export';
   static const restoreExportedAt = 'Exportado em';
   static const restoreEntityCounts = 'Conteúdo';
-  static const emptyInbox = 'Inbox vazia. Use captura rápida para registrar algo.';
+  static const emptyInbox =
+      'Inbox vazia. Use captura rápida para registrar algo.';
   static const emptyTimeline = 'Nenhum evento registrado ainda.';
   static const loading = 'Carregando…';
   static const errorGeneric = 'Algo deu errado. Tente novamente.';
@@ -292,7 +277,8 @@ abstract final class AppStrings {
   static const planDayHomeCta = 'Abrir hoje';
   static const planDayTodayPill = 'Hoje';
   static const planDayAllDone = 'Tudo concluído por hoje.';
-  static const planDayErrorLoad = 'Não foi possível carregar as tarefas de hoje.';
+  static const planDayErrorLoad =
+      'Não foi possível carregar as tarefas de hoje.';
   static const planDayRetry = 'Tentar novamente';
   static const planDayPreviousDay = 'Dia anterior';
   static const planDayNextDay = 'Próximo dia';
@@ -348,8 +334,8 @@ abstract final class AppStrings {
     final hello = hour < 12
         ? homeGreetingMorning
         : hour < 18
-            ? homeGreetingAfternoon
-            : homeGreetingEvening;
+        ? homeGreetingAfternoon
+        : homeGreetingEvening;
     return '$hello, $displayName';
   }
 
@@ -419,11 +405,12 @@ abstract final class AppStrings {
     NeedHistoryRange range = NeedHistoryRange.all,
   }) => '${name.toUpperCase()} · ${needHistoryRangeLabel(range)}';
 
-  static String needHistoryRangeLabel(NeedHistoryRange range) => switch (range) {
-    NeedHistoryRange.days7 => needHistoryDays,
-    NeedHistoryRange.days30 => needHistoryDays30,
-    NeedHistoryRange.all => needHistoryAll,
-  };
+  static String needHistoryRangeLabel(NeedHistoryRange range) =>
+      switch (range) {
+        NeedHistoryRange.days7 => needHistoryDays,
+        NeedHistoryRange.days30 => needHistoryDays30,
+        NeedHistoryRange.all => needHistoryAll,
+      };
 
   static String needNoHistoryFor(NeedHistoryRange range) => switch (range) {
     NeedHistoryRange.days7 => needNoHistory,
@@ -452,11 +439,7 @@ abstract final class AppStrings {
     ];
     return [
       for (var i = 0; i < n; i++)
-        _needHistoryAxisLabel(
-          days: days,
-          index: i,
-          months: months,
-        ),
+        _needHistoryAxisLabel(days: days, index: i, months: months),
     ];
   }
 
@@ -502,12 +485,14 @@ abstract final class AppStrings {
       final l = v.toLocal();
       return '${l.hour.toString().padLeft(2, '0')}:${l.minute.toString().padLeft(2, '0')}';
     }
+
     return '${hm(start)} - ${hm(end)}';
   }
 
   static String homeInboxCount(int n) => 'Inbox $n';
 
-  static String scheduleBlockShortLabel(ScheduleBlockMode mode) => switch (mode) {
+  static String scheduleBlockShortLabel(ScheduleBlockMode mode) =>
+      switch (mode) {
         ScheduleBlockMode.sleep => 'Sono',
         ScheduleBlockMode.routine => 'Rotina',
         ScheduleBlockMode.focus => 'Foco',
@@ -595,6 +580,7 @@ abstract final class AppStrings {
     final m = local.month.toString().padLeft(2, '0');
     return '$d/$m/${local.year}';
   }
+
   static const dailyReview = 'Revisão diária';
   static const pawnTabSummary = 'Resumo';
   static const pawnTabNeeds = 'Necessidades';
@@ -624,8 +610,7 @@ abstract final class AppStrings {
   static const pawnSitrepMoodTodayPrefix = 'Humor';
   static const pawnSitrepMoodStalePrefix = 'Último humor';
   static const pawnSitrepMoodNotToday = 'não é de hoje';
-  static const pawnSitrepNoReadings =
-      'Ainda sem leituras de necessidades.';
+  static const pawnSitrepNoReadings = 'Ainda sem leituras de necessidades.';
   static const pawnSitrepNeedsQuiet =
       'Nenhuma necessidade pedindo atenção agora.';
   static const pawnSitrepOpenRoute = 'Uma rota de mobilização está aberta.';
@@ -655,13 +640,13 @@ abstract final class AppStrings {
     final mood = !hasCheckIn
         ? pawnSitrepNoCheckIn
         : checkInIsToday
-            ? '$pawnSitrepMoodTodayPrefix ${moodLabel ?? '—'}.'
-            : '$pawnSitrepMoodStalePrefix: ${moodLabel ?? '—'} ($pawnSitrepMoodNotToday).';
+        ? '$pawnSitrepMoodTodayPrefix ${moodLabel ?? '—'}.'
+        : '$pawnSitrepMoodStalePrefix: ${moodLabel ?? '—'} ($pawnSitrepMoodNotToday).';
     final needs = !hasNeedReadings
         ? pawnSitrepNoReadings
         : attentionCount == 0
-            ? pawnSitrepNeedsQuiet
-            : pawnSitrepNeedCount(attentionCount);
+        ? pawnSitrepNeedsQuiet
+        : pawnSitrepNeedCount(attentionCount);
     final route = openRoute ? ' $pawnSitrepOpenRoute' : '';
     return '$mood $needs$route';
   }
@@ -725,6 +710,7 @@ abstract final class AppStrings {
           '${u.month.toString().padLeft(2, '0')}-'
           '${u.day.toString().padLeft(2, '0')}';
     }
+
     return 'Período: ${fmt(start)} → ${fmt(end)}';
   }
 
@@ -747,7 +733,8 @@ abstract final class AppStrings {
         '${count ?? 0} movimento${count == 1 ? '' : 's'} em missões.',
       'task_activity' =>
         '${count ?? 0} atividade${count == 1 ? '' : 's'} em tarefas/capturas.',
-      'check_ins' => '${count ?? 0} check-in${count == 1 ? '' : 's'} registrado${count == 1 ? '' : 's'}.',
+      'check_ins' =>
+        '${count ?? 0} check-in${count == 1 ? '' : 's'} registrado${count == 1 ? '' : 's'}.',
       'decisions' =>
         '${count ?? 0} decisão${count == 1 ? '' : 'ões'} registrada${count == 1 ? '' : 's'}.',
       'ics_imports' =>
@@ -778,6 +765,7 @@ abstract final class AppStrings {
       _ => bullet.templateId,
     };
   }
+
   static const reviewFacts = 'Fatos da semana';
   static const reviewWins = 'Vitórias';
   static const reviewProblems = 'Problemas';
@@ -839,33 +827,34 @@ abstract final class AppStrings {
   }
 
   static String workTypeLabel(WorkType type) => switch (type) {
-        WorkType.urgentHealth => 'Saúde urgente',
-        WorkType.personalAdmin => 'Admin pessoal',
-        WorkType.university => 'Universidade',
-        WorkType.mainWork => 'Trabalho principal',
-        WorkType.projectA => 'Projeto A',
-        WorkType.projectB => 'Projeto B',
-        WorkType.finances => 'Finanças',
-        WorkType.home => 'Casa',
-        WorkType.relations => 'Relações',
-        WorkType.music => 'Música',
-        WorkType.generalLearning => 'Aprendizado',
-        WorkType.exercise => 'Exercício',
-        WorkType.travelPlanning => 'Viagem',
-        WorkType.restRecreation => 'Descanso',
-        WorkType.captureOrganization => 'Captura',
-      };
+    WorkType.urgentHealth => 'Saúde urgente',
+    WorkType.personalAdmin => 'Admin pessoal',
+    WorkType.university => 'Universidade',
+    WorkType.mainWork => 'Trabalho principal',
+    WorkType.projectA => 'Projeto A',
+    WorkType.projectB => 'Projeto B',
+    WorkType.finances => 'Finanças',
+    WorkType.home => 'Casa',
+    WorkType.relations => 'Relações',
+    WorkType.music => 'Música',
+    WorkType.generalLearning => 'Aprendizado',
+    WorkType.exercise => 'Exercício',
+    WorkType.travelPlanning => 'Viagem',
+    WorkType.restRecreation => 'Descanso',
+    WorkType.captureOrganization => 'Captura',
+  };
 
   static String priorityLevelLabel(PriorityLevel level) => switch (level) {
-        PriorityLevel.blocked => '—',
-        PriorityLevel.immediate => '1',
-        PriorityLevel.high => '2',
-        PriorityLevel.normal => '3',
-        PriorityLevel.low => '4',
-        PriorityLevel.automatic => 'A',
-      };
+    PriorityLevel.blocked => '—',
+    PriorityLevel.immediate => '1',
+    PriorityLevel.high => '2',
+    PriorityLevel.normal => '3',
+    PriorityLevel.low => '4',
+    PriorityLevel.automatic => 'A',
+  };
 
-  static String scheduleBlockModeLabel(ScheduleBlockMode mode) => switch (mode) {
+  static String scheduleBlockModeLabel(ScheduleBlockMode mode) =>
+      switch (mode) {
         ScheduleBlockMode.sleep => 'Dormir',
         ScheduleBlockMode.routine => 'Rotina',
         ScheduleBlockMode.focus => 'Foco',
@@ -881,12 +870,12 @@ abstract final class AppStrings {
       };
 
   static String billRepeatModeLabel(BillRepeatMode mode) => switch (mode) {
-        BillRepeatMode.fixed => 'Fixa',
-        BillRepeatMode.untilState => 'Até estado',
-        BillRepeatMode.maintainStock => 'Manter estoque',
-        BillRepeatMode.interval => 'Intervalo',
-        BillRepeatMode.quotaWindow => 'Cota/janela',
-      };
+    BillRepeatMode.fixed => 'Fixa',
+    BillRepeatMode.untilState => 'Até estado',
+    BillRepeatMode.maintainStock => 'Manter estoque',
+    BillRepeatMode.interval => 'Intervalo',
+    BillRepeatMode.quotaWindow => 'Cota/janela',
+  };
 
   // Quests (Phase 4)
   static const newQuest = 'Nova missão';
@@ -950,40 +939,40 @@ abstract final class AppStrings {
   static const questClearDeadline = 'Remover prazo';
 
   static String questStatusLabel(QuestStatus status) => switch (status) {
-        QuestStatus.draft => 'Rascunho',
-        QuestStatus.active => 'Ativa',
-        QuestStatus.paused => 'Pausada',
-        QuestStatus.completed => 'Concluída',
-        QuestStatus.abandoned => 'Abandonada',
-      };
+    QuestStatus.draft => 'Rascunho',
+    QuestStatus.active => 'Ativa',
+    QuestStatus.paused => 'Pausada',
+    QuestStatus.completed => 'Concluída',
+    QuestStatus.abandoned => 'Abandonada',
+  };
 
   static String taskStatusLabel(TaskStatus status) => switch (status) {
-        TaskStatus.inbox => 'Inbox',
-        TaskStatus.next => 'Próxima',
-        TaskStatus.scheduled => 'Agendada',
-        TaskStatus.doing => 'Em andamento',
-        TaskStatus.blocked => 'Bloqueada',
-        TaskStatus.waiting => 'Aguardando',
-        TaskStatus.done => 'Concluída',
-        TaskStatus.cancelled => 'Cancelada',
-        TaskStatus.archived => 'Arquivada',
-      };
+    TaskStatus.inbox => 'Inbox',
+    TaskStatus.next => 'Próxima',
+    TaskStatus.scheduled => 'Agendada',
+    TaskStatus.doing => 'Em andamento',
+    TaskStatus.blocked => 'Bloqueada',
+    TaskStatus.waiting => 'Aguardando',
+    TaskStatus.done => 'Concluída',
+    TaskStatus.cancelled => 'Cancelada',
+    TaskStatus.archived => 'Arquivada',
+  };
 
   static String taskPriorityLabel(TaskPriority priority) => switch (priority) {
-        TaskPriority.none => 'Sem prioridade',
-        TaskPriority.later => 'Depois',
-        TaskPriority.soon => 'Em breve',
-        TaskPriority.now => 'Agora',
-      };
+    TaskPriority.none => 'Sem prioridade',
+    TaskPriority.later => 'Depois',
+    TaskPriority.soon => 'Em breve',
+    TaskPriority.now => 'Agora',
+  };
 
   static String taskSubtaskProgress(int done, int total) => '$done/$total';
 
   static String taskEnergyLabel(EnergyRequirement energy) => switch (energy) {
-        EnergyRequirement.unknown => 'Qualquer',
-        EnergyRequirement.low => 'Baixa',
-        EnergyRequirement.medium => 'Média',
-        EnergyRequirement.high => 'Alta',
-      };
+    EnergyRequirement.unknown => 'Qualquer',
+    EnergyRequirement.low => 'Baixa',
+    EnergyRequirement.medium => 'Média',
+    EnergyRequirement.high => 'Alta',
+  };
 
   static String taskDateLabel(DateTime value) {
     final local = value.toLocal();
@@ -1011,8 +1000,7 @@ abstract final class AppStrings {
   static const projectPickerEmpty = 'Nenhum projeto ativo disponível.';
   static const projectEdit = 'Editar projeto';
   static const projectComplete = 'Concluir projeto';
-  static const projectCompleteConfirm =
-      'Marcar este projeto como concluído?';
+  static const projectCompleteConfirm = 'Marcar este projeto como concluído?';
   static const projectArchive = 'Arquivar projeto';
   static const projectArchiveConfirm =
       'Arquivar este projeto? Ele ficará fora da lista de ativos.';
@@ -1024,8 +1012,7 @@ abstract final class AppStrings {
   static const questNoLinkedResearch = 'Nenhum nó de pesquisa vinculado.';
   static const questLinkResearch = 'Vincular pesquisa';
   static const questUnlinkResearch = 'Desvincular pesquisa';
-  static const researchNodePickerEmpty =
-      'Nenhum nó de pesquisa disponível.';
+  static const researchNodePickerEmpty = 'Nenhum nó de pesquisa disponível.';
   static const questPauseReason = 'Motivo da pausa';
 
   static String questSelectedProjectsCount(int count) =>
@@ -1053,10 +1040,10 @@ abstract final class AppStrings {
       : '$count pré-requisitos selecionados';
 
   static String projectStatusLabel(ProjectStatus status) => switch (status) {
-        ProjectStatus.active => 'Ativo',
-        ProjectStatus.completed => 'Concluído',
-        ProjectStatus.archived => 'Arquivado',
-      };
+    ProjectStatus.active => 'Ativo',
+    ProjectStatus.completed => 'Concluído',
+    ProjectStatus.archived => 'Arquivado',
+  };
 
   static const newResearchNode = 'Novo nó';
   static const flashcardsTitle = 'Flashcards';
@@ -1097,7 +1084,8 @@ abstract final class AppStrings {
   static const musicAtlasCompleteExpedition = 'Concluir';
   static const musicAtlasSuggestCards = 'Sugerir prática';
   static const musicAtlasAcceptCards = 'Criar cartões escolhidos';
-  static const musicAtlasNoCandidates = 'Nenhum candidato — escuta casual não gera cartões.';
+  static const musicAtlasNoCandidates =
+      'Nenhum candidato — escuta casual não gera cartões.';
   static const musicAtlasSpotifyTitle = 'Spotify';
   static const musicAtlasSpotifyDisclaimer =
       'Lê a tua biblioteca e o histórico recente. Não toca música no Colony. Não marca discos como conhecidos.';
@@ -1106,11 +1094,11 @@ abstract final class AppStrings {
   static const musicAtlasSpotifyPasteCode = 'Colar URI de retorno ou código';
   static const musicAtlasSpotifyPull = 'Actualizar biblioteca';
   static const musicAtlasSpotifyRevoke = 'Revogar';
-  static const musicAtlasSpotifyNeedConsent = 'Activa o opt-in do Spotify primeiro.';
+  static const musicAtlasSpotifyNeedConsent =
+      'Activa o opt-in do Spotify primeiro.';
   static const musicAtlasSpotifyNeedClient =
       'Indica o Client ID da app Spotify (Development Mode).';
-  static const musicAtlasSpotifyNeedConnect =
-      'Liga a conta Spotify primeiro.';
+  static const musicAtlasSpotifyNeedConnect = 'Liga a conta Spotify primeiro.';
   static const musicAtlasSpotifyLinked = 'Conta ligada neste aparelho.';
   static const musicAtlasSpotifyNotLinked =
       'Ainda não há sessão Spotify neste aparelho.';
@@ -1126,7 +1114,8 @@ abstract final class AppStrings {
   static const musicAtlasSpotifyOpenDashboard = 'Abrir dashboard Spotify';
   static const musicAtlasSpotifyCopyRedirect = 'Copiar Redirect URI';
   static const musicAtlasSpotifyRedirectCopied = 'Redirect URI copiado.';
-  static const musicAtlasSpotifyHistoryTitle = 'Histórico alargado (como o stats.fm)';
+  static const musicAtlasSpotifyHistoryTitle =
+      'Histórico alargado (como o stats.fm)';
   static const musicAtlasSpotifyHistoryLead =
       'A API da Spotify só entrega a biblioteca gravada e as últimas ~50 faixas. O mapa da tua vida musical vem do ficheiro de privacidade — o mesmo dump que o stats.fm pede. Fica no telemóvel. Nunca partilhes o ZIP.';
   static const musicAtlasSpotifyHistory1 =
@@ -1155,7 +1144,9 @@ abstract final class AppStrings {
   }) {
     return '$albums álbuns no dump · $created novos · $encounters escutas registadas. O mapa acende o que já ouviste.';
   }
-  static const musicAtlasOffline = 'Offline — o núcleo local continua disponível.';
+
+  static const musicAtlasOffline =
+      'Offline — o núcleo local continua disponível.';
   static const musicAtlasImportEmpty =
       'Cola o JSON ou escolhe um ficheiro. O picker não deita o dump no campo.';
   static const musicAtlasImportNothingToDo = 'Nada novo para importar.';
@@ -1215,7 +1206,8 @@ abstract final class AppStrings {
       'Não há markdown local para $title. A capa gerada fica no sítio da arte '
       'enquanto a ficha não existir. A busca abre o Google com artista, título e ano.';
 
-  static String musicAtlasListenDepth(MusicListenDepth depth) => switch (depth) {
+  static String musicAtlasListenDepth(MusicListenDepth depth) =>
+      switch (depth) {
         MusicListenDepth.unknown => 'Sem encontro',
         MusicListenDepth.contact => 'Contacto / gravado',
         MusicListenDepth.heard => 'Já ouvido',
@@ -1247,18 +1239,18 @@ abstract final class AppStrings {
       };
 
   static String musicAtlasNodeTypeLabel(MusicNodeType type) => switch (type) {
-        MusicNodeType.artist => 'Artista',
-        MusicNodeType.work => 'Obra',
-        MusicNodeType.recording => 'Gravação',
-        MusicNodeType.releaseGroup => 'Álbum',
-        MusicNodeType.release => 'Edição',
-        MusicNodeType.territory => 'Território',
-        MusicNodeType.scene => 'Cena',
-        MusicNodeType.concept => 'Conceito',
-        MusicNodeType.label => 'Selo',
-        MusicNodeType.place => 'Lugar',
-        MusicNodeType.show => 'Show',
-      };
+    MusicNodeType.artist => 'Artista',
+    MusicNodeType.work => 'Obra',
+    MusicNodeType.recording => 'Gravação',
+    MusicNodeType.releaseGroup => 'Álbum',
+    MusicNodeType.release => 'Edição',
+    MusicNodeType.territory => 'Território',
+    MusicNodeType.scene => 'Cena',
+    MusicNodeType.concept => 'Conceito',
+    MusicNodeType.label => 'Selo',
+    MusicNodeType.place => 'Lugar',
+    MusicNodeType.show => 'Show',
+  };
 
   static String musicAtlasEncounterLabel(MusicEncounterType type) =>
       switch (type) {
@@ -1326,7 +1318,8 @@ abstract final class AppStrings {
   static const flashcardsTagsHint = 'Tag ou caminho (ex. Música / Harmonia)';
   static const flashcardsAddTag = 'Adicionar';
   static const flashcardsSubtags = 'Subtags';
-  static const flashcardsNoCardsInTag = 'Nenhum cartão com esta tag ou subtags.';
+  static const flashcardsNoCardsInTag =
+      'Nenhum cartão com esta tag ou subtags.';
   static const flashcardsStudyTag = 'Estudar tag';
   static const flashcardsPracticeTag = 'Praticar tag';
   static const flashcardsBidirectional = 'Também criar o inverso';
@@ -1385,13 +1378,14 @@ abstract final class AppStrings {
   static const flashcardsPaceLapses = 'Lapsos';
   static const flashcardsPaceReviewsPerCard = 'Reviews/cartão';
   static const flashcardsPaceAgainRate = 'De novo';
-  static const flashcardsPaceRemaining =
-      'Ainda por formar';
+  static const flashcardsPaceRemaining = 'Ainda por formar';
   static const flashcardsPaceLoad = 'Avaliações restantes';
   static const flashcardsPaceTargetPerDay = 'Cartões por dia';
   static const flashcardsPaceTargetDays = 'Terminar em (dias)';
-  static const flashcardsPaceNeedSample = 'Sem ritmo ainda — use um alvo manual.';
-  static const flashcardsPaceAllDone = 'Todos os cartões agendados já passaram da formação.';
+  static const flashcardsPaceNeedSample =
+      'Sem ritmo ainda — use um alvo manual.';
+  static const flashcardsPaceAllDone =
+      'Todos os cartões agendados já passaram da formação.';
   static const flashcardsRetention = 'Retenção recente';
   static const flashcardsCards = 'Cartões';
   static const flashcardsSubareas = 'Subáreas';
@@ -1451,7 +1445,8 @@ abstract final class AppStrings {
   static const flashcardsLinkedShelves = 'Prateleiras de conhecimento';
   static const flashcardsNoLinkedShelves = 'Nenhuma área ligada a este nó.';
   static const flashcardsLinkShelf = 'Ligar área';
-  static const flashcardsLinkedResearchEmpty = 'Nenhum nó de pesquisa nesta área.';
+  static const flashcardsLinkedResearchEmpty =
+      'Nenhum nó de pesquisa nesta área.';
   static const flashcardsLinkResearch = 'Ligar pesquisa';
   static const flashcardsPlacementParent = 'Outra prateleira';
   static const flashcardsTodayDigestHelp =
@@ -1502,7 +1497,8 @@ abstract final class AppStrings {
   static const flashcardsImportPickFile = 'Escolher ficheiro';
   static const flashcardsImportPreview = 'Pré-visualizar';
   static const flashcardsImportConfirm = 'Importar agora';
-  static const flashcardsImportEmpty = 'Cole ou escolha um JSON para continuar.';
+  static const flashcardsImportEmpty =
+      'Cole ou escolha um JSON para continuar.';
   static const flashcardsImportInvalid = 'JSON inválido';
   static const flashcardsImportDone = 'Importação concluída.';
   static const flashcardsImportPromptLive =
@@ -1521,7 +1517,9 @@ abstract final class AppStrings {
         '$areas áreas · $decks baralhos';
   }
 
-  static String flashcardsImportResultSummary(FlashcardJsonImportResult result) {
+  static String flashcardsImportResultSummary(
+    FlashcardJsonImportResult result,
+  ) {
     return flashcardsImportPlanSummary(
       create: result.createdCards,
       skip: result.skippedCards,
@@ -1531,9 +1529,8 @@ abstract final class AppStrings {
     );
   }
 
-  static String flashcardsHeroStudyCount(int count) => count == 1
-      ? '1 cartão agora'
-      : '$count cartões agora';
+  static String flashcardsHeroStudyCount(int count) =>
+      count == 1 ? '1 cartão agora' : '$count cartões agora';
 
   static String flashcardsMinutes(int minutes) => '~$minutes min';
 
@@ -1584,13 +1581,13 @@ abstract final class AppStrings {
       };
 
   static String flashcardKindLabel(FlashcardKind kind) => switch (kind) {
-        FlashcardKind.basic => 'Básico',
-        FlashcardKind.reverse => 'Inverso',
-        FlashcardKind.cloze => 'Lacuna',
-        FlashcardKind.freeRecall => 'Recordação livre',
-        FlashcardKind.exercise => 'Exercício',
-        FlashcardKind.repertoire => 'Repertório',
-      };
+    FlashcardKind.basic => 'Básico',
+    FlashcardKind.reverse => 'Inverso',
+    FlashcardKind.cloze => 'Lacuna',
+    FlashcardKind.freeRecall => 'Recordação livre',
+    FlashcardKind.exercise => 'Exercício',
+    FlashcardKind.repertoire => 'Repertório',
+  };
 
   static const researchListEmpty = 'Nenhum nó de pesquisa ainda.';
   static const researchListEmptyHint =
@@ -1617,7 +1614,8 @@ abstract final class AppStrings {
       'Nível heurístico 0–6 a partir de evidências e sessões. Não altera o status do nó.';
   static const researchSkillRubricStale =
       'Confiança possivelmente defasada — última evidência antiga.';
-  static String researchSkillRubricLevel(int level) => 'Nível sugerido: $level/6';
+  static String researchSkillRubricLevel(int level) =>
+      'Nível sugerido: $level/6';
   static const researchActiveFocus = 'Foco atual';
   static const researchStartFocus = 'Iniciar foco';
   static const researchDemonstrate = 'Demonstrar';
@@ -1630,7 +1628,8 @@ abstract final class AppStrings {
   static const researchUnlinkQuest = 'Desvincular missão';
   static const researchQuestPickerEmpty = 'Nenhuma missão disponível.';
   static const researchLinkedPrerequisites = 'Pré-requisitos';
-  static const researchNoLinkedPrerequisites = 'Nenhum pré-requisito vinculado.';
+  static const researchNoLinkedPrerequisites =
+      'Nenhum pré-requisito vinculado.';
   static const researchLinkPrerequisite = 'Vincular pré-requisito';
   static const researchPrerequisitePickerEmpty =
       'Nenhum outro nó disponível para vincular.';
@@ -1646,7 +1645,8 @@ abstract final class AppStrings {
   static const researchNoSessions = 'Nenhuma sessão registrada.';
   static const researchSessionMode = 'Modo';
   static const researchSessionDuration = 'Duração (minutos)';
-  static const researchSessionDurationInvalid = 'Informe duração válida em minutos';
+  static const researchSessionDurationInvalid =
+      'Informe duração válida em minutos';
   static const researchSessionNotesOptional = 'Notas (opcional)';
   static const researchAddEvidence = 'Adicionar evidência';
   static const researchEvidence = 'Evidências';
@@ -1684,8 +1684,10 @@ abstract final class AppStrings {
     return '$minutes min · $date';
   }
 
-  static String researchProgressSummaryValue(int demonstrated, int activeTotal) =>
-      '$demonstrated/$activeTotal demonstrados';
+  static String researchProgressSummaryValue(
+    int demonstrated,
+    int activeTotal,
+  ) => '$demonstrated/$activeTotal demonstrados';
 
   static String researchNodeActivitySummaryValue({
     required int sessionCount,
@@ -1693,11 +1695,14 @@ abstract final class AppStrings {
     required int evidenceCount,
   }) {
     final sessions = sessionCount == 1 ? '1 sessão' : '$sessionCount sessões';
-    final evidence = evidenceCount == 1 ? '1 evidência' : '$evidenceCount evidências';
+    final evidence = evidenceCount == 1
+        ? '1 evidência'
+        : '$evidenceCount evidências';
     return '$sessions · $totalDurationMinutes min · $evidence';
   }
 
-  static String researchStatusLabel(ResearchNodeStatus status) => switch (status) {
+  static String researchStatusLabel(ResearchNodeStatus status) =>
+      switch (status) {
         ResearchNodeStatus.available => 'Disponível',
         ResearchNodeStatus.inResearch => 'Em foco',
         ResearchNodeStatus.demonstrated => 'Demonstrado',
@@ -1705,11 +1710,11 @@ abstract final class AppStrings {
       };
 
   static String researchTypeLabel(ResearchNodeType type) => switch (type) {
-        ResearchNodeType.skill => 'Habilidade',
-        ResearchNodeType.knowledge => 'Conhecimento',
-        ResearchNodeType.capability => 'Capacidade',
-        ResearchNodeType.practice => 'Prática',
-      };
+    ResearchNodeType.skill => 'Habilidade',
+    ResearchNodeType.knowledge => 'Conhecimento',
+    ResearchNodeType.capability => 'Capacidade',
+    ResearchNodeType.practice => 'Prática',
+  };
 
   static String researchSelectedPrerequisitesCount(int count) => count == 1
       ? '1 pré-requisito selecionado'
@@ -1782,8 +1787,7 @@ abstract final class AppStrings {
   static const personDisplayName = 'Nome';
   static const personNameRequired = 'Informe o nome';
   static const personPreferredNameOptional = 'Apelido (opcional)';
-  static const personRelationshipTypesOptional =
-      'Tipos de relação (opcional)';
+  static const personRelationshipTypesOptional = 'Tipos de relação (opcional)';
   static const personRelationshipTypesHint = 'amiga, família, colega';
   static const personNotesOptional = 'Notas (opcional)';
   static const personArchive = 'Arquivar';
@@ -1793,18 +1797,18 @@ abstract final class AppStrings {
   static const personInteractionsEmpty = 'Nenhuma interação registrada.';
 
   static String interactionKindLabel(InteractionKind kind) => switch (kind) {
-        InteractionKind.meeting => 'Encontro',
-        InteractionKind.call => 'Ligação',
-        InteractionKind.message => 'Mensagem',
-        InteractionKind.gathering => 'Reunião',
-        InteractionKind.help => 'Ajuda',
-        InteractionKind.conflict => 'Conflito',
-        InteractionKind.decision => 'Decisão',
-        InteractionKind.promise => 'Promessa',
-        InteractionKind.gift => 'Presente',
-        InteractionKind.introduction => 'Introdução',
-        InteractionKind.other => 'Outro',
-      };
+    InteractionKind.meeting => 'Encontro',
+    InteractionKind.call => 'Ligação',
+    InteractionKind.message => 'Mensagem',
+    InteractionKind.gathering => 'Reunião',
+    InteractionKind.help => 'Ajuda',
+    InteractionKind.conflict => 'Conflito',
+    InteractionKind.decision => 'Decisão',
+    InteractionKind.promise => 'Promessa',
+    InteractionKind.gift => 'Presente',
+    InteractionKind.introduction => 'Introdução',
+    InteractionKind.other => 'Outro',
+  };
 
   static const personBirthdayOptional = 'Aniversário (opcional)';
   static const personSearchHint = 'Buscar pessoas';
@@ -1860,20 +1864,20 @@ abstract final class AppStrings {
   static const friendshipSelectPeople = 'Quem estava';
 
   static String friendshipKindLabel(FriendshipKind kind) => switch (kind) {
-        FriendshipKind.innerCircle => 'Círculo interno',
-        FriendshipKind.close => 'Próxima',
-        FriendshipKind.regular => 'Regular',
-        FriendshipKind.casual => 'Casual',
-        FriendshipKind.acquaintance => 'Conhecida',
-        FriendshipKind.childhood => 'Infância',
-        FriendshipKind.familyFriend => 'Amiga da família',
-        FriendshipKind.colleagueSocial => 'Colega social',
-        FriendshipKind.neighbor => 'Vizinha',
-        FriendshipKind.online => 'Online',
-        FriendshipKind.seasonal => 'Sazonal',
-        FriendshipKind.dormant => 'Dormente',
-        FriendshipKind.unspecified => 'Por classificar',
-      };
+    FriendshipKind.innerCircle => 'Círculo interno',
+    FriendshipKind.close => 'Próxima',
+    FriendshipKind.regular => 'Regular',
+    FriendshipKind.casual => 'Casual',
+    FriendshipKind.acquaintance => 'Conhecida',
+    FriendshipKind.childhood => 'Infância',
+    FriendshipKind.familyFriend => 'Amiga da família',
+    FriendshipKind.colleagueSocial => 'Colega social',
+    FriendshipKind.neighbor => 'Vizinha',
+    FriendshipKind.online => 'Online',
+    FriendshipKind.seasonal => 'Sazonal',
+    FriendshipKind.dormant => 'Dormente',
+    FriendshipKind.unspecified => 'Por classificar',
+  };
 
   static String friendshipCadenceLabel(FriendshipCadence cadence) =>
       switch (cadence) {
@@ -1902,9 +1906,8 @@ abstract final class AppStrings {
     return 'Último encontro há $days dias';
   }
 
-  static String encounterCountLabel(int count) => count == 1
-      ? '1 encontro registrado'
-      : '$count encontros registrados';
+  static String encounterCountLabel(int count) =>
+      count == 1 ? '1 encontro registrado' : '$count encontros registrados';
 
   static String typicalIntervalLabel(int days) =>
       'Intervalo típico: $days dias';
@@ -1951,7 +1954,8 @@ abstract final class AppStrings {
       'Aniversário $day/$month';
 
   static const circleAddMember = 'Ligar pessoa';
-  static const circleAddMemberEmpty = 'Todas as pessoas já estão neste círculo.';
+  static const circleAddMemberEmpty =
+      'Todas as pessoas já estão neste círculo.';
   static const circleUnlinkMember = 'Retirar do círculo';
   static const friendshipOpenPerson = 'Abrir dossiê';
   static const friendshipHowWeMetTitle = 'Como nos conhecemos';
@@ -2036,7 +2040,8 @@ abstract final class AppStrings {
       'Use o ícone de vínculo para adicionar itens do inventário.';
   static const tripLinkInventoryItem = 'Vincular item';
   static const tripUnlinkInventoryItem = 'Desvincular item';
-  static const tripInventoryPickerEmpty = 'Nenhum item de inventário disponível.';
+  static const tripInventoryPickerEmpty =
+      'Nenhum item de inventário disponível.';
 
   static const timelineHubTitle = 'Linha do tempo';
   static const timelineImport = 'Importar Timeline';
@@ -2064,7 +2069,8 @@ abstract final class AppStrings {
   static const timelinePasteJson = 'Colar JSON';
   static const timelinePasteHint = 'Cole o conteúdo de Timeline.json';
   static const timelineReadError = 'Não foi possível ler o ficheiro.';
-  static const timelineParseError = 'JSON inválido ou não é a Timeline on-device.';
+  static const timelineParseError =
+      'JSON inválido ou não é a Timeline on-device.';
   static const timelinePreviewTitle = 'Pré-visualização';
   static const timelineOverwriteTitle = 'Substituir Timeline importada?';
   static const timelineOverwriteBody =
@@ -2157,15 +2163,15 @@ abstract final class AppStrings {
       };
 
   static String timelineModeLabel(String id) => switch (id) {
-        'walking' => timelineWalk,
-        'driving' => timelineDrive,
-        'transit' => timelineTransit,
-        'flying' => timelineFly,
-        'cycling' => timelineCycling,
-        'other' => timelineOtherMode,
-        'unknown' => 'Desconhecido',
-        _ => id,
-      };
+    'walking' => timelineWalk,
+    'driving' => timelineDrive,
+    'transit' => timelineTransit,
+    'flying' => timelineFly,
+    'cycling' => timelineCycling,
+    'other' => timelineOtherMode,
+    'unknown' => 'Desconhecido',
+    _ => id,
+  };
 
   static String timelineDurationHours(Duration d) {
     final hours = d.inMinutes / 60.0;
@@ -2197,21 +2203,21 @@ abstract final class AppStrings {
   }
 
   static String timelineWeekdayShort(int mondayIndex) => const [
-        'Seg',
-        'Ter',
-        'Qua',
-        'Qui',
-        'Sex',
-        'Sáb',
-        'Dom',
-      ][mondayIndex.clamp(0, 6)];
+    'Seg',
+    'Ter',
+    'Qua',
+    'Qui',
+    'Sex',
+    'Sáb',
+    'Dom',
+  ][mondayIndex.clamp(0, 6)];
 
   static String tripStatusLabel(TripStatus status) => switch (status) {
-        TripStatus.planned => 'Planejada',
-        TripStatus.active => 'Ativa',
-        TripStatus.completed => 'Concluída',
-        TripStatus.cancelled => 'Cancelada',
-      };
+    TripStatus.planned => 'Planejada',
+    TripStatus.active => 'Ativa',
+    TripStatus.completed => 'Concluída',
+    TripStatus.cancelled => 'Cancelada',
+  };
 
   static const homeMaintenanceTitle = 'Casa';
   static const homeMaintenanceDisclaimer =
@@ -2261,8 +2267,7 @@ abstract final class AppStrings {
   static const zoneName = 'Nome';
   static const zoneNameRequired = 'Informe o nome';
   static const zoneLocationOptional = 'Local (rótulo, opcional)';
-  static const zoneCapabilitiesOptional =
-      'Capacidades (separadas por vírgula)';
+  static const zoneCapabilitiesOptional = 'Capacidades (separadas por vírgula)';
   static const zoneCapabilitiesHint = 'leitura, notas, chamadas';
   static const zoneUnavailableWorkTypesOptional =
       'Trabalho indisponível (vírgula, opcional)';
@@ -2282,11 +2287,11 @@ abstract final class AppStrings {
   static const zoneTripPickerEmpty = 'Nenhuma viagem disponível.';
 
   static String zoneConnectivityLabel(ZoneConnectivity c) => switch (c) {
-        ZoneConnectivity.online => 'Online',
-        ZoneConnectivity.offline => 'Offline',
-        ZoneConnectivity.limited => 'Limitada',
-        ZoneConnectivity.unknown => 'Desconhecida',
-      };
+    ZoneConnectivity.online => 'Online',
+    ZoneConnectivity.offline => 'Offline',
+    ZoneConnectivity.limited => 'Limitada',
+    ZoneConnectivity.unknown => 'Desconhecida',
+  };
 
   static const syncTitle = 'Sincronização';
   static const syncDisclaimer =
@@ -2310,14 +2315,14 @@ abstract final class AppStrings {
       : '$count operações processadas localmente (sem rede).';
 
   static String syncEntityTypeLabel(String entityType) => switch (entityType) {
-        'task' => 'Tarefa',
-        'quest' => 'Missão',
-        'inventory_item' => 'Inventário',
-        'commitment' => 'Compromisso',
-        'trip' => 'Viagem',
-        'context_zone' => 'Zona',
-        _ => entityType,
-      };
+    'task' => 'Tarefa',
+    'quest' => 'Missão',
+    'inventory_item' => 'Inventário',
+    'commitment' => 'Compromisso',
+    'trip' => 'Viagem',
+    'context_zone' => 'Zona',
+    _ => entityType,
+  };
 
   static const integrationsTitle = 'Integrações';
   static const integrationsDisclaimer =
@@ -2337,8 +2342,7 @@ abstract final class AppStrings {
   static const integrationsNotificationsAppOn = 'Passo do app: ligado';
   static const integrationsNotificationsAppOff =
       'Ligue para gravar e extrair o que chegar.';
-  static const integrationsNotificationsStep3Title =
-      'Autorize no Android';
+  static const integrationsNotificationsStep3Title = 'Autorize no Android';
   static const integrationsNotificationsOpenAndroid = 'Abrir ajustes';
   static const integrationsNotificationsAndroidOn =
       'Acesso a notificações: Colônia está na lista.';
@@ -2421,8 +2425,7 @@ abstract final class AppStrings {
   static const commitmentDescriptionRequired = 'Informe a descrição';
   static const commitmentMadeBy = 'Feito por';
   static const commitmentMadeToLabel = 'Para (nome ou rótulo)';
-  static const commitmentMadeToRequired =
-      'Informe para quem é o compromisso';
+  static const commitmentMadeToRequired = 'Informe para quem é o compromisso';
   static const commitmentNotesOptional = 'Notas (opcional)';
   static const commitmentLinkedQuest = 'Missão vinculada (opcional)';
   static String commitmentLinkedQuestTitle(String title) => 'Missão: $title';
@@ -2475,17 +2478,17 @@ abstract final class AppStrings {
   static const membershipPickerEmpty = 'Nada disponível para vincular.';
 
   static String organizationKindLabel(OrganizationKind kind) => switch (kind) {
-        OrganizationKind.company => 'Empresa',
-        OrganizationKind.university => 'Universidade',
-        OrganizationKind.family => 'Família',
-        OrganizationKind.friends => 'Amigos',
-        OrganizationKind.association => 'Associação',
-        OrganizationKind.community => 'Comunidade',
-        OrganizationKind.vendor => 'Fornecedor',
-        OrganizationKind.clinic => 'Clínica',
-        OrganizationKind.financial => 'Financeira',
-        OrganizationKind.other => 'Outro',
-      };
+    OrganizationKind.company => 'Empresa',
+    OrganizationKind.university => 'Universidade',
+    OrganizationKind.family => 'Família',
+    OrganizationKind.friends => 'Amigos',
+    OrganizationKind.association => 'Associação',
+    OrganizationKind.community => 'Comunidade',
+    OrganizationKind.vendor => 'Fornecedor',
+    OrganizationKind.clinic => 'Clínica',
+    OrganizationKind.financial => 'Financeira',
+    OrganizationKind.other => 'Outro',
+  };
 
   static String inventoryCategoryLabel(InventoryCategory category) =>
       switch (category) {
@@ -2555,10 +2558,9 @@ abstract final class AppStrings {
   static String healthSleepHistorySessionCount(int n) =>
       n == 1 ? '1 sess├úo' : '$n sess├Áes';
 
-  static String healthSleepSyncDone(int n) =>
-      n == 0
-          ? 'Nenhuma sess├úo nova.'
-          : '$n sess├úo${n == 1 ? '' : '├Áes'} sincronizada${n == 1 ? '' : 's'}.';
+  static String healthSleepSyncDone(int n) => n == 0
+      ? 'Nenhuma sess├úo nova.'
+      : '$n sess├úo${n == 1 ? '' : '├Áes'} sincronizada${n == 1 ? '' : 's'}.';
 
   static String healthSleepSyncResult({
     required int imported,
@@ -2666,11 +2668,11 @@ abstract final class AppStrings {
   static const financeAccountsEmpty = 'Nenhuma conta registrada.';
 
   static String financePeriodLabel(FinancePeriod period) => switch (period) {
-        FinancePeriod.days7 => financePeriod7d,
-        FinancePeriod.days30 => financePeriod30d,
-        FinancePeriod.days90 => financePeriod90d,
-        FinancePeriod.all => financePeriodAll,
-      };
+    FinancePeriod.days7 => financePeriod7d,
+    FinancePeriod.days30 => financePeriod30d,
+    FinancePeriod.days90 => financePeriod90d,
+    FinancePeriod.all => financePeriodAll,
+  };
   static const financeAccountsEmptyHint =
       'Adicione contas manualmente para acompanhar saldos e movimentações.';
   static const financeTransactionsEmpty = 'Nenhuma transação registrada.';
@@ -2680,8 +2682,7 @@ abstract final class AppStrings {
   static const financeIncludeInNetWorth = 'Incluir no patrimônio';
   static const financeMaskValuesByDefault = 'Ocultar valores por padrão';
   static const financeNetWorthSection = 'Patrimônio';
-  static const financeNetWorthEmpty =
-      'Nenhuma conta incluída no patrimônio.';
+  static const financeNetWorthEmpty = 'Nenhuma conta incluída no patrimônio.';
   static const financeNetWorthExcludedHint = 'Fora do patrimônio';
   static const financeNetWorthHint =
       'Soma das contas marcadas para patrimônio. Sem conversão de moeda.';
@@ -2705,7 +2706,8 @@ abstract final class AppStrings {
   static const financeImportCsvPreviewAction = 'Analisar';
   static const financeImportCsvApplyAction = 'Aplicar importação';
   static const financeImportCsvAction = 'Importar';
-  static const financeImportCsvEmpty = 'Cole o conteúdo OFX/CSV ou escolha um arquivo';
+  static const financeImportCsvEmpty =
+      'Cole o conteúdo OFX/CSV ou escolha um arquivo';
   static const financeImportCsvInvalid =
       'Arquivo inválido. Use OFX, CSV do Inter (Data/Valor) ou o CSV exportado pelo Colony.';
   static const financeImportCsvNothingToApply =

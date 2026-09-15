@@ -159,4 +159,35 @@ void main() {
     await tester.pumpAndSettle();
     expect(committed, 1.0);
   });
+
+  testWidgets('NeedInspectBar with onTap does not commit a tap', (
+    tester,
+  ) async {
+    var taps = 0;
+    double? committed;
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: ColonyTheme.dark(),
+        home: Scaffold(
+          body: Center(
+            child: SizedBox(
+              width: 240,
+              child: NeedInspectBar(
+                label: 'Humor',
+                value: 0.75,
+                showPointer: true,
+                onTap: () => taps++,
+                onValueCommit: (v) => committed = v,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    await tester.tap(find.byType(NeedInspectBar));
+    await tester.pumpAndSettle();
+    expect(taps, 1);
+    expect(committed, isNull);
+  });
 }
