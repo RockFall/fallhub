@@ -12,7 +12,8 @@ int denormalizeScale5(double value) => (value * 4).round().clamp(1, 5) + 1;
 /// Instant stored as [CheckIn.observedAt] for a chosen local calendar day.
 ///
 /// Today (local) uses [nowUtc] as-is so a same-day check-in stays "now".
-/// Another day keeps the current local clock time on that date.
+/// Another day is stored at local noon so a late-night log does not land at
+/// 23:59 (or slip into the next UTC day).
 DateTime checkInObservedAt({
   required DateTime selectedLocalDay,
   required DateTime nowUtc,
@@ -21,16 +22,8 @@ DateTime checkInObservedAt({
   if (_sameLocalCalendarDay(selectedLocalDay, nowLocal)) {
     return nowUtc;
   }
-  return DateTime(
-    selectedLocalDay.year,
-    selectedLocalDay.month,
-    selectedLocalDay.day,
-    nowLocal.hour,
-    nowLocal.minute,
-    nowLocal.second,
-    nowLocal.millisecond,
-    nowLocal.microsecond,
-  ).toUtc();
+  final local = selectedLocalDay.toLocal();
+  return DateTime(local.year, local.month, local.day, 12).toUtc();
 }
 
 bool isSameLocalCalendarDay(DateTime a, DateTime b) {

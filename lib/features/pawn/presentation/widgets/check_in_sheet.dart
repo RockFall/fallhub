@@ -236,7 +236,7 @@ class _CheckInSheetState extends ConsumerState<CheckInSheet> {
                     Padding(
                       padding: const EdgeInsets.only(bottom: 4),
                       child: SizedBox(
-                        height: 34,
+                        height: 40,
                         child: _NeedEditor(
                           slug: seed.slug,
                           name: seed.name,
@@ -325,10 +325,11 @@ class _NeedEditor extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return NeedInspectBar(
+      key: ValueKey('checkin-need-$slug'),
       label: name,
       value: value,
       scale: scale,
-      showPointer: scale != NeedInspectBarScale.compact,
+      showPointer: true,
       fillSlot: scale == NeedInspectBarScale.compact,
       semanticId: 'pawn.checkin.need.$slug',
       onValueChanged: onChanged,

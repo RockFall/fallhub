@@ -250,8 +250,41 @@ class NeedSeed extends Equatable {
   List<Object?> get props => [name, slug, subjective, privacyClass, aliases];
 }
 
+enum NeedHistoryRange {
+  days7,
+  days30,
+  all;
+
+  int? get dayCount => switch (this) {
+    NeedHistoryRange.days7 => 7,
+    NeedHistoryRange.days30 => 30,
+    NeedHistoryRange.all => null,
+  };
+}
+
 /// Catalog of needs shown on the pawn inspect. Humor is tracked via check-in.
 abstract final class DefaultNeedSeeds {
+  static NeedSeed? seedFor(String slug) {
+    for (final seed in core) {
+      if (seed.matchesSlug(slug)) return seed;
+    }
+    return null;
+  }
+
+  static NeedDefinition? definitionFor(
+    String slug,
+    Iterable<NeedDefinition> definitions,
+  ) {
+    final seed = seedFor(slug);
+    for (final definition in definitions) {
+      if (definition.slug == slug) return definition;
+      if (seed != null && seed.matchesSlug(definition.slug)) {
+        return definition;
+      }
+    }
+    return null;
+  }
+
   static const core = <NeedSeed>[
     NeedSeed(name: 'Sono', slug: 'sono', subjective: false),
     NeedSeed(name: 'Alimentação', slug: 'alimentacao', subjective: true),
@@ -349,18 +382,42 @@ class NeedHistoryWindow extends Equatable {
 }
 
 abstract final class NeedHistorySeries {
-  /// Last [days] local calendar days, keeping every sample (several per day).
+  static NeedHistoryWindow forRange({
+    required DateTime nowLocal,
+    required List<NeedHistorySample> samples,
+    NeedHistoryRange range = NeedHistoryRange.all,
+  }) {
+    return lastLocalDays(
+      nowLocal: nowLocal,
+      samples: samples,
+      days: range.dayCount,
+    );
+  }
+
+  /// Local calendar window. [days] `null` keeps every sample back to the
+  /// earliest day (at least 7 days so an empty chart still has an axis).
   static NeedHistoryWindow lastLocalDays({
     required DateTime nowLocal,
     required List<NeedHistorySample> samples,
-    int days = 7,
+    int? days = 7,
   }) {
     final today = DateTime(nowLocal.year, nowLocal.month, nowLocal.day);
-    final start = today.subtract(Duration(days: days - 1));
+    var start = days == null
+        ? today.subtract(const Duration(days: 6))
+        : today.subtract(Duration(days: (days < 1 ? 1 : days) - 1));
+    if (days == null) {
+      for (final sample in samples) {
+        if (sample.value == null) continue;
+        final local = sample.observedAt.toLocal();
+        final day = DateTime(local.year, local.month, local.day);
+        if (day.isBefore(start)) start = day;
+      }
+    }
+    final dayCount = today.difference(start).inDays + 1;
     final end = today.add(const Duration(days: 1));
     final spanMs = end.difference(start).inMilliseconds;
     final dayList = List<DateTime>.generate(
-      days,
+      dayCount < 1 ? 1 : dayCount,
       (i) => DateTime(start.year, start.month, start.day + i),
     );
 

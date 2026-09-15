@@ -82,6 +82,9 @@ void main() {
 
     expect(find.text(AppStrings.needChartTitle('Sono')), findsOneWidget);
     expect(find.text(AppStrings.needRecordToday), findsOneWidget);
+    expect(find.text(AppStrings.needHistoryAll.toUpperCase()), findsWidgets);
+    expect(find.text(AppStrings.needHistoryDays.toUpperCase()), findsOneWidget);
+    expect(find.text(AppStrings.needHistoryDays30.toUpperCase()), findsOneWidget);
 
     await tester.tap(find.widgetWithText(ColonyButton, AppStrings.mood));
     await tester.pump();
@@ -197,6 +200,97 @@ void main() {
       ),
       findsOneWidget,
     );
+
+    await tester.pumpWidget(const SizedBox.shrink());
+    for (var i = 0; i < 40; i++) {
+      await tester.pump(const Duration(milliseconds: 1));
+    }
+  });
+
+  testWidgets('Need chart range defaults to all and can shrink to 7 days', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(800, 1400);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    final db = ColonyDatabase.inMemory();
+    addTearDown(db.close);
+
+    var now = DateTime.utc(2026, 8, 31, 14, 20);
+    DateTime clock() => now;
+
+    final repos = ColonyRepositories.create(
+      db,
+      idGenerator: FixedIdGenerator([for (var i = 0; i < 200; i++) 'id-$i']),
+      clock: clock,
+    );
+
+    final profile = await repos.profiles.create(
+      colonyName: 'Test',
+      displayName: 'Caio',
+      timezone: 'UTC',
+      locale: 'pt_BR',
+      baseCurrency: 'BRL',
+    );
+    await repos.preferences.save(
+      AppPreferences.defaults().copyWith(onboardingCompleted: true),
+    );
+    await repos.needs.seedDefaults(profile.id);
+    final snapshots = await repos.needs.buildSnapshots(profile.id);
+    final sono = snapshots.firstWhere((s) => s.definition.slug == 'sono');
+    final oldAt = DateTime.utc(2026, 8, 11, 12);
+    await repos.needs.recordReading(
+      needId: sono.definition.id,
+      normalizedValue: 0.25,
+      observedAt: oldAt,
+    );
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          databaseProvider.overrideWithValue(db),
+          clockProvider.overrideWithValue(clock),
+        ],
+        child: MaterialApp(
+          theme: ColonyTheme.dark(),
+          home: const Scaffold(body: NeedsInspectTab()),
+        ),
+      ),
+    );
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+
+    await tester.tap(find.text('SONO'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+
+    expect(
+      find.text(AppStrings.needChartTitle('Sono', range: NeedHistoryRange.all)),
+      findsOneWidget,
+    );
+    expect(
+      find.text(
+        AppStrings.needSampleHeadline(
+          oldAt,
+          AppStrings.scaleFiveLabel(0.25),
+        ),
+      ),
+      findsOneWidget,
+    );
+
+    await tester.tap(find.text(AppStrings.needHistoryDays.toUpperCase()));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+
+    expect(
+      find.text(
+        AppStrings.needChartTitle('Sono', range: NeedHistoryRange.days7),
+      ),
+      findsOneWidget,
+    );
+    expect(find.text(AppStrings.needNoHistory), findsOneWidget);
 
     await tester.pumpWidget(const SizedBox.shrink());
     for (var i = 0; i < 40; i++) {

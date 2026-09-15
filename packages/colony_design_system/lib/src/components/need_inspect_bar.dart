@@ -115,10 +115,14 @@ class _NeedInspectBarState extends State<NeedInspectBar> {
   }
 
   void _cancelDrag() {
-    setState(() {
-      _dragging = false;
-      _dragValue = null;
-    });
+    // Parent rebuilds during a drag can cancel the gesture. Keep the last
+    // snapped value so compact rails (sexo, foco, …) still persist.
+    _endDrag();
+  }
+
+  void _commitAt(Offset global) {
+    _applyGlobal(global);
+    _endDrag();
   }
 
   @override
@@ -223,6 +227,7 @@ class _NeedInspectBarState extends State<NeedInspectBar> {
       body = GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTap: widget.onTap,
+        onTapUp: (details) => _commitAt(details.globalPosition),
         onLongPress: widget.onLongPress,
         onHorizontalDragStart: (details) => _applyGlobal(details.globalPosition),
         onHorizontalDragUpdate: (details) =>

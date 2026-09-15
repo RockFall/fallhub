@@ -414,8 +414,70 @@ abstract final class AppStrings {
     return initials[(local.weekday - 1).clamp(0, 6)];
   }
 
-  static String needChartTitle(String name) =>
-      '${name.toUpperCase()} · $needHistoryDays';
+  static String needChartTitle(
+    String name, {
+    NeedHistoryRange range = NeedHistoryRange.all,
+  }) => '${name.toUpperCase()} · ${needHistoryRangeLabel(range)}';
+
+  static String needHistoryRangeLabel(NeedHistoryRange range) => switch (range) {
+    NeedHistoryRange.days7 => needHistoryDays,
+    NeedHistoryRange.days30 => needHistoryDays30,
+    NeedHistoryRange.all => needHistoryAll,
+  };
+
+  static String needNoHistoryFor(NeedHistoryRange range) => switch (range) {
+    NeedHistoryRange.days7 => needNoHistory,
+    NeedHistoryRange.days30 => needNoHistory30,
+    NeedHistoryRange.all => needNoHistoryAll,
+  };
+
+  static List<String> needHistoryAxisLabels(List<DateTime> days) {
+    final n = days.length;
+    if (n <= 7) {
+      return [for (final day in days) weekdayInitial(day)];
+    }
+    const months = [
+      'JAN',
+      'FEV',
+      'MAR',
+      'ABR',
+      'MAI',
+      'JUN',
+      'JUL',
+      'AGO',
+      'SET',
+      'OUT',
+      'NOV',
+      'DEZ',
+    ];
+    return [
+      for (var i = 0; i < n; i++)
+        _needHistoryAxisLabel(
+          days: days,
+          index: i,
+          months: months,
+        ),
+    ];
+  }
+
+  static String _needHistoryAxisLabel({
+    required List<DateTime> days,
+    required int index,
+    required List<String> months,
+  }) {
+    final n = days.length;
+    final day = days[index];
+    final show =
+        index == 0 ||
+        index == n - 1 ||
+        day.day == 1 ||
+        (n <= 31 && index % 7 == 0);
+    if (!show) return '';
+    if (n > 60) {
+      return months[(day.month - 1).clamp(0, 11)];
+    }
+    return '${day.day}';
+  }
 
   static String needDayHeadline(DateTime local, String scaleLabel) {
     const short = ['SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SÁB', 'DOM'];
@@ -539,7 +601,11 @@ abstract final class AppStrings {
   static const pawnTabMind = 'Mente';
   static const mood = 'Humor';
   static const needHistoryDays = '7 dias';
+  static const needHistoryDays30 = '30 dias';
+  static const needHistoryAll = 'Tudo';
   static const needNoHistory = 'Sem registros nestes 7 dias.';
+  static const needNoHistory30 = 'Sem registros nestes 30 dias.';
+  static const needNoHistoryAll = 'Sem registros.';
   static const needRecordToday = 'Registrar hoje';
   static const energy = 'Energia';
   static const tension = 'Tensão';

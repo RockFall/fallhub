@@ -183,6 +183,8 @@ void main() {
     expect(latest, isNotNull);
     expect(isSameLocalCalendarDay(latest!.observedAt, yesterday), isTrue);
     expect(isSameLocalCalendarDay(latest.observedAt, clock()), isFalse);
+    expect(latest.observedAt.toLocal().hour, 12);
+    expect(latest.observedAt.toLocal().minute, 0);
 
     await tester.pumpWidget(const SizedBox.shrink());
     for (var i = 0; i < 40; i++) {
@@ -248,6 +250,86 @@ void main() {
     await tester.tap(find.text('OK'));
     await tester.pumpAndSettle();
     expect(find.byType(DatePickerDialog), findsNothing);
+
+    await tester.pumpWidget(const SizedBox.shrink());
+    for (var i = 0; i < 40; i++) {
+      await tester.pump(const Duration(milliseconds: 1));
+    }
+  });
+
+  testWidgets('Check-in sheet records a compact need such as sexo', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(800, 1600);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    final db = ColonyDatabase.inMemory();
+    addTearDown(db.close);
+
+    var tick = 0;
+    DateTime clock() {
+      tick += 1;
+      return DateTime.utc(2026, 8, 31, 14, 20).add(Duration(seconds: tick));
+    }
+
+    final repos = ColonyRepositories.create(
+      db,
+      idGenerator: FixedIdGenerator([for (var i = 0; i < 200; i++) 'id-$i']),
+      clock: clock,
+    );
+
+    final profile = await repos.profiles.create(
+      colonyName: 'Test',
+      displayName: 'Caio',
+      timezone: 'UTC',
+      locale: 'pt_BR',
+      baseCurrency: 'BRL',
+    );
+    await repos.preferences.save(
+      AppPreferences.defaults().copyWith(onboardingCompleted: true),
+    );
+    await repos.needs.seedDefaults(profile.id);
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          databaseProvider.overrideWithValue(db),
+          clockProvider.overrideWithValue(clock),
+        ],
+        child: MaterialApp(
+          theme: ColonyTheme.dark(),
+          home: const Scaffold(
+            body: SizedBox(height: 1200, child: CheckInSheet()),
+          ),
+        ),
+      ),
+    );
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+
+    final sexoBar = find.byWidgetPredicate(
+      (widget) =>
+          widget is NeedInspectBar && widget.semanticId == 'pawn.checkin.need.sexo',
+    );
+    await tester.ensureVisible(sexoBar);
+    await tester.tap(sexoBar);
+    await tester.pump();
+
+    await tester.ensureVisible(
+      find.widgetWithText(ColonyButton, AppStrings.checkIn),
+    );
+    await tester.tap(find.widgetWithText(ColonyButton, AppStrings.checkIn));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+
+    final defs = await repos.needs.listEnabled(profile.id);
+    final sexo = DefaultNeedSeeds.definitionFor('sexo', defs);
+    expect(sexo, isNotNull);
+    final history = await repos.needs.listReadings(sexo!.id);
+    expect(history, isNotEmpty);
+    expect(history.last.normalizedValue, isNotNull);
 
     await tester.pumpWidget(const SizedBox.shrink());
     for (var i = 0; i < 40; i++) {
