@@ -20,6 +20,12 @@ internal object NotificationInbox {
         }
     }
 
+    fun appendAll(context: Context, payloads: List<Map<String, Any?>>) {
+        for (payload in payloads) {
+            append(context, payload)
+        }
+    }
+
     fun drain(context: Context): List<Map<String, Any?>> {
         synchronized(lock) {
             val file = file(context)

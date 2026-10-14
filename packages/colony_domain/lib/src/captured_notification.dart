@@ -167,6 +167,8 @@ class FinanceSpendCandidate extends Equatable {
     required this.description,
     required this.occurredAt,
     required this.confidence,
+    this.installmentCount = 1,
+    this.amountIsPerInstallment = false,
   });
 
   final int amountMinor;
@@ -177,6 +179,12 @@ class FinanceSpendCandidate extends Equatable {
   final DateTime occurredAt;
   final double confidence;
 
+  /// Parcelas detectadas no texto (>1 quando a compra é parcelada).
+  final int installmentCount;
+
+  /// True quando [amountMinor] é o valor de uma parcela, não o total.
+  final bool amountIsPerInstallment;
+
   @override
   List<Object?> get props => [
         amountMinor,
@@ -186,6 +194,8 @@ class FinanceSpendCandidate extends Equatable {
         description,
         occurredAt,
         confidence,
+        installmentCount,
+        amountIsPerInstallment,
       ];
 }
 

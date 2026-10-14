@@ -88,6 +88,7 @@ class _CommandPaletteState extends ConsumerState<CommandPalette> {
     _PaletteCommand('Tags de flashcards', '/flashcards?tab=tags', Icons.label_outline),
     _PaletteCommand('Novo nó de pesquisa', '/research?create=1', Icons.add),
     _PaletteCommand('Finanças', '/resources/finance', Icons.account_balance_wallet_outlined),
+    _PaletteCommand('Cofrinho', '/resources/piggy', Icons.savings_outlined),
     _PaletteCommand('Nova conta financeira', '/resources/finance?create=account', Icons.add),
     _PaletteCommand('Saúde', '/resources/health', Icons.favorite_outline),
     _PaletteCommand('Nova condição de saúde', '/resources/health', Icons.add),

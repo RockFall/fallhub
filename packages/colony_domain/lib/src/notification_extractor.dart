@@ -79,6 +79,7 @@ class FinanceNotificationExtractor implements NotificationExtractor {
     final inflow = _isInflow(lower);
     final credit = _isCreditCard(lower, input.packageName);
     final merchant = _merchant(text, lower);
+    final plan = installmentPlan(text);
     return FinanceSpendCandidate(
       amountMinor: amountMinor,
       currency: 'BRL',
@@ -90,7 +91,41 @@ class FinanceNotificationExtractor implements NotificationExtractor {
       description: merchant,
       occurredAt: input.postedAt.toUtc(),
       confidence: credit || lower.contains('pix') ? 0.9 : 0.7,
+      installmentCount: plan.count,
+      amountIsPerInstallment: plan.perInstallment,
     );
+  }
+
+  /// Parcelamento no texto do push. Reutilizado pelo cofrinho (ADR-052).
+  ///
+  /// "3x de R$ 30,00" → valor parseado é a parcela.
+  /// "R$ 90,00 em 3x" → valor parseado é o total.
+  static ({int count, bool perInstallment}) installmentPlan(String text) {
+    final emNx = RegExp(
+      r'em\s+(\d{1,2})\s*x\b',
+      caseSensitive: false,
+    ).firstMatch(text);
+    if (emNx != null) {
+      final n = int.tryParse(emNx.group(1)!) ?? 1;
+      if (n > 1) return (count: n, perInstallment: false);
+    }
+    final nxDe = RegExp(
+      r'(\d{1,2})\s*x\s*(?:de\s*)?R\$',
+      caseSensitive: false,
+    ).firstMatch(text);
+    if (nxDe != null) {
+      final n = int.tryParse(nxDe.group(1)!) ?? 1;
+      if (n > 1) return (count: n, perInstallment: true);
+    }
+    final parcela = RegExp(
+      r'parcela\s+\d+\s*/\s*(\d{1,2})',
+      caseSensitive: false,
+    ).firstMatch(text);
+    if (parcela != null) {
+      final n = int.tryParse(parcela.group(1)!) ?? 1;
+      if (n > 1) return (count: n, perInstallment: true);
+    }
+    return (count: 1, perInstallment: false);
   }
 
   static bool _looksFinancial(String lower, String packageName) {

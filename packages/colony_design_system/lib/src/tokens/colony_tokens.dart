@@ -128,6 +128,7 @@ abstract final class ColonyMiniAppColors {
   static const musicAtlas = Color(0xFFC45A8A);
   static const research = Color(0xFF7B5EA7);
   static const finance = Color(0xFFD4A017);
+  static const piggy = Color(0xFF2F8F6B);
   static const health = Color(0xFF6AB06E);
   static const inventory = Color(0xFFA67C52);
   static const travel = Color(0xFF4A90C8);

@@ -43,6 +43,7 @@ import '../../features/flashcards/presentation/flashcard_tag_screen.dart';
 import '../../features/flashcards/presentation/knowledge_area_screen.dart';
 import '../../features/flashcards/presentation/study_session_screen.dart';
 import '../../features/finance/presentation/finance_ledger_screen.dart';
+import '../../features/finance/presentation/piggy_bank_screen.dart';
 import '../../features/health/presentation/health_screen.dart';
 import '../../features/health/presentation/sleep_history_screen.dart';
 import '../../features/inventory/presentation/inventory_screen.dart';
@@ -340,6 +341,10 @@ final routerProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: '/resources/finance',
             builder: (context, state) => const FinanceLedgerScreen(),
+          ),
+          GoRoute(
+            path: '/resources/piggy',
+            builder: (context, state) => const PiggyBankScreen(),
           ),
           GoRoute(
             path: '/resources/health',

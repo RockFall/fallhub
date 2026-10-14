@@ -83,6 +83,7 @@ export 'src/ics_feed_policy.dart';
 export 'src/ics_schedule_policy.dart';
 export 'src/captured_notification.dart';
 export 'src/notification_extractor.dart';
+export 'src/piggy_bank.dart';
 export 'src/bank_connector.dart';
 export 'src/inter_statement_codec.dart';
 export 'src/narrative_digest.dart';

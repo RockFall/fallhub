@@ -52,6 +52,14 @@
                 <category android:name="android.intent.category.BROWSABLE"/>
                 <data
                     android:scheme="colony"
+                    android:host="piggy"/>
+            </intent-filter>
+            <intent-filter android:autoVerify="false">
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data
+                    android:scheme="colony"
                     android:host="integrations"
                     android:pathPrefix="/spotify"/>
             </intent-filter>
@@ -67,6 +75,30 @@
                 <category android:name="android.intent.category.HEALTH_PERMISSIONS" />
             </intent-filter>
         </activity-alias>
+
+        <receiver
+            android:name=".PiggyBankWidgetProvider"
+            android:exported="true"
+            android:label="@string/piggy_widget_label">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/piggy_bank_widget_info" />
+        </receiver>
+
+        <receiver
+            android:name=".PiggyMidnightReceiver"
+            android:exported="false" />
+
+        <receiver
+            android:name=".PiggyBootReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
 
         <service
             android:name=".ColonyNotificationListenerService"

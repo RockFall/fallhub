@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:colony_database/colony_database.dart';
 import 'package:colony_design_system/colony_design_system.dart';
 import 'package:colony_domain/colony_domain.dart';
@@ -6,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'app/bootstrap/colony_app.dart';
+import 'piggy_headless.dart';
 import 'app/localization/app_locale.dart';
 import 'app/localization/app_strings.dart';
 import 'core/providers/app_providers.dart';
@@ -14,6 +17,7 @@ import 'features/integrations/application/integrations_providers.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  _keepPiggyHeadlessLinked();
   await AppLocale.ensureInitialized();
 
   if (kIsWeb) {
@@ -26,6 +30,13 @@ Future<void> main() async {
     runApp(ColonyRoot(database: database));
   } catch (error) {
     runApp(_DatabaseOpenFailedApp(error: error));
+  }
+}
+
+void _keepPiggyHeadlessLinked() {
+  // Zone values are not constant-folded, so this reference survives release AOT.
+  if (Zone.current[#piggyHeadless] == true) {
+    piggyBankHeadless();
   }
 }
 

@@ -41,6 +41,9 @@ class ColonyNotificationListenerService : NotificationListenerService() {
         )
 
         NotificationInbox.append(applicationContext, payload)
+        if (PiggyWork.shouldWake(sbn.packageName, title, body)) {
+            PiggyWork.enqueue(applicationContext)
+        }
         val sink = NotificationChannels.eventSink
         if (sink != null) {
             Handler(Looper.getMainLooper()).post {

@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/piggy_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FF16201C"
+    android:orientation="vertical"
+    android:padding="12dp">
+
+    <TextView
+        android:id="@+id/piggy_balance"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Cofrinho"
+        android:textColor="#FF2E7D32"
+        android:textSize="28sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/piggy_spent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:text="Hoje: —"
+        android:textColor="#FFE7E2D6"
+        android:textSize="13sp" />
+
+    <TextView
+        android:id="@+id/piggy_available"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Pode gastar hoje: —"
+        android:textColor="#FFE7E2D6"
+        android:textSize="13sp" />
+
+    <TextView
+        android:id="@+id/piggy_debt"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="#FFC62828"
+        android:textSize="13sp"
+        android:textStyle="bold"
+        android:visibility="gone" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="28dp"
+        android:layout_marginTop="8dp"
+        android:gravity="bottom"
+        android:orientation="horizontal">
+
+        <ProgressBar
+            android:id="@+id/bar0"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="0dp"
+            android:layout_height="8dp"
+            android:layout_marginEnd="3dp"
+            android:layout_weight="1"
+            android:max="1"
+            android:progress="0" />
+
+        <ProgressBar
+            android:id="@+id/bar1"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="0dp"
+            android:layout_height="8dp"
+            android:layout_marginEnd="3dp"
+            android:layout_weight="1"
+            android:max="1"
+            android:progress="0" />
+
+        <ProgressBar
+            android:id="@+id/bar2"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="0dp"
+            android:layout_height="8dp"
+            android:layout_marginEnd="3dp"
+            android:layout_weight="1"
+            android:max="1"
+            android:progress="0" />
+
+        <ProgressBar
+            android:id="@+id/bar3"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="0dp"
+            android:layout_height="8dp"
+            android:layout_marginEnd="3dp"
+            android:layout_weight="1"
+            android:max="1"
+            android:progress="0" />
+
+        <ProgressBar
+            android:id="@+id/bar4"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="0dp"
+            android:layout_height="8dp"
+            android:layout_marginEnd="3dp"
+            android:layout_weight="1"
+            android:max="1"
+            android:progress="0" />
+
+        <ProgressBar
+            android:id="@+id/bar5"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="0dp"
+            android:layout_height="8dp"
+            android:layout_marginEnd="3dp"
+            android:layout_weight="1"
+            android:max="1"
+            android:progress="0" />
+
+        <ProgressBar
+            android:id="@+id/bar6"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="0dp"
+            android:layout_height="8dp"
+            android:layout_weight="1"
+            android:max="1"
+            android:progress="0" />
+    </LinearLayout>
+</LinearLayout>

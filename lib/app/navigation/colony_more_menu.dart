@@ -73,6 +73,12 @@ void showColonyMoreMenu(BuildContext context) {
         onSelected: () => context.go('/resources/finance'),
       ),
       ColonyFloatMenuItem(
+        icon: Icons.savings_outlined,
+        iconName: 'coin',
+        label: AppStrings.piggyTitle,
+        onSelected: () => context.go('/resources/piggy'),
+      ),
+      ColonyFloatMenuItem(
         icon: Icons.favorite_outline,
         iconName: 'heart',
         label: AppStrings.healthTitle,

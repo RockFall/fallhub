@@ -2670,6 +2670,44 @@ abstract final class AppStrings {
   static const financeAmountInvalid = 'Informe um valor válido';
   static const financeDirectionInflow = 'Entrada';
   static const financeDirectionOutflow = 'Saída';
+  static const piggyTitle = 'Cofrinho';
+  static const piggyOfflineHint =
+      'Funciona offline, neste aparelho. O saldo não sai do dispositivo.';
+  static const piggyNoProfile = 'Crie um perfil para usar o cofrinho.';
+  static const piggyRetry = 'Tentar de novo';
+  static const piggyHistoryTitle = 'Histórico diário';
+  static const piggyHistoryEmpty = 'O período ainda não começou.';
+  static const piggyTodayTitle = 'Despesas de hoje';
+  static const piggyTodayEmpty = 'Nenhuma despesa elegível hoje.';
+  static const piggyInPiggy = 'Conta no cofrinho';
+  static const piggyOutOfPiggy = 'Fora do cofrinho';
+  static const piggyCorrectAmount = 'Corrigir valor';
+  static const piggyAmount = 'Valor';
+  static const piggyCancel = 'Cancelar';
+  static const piggySave = 'Salvar';
+  static const piggySaveDaily = 'Salvar valor diário';
+  static const piggySettingsTitle = 'Configuração';
+  static const piggyDailyAmount = 'Valor diário';
+  static const piggyStartDate = 'Data de início';
+  static const piggyEndDate = 'Data fim (próximo salário)';
+  static const piggyEndDateEmpty = 'Sem data fim';
+  static const piggyClearEndDate = 'Remover data fim';
+  static const piggyInstallmentTotal = 'Parcelado conta o total no dia da compra';
+  static const piggyInstallmentTotalHint =
+      'Desligado, entra só o valor da parcela.';
+  static const piggyAlertWhenRed = 'Avisar quando o saldo ficar negativo';
+  static const piggyExcludedCategories = 'Categorias fora do cofrinho';
+  static const piggyInvalidDates =
+      'A data fim precisa ser no dia de início ou depois.';
+
+  static String piggySpentToday(String amount) => 'Hoje: $amount gastos';
+  static String piggyAvailableToday(String amount) => 'Pode gastar hoje: $amount';
+  static String piggyDebtDays(int days) => '−$days dias';
+  static String piggyRequiredPace(String amount) =>
+      'Ritmo até a data fim: $amount por dia';
+  static String piggyHistoryLine(String spent, String daily) =>
+      'Gasto $spent · diário $daily';
+
   static const financeCategory = 'Categoria';
   static const financeCategoryNone = 'Sem categoria';
   static const financeEditTransaction = 'Editar transação';

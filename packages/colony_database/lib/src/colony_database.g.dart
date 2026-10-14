@@ -55073,6 +55073,960 @@ class DayPlanItemsCompanion extends UpdateCompanion<DayPlanItemRow> {
   }
 }
 
+class $PiggyBankConfigsTable extends PiggyBankConfigs
+    with TableInfo<$PiggyBankConfigsTable, PiggyBankConfigRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $PiggyBankConfigsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _profileIdMeta = const VerificationMeta(
+    'profileId',
+  );
+  @override
+  late final GeneratedColumn<String> profileId = GeneratedColumn<String>(
+    'profile_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES profiles (id)',
+    ),
+  );
+  static const VerificationMeta _dailyAmountMinorMeta = const VerificationMeta(
+    'dailyAmountMinor',
+  );
+  @override
+  late final GeneratedColumn<int> dailyAmountMinor = GeneratedColumn<int>(
+    'daily_amount_minor',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _startDateMeta = const VerificationMeta(
+    'startDate',
+  );
+  @override
+  late final GeneratedColumn<String> startDate = GeneratedColumn<String>(
+    'start_date',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _endDateMeta = const VerificationMeta(
+    'endDate',
+  );
+  @override
+  late final GeneratedColumn<String> endDate = GeneratedColumn<String>(
+    'end_date',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _installmentCountsTotalMeta =
+      const VerificationMeta('installmentCountsTotal');
+  @override
+  late final GeneratedColumn<bool> installmentCountsTotal =
+      GeneratedColumn<bool>(
+        'installment_counts_total',
+        aliasedName,
+        false,
+        type: DriftSqlType.bool,
+        requiredDuringInsert: false,
+        defaultConstraints: GeneratedColumn.constraintIsAlways(
+          'CHECK ("installment_counts_total" IN (0, 1))',
+        ),
+        defaultValue: const Constant(true),
+      );
+  static const VerificationMeta _alertWhenRedMeta = const VerificationMeta(
+    'alertWhenRed',
+  );
+  @override
+  late final GeneratedColumn<bool> alertWhenRed = GeneratedColumn<bool>(
+    'alert_when_red',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("alert_when_red" IN (0, 1))',
+    ),
+    defaultValue: const Constant(true),
+  );
+  static const VerificationMeta _excludedCategoryIdsJsonMeta =
+      const VerificationMeta('excludedCategoryIdsJson');
+  @override
+  late final GeneratedColumn<String> excludedCategoryIdsJson =
+      GeneratedColumn<String>(
+        'excluded_category_ids_json',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+        defaultValue: const Constant('[]'),
+      );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<int> updatedAt = GeneratedColumn<int>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    profileId,
+    dailyAmountMinor,
+    startDate,
+    endDate,
+    installmentCountsTotal,
+    alertWhenRed,
+    excludedCategoryIdsJson,
+    updatedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'piggy_bank_configs';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<PiggyBankConfigRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('profile_id')) {
+      context.handle(
+        _profileIdMeta,
+        profileId.isAcceptableOrUnknown(data['profile_id']!, _profileIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_profileIdMeta);
+    }
+    if (data.containsKey('daily_amount_minor')) {
+      context.handle(
+        _dailyAmountMinorMeta,
+        dailyAmountMinor.isAcceptableOrUnknown(
+          data['daily_amount_minor']!,
+          _dailyAmountMinorMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_dailyAmountMinorMeta);
+    }
+    if (data.containsKey('start_date')) {
+      context.handle(
+        _startDateMeta,
+        startDate.isAcceptableOrUnknown(data['start_date']!, _startDateMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_startDateMeta);
+    }
+    if (data.containsKey('end_date')) {
+      context.handle(
+        _endDateMeta,
+        endDate.isAcceptableOrUnknown(data['end_date']!, _endDateMeta),
+      );
+    }
+    if (data.containsKey('installment_counts_total')) {
+      context.handle(
+        _installmentCountsTotalMeta,
+        installmentCountsTotal.isAcceptableOrUnknown(
+          data['installment_counts_total']!,
+          _installmentCountsTotalMeta,
+        ),
+      );
+    }
+    if (data.containsKey('alert_when_red')) {
+      context.handle(
+        _alertWhenRedMeta,
+        alertWhenRed.isAcceptableOrUnknown(
+          data['alert_when_red']!,
+          _alertWhenRedMeta,
+        ),
+      );
+    }
+    if (data.containsKey('excluded_category_ids_json')) {
+      context.handle(
+        _excludedCategoryIdsJsonMeta,
+        excludedCategoryIdsJson.isAcceptableOrUnknown(
+          data['excluded_category_ids_json']!,
+          _excludedCategoryIdsJsonMeta,
+        ),
+      );
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {profileId};
+  @override
+  PiggyBankConfigRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return PiggyBankConfigRow(
+      profileId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}profile_id'],
+      )!,
+      dailyAmountMinor: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}daily_amount_minor'],
+      )!,
+      startDate: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}start_date'],
+      )!,
+      endDate: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}end_date'],
+      ),
+      installmentCountsTotal: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}installment_counts_total'],
+      )!,
+      alertWhenRed: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}alert_when_red'],
+      )!,
+      excludedCategoryIdsJson: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}excluded_category_ids_json'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}updated_at'],
+      )!,
+    );
+  }
+
+  @override
+  $PiggyBankConfigsTable createAlias(String alias) {
+    return $PiggyBankConfigsTable(attachedDatabase, alias);
+  }
+}
+
+class PiggyBankConfigRow extends DataClass
+    implements Insertable<PiggyBankConfigRow> {
+  final String profileId;
+  final int dailyAmountMinor;
+  final String startDate;
+  final String? endDate;
+  final bool installmentCountsTotal;
+  final bool alertWhenRed;
+  final String excludedCategoryIdsJson;
+  final int updatedAt;
+  const PiggyBankConfigRow({
+    required this.profileId,
+    required this.dailyAmountMinor,
+    required this.startDate,
+    this.endDate,
+    required this.installmentCountsTotal,
+    required this.alertWhenRed,
+    required this.excludedCategoryIdsJson,
+    required this.updatedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['profile_id'] = Variable<String>(profileId);
+    map['daily_amount_minor'] = Variable<int>(dailyAmountMinor);
+    map['start_date'] = Variable<String>(startDate);
+    if (!nullToAbsent || endDate != null) {
+      map['end_date'] = Variable<String>(endDate);
+    }
+    map['installment_counts_total'] = Variable<bool>(installmentCountsTotal);
+    map['alert_when_red'] = Variable<bool>(alertWhenRed);
+    map['excluded_category_ids_json'] = Variable<String>(
+      excludedCategoryIdsJson,
+    );
+    map['updated_at'] = Variable<int>(updatedAt);
+    return map;
+  }
+
+  PiggyBankConfigsCompanion toCompanion(bool nullToAbsent) {
+    return PiggyBankConfigsCompanion(
+      profileId: Value(profileId),
+      dailyAmountMinor: Value(dailyAmountMinor),
+      startDate: Value(startDate),
+      endDate: endDate == null && nullToAbsent
+          ? const Value.absent()
+          : Value(endDate),
+      installmentCountsTotal: Value(installmentCountsTotal),
+      alertWhenRed: Value(alertWhenRed),
+      excludedCategoryIdsJson: Value(excludedCategoryIdsJson),
+      updatedAt: Value(updatedAt),
+    );
+  }
+
+  factory PiggyBankConfigRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return PiggyBankConfigRow(
+      profileId: serializer.fromJson<String>(json['profileId']),
+      dailyAmountMinor: serializer.fromJson<int>(json['dailyAmountMinor']),
+      startDate: serializer.fromJson<String>(json['startDate']),
+      endDate: serializer.fromJson<String?>(json['endDate']),
+      installmentCountsTotal: serializer.fromJson<bool>(
+        json['installmentCountsTotal'],
+      ),
+      alertWhenRed: serializer.fromJson<bool>(json['alertWhenRed']),
+      excludedCategoryIdsJson: serializer.fromJson<String>(
+        json['excludedCategoryIdsJson'],
+      ),
+      updatedAt: serializer.fromJson<int>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'profileId': serializer.toJson<String>(profileId),
+      'dailyAmountMinor': serializer.toJson<int>(dailyAmountMinor),
+      'startDate': serializer.toJson<String>(startDate),
+      'endDate': serializer.toJson<String?>(endDate),
+      'installmentCountsTotal': serializer.toJson<bool>(installmentCountsTotal),
+      'alertWhenRed': serializer.toJson<bool>(alertWhenRed),
+      'excludedCategoryIdsJson': serializer.toJson<String>(
+        excludedCategoryIdsJson,
+      ),
+      'updatedAt': serializer.toJson<int>(updatedAt),
+    };
+  }
+
+  PiggyBankConfigRow copyWith({
+    String? profileId,
+    int? dailyAmountMinor,
+    String? startDate,
+    Value<String?> endDate = const Value.absent(),
+    bool? installmentCountsTotal,
+    bool? alertWhenRed,
+    String? excludedCategoryIdsJson,
+    int? updatedAt,
+  }) => PiggyBankConfigRow(
+    profileId: profileId ?? this.profileId,
+    dailyAmountMinor: dailyAmountMinor ?? this.dailyAmountMinor,
+    startDate: startDate ?? this.startDate,
+    endDate: endDate.present ? endDate.value : this.endDate,
+    installmentCountsTotal:
+        installmentCountsTotal ?? this.installmentCountsTotal,
+    alertWhenRed: alertWhenRed ?? this.alertWhenRed,
+    excludedCategoryIdsJson:
+        excludedCategoryIdsJson ?? this.excludedCategoryIdsJson,
+    updatedAt: updatedAt ?? this.updatedAt,
+  );
+  PiggyBankConfigRow copyWithCompanion(PiggyBankConfigsCompanion data) {
+    return PiggyBankConfigRow(
+      profileId: data.profileId.present ? data.profileId.value : this.profileId,
+      dailyAmountMinor: data.dailyAmountMinor.present
+          ? data.dailyAmountMinor.value
+          : this.dailyAmountMinor,
+      startDate: data.startDate.present ? data.startDate.value : this.startDate,
+      endDate: data.endDate.present ? data.endDate.value : this.endDate,
+      installmentCountsTotal: data.installmentCountsTotal.present
+          ? data.installmentCountsTotal.value
+          : this.installmentCountsTotal,
+      alertWhenRed: data.alertWhenRed.present
+          ? data.alertWhenRed.value
+          : this.alertWhenRed,
+      excludedCategoryIdsJson: data.excludedCategoryIdsJson.present
+          ? data.excludedCategoryIdsJson.value
+          : this.excludedCategoryIdsJson,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PiggyBankConfigRow(')
+          ..write('profileId: $profileId, ')
+          ..write('dailyAmountMinor: $dailyAmountMinor, ')
+          ..write('startDate: $startDate, ')
+          ..write('endDate: $endDate, ')
+          ..write('installmentCountsTotal: $installmentCountsTotal, ')
+          ..write('alertWhenRed: $alertWhenRed, ')
+          ..write('excludedCategoryIdsJson: $excludedCategoryIdsJson, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    profileId,
+    dailyAmountMinor,
+    startDate,
+    endDate,
+    installmentCountsTotal,
+    alertWhenRed,
+    excludedCategoryIdsJson,
+    updatedAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is PiggyBankConfigRow &&
+          other.profileId == this.profileId &&
+          other.dailyAmountMinor == this.dailyAmountMinor &&
+          other.startDate == this.startDate &&
+          other.endDate == this.endDate &&
+          other.installmentCountsTotal == this.installmentCountsTotal &&
+          other.alertWhenRed == this.alertWhenRed &&
+          other.excludedCategoryIdsJson == this.excludedCategoryIdsJson &&
+          other.updatedAt == this.updatedAt);
+}
+
+class PiggyBankConfigsCompanion extends UpdateCompanion<PiggyBankConfigRow> {
+  final Value<String> profileId;
+  final Value<int> dailyAmountMinor;
+  final Value<String> startDate;
+  final Value<String?> endDate;
+  final Value<bool> installmentCountsTotal;
+  final Value<bool> alertWhenRed;
+  final Value<String> excludedCategoryIdsJson;
+  final Value<int> updatedAt;
+  final Value<int> rowid;
+  const PiggyBankConfigsCompanion({
+    this.profileId = const Value.absent(),
+    this.dailyAmountMinor = const Value.absent(),
+    this.startDate = const Value.absent(),
+    this.endDate = const Value.absent(),
+    this.installmentCountsTotal = const Value.absent(),
+    this.alertWhenRed = const Value.absent(),
+    this.excludedCategoryIdsJson = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  PiggyBankConfigsCompanion.insert({
+    required String profileId,
+    required int dailyAmountMinor,
+    required String startDate,
+    this.endDate = const Value.absent(),
+    this.installmentCountsTotal = const Value.absent(),
+    this.alertWhenRed = const Value.absent(),
+    this.excludedCategoryIdsJson = const Value.absent(),
+    required int updatedAt,
+    this.rowid = const Value.absent(),
+  }) : profileId = Value(profileId),
+       dailyAmountMinor = Value(dailyAmountMinor),
+       startDate = Value(startDate),
+       updatedAt = Value(updatedAt);
+  static Insertable<PiggyBankConfigRow> custom({
+    Expression<String>? profileId,
+    Expression<int>? dailyAmountMinor,
+    Expression<String>? startDate,
+    Expression<String>? endDate,
+    Expression<bool>? installmentCountsTotal,
+    Expression<bool>? alertWhenRed,
+    Expression<String>? excludedCategoryIdsJson,
+    Expression<int>? updatedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (profileId != null) 'profile_id': profileId,
+      if (dailyAmountMinor != null) 'daily_amount_minor': dailyAmountMinor,
+      if (startDate != null) 'start_date': startDate,
+      if (endDate != null) 'end_date': endDate,
+      if (installmentCountsTotal != null)
+        'installment_counts_total': installmentCountsTotal,
+      if (alertWhenRed != null) 'alert_when_red': alertWhenRed,
+      if (excludedCategoryIdsJson != null)
+        'excluded_category_ids_json': excludedCategoryIdsJson,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  PiggyBankConfigsCompanion copyWith({
+    Value<String>? profileId,
+    Value<int>? dailyAmountMinor,
+    Value<String>? startDate,
+    Value<String?>? endDate,
+    Value<bool>? installmentCountsTotal,
+    Value<bool>? alertWhenRed,
+    Value<String>? excludedCategoryIdsJson,
+    Value<int>? updatedAt,
+    Value<int>? rowid,
+  }) {
+    return PiggyBankConfigsCompanion(
+      profileId: profileId ?? this.profileId,
+      dailyAmountMinor: dailyAmountMinor ?? this.dailyAmountMinor,
+      startDate: startDate ?? this.startDate,
+      endDate: endDate ?? this.endDate,
+      installmentCountsTotal:
+          installmentCountsTotal ?? this.installmentCountsTotal,
+      alertWhenRed: alertWhenRed ?? this.alertWhenRed,
+      excludedCategoryIdsJson:
+          excludedCategoryIdsJson ?? this.excludedCategoryIdsJson,
+      updatedAt: updatedAt ?? this.updatedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (profileId.present) {
+      map['profile_id'] = Variable<String>(profileId.value);
+    }
+    if (dailyAmountMinor.present) {
+      map['daily_amount_minor'] = Variable<int>(dailyAmountMinor.value);
+    }
+    if (startDate.present) {
+      map['start_date'] = Variable<String>(startDate.value);
+    }
+    if (endDate.present) {
+      map['end_date'] = Variable<String>(endDate.value);
+    }
+    if (installmentCountsTotal.present) {
+      map['installment_counts_total'] = Variable<bool>(
+        installmentCountsTotal.value,
+      );
+    }
+    if (alertWhenRed.present) {
+      map['alert_when_red'] = Variable<bool>(alertWhenRed.value);
+    }
+    if (excludedCategoryIdsJson.present) {
+      map['excluded_category_ids_json'] = Variable<String>(
+        excludedCategoryIdsJson.value,
+      );
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<int>(updatedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PiggyBankConfigsCompanion(')
+          ..write('profileId: $profileId, ')
+          ..write('dailyAmountMinor: $dailyAmountMinor, ')
+          ..write('startDate: $startDate, ')
+          ..write('endDate: $endDate, ')
+          ..write('installmentCountsTotal: $installmentCountsTotal, ')
+          ..write('alertWhenRed: $alertWhenRed, ')
+          ..write('excludedCategoryIdsJson: $excludedCategoryIdsJson, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $PiggyBankOverridesTable extends PiggyBankOverrides
+    with TableInfo<$PiggyBankOverridesTable, PiggyBankOverrideRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $PiggyBankOverridesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _transactionIdMeta = const VerificationMeta(
+    'transactionId',
+  );
+  @override
+  late final GeneratedColumn<String> transactionId = GeneratedColumn<String>(
+    'transaction_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _profileIdMeta = const VerificationMeta(
+    'profileId',
+  );
+  @override
+  late final GeneratedColumn<String> profileId = GeneratedColumn<String>(
+    'profile_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES profiles (id)',
+    ),
+  );
+  static const VerificationMeta _excludedMeta = const VerificationMeta(
+    'excluded',
+  );
+  @override
+  late final GeneratedColumn<bool> excluded = GeneratedColumn<bool>(
+    'excluded',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("excluded" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _amountOverrideMinorMeta =
+      const VerificationMeta('amountOverrideMinor');
+  @override
+  late final GeneratedColumn<int> amountOverrideMinor = GeneratedColumn<int>(
+    'amount_override_minor',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<int> updatedAt = GeneratedColumn<int>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    transactionId,
+    profileId,
+    excluded,
+    amountOverrideMinor,
+    updatedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'piggy_bank_overrides';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<PiggyBankOverrideRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('transaction_id')) {
+      context.handle(
+        _transactionIdMeta,
+        transactionId.isAcceptableOrUnknown(
+          data['transaction_id']!,
+          _transactionIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_transactionIdMeta);
+    }
+    if (data.containsKey('profile_id')) {
+      context.handle(
+        _profileIdMeta,
+        profileId.isAcceptableOrUnknown(data['profile_id']!, _profileIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_profileIdMeta);
+    }
+    if (data.containsKey('excluded')) {
+      context.handle(
+        _excludedMeta,
+        excluded.isAcceptableOrUnknown(data['excluded']!, _excludedMeta),
+      );
+    }
+    if (data.containsKey('amount_override_minor')) {
+      context.handle(
+        _amountOverrideMinorMeta,
+        amountOverrideMinor.isAcceptableOrUnknown(
+          data['amount_override_minor']!,
+          _amountOverrideMinorMeta,
+        ),
+      );
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {transactionId};
+  @override
+  PiggyBankOverrideRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return PiggyBankOverrideRow(
+      transactionId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}transaction_id'],
+      )!,
+      profileId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}profile_id'],
+      )!,
+      excluded: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}excluded'],
+      )!,
+      amountOverrideMinor: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}amount_override_minor'],
+      ),
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}updated_at'],
+      )!,
+    );
+  }
+
+  @override
+  $PiggyBankOverridesTable createAlias(String alias) {
+    return $PiggyBankOverridesTable(attachedDatabase, alias);
+  }
+}
+
+class PiggyBankOverrideRow extends DataClass
+    implements Insertable<PiggyBankOverrideRow> {
+  final String transactionId;
+  final String profileId;
+  final bool excluded;
+  final int? amountOverrideMinor;
+  final int updatedAt;
+  const PiggyBankOverrideRow({
+    required this.transactionId,
+    required this.profileId,
+    required this.excluded,
+    this.amountOverrideMinor,
+    required this.updatedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['transaction_id'] = Variable<String>(transactionId);
+    map['profile_id'] = Variable<String>(profileId);
+    map['excluded'] = Variable<bool>(excluded);
+    if (!nullToAbsent || amountOverrideMinor != null) {
+      map['amount_override_minor'] = Variable<int>(amountOverrideMinor);
+    }
+    map['updated_at'] = Variable<int>(updatedAt);
+    return map;
+  }
+
+  PiggyBankOverridesCompanion toCompanion(bool nullToAbsent) {
+    return PiggyBankOverridesCompanion(
+      transactionId: Value(transactionId),
+      profileId: Value(profileId),
+      excluded: Value(excluded),
+      amountOverrideMinor: amountOverrideMinor == null && nullToAbsent
+          ? const Value.absent()
+          : Value(amountOverrideMinor),
+      updatedAt: Value(updatedAt),
+    );
+  }
+
+  factory PiggyBankOverrideRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return PiggyBankOverrideRow(
+      transactionId: serializer.fromJson<String>(json['transactionId']),
+      profileId: serializer.fromJson<String>(json['profileId']),
+      excluded: serializer.fromJson<bool>(json['excluded']),
+      amountOverrideMinor: serializer.fromJson<int?>(
+        json['amountOverrideMinor'],
+      ),
+      updatedAt: serializer.fromJson<int>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'transactionId': serializer.toJson<String>(transactionId),
+      'profileId': serializer.toJson<String>(profileId),
+      'excluded': serializer.toJson<bool>(excluded),
+      'amountOverrideMinor': serializer.toJson<int?>(amountOverrideMinor),
+      'updatedAt': serializer.toJson<int>(updatedAt),
+    };
+  }
+
+  PiggyBankOverrideRow copyWith({
+    String? transactionId,
+    String? profileId,
+    bool? excluded,
+    Value<int?> amountOverrideMinor = const Value.absent(),
+    int? updatedAt,
+  }) => PiggyBankOverrideRow(
+    transactionId: transactionId ?? this.transactionId,
+    profileId: profileId ?? this.profileId,
+    excluded: excluded ?? this.excluded,
+    amountOverrideMinor: amountOverrideMinor.present
+        ? amountOverrideMinor.value
+        : this.amountOverrideMinor,
+    updatedAt: updatedAt ?? this.updatedAt,
+  );
+  PiggyBankOverrideRow copyWithCompanion(PiggyBankOverridesCompanion data) {
+    return PiggyBankOverrideRow(
+      transactionId: data.transactionId.present
+          ? data.transactionId.value
+          : this.transactionId,
+      profileId: data.profileId.present ? data.profileId.value : this.profileId,
+      excluded: data.excluded.present ? data.excluded.value : this.excluded,
+      amountOverrideMinor: data.amountOverrideMinor.present
+          ? data.amountOverrideMinor.value
+          : this.amountOverrideMinor,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PiggyBankOverrideRow(')
+          ..write('transactionId: $transactionId, ')
+          ..write('profileId: $profileId, ')
+          ..write('excluded: $excluded, ')
+          ..write('amountOverrideMinor: $amountOverrideMinor, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    transactionId,
+    profileId,
+    excluded,
+    amountOverrideMinor,
+    updatedAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is PiggyBankOverrideRow &&
+          other.transactionId == this.transactionId &&
+          other.profileId == this.profileId &&
+          other.excluded == this.excluded &&
+          other.amountOverrideMinor == this.amountOverrideMinor &&
+          other.updatedAt == this.updatedAt);
+}
+
+class PiggyBankOverridesCompanion
+    extends UpdateCompanion<PiggyBankOverrideRow> {
+  final Value<String> transactionId;
+  final Value<String> profileId;
+  final Value<bool> excluded;
+  final Value<int?> amountOverrideMinor;
+  final Value<int> updatedAt;
+  final Value<int> rowid;
+  const PiggyBankOverridesCompanion({
+    this.transactionId = const Value.absent(),
+    this.profileId = const Value.absent(),
+    this.excluded = const Value.absent(),
+    this.amountOverrideMinor = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  PiggyBankOverridesCompanion.insert({
+    required String transactionId,
+    required String profileId,
+    this.excluded = const Value.absent(),
+    this.amountOverrideMinor = const Value.absent(),
+    required int updatedAt,
+    this.rowid = const Value.absent(),
+  }) : transactionId = Value(transactionId),
+       profileId = Value(profileId),
+       updatedAt = Value(updatedAt);
+  static Insertable<PiggyBankOverrideRow> custom({
+    Expression<String>? transactionId,
+    Expression<String>? profileId,
+    Expression<bool>? excluded,
+    Expression<int>? amountOverrideMinor,
+    Expression<int>? updatedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (transactionId != null) 'transaction_id': transactionId,
+      if (profileId != null) 'profile_id': profileId,
+      if (excluded != null) 'excluded': excluded,
+      if (amountOverrideMinor != null)
+        'amount_override_minor': amountOverrideMinor,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  PiggyBankOverridesCompanion copyWith({
+    Value<String>? transactionId,
+    Value<String>? profileId,
+    Value<bool>? excluded,
+    Value<int?>? amountOverrideMinor,
+    Value<int>? updatedAt,
+    Value<int>? rowid,
+  }) {
+    return PiggyBankOverridesCompanion(
+      transactionId: transactionId ?? this.transactionId,
+      profileId: profileId ?? this.profileId,
+      excluded: excluded ?? this.excluded,
+      amountOverrideMinor: amountOverrideMinor ?? this.amountOverrideMinor,
+      updatedAt: updatedAt ?? this.updatedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (transactionId.present) {
+      map['transaction_id'] = Variable<String>(transactionId.value);
+    }
+    if (profileId.present) {
+      map['profile_id'] = Variable<String>(profileId.value);
+    }
+    if (excluded.present) {
+      map['excluded'] = Variable<bool>(excluded.value);
+    }
+    if (amountOverrideMinor.present) {
+      map['amount_override_minor'] = Variable<int>(amountOverrideMinor.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<int>(updatedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PiggyBankOverridesCompanion(')
+          ..write('transactionId: $transactionId, ')
+          ..write('profileId: $profileId, ')
+          ..write('excluded: $excluded, ')
+          ..write('amountOverrideMinor: $amountOverrideMinor, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$ColonyDatabase extends GeneratedDatabase {
   _$ColonyDatabase(QueryExecutor e) : super(e);
   $ColonyDatabaseManager get managers => $ColonyDatabaseManager(this);
@@ -55230,6 +56184,11 @@ abstract class _$ColonyDatabase extends GeneratedDatabase {
       $ActivationInsightsTable(this);
   late final $DayPlansTable dayPlans = $DayPlansTable(this);
   late final $DayPlanItemsTable dayPlanItems = $DayPlanItemsTable(this);
+  late final $PiggyBankConfigsTable piggyBankConfigs = $PiggyBankConfigsTable(
+    this,
+  );
+  late final $PiggyBankOverridesTable piggyBankOverrides =
+      $PiggyBankOverridesTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -55326,6 +56285,8 @@ abstract class _$ColonyDatabase extends GeneratedDatabase {
     activationInsights,
     dayPlans,
     dayPlanItems,
+    piggyBankConfigs,
+    piggyBankOverrides,
   ];
 }
 
@@ -56680,6 +57641,57 @@ final class $$ProfilesTableReferences
     ).filter((f) => f.profileId.id.sqlEquals($_itemColumn<String>('id')!));
 
     final cache = $_typedResult.readTableOrNull(_dayPlansRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$PiggyBankConfigsTable, List<PiggyBankConfigRow>>
+  _piggyBankConfigsRefsTable(_$ColonyDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.piggyBankConfigs,
+        aliasName: $_aliasNameGenerator(
+          db.profiles.id,
+          db.piggyBankConfigs.profileId,
+        ),
+      );
+
+  $$PiggyBankConfigsTableProcessedTableManager get piggyBankConfigsRefs {
+    final manager = $$PiggyBankConfigsTableTableManager(
+      $_db,
+      $_db.piggyBankConfigs,
+    ).filter((f) => f.profileId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _piggyBankConfigsRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<
+    $PiggyBankOverridesTable,
+    List<PiggyBankOverrideRow>
+  >
+  _piggyBankOverridesRefsTable(_$ColonyDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.piggyBankOverrides,
+        aliasName: $_aliasNameGenerator(
+          db.profiles.id,
+          db.piggyBankOverrides.profileId,
+        ),
+      );
+
+  $$PiggyBankOverridesTableProcessedTableManager get piggyBankOverridesRefs {
+    final manager = $$PiggyBankOverridesTableTableManager(
+      $_db,
+      $_db.piggyBankOverrides,
+    ).filter((f) => f.profileId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _piggyBankOverridesRefsTable($_db),
+    );
     return ProcessedTableManager(
       manager.$state.copyWith(prefetchedData: cache),
     );
@@ -58172,6 +59184,56 @@ class $$ProfilesTableFilterComposer
           }) => $$DayPlansTableFilterComposer(
             $db: $db,
             $table: $db.dayPlans,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> piggyBankConfigsRefs(
+    Expression<bool> Function($$PiggyBankConfigsTableFilterComposer f) f,
+  ) {
+    final $$PiggyBankConfigsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.piggyBankConfigs,
+      getReferencedColumn: (t) => t.profileId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PiggyBankConfigsTableFilterComposer(
+            $db: $db,
+            $table: $db.piggyBankConfigs,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> piggyBankOverridesRefs(
+    Expression<bool> Function($$PiggyBankOverridesTableFilterComposer f) f,
+  ) {
+    final $$PiggyBankOverridesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.piggyBankOverrides,
+      getReferencedColumn: (t) => t.profileId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PiggyBankOverridesTableFilterComposer(
+            $db: $db,
+            $table: $db.piggyBankOverrides,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -59736,6 +60798,57 @@ class $$ProfilesTableAnnotationComposer
     );
     return f(composer);
   }
+
+  Expression<T> piggyBankConfigsRefs<T extends Object>(
+    Expression<T> Function($$PiggyBankConfigsTableAnnotationComposer a) f,
+  ) {
+    final $$PiggyBankConfigsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.piggyBankConfigs,
+      getReferencedColumn: (t) => t.profileId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PiggyBankConfigsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.piggyBankConfigs,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<T> piggyBankOverridesRefs<T extends Object>(
+    Expression<T> Function($$PiggyBankOverridesTableAnnotationComposer a) f,
+  ) {
+    final $$PiggyBankOverridesTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.piggyBankOverrides,
+          getReferencedColumn: (t) => t.profileId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$PiggyBankOverridesTableAnnotationComposer(
+                $db: $db,
+                $table: $db.piggyBankOverrides,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
 }
 
 class $$ProfilesTableTableManager
@@ -59809,6 +60922,8 @@ class $$ProfilesTableTableManager
             bool activationExperimentsRefs,
             bool activationInsightsRefs,
             bool dayPlansRefs,
+            bool piggyBankConfigsRefs,
+            bool piggyBankOverridesRefs,
           })
         > {
   $$ProfilesTableTableManager(_$ColonyDatabase db, $ProfilesTable table)
@@ -59941,6 +61056,8 @@ class $$ProfilesTableTableManager
                 activationExperimentsRefs = false,
                 activationInsightsRefs = false,
                 dayPlansRefs = false,
+                piggyBankConfigsRefs = false,
+                piggyBankOverridesRefs = false,
               }) {
                 return PrefetchHooks(
                   db: db,
@@ -60003,6 +61120,8 @@ class $$ProfilesTableTableManager
                     if (activationExperimentsRefs) db.activationExperiments,
                     if (activationInsightsRefs) db.activationInsights,
                     if (dayPlansRefs) db.dayPlans,
+                    if (piggyBankConfigsRefs) db.piggyBankConfigs,
+                    if (piggyBankOverridesRefs) db.piggyBankOverrides,
                   ],
                   addJoins: null,
                   getPrefetchedDataCallback: (items) async {
@@ -61204,6 +62323,48 @@ class $$ProfilesTableTableManager
                               ),
                           typedResults: items,
                         ),
+                      if (piggyBankConfigsRefs)
+                        await $_getPrefetchedData<
+                          Profile,
+                          $ProfilesTable,
+                          PiggyBankConfigRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$ProfilesTableReferences
+                              ._piggyBankConfigsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$ProfilesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).piggyBankConfigsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.profileId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (piggyBankOverridesRefs)
+                        await $_getPrefetchedData<
+                          Profile,
+                          $ProfilesTable,
+                          PiggyBankOverrideRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$ProfilesTableReferences
+                              ._piggyBankOverridesRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$ProfilesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).piggyBankOverridesRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.profileId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
                     ];
                   },
                 );
@@ -61282,6 +62443,8 @@ typedef $$ProfilesTableProcessedTableManager =
         bool activationExperimentsRefs,
         bool activationInsightsRefs,
         bool dayPlansRefs,
+        bool piggyBankConfigsRefs,
+        bool piggyBankOverridesRefs,
       })
     >;
 typedef $$DomainEventsTableCreateCompanionBuilder =
@@ -107113,6 +108276,742 @@ typedef $$DayPlanItemsTableProcessedTableManager =
       DayPlanItemRow,
       PrefetchHooks Function({bool dayPlanId, bool taskId})
     >;
+typedef $$PiggyBankConfigsTableCreateCompanionBuilder =
+    PiggyBankConfigsCompanion Function({
+      required String profileId,
+      required int dailyAmountMinor,
+      required String startDate,
+      Value<String?> endDate,
+      Value<bool> installmentCountsTotal,
+      Value<bool> alertWhenRed,
+      Value<String> excludedCategoryIdsJson,
+      required int updatedAt,
+      Value<int> rowid,
+    });
+typedef $$PiggyBankConfigsTableUpdateCompanionBuilder =
+    PiggyBankConfigsCompanion Function({
+      Value<String> profileId,
+      Value<int> dailyAmountMinor,
+      Value<String> startDate,
+      Value<String?> endDate,
+      Value<bool> installmentCountsTotal,
+      Value<bool> alertWhenRed,
+      Value<String> excludedCategoryIdsJson,
+      Value<int> updatedAt,
+      Value<int> rowid,
+    });
+
+final class $$PiggyBankConfigsTableReferences
+    extends
+        BaseReferences<
+          _$ColonyDatabase,
+          $PiggyBankConfigsTable,
+          PiggyBankConfigRow
+        > {
+  $$PiggyBankConfigsTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $ProfilesTable _profileIdTable(_$ColonyDatabase db) =>
+      db.profiles.createAlias(
+        $_aliasNameGenerator(db.piggyBankConfigs.profileId, db.profiles.id),
+      );
+
+  $$ProfilesTableProcessedTableManager get profileId {
+    final $_column = $_itemColumn<String>('profile_id')!;
+
+    final manager = $$ProfilesTableTableManager(
+      $_db,
+      $_db.profiles,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_profileIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$PiggyBankConfigsTableFilterComposer
+    extends Composer<_$ColonyDatabase, $PiggyBankConfigsTable> {
+  $$PiggyBankConfigsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get dailyAmountMinor => $composableBuilder(
+    column: $table.dailyAmountMinor,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get startDate => $composableBuilder(
+    column: $table.startDate,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get endDate => $composableBuilder(
+    column: $table.endDate,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get installmentCountsTotal => $composableBuilder(
+    column: $table.installmentCountsTotal,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get alertWhenRed => $composableBuilder(
+    column: $table.alertWhenRed,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get excludedCategoryIdsJson => $composableBuilder(
+    column: $table.excludedCategoryIdsJson,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$ProfilesTableFilterComposer get profileId {
+    final $$ProfilesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.profileId,
+      referencedTable: $db.profiles,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProfilesTableFilterComposer(
+            $db: $db,
+            $table: $db.profiles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$PiggyBankConfigsTableOrderingComposer
+    extends Composer<_$ColonyDatabase, $PiggyBankConfigsTable> {
+  $$PiggyBankConfigsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get dailyAmountMinor => $composableBuilder(
+    column: $table.dailyAmountMinor,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get startDate => $composableBuilder(
+    column: $table.startDate,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get endDate => $composableBuilder(
+    column: $table.endDate,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get installmentCountsTotal => $composableBuilder(
+    column: $table.installmentCountsTotal,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get alertWhenRed => $composableBuilder(
+    column: $table.alertWhenRed,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get excludedCategoryIdsJson => $composableBuilder(
+    column: $table.excludedCategoryIdsJson,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$ProfilesTableOrderingComposer get profileId {
+    final $$ProfilesTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.profileId,
+      referencedTable: $db.profiles,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProfilesTableOrderingComposer(
+            $db: $db,
+            $table: $db.profiles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$PiggyBankConfigsTableAnnotationComposer
+    extends Composer<_$ColonyDatabase, $PiggyBankConfigsTable> {
+  $$PiggyBankConfigsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get dailyAmountMinor => $composableBuilder(
+    column: $table.dailyAmountMinor,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get startDate =>
+      $composableBuilder(column: $table.startDate, builder: (column) => column);
+
+  GeneratedColumn<String> get endDate =>
+      $composableBuilder(column: $table.endDate, builder: (column) => column);
+
+  GeneratedColumn<bool> get installmentCountsTotal => $composableBuilder(
+    column: $table.installmentCountsTotal,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get alertWhenRed => $composableBuilder(
+    column: $table.alertWhenRed,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get excludedCategoryIdsJson => $composableBuilder(
+    column: $table.excludedCategoryIdsJson,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  $$ProfilesTableAnnotationComposer get profileId {
+    final $$ProfilesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.profileId,
+      referencedTable: $db.profiles,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProfilesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.profiles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$PiggyBankConfigsTableTableManager
+    extends
+        RootTableManager<
+          _$ColonyDatabase,
+          $PiggyBankConfigsTable,
+          PiggyBankConfigRow,
+          $$PiggyBankConfigsTableFilterComposer,
+          $$PiggyBankConfigsTableOrderingComposer,
+          $$PiggyBankConfigsTableAnnotationComposer,
+          $$PiggyBankConfigsTableCreateCompanionBuilder,
+          $$PiggyBankConfigsTableUpdateCompanionBuilder,
+          (PiggyBankConfigRow, $$PiggyBankConfigsTableReferences),
+          PiggyBankConfigRow,
+          PrefetchHooks Function({bool profileId})
+        > {
+  $$PiggyBankConfigsTableTableManager(
+    _$ColonyDatabase db,
+    $PiggyBankConfigsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$PiggyBankConfigsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$PiggyBankConfigsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$PiggyBankConfigsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> profileId = const Value.absent(),
+                Value<int> dailyAmountMinor = const Value.absent(),
+                Value<String> startDate = const Value.absent(),
+                Value<String?> endDate = const Value.absent(),
+                Value<bool> installmentCountsTotal = const Value.absent(),
+                Value<bool> alertWhenRed = const Value.absent(),
+                Value<String> excludedCategoryIdsJson = const Value.absent(),
+                Value<int> updatedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => PiggyBankConfigsCompanion(
+                profileId: profileId,
+                dailyAmountMinor: dailyAmountMinor,
+                startDate: startDate,
+                endDate: endDate,
+                installmentCountsTotal: installmentCountsTotal,
+                alertWhenRed: alertWhenRed,
+                excludedCategoryIdsJson: excludedCategoryIdsJson,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String profileId,
+                required int dailyAmountMinor,
+                required String startDate,
+                Value<String?> endDate = const Value.absent(),
+                Value<bool> installmentCountsTotal = const Value.absent(),
+                Value<bool> alertWhenRed = const Value.absent(),
+                Value<String> excludedCategoryIdsJson = const Value.absent(),
+                required int updatedAt,
+                Value<int> rowid = const Value.absent(),
+              }) => PiggyBankConfigsCompanion.insert(
+                profileId: profileId,
+                dailyAmountMinor: dailyAmountMinor,
+                startDate: startDate,
+                endDate: endDate,
+                installmentCountsTotal: installmentCountsTotal,
+                alertWhenRed: alertWhenRed,
+                excludedCategoryIdsJson: excludedCategoryIdsJson,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$PiggyBankConfigsTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({profileId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (profileId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.profileId,
+                                referencedTable:
+                                    $$PiggyBankConfigsTableReferences
+                                        ._profileIdTable(db),
+                                referencedColumn:
+                                    $$PiggyBankConfigsTableReferences
+                                        ._profileIdTable(db)
+                                        .id,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$PiggyBankConfigsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$ColonyDatabase,
+      $PiggyBankConfigsTable,
+      PiggyBankConfigRow,
+      $$PiggyBankConfigsTableFilterComposer,
+      $$PiggyBankConfigsTableOrderingComposer,
+      $$PiggyBankConfigsTableAnnotationComposer,
+      $$PiggyBankConfigsTableCreateCompanionBuilder,
+      $$PiggyBankConfigsTableUpdateCompanionBuilder,
+      (PiggyBankConfigRow, $$PiggyBankConfigsTableReferences),
+      PiggyBankConfigRow,
+      PrefetchHooks Function({bool profileId})
+    >;
+typedef $$PiggyBankOverridesTableCreateCompanionBuilder =
+    PiggyBankOverridesCompanion Function({
+      required String transactionId,
+      required String profileId,
+      Value<bool> excluded,
+      Value<int?> amountOverrideMinor,
+      required int updatedAt,
+      Value<int> rowid,
+    });
+typedef $$PiggyBankOverridesTableUpdateCompanionBuilder =
+    PiggyBankOverridesCompanion Function({
+      Value<String> transactionId,
+      Value<String> profileId,
+      Value<bool> excluded,
+      Value<int?> amountOverrideMinor,
+      Value<int> updatedAt,
+      Value<int> rowid,
+    });
+
+final class $$PiggyBankOverridesTableReferences
+    extends
+        BaseReferences<
+          _$ColonyDatabase,
+          $PiggyBankOverridesTable,
+          PiggyBankOverrideRow
+        > {
+  $$PiggyBankOverridesTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $ProfilesTable _profileIdTable(_$ColonyDatabase db) =>
+      db.profiles.createAlias(
+        $_aliasNameGenerator(db.piggyBankOverrides.profileId, db.profiles.id),
+      );
+
+  $$ProfilesTableProcessedTableManager get profileId {
+    final $_column = $_itemColumn<String>('profile_id')!;
+
+    final manager = $$ProfilesTableTableManager(
+      $_db,
+      $_db.profiles,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_profileIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$PiggyBankOverridesTableFilterComposer
+    extends Composer<_$ColonyDatabase, $PiggyBankOverridesTable> {
+  $$PiggyBankOverridesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get transactionId => $composableBuilder(
+    column: $table.transactionId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get excluded => $composableBuilder(
+    column: $table.excluded,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get amountOverrideMinor => $composableBuilder(
+    column: $table.amountOverrideMinor,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$ProfilesTableFilterComposer get profileId {
+    final $$ProfilesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.profileId,
+      referencedTable: $db.profiles,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProfilesTableFilterComposer(
+            $db: $db,
+            $table: $db.profiles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$PiggyBankOverridesTableOrderingComposer
+    extends Composer<_$ColonyDatabase, $PiggyBankOverridesTable> {
+  $$PiggyBankOverridesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get transactionId => $composableBuilder(
+    column: $table.transactionId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get excluded => $composableBuilder(
+    column: $table.excluded,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get amountOverrideMinor => $composableBuilder(
+    column: $table.amountOverrideMinor,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$ProfilesTableOrderingComposer get profileId {
+    final $$ProfilesTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.profileId,
+      referencedTable: $db.profiles,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProfilesTableOrderingComposer(
+            $db: $db,
+            $table: $db.profiles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$PiggyBankOverridesTableAnnotationComposer
+    extends Composer<_$ColonyDatabase, $PiggyBankOverridesTable> {
+  $$PiggyBankOverridesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get transactionId => $composableBuilder(
+    column: $table.transactionId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get excluded =>
+      $composableBuilder(column: $table.excluded, builder: (column) => column);
+
+  GeneratedColumn<int> get amountOverrideMinor => $composableBuilder(
+    column: $table.amountOverrideMinor,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  $$ProfilesTableAnnotationComposer get profileId {
+    final $$ProfilesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.profileId,
+      referencedTable: $db.profiles,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProfilesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.profiles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$PiggyBankOverridesTableTableManager
+    extends
+        RootTableManager<
+          _$ColonyDatabase,
+          $PiggyBankOverridesTable,
+          PiggyBankOverrideRow,
+          $$PiggyBankOverridesTableFilterComposer,
+          $$PiggyBankOverridesTableOrderingComposer,
+          $$PiggyBankOverridesTableAnnotationComposer,
+          $$PiggyBankOverridesTableCreateCompanionBuilder,
+          $$PiggyBankOverridesTableUpdateCompanionBuilder,
+          (PiggyBankOverrideRow, $$PiggyBankOverridesTableReferences),
+          PiggyBankOverrideRow,
+          PrefetchHooks Function({bool profileId})
+        > {
+  $$PiggyBankOverridesTableTableManager(
+    _$ColonyDatabase db,
+    $PiggyBankOverridesTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$PiggyBankOverridesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$PiggyBankOverridesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$PiggyBankOverridesTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> transactionId = const Value.absent(),
+                Value<String> profileId = const Value.absent(),
+                Value<bool> excluded = const Value.absent(),
+                Value<int?> amountOverrideMinor = const Value.absent(),
+                Value<int> updatedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => PiggyBankOverridesCompanion(
+                transactionId: transactionId,
+                profileId: profileId,
+                excluded: excluded,
+                amountOverrideMinor: amountOverrideMinor,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String transactionId,
+                required String profileId,
+                Value<bool> excluded = const Value.absent(),
+                Value<int?> amountOverrideMinor = const Value.absent(),
+                required int updatedAt,
+                Value<int> rowid = const Value.absent(),
+              }) => PiggyBankOverridesCompanion.insert(
+                transactionId: transactionId,
+                profileId: profileId,
+                excluded: excluded,
+                amountOverrideMinor: amountOverrideMinor,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$PiggyBankOverridesTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({profileId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (profileId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.profileId,
+                                referencedTable:
+                                    $$PiggyBankOverridesTableReferences
+                                        ._profileIdTable(db),
+                                referencedColumn:
+                                    $$PiggyBankOverridesTableReferences
+                                        ._profileIdTable(db)
+                                        .id,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$PiggyBankOverridesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$ColonyDatabase,
+      $PiggyBankOverridesTable,
+      PiggyBankOverrideRow,
+      $$PiggyBankOverridesTableFilterComposer,
+      $$PiggyBankOverridesTableOrderingComposer,
+      $$PiggyBankOverridesTableAnnotationComposer,
+      $$PiggyBankOverridesTableCreateCompanionBuilder,
+      $$PiggyBankOverridesTableUpdateCompanionBuilder,
+      (PiggyBankOverrideRow, $$PiggyBankOverridesTableReferences),
+      PiggyBankOverrideRow,
+      PrefetchHooks Function({bool profileId})
+    >;
 
 class $ColonyDatabaseManager {
   final _$ColonyDatabase _db;
@@ -107342,4 +109241,8 @@ class $ColonyDatabaseManager {
       $$DayPlansTableTableManager(_db, _db.dayPlans);
   $$DayPlanItemsTableTableManager get dayPlanItems =>
       $$DayPlanItemsTableTableManager(_db, _db.dayPlanItems);
+  $$PiggyBankConfigsTableTableManager get piggyBankConfigs =>
+      $$PiggyBankConfigsTableTableManager(_db, _db.piggyBankConfigs);
+  $$PiggyBankOverridesTableTableManager get piggyBankOverrides =>
+      $$PiggyBankOverridesTableTableManager(_db, _db.piggyBankOverrides);
 }
