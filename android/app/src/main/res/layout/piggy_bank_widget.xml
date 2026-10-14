@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/piggy_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FF16201C"
+    android:gravity="center_vertical"
+    android:orientation="vertical"
+    android:padding="12dp">
+
+    <TextView
+        android:id="@+id/piggy_balance"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Cofrinho"
+        android:textColor="#FF2E7D32"
+        android:textSize="22sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/piggy_spent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Hoje: —"
+        android:textColor="#FFE7E2D6"
+        android:textSize="12sp" />
+
+    <TextView
+        android:id="@+id/piggy_available"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Pode gastar hoje: —"
+        android:textColor="#FFE7E2D6"
+        android:textSize="12sp" />
+</LinearLayout>

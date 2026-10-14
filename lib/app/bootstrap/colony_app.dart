@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../app/localization/app_strings.dart';
 import '../../core/providers/app_providers.dart';
+import '../../features/finance/application/piggy_bank_providers.dart';
 import '../../features/integrations/application/integrations_controllers.dart';
 import '../../features/music_atlas/application/spotify_deeplink.dart';
 import '../routing/app_router.dart';
@@ -16,6 +17,8 @@ class ColonyApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     ref.watch(notificationIngestRuntimeProvider);
+    ref.watch(piggyWidgetRuntimeProvider);
+    ref.watch(piggyDeepLinkRuntimeProvider);
     ref.watch(spotifyDeepLinkRuntimeProvider);
     ref.watch(calendarIcsRuntimeProvider);
     final router = ref.watch(routerProvider);

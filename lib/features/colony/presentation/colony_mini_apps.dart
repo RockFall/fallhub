@@ -127,6 +127,14 @@ abstract final class ColonyMiniApps {
       pinned: true,
     ),
     ColonyMiniApp(
+      id: 'piggy',
+      label: AppStrings.piggyTitle,
+      route: '/resources/piggy',
+      icon: Icons.savings_outlined,
+      color: ColonyMiniAppColors.piggy,
+      pinned: true,
+    ),
+    ColonyMiniApp(
       id: 'health',
       label: AppStrings.healthTitle,
       route: '/resources/health',

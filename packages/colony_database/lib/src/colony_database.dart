@@ -103,6 +103,8 @@ part 'colony_database.g.dart';
   ActivationInsights,
   DayPlans,
   DayPlanItems,
+  PiggyBankConfigs,
+  PiggyBankOverrides,
 ])
 class ColonyDatabase extends _$ColonyDatabase {
   ColonyDatabase(super.e, {this.dataDirectory});
@@ -110,7 +112,7 @@ class ColonyDatabase extends _$ColonyDatabase {
   /// App documents dir when opened from disk. Null for in-memory tests.
   final String? dataDirectory;
 
-  static const int currentSchemaVersion = 45;
+  static const int currentSchemaVersion = 46;
   static const String defaultFileName = 'colony.db';
 
   @override
@@ -478,6 +480,18 @@ class ColonyDatabase extends _$ColonyDatabase {
           }
           if (from < 45) {
             await m.createTable(sleepSessions);
+          }
+          if (from < 46) {
+            await _createTableIfAbsent(
+              m,
+              'piggy_bank_configs',
+              () => m.createTable(piggyBankConfigs),
+            );
+            await _createTableIfAbsent(
+              m,
+              'piggy_bank_overrides',
+              () => m.createTable(piggyBankOverrides),
+            );
           }
         },
       );
@@ -1479,6 +1493,80 @@ class ColonyMappers {
       createdAt: transaction.createdAt.millisecondsSinceEpoch,
       updatedAt: transaction.updatedAt.millisecondsSinceEpoch,
     );
+  }
+
+  static domain.PiggyBankConfig toPiggyBankConfig(PiggyBankConfigRow row) {
+    final raw = jsonDecode(row.excludedCategoryIdsJson);
+    final excluded = raw is List
+        ? raw.map((item) => item.toString()).toList()
+        : <String>[];
+    return domain.PiggyBankConfig(
+      profileId: domain.EntityId(row.profileId),
+      dailyAmountMinor: row.dailyAmountMinor,
+      startDate: _parseCivilDate(row.startDate),
+      endDate: row.endDate == null ? null : _parseCivilDate(row.endDate!),
+      installmentCountsTotal: row.installmentCountsTotal,
+      alertWhenRed: row.alertWhenRed,
+      excludedCategoryIds: excluded,
+      updatedAt:
+          DateTime.fromMillisecondsSinceEpoch(row.updatedAt, isUtc: true),
+    );
+  }
+
+  static PiggyBankConfigsCompanion fromPiggyBankConfig(
+    domain.PiggyBankConfig config,
+  ) {
+    return PiggyBankConfigsCompanion.insert(
+      profileId: config.profileId.value,
+      dailyAmountMinor: config.dailyAmountMinor,
+      startDate: _formatCivilDate(config.startDate),
+      endDate: Value(
+        config.endDate == null ? null : _formatCivilDate(config.endDate!),
+      ),
+      installmentCountsTotal: Value(config.installmentCountsTotal),
+      alertWhenRed: Value(config.alertWhenRed),
+      excludedCategoryIdsJson: Value(jsonEncode(config.excludedCategoryIds)),
+      updatedAt: config.updatedAt.millisecondsSinceEpoch,
+    );
+  }
+
+  static domain.PiggyBankOverride toPiggyBankOverride(PiggyBankOverrideRow row) {
+    return domain.PiggyBankOverride(
+      profileId: domain.EntityId(row.profileId),
+      transactionId: domain.EntityId(row.transactionId),
+      excluded: row.excluded,
+      amountOverrideMinor: row.amountOverrideMinor,
+      updatedAt:
+          DateTime.fromMillisecondsSinceEpoch(row.updatedAt, isUtc: true),
+    );
+  }
+
+  static PiggyBankOverridesCompanion fromPiggyBankOverride(
+    domain.PiggyBankOverride override,
+  ) {
+    return PiggyBankOverridesCompanion.insert(
+      transactionId: override.transactionId.value,
+      profileId: override.profileId.value,
+      excluded: Value(override.excluded),
+      amountOverrideMinor: Value(override.amountOverrideMinor),
+      updatedAt: override.updatedAt.millisecondsSinceEpoch,
+    );
+  }
+
+  static DateTime _parseCivilDate(String value) {
+    final parts = value.split('-');
+    return DateTime.utc(
+      int.parse(parts[0]),
+      int.parse(parts[1]),
+      int.parse(parts[2]),
+    );
+  }
+
+  static String _formatCivilDate(DateTime value) {
+    final civil = domain.PiggyBankCalendar.dateOnly(value);
+    final month = civil.month.toString().padLeft(2, '0');
+    final day = civil.day.toString().padLeft(2, '0');
+    return '${civil.year}-$month-$day';
   }
 
   static domain.HealthCondition toHealthCondition(HealthConditionRow row) {

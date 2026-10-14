@@ -1,4 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="notification_listener_label">Colônia — leitor de notificações</string>
+    <string name="piggy_widget_label">Cofrinho</string>
+    <string name="piggy_widget_description">Saldo do cofrinho diário</string>
+    <string name="piggy_channel_name">Cofrinho</string>
+    <string name="piggy_alert_title">Cofrinho no vermelho</string>
 </resources>

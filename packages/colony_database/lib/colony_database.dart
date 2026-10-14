@@ -5,5 +5,6 @@ export 'src/sqlite_backup_store.dart';
 export 'src/repositories/activation_repository.dart';
 export 'src/repositories/colony_repositories.dart';
 export 'src/repositories/day_plan_repository.dart';
+export 'src/repositories/piggy_bank_repository.dart';
 export 'src/repositories/friendship_repository.dart';
 export 'src/repositories/music_atlas_repository.dart';

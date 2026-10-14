@@ -11,6 +11,7 @@ import '../colony_database.dart'
 import 'activation_repository.dart';
 import 'day_plan_repository.dart';
 import 'friendship_repository.dart';
+import 'piggy_bank_repository.dart';
 import 'music_atlas_repository.dart';
 
 class ProfileRepository {
@@ -7155,6 +7156,7 @@ class ColonyRepositories {
     required this.musicAtlas,
     required this.activation,
     required this.dayPlan,
+    required this.piggy,
     required this.sync,
     required this.export,
     required this.restore,
@@ -7192,6 +7194,7 @@ class ColonyRepositories {
   final MusicAtlasRepository musicAtlas;
   final ActivationRepository activation;
   final DayPlanRepository dayPlan;
+  final PiggyBankRepository piggy;
   final SyncRepository sync;
   final ExportRepository export;
   final RestoreRepository restore;
@@ -7244,6 +7247,7 @@ class ColonyRepositories {
     );
     final activationRepo = ActivationRepository(database, ids, now, events);
     final dayPlanRepo = DayPlanRepository(database, ids, now, events, tasks);
+    final piggyRepo = PiggyBankRepository(database, now);
     final dailyReviews = DailyReviewRepository(database, ids, now, events);
     final weeklyReviews = WeeklyReviewRepository(database, ids, now, events);
     final restore = RestoreRepository(database, events, now);
@@ -7280,6 +7284,7 @@ class ColonyRepositories {
       musicAtlas: musicAtlasRepo,
       activation: activationRepo,
       dayPlan: dayPlanRepo,
+      piggy: piggyRepo,
       sync: syncRepo,
       export: ExportRepository(
         profiles,

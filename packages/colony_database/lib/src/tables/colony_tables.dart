@@ -1727,3 +1727,38 @@ class DayPlanItems extends Table {
   @override
   Set<Column<Object>> get primaryKey => {id};
 }
+
+@DataClassName('PiggyBankConfigRow')
+class PiggyBankConfigs extends Table {
+  @override
+  String get tableName => 'piggy_bank_configs';
+
+  TextColumn get profileId => text().references(Profiles, #id)();
+  IntColumn get dailyAmountMinor => integer()();
+  TextColumn get startDate => text()();
+  TextColumn get endDate => text().nullable()();
+  BoolColumn get installmentCountsTotal =>
+      boolean().withDefault(const Constant(true))();
+  BoolColumn get alertWhenRed => boolean().withDefault(const Constant(true))();
+  TextColumn get excludedCategoryIdsJson =>
+      text().withDefault(const Constant('[]'))();
+  IntColumn get updatedAt => integer()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {profileId};
+}
+
+@DataClassName('PiggyBankOverrideRow')
+class PiggyBankOverrides extends Table {
+  @override
+  String get tableName => 'piggy_bank_overrides';
+
+  TextColumn get transactionId => text()();
+  TextColumn get profileId => text().references(Profiles, #id)();
+  BoolColumn get excluded => boolean().withDefault(const Constant(false))();
+  IntColumn get amountOverrideMinor => integer().nullable()();
+  IntColumn get updatedAt => integer()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {transactionId};
+}

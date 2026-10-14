@@ -208,6 +208,11 @@ class ColonyTerminalHome extends ConsumerWidget {
                         onPressed: () => context.go('/resources/finance'),
                       ),
                       ColonyNavTile(
+                        label: AppStrings.piggyTitle,
+                        iconName: 'coin',
+                        onPressed: () => context.go('/resources/piggy'),
+                      ),
+                      ColonyNavTile(
                         label: AppStrings.habitatTitle,
                         iconName: 'house',
                         onPressed: () => context.go('/colony/habitat'),
