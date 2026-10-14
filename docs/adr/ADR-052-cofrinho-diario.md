@@ -19,7 +19,7 @@ O cofrinho é um derivado do ledger. Não há um segundo detector de gastos.
 - Dedupe: fingerprint do pipeline (`notif:<nativeKey>` ou hash). Compras importadas (`notif:` / `ofx:`) com o mesmo dia, valor e comerciante colapsam. Uma notificação de pagamento sem favorecido, no mesmo dia e valor de uma compra, não conta de novo.
 - Parcelado: o extrator existente (`FinanceNotificationExtractor.installmentPlan`) distingue "3x de R$" (parcela) de "R$ em 3x" (total). Por padrão o cofrinho conta o total no dia da compra; a config pode contar só a parcela.
 - Correção de valor e "fora do cofrinho" ficam numa tabela de override e não reescrevem o fingerprint do ledger.
-- Widget Android 2×1 / 4×2 lê um snapshot em `HomeWidgetPreferences` (saldo, gasto de hoje, disponível, status, últimos 7 dias). Toque abre `colony://piggy`.
+- Widget Android 2×1 / 4×2 lê um snapshot em `HomeWidgetPreferences` (saldo, gasto de hoje, disponível, status, últimos 7 dias). O app grava esse arquivo pelo canal `colony/piggy_widget`; com o app fechado o worker grava o mesmo mapa antes de redesenhar. O plugin `home_widget` ficou de fora porque o Glance 1.3 que ele declara exige AGP 9 e compileSdk 37. Toque abre `colony://piggy`.
 - Atualização: ao abrir ou voltar o app; no próximo midnight de São Paulo (alarme + timer); e, com o app fechado, o `NotificationListenerService` só acorda um `WorkManager` que sobe o entrypoint Dart `piggyBankHeadless`. Esse isolate drena o inbox e chama o ingest já existente. O Kotlin não interpreta valor de compra.
 - Aviso local opcional quando o status entra no vermelho vindo de outro status.
 

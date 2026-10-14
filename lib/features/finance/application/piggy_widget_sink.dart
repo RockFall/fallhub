@@ -1,6 +1,5 @@
 import 'package:colony_domain/colony_domain.dart';
 import 'package:flutter/services.dart';
-import 'package:home_widget/home_widget.dart';
 
 abstract interface class PiggyWidgetSink {
   Future<String?> readStatus();
@@ -28,16 +27,18 @@ class MemoryPiggyWidgetSink implements PiggyWidgetSink {
   }
 }
 
-class HomeWidgetPiggySink implements PiggyWidgetSink {
-  const HomeWidgetPiggySink();
+/// Writes the home-screen snapshot through [MethodChannel] `colony/piggy_widget`.
+/// Android stores `HomeWidgetPreferences` and redraws the piggy widget.
+/// The headless worker has no activity channel, so it persists the same map itself.
+class ChannelPiggyWidgetSink implements PiggyWidgetSink {
+  const ChannelPiggyWidgetSink();
 
   static const _channel = MethodChannel('colony/piggy_widget');
-  static const androidProvider = 'PiggyBankWidgetProvider';
 
   @override
   Future<String?> readStatus() async {
     try {
-      return await HomeWidget.getWidgetData<String>('piggy_status');
+      return await _channel.invokeMethod<String>('readStatus');
     } catch (_) {
       return null;
     }
@@ -46,22 +47,16 @@ class HomeWidgetPiggySink implements PiggyWidgetSink {
   @override
   Future<void> write(PiggyWidgetPayload payload) async {
     try {
-      await HomeWidget.saveWidgetData<String>('piggy_balance', payload.balanceLabel);
-      await HomeWidget.saveWidgetData<String>(
-        'piggy_spent_today',
-        payload.spentTodayLabel,
-      );
-      await HomeWidget.saveWidgetData<String>(
-        'piggy_available',
-        payload.availableLabel,
-      );
-      await HomeWidget.saveWidgetData<String>('piggy_debt', payload.debtLabel);
-      await HomeWidget.saveWidgetData<String>('piggy_status', payload.statusName);
-      await HomeWidget.saveWidgetData<String>('piggy_week', payload.weekCsv);
-      await HomeWidget.updateWidget(androidName: androidProvider);
-      await _channel.invokeMethod<void>('scheduleMidnight');
+      await _channel.invokeMethod<void>('publish', {
+        'balance': payload.balanceLabel,
+        'spentToday': payload.spentTodayLabel,
+        'available': payload.availableLabel,
+        'debt': payload.debtLabel,
+        'status': payload.statusName,
+        'week': payload.weekCsv,
+      });
     } catch (_) {
-      // Desktop tests and hosts without the plugin keep the in-app cofrinho.
+      // Desktop tests and the headless isolate have no activity channel.
     }
   }
 

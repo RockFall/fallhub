@@ -12,7 +12,7 @@ import 'piggy_bank_query.dart';
 import 'piggy_widget_sink.dart';
 
 final piggyWidgetSinkProvider = Provider<PiggyWidgetSink>(
-  (ref) => const HomeWidgetPiggySink(),
+  (ref) => const ChannelPiggyWidgetSink(),
 );
 
 class PiggySnapshotNotifier extends AsyncNotifier<PiggyEvaluation?> {

@@ -33,6 +33,23 @@ class PiggyBankWidgetProvider : AppWidgetProvider() {
     companion object {
         const val PREFS = "HomeWidgetPreferences"
 
+        fun publishSnapshot(context: Context, values: Map<*, *>) {
+            context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+                .edit()
+                .putString("piggy_balance", values["balance"]?.toString().orEmpty())
+                .putString("piggy_spent_today", values["spentToday"]?.toString().orEmpty())
+                .putString("piggy_available", values["available"]?.toString().orEmpty())
+                .putString("piggy_debt", values["debt"]?.toString().orEmpty())
+                .putString("piggy_status", values["status"]?.toString().orEmpty())
+                .putString("piggy_week", values["week"]?.toString().orEmpty())
+                .commit()
+            val manager = AppWidgetManager.getInstance(context)
+            val component = ComponentName(context, PiggyBankWidgetProvider::class.java)
+            for (id in manager.getAppWidgetIds(component)) {
+                render(context, manager, id)
+            }
+        }
+
         fun render(context: Context, manager: AppWidgetManager, id: Int) {
             val options = manager.getAppWidgetOptions(id)
             val minHeight = options.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT, 40)

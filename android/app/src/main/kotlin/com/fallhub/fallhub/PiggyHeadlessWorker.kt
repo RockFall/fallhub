@@ -1,7 +1,5 @@
 package com.fallhub.fallhub
 
-import android.appwidget.AppWidgetManager
-import android.content.ComponentName
 import android.content.Context
 import android.os.Handler
 import android.os.Looper
@@ -44,9 +42,16 @@ class PiggyHeadlessWorker(
                 channel.setMethodCallHandler { call, result ->
                     if (call.method == "ready") {
                         result.success(null)
+                        val previous = applicationContext.getSharedPreferences(
+                            PiggyBankWidgetProvider.PREFS,
+                            Context.MODE_PRIVATE,
+                        ).getString("piggy_status", null)
                         channel.invokeMethod(
                             "run",
-                            mapOf("payloads" to drained),
+                            mapOf(
+                                "payloads" to drained,
+                                "previousStatus" to previous,
+                            ),
                             object : MethodChannel.Result {
                                 override fun success(value: Any?) {
                                     applyNativeSideEffects(value)
@@ -95,6 +100,9 @@ class PiggyHeadlessWorker(
 
     private fun applyNativeSideEffects(value: Any?) {
         val map = value as? Map<*, *> ?: return
+        if (map["balance"] != null) {
+            PiggyBankWidgetProvider.publishSnapshot(applicationContext, map)
+        }
         if (map["alert"] == true) {
             val message = map["message"]?.toString().orEmpty()
             if (message.isNotBlank()) {
@@ -102,12 +110,6 @@ class PiggyHeadlessWorker(
             }
         }
         PiggyMidnight.schedule(applicationContext)
-        val manager = AppWidgetManager.getInstance(applicationContext)
-        val component = ComponentName(applicationContext, PiggyBankWidgetProvider::class.java)
-        val ids = manager.getAppWidgetIds(component)
-        for (id in ids) {
-            PiggyBankWidgetProvider.render(applicationContext, manager, id)
-        }
     }
 
     private fun finish(engine: FlutterEngine, latch: CountDownLatch) {

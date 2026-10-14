@@ -1,6 +1,7 @@
 package com.fallhub.fallhub
 
 import android.content.ActivityNotFoundException
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Handler
@@ -33,6 +34,19 @@ class MainActivity : FlutterFragmentActivity() {
         MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "colony/piggy_widget")
             .setMethodCallHandler { call, result ->
                 when (call.method) {
+                    "publish" -> {
+                        val values = call.arguments as? Map<*, *> ?: emptyMap<String, Any?>()
+                        PiggyBankWidgetProvider.publishSnapshot(this, values)
+                        PiggyMidnight.schedule(this)
+                        result.success(null)
+                    }
+                    "readStatus" -> {
+                        val status = getSharedPreferences(
+                            PiggyBankWidgetProvider.PREFS,
+                            Context.MODE_PRIVATE,
+                        ).getString("piggy_status", null)
+                        result.success(status)
+                    }
                     "notifyRed" -> {
                         val message = call.argument<String>("message").orEmpty()
                         if (message.isNotBlank()) {

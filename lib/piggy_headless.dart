@@ -16,6 +16,7 @@ Future<void> piggyBankHeadless() async {
     if (call.method != 'run') return null;
     final payloads = <NotificationCapturePayload>[];
     final arguments = call.arguments;
+    String? previousFromWorker;
     if (arguments is Map) {
       final raw = arguments['payloads'];
       if (raw is List) {
@@ -29,11 +30,15 @@ Future<void> piggyBankHeadless() async {
           }
         }
       }
+      final previous = arguments['previousStatus'];
+      if (previous is String && previous.isNotEmpty) {
+        previousFromWorker = previous;
+      }
     }
     final database = await ColonyDatabase.open();
     try {
-      final sink = const HomeWidgetPiggySink();
-      final previous = await sink.readStatus();
+      final sink = const ChannelPiggyWidgetSink();
+      final previous = await sink.readStatus() ?? previousFromWorker;
       final repos = ColonyRepositories.create(database);
       final evaluation = await PiggyClosedAppSync(
         repositories: repos,
