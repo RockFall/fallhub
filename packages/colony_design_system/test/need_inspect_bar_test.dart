@@ -132,4 +132,62 @@ void main() {
     expect(committed, isNotNull);
     expect(committed, greaterThan(0.5));
   });
+
+  testWidgets('NeedInspectBar tap commits the tapped scale', (tester) async {
+    double? committed;
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: ColonyTheme.dark(),
+        home: Scaffold(
+          body: Center(
+            child: SizedBox(
+              width: 240,
+              child: NeedInspectBar(
+                label: 'Sexo',
+                value: 0.5,
+                showPointer: true,
+                onValueCommit: (v) => committed = v,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    final rect = tester.getRect(find.byType(NeedInspectBar));
+    await tester.tapAt(Offset(rect.right - 8, rect.center.dy));
+    await tester.pumpAndSettle();
+    expect(committed, 1.0);
+  });
+
+  testWidgets('NeedInspectBar with onTap does not commit a tap', (
+    tester,
+  ) async {
+    var taps = 0;
+    double? committed;
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: ColonyTheme.dark(),
+        home: Scaffold(
+          body: Center(
+            child: SizedBox(
+              width: 240,
+              child: NeedInspectBar(
+                label: 'Humor',
+                value: 0.75,
+                showPointer: true,
+                onTap: () => taps++,
+                onValueCommit: (v) => committed = v,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    await tester.tap(find.byType(NeedInspectBar));
+    await tester.pumpAndSettle();
+    expect(taps, 1);
+    expect(committed, isNull);
+  });
 }
