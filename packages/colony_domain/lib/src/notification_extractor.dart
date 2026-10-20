@@ -1,4 +1,5 @@
 import 'captured_notification.dart';
+import 'finance_expense_marker.dart';
 import 'financial_account.dart';
 import 'ledger_transaction.dart';
 
@@ -69,14 +70,23 @@ class FinanceNotificationExtractor implements NotificationExtractor {
     return tryParse(input) == null ? null : NotificationExtractorKind.finance;
   }
 
-  static FinanceSpendCandidate? tryParse(NotificationExtractInput input) {
+  /// [expenseSlices] vazio mantém a detecção automática.
+  /// Com trechos, uma saída só existe se o texto da notificação contiver algum
+  /// (ADR-053). Entradas continuam pela heurística e não viram despesa.
+  static FinanceSpendCandidate? tryParse(
+    NotificationExtractInput input, {
+    List<String> expenseSlices = const [],
+  }) {
     final text = input.combined;
     final lower = text.toLowerCase();
-    if (!_looksFinancial(lower, input.packageName)) return null;
+    final slices = FinanceExpenseMarkerPolicy.normalize(expenseSlices);
+    final sliceHit = FinanceExpenseMarkerPolicy.matches(text, slices);
+    if (!_looksFinancial(lower, input.packageName) && !sliceHit) return null;
     final amountMinor = _parseAmountMinor(text);
     if (amountMinor == null || amountMinor <= 0) return null;
 
     final inflow = _isInflow(lower);
+    if (slices.isNotEmpty && !inflow && !sliceHit) return null;
     final credit = _isCreditCard(lower, input.packageName);
     final merchant = _merchant(text, lower);
     final plan = installmentPlan(text);

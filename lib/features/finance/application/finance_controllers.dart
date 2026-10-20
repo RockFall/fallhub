@@ -268,6 +268,19 @@ class FinanceController extends AsyncNotifier<void> {
     return applyTransactionsCsv(plan);
   }
 
+  Future<bool> saveExpenseSlices(List<String> slices) async {
+    state = const AsyncLoading();
+    state = await AsyncValue.guard(() async {
+      final profile = await ref.read(repositoriesProvider).profiles.getActive();
+      if (profile == null) throw StateError('Perfil não configurado');
+      await ref.read(repositoriesProvider).finance.saveExpenseSlices(
+            profileId: profile.id,
+            slices: slices,
+          );
+    });
+    return !state.hasError;
+  }
+
   Future<bool> ensureInterAccounts() async {
     state = const AsyncLoading();
     state = await AsyncValue.guard(() async {

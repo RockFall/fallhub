@@ -2653,6 +2653,14 @@ abstract final class AppStrings {
   static const financeLedgerTitle = 'Finanças';
   static const financeDisclaimer =
       'Registro pessoal local. Não diagnostica situação financeira, não recomenda investimentos e não substitui contador ou assessor.';
+  static const financeExpenseSliceTitle = 'O que conta como despesa';
+  static const financeExpenseSliceHint =
+      'Escreva um pedaço do texto da notificação, um por linha. Só marcamos despesa se esse trecho aparecer. Vazio mantém a detecção automática.';
+  static const financeExpenseSliceLabel = 'Trecho no texto da notificação';
+  static const financeExpenseSliceSave = 'Salvar trechos';
+  static const financeExpenseSliceSaved = 'Trechos salvos neste aparelho.';
+  static const financeExpenseSliceTooShort =
+      'Cada trecho precisa de pelo menos 2 caracteres.';
   static const financeShowValues = 'Mostrar valores';
   static const financeHideValues = 'Ocultar valores';
   static const financeAccountsSection = 'Contas';

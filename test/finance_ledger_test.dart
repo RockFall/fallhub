@@ -48,6 +48,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text(AppStrings.financeDisclaimer), findsOneWidget);
+    expect(find.text(AppStrings.financeExpenseSliceTitle), findsOneWidget);
     expect(find.text(AppStrings.financeAccountsEmpty), findsOneWidget);
     expect(find.text(AppStrings.financeNewAccount), findsOneWidget);
     expect(find.byIcon(Icons.table_rows_outlined), findsOneWidget);
@@ -667,6 +668,60 @@ void main() {
     final budgets = await repos.finance.listBudgets(profile.id);
     expect(budgets, hasLength(1));
     expect(budgets.single.limitAmountMinor, 25000);
+
+    await db.close();
+    await tester.pumpWidget(const SizedBox.shrink());
+  });
+
+  testWidgets('FinanceLedgerScreen saves the notification slice that marks an expense',
+      (tester) async {
+    tester.view.physicalSize = const Size(800, 1200);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    final db = ColonyDatabase.inMemory();
+    addTearDown(db.close);
+
+    final repos = ColonyRepositories.create(
+      db,
+      idGenerator: FixedIdGenerator(['profile-1', 'entity-1']),
+      clock: () => DateTime.utc(2026, 10, 20, 12),
+    );
+    final profile = await repos.profiles.create(
+      colonyName: 'Test',
+      displayName: 'Caio',
+      timezone: 'UTC',
+      locale: 'pt_BR',
+      baseCurrency: 'BRL',
+    );
+    await repos.preferences.save(
+      AppPreferences.defaults().copyWith(onboardingCompleted: true),
+    );
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [databaseProvider.overrideWithValue(db)],
+        child: MaterialApp(
+          theme: ColonyTheme.dark(),
+          home: const Scaffold(body: FinanceLedgerScreen()),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.enterText(
+      find.byKey(const Key('finance.expenseSlices')),
+      'Compra aprovada\nPix enviado',
+    );
+    await tester.tap(find.byKey(const Key('finance.expenseSlices.save')));
+    await tester.pumpAndSettle();
+
+    expect(find.text(AppStrings.financeExpenseSliceSaved), findsOneWidget);
+    expect(
+      await repos.finance.listExpenseSlices(profile.id),
+      ['Compra aprovada', 'Pix enviado'],
+    );
 
     await db.close();
     await tester.pumpWidget(const SizedBox.shrink());

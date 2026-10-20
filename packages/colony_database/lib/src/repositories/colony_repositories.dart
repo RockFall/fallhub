@@ -3109,6 +3109,39 @@ class FinanceRepository {
       );
     });
   }
+
+  Stream<List<String>> watchExpenseSlices(EntityId profileId) {
+    return (_db.select(_db.financeExpenseMarkers)
+          ..where((row) => row.profileId.equals(profileId.value)))
+        .watchSingleOrNull()
+        .map((row) {
+      if (row == null) return const <String>[];
+      return ColonyMappers.toFinanceExpenseMarker(row).slices;
+    });
+  }
+
+  Future<List<String>> listExpenseSlices(EntityId profileId) async {
+    final row = await (_db.select(_db.financeExpenseMarkers)
+          ..where((t) => t.profileId.equals(profileId.value)))
+        .getSingleOrNull();
+    if (row == null) return const [];
+    return ColonyMappers.toFinanceExpenseMarker(row).slices;
+  }
+
+  Future<void> saveExpenseSlices({
+    required EntityId profileId,
+    required List<String> slices,
+  }) async {
+    final config = FinanceExpenseMarkerConfig(
+      profileId: profileId,
+      slices: FinanceExpenseMarkerPolicy.normalize(slices),
+      updatedAt: _clock(),
+    );
+    config.validate();
+    await _db.into(_db.financeExpenseMarkers).insertOnConflictUpdate(
+          ColonyMappers.fromFinanceExpenseMarker(config),
+        );
+  }
 }
 
 class ProjectRepository {
@@ -5363,38 +5396,41 @@ class IntegrationRepository {
       );
     }
 
+    final expenseSlices = await _finance.listExpenseSlices(profileId);
+    final spend = FinanceNotificationExtractor.tryParse(
+      payload.extractInput,
+      expenseSlices: expenseSlices,
+    );
     LedgerTransaction? booked;
     var extractorKind = kind;
-    if (kind == NotificationExtractorKind.finance) {
-      final spend = FinanceNotificationExtractor.tryParse(payload.extractInput);
-      if (spend != null) {
-        final account = await _finance.ensureInterAccount(
+    if (spend != null) {
+      extractorKind = NotificationExtractorKind.finance;
+      final account = await _finance.ensureInterAccount(
+        profileId: profileId,
+        type: spend.accountType,
+      );
+      const fingerprintPrefix = 'notif:';
+      final fingerprint = '$fingerprintPrefix${payload.nativeKey}';
+      final already = await _finance.fingerprintExists(
+        profileId: profileId,
+        fingerprint: fingerprint,
+      );
+      if (!already) {
+        booked = await _finance.createTransaction(
           profileId: profileId,
-          type: spend.accountType,
-        );
-        const fingerprintPrefix = 'notif:';
-        final fingerprint = '$fingerprintPrefix${payload.nativeKey}';
-        final already = await _finance.fingerprintExists(
-          profileId: profileId,
+          accountId: account.id,
+          occurredAt: spend.occurredAt,
+          descriptionOriginal: spend.description,
+          amountMinor: spend.amountMinor,
+          currency: spend.currency,
+          direction: spend.direction,
           fingerprint: fingerprint,
+          notes: 'Leitor de notificações · ${payload.packageName}',
+          sourceType: SourceType.integration,
         );
-        if (!already) {
-          booked = await _finance.createTransaction(
-            profileId: profileId,
-            accountId: account.id,
-            occurredAt: spend.occurredAt,
-            descriptionOriginal: spend.description,
-            amountMinor: spend.amountMinor,
-            currency: spend.currency,
-            direction: spend.direction,
-            fingerprint: fingerprint,
-            notes: 'Leitor de notificações · ${payload.packageName}',
-            sourceType: SourceType.integration,
-          );
-        }
-      } else {
-        extractorKind = NotificationExtractorKind.unknown;
       }
+    } else if (kind == NotificationExtractorKind.finance) {
+      extractorKind = NotificationExtractorKind.unknown;
     }
 
     final now = _clock();
