@@ -169,6 +169,19 @@ final financeBudgetProgressProvider = Provider<List<BudgetProgress>>((ref) {
   );
 });
 
+final financeExpenseMarkersProvider =
+    StreamProvider<List<String>>((ref) async* {
+  final profile = await ref.watch(profileProvider.future);
+  if (profile == null) {
+    yield const [];
+    return;
+  }
+  yield* ref
+      .watch(repositoriesProvider)
+      .finance
+      .watchExpenseSlices(profile.id);
+});
+
 final defaultFinancialEntityProvider = Provider<FinancialEntity?>((ref) {
   final entitiesAsync = ref.watch(financialEntitiesProvider);
   return entitiesAsync.when(

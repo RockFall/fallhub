@@ -105,6 +105,7 @@ part 'colony_database.g.dart';
   DayPlanItems,
   PiggyBankConfigs,
   PiggyBankOverrides,
+  FinanceExpenseMarkers,
 ])
 class ColonyDatabase extends _$ColonyDatabase {
   ColonyDatabase(super.e, {this.dataDirectory});
@@ -112,7 +113,7 @@ class ColonyDatabase extends _$ColonyDatabase {
   /// App documents dir when opened from disk. Null for in-memory tests.
   final String? dataDirectory;
 
-  static const int currentSchemaVersion = 46;
+  static const int currentSchemaVersion = 47;
   static const String defaultFileName = 'colony.db';
 
   @override
@@ -491,6 +492,13 @@ class ColonyDatabase extends _$ColonyDatabase {
               m,
               'piggy_bank_overrides',
               () => m.createTable(piggyBankOverrides),
+            );
+          }
+          if (from < 47) {
+            await _createTableIfAbsent(
+              m,
+              'finance_expense_markers',
+              () => m.createTable(financeExpenseMarkers),
             );
           }
         },
@@ -1492,6 +1500,33 @@ class ColonyMappers {
       fingerprint: transaction.fingerprint,
       createdAt: transaction.createdAt.millisecondsSinceEpoch,
       updatedAt: transaction.updatedAt.millisecondsSinceEpoch,
+    );
+  }
+
+  static domain.FinanceExpenseMarkerConfig toFinanceExpenseMarker(
+    FinanceExpenseMarkerRow row,
+  ) {
+    final raw = jsonDecode(row.slicesJson);
+    final slices = raw is List
+        ? domain.FinanceExpenseMarkerPolicy.normalize(
+            raw.map((item) => item.toString()).toList(),
+          )
+        : const <String>[];
+    return domain.FinanceExpenseMarkerConfig(
+      profileId: domain.EntityId(row.profileId),
+      slices: slices,
+      updatedAt:
+          DateTime.fromMillisecondsSinceEpoch(row.updatedAt, isUtc: true),
+    );
+  }
+
+  static FinanceExpenseMarkersCompanion fromFinanceExpenseMarker(
+    domain.FinanceExpenseMarkerConfig config,
+  ) {
+    return FinanceExpenseMarkersCompanion.insert(
+      profileId: config.profileId.value,
+      slicesJson: Value(jsonEncode(config.slices)),
+      updatedAt: config.updatedAt.millisecondsSinceEpoch,
     );
   }
 

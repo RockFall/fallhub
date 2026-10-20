@@ -56027,6 +56027,285 @@ class PiggyBankOverridesCompanion
   }
 }
 
+class $FinanceExpenseMarkersTable extends FinanceExpenseMarkers
+    with TableInfo<$FinanceExpenseMarkersTable, FinanceExpenseMarkerRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $FinanceExpenseMarkersTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _profileIdMeta = const VerificationMeta(
+    'profileId',
+  );
+  @override
+  late final GeneratedColumn<String> profileId = GeneratedColumn<String>(
+    'profile_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES profiles (id)',
+    ),
+  );
+  static const VerificationMeta _slicesJsonMeta = const VerificationMeta(
+    'slicesJson',
+  );
+  @override
+  late final GeneratedColumn<String> slicesJson = GeneratedColumn<String>(
+    'slices_json',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('[]'),
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<int> updatedAt = GeneratedColumn<int>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [profileId, slicesJson, updatedAt];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'finance_expense_markers';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<FinanceExpenseMarkerRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('profile_id')) {
+      context.handle(
+        _profileIdMeta,
+        profileId.isAcceptableOrUnknown(data['profile_id']!, _profileIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_profileIdMeta);
+    }
+    if (data.containsKey('slices_json')) {
+      context.handle(
+        _slicesJsonMeta,
+        slicesJson.isAcceptableOrUnknown(data['slices_json']!, _slicesJsonMeta),
+      );
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {profileId};
+  @override
+  FinanceExpenseMarkerRow map(
+    Map<String, dynamic> data, {
+    String? tablePrefix,
+  }) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return FinanceExpenseMarkerRow(
+      profileId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}profile_id'],
+      )!,
+      slicesJson: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}slices_json'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}updated_at'],
+      )!,
+    );
+  }
+
+  @override
+  $FinanceExpenseMarkersTable createAlias(String alias) {
+    return $FinanceExpenseMarkersTable(attachedDatabase, alias);
+  }
+}
+
+class FinanceExpenseMarkerRow extends DataClass
+    implements Insertable<FinanceExpenseMarkerRow> {
+  final String profileId;
+  final String slicesJson;
+  final int updatedAt;
+  const FinanceExpenseMarkerRow({
+    required this.profileId,
+    required this.slicesJson,
+    required this.updatedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['profile_id'] = Variable<String>(profileId);
+    map['slices_json'] = Variable<String>(slicesJson);
+    map['updated_at'] = Variable<int>(updatedAt);
+    return map;
+  }
+
+  FinanceExpenseMarkersCompanion toCompanion(bool nullToAbsent) {
+    return FinanceExpenseMarkersCompanion(
+      profileId: Value(profileId),
+      slicesJson: Value(slicesJson),
+      updatedAt: Value(updatedAt),
+    );
+  }
+
+  factory FinanceExpenseMarkerRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return FinanceExpenseMarkerRow(
+      profileId: serializer.fromJson<String>(json['profileId']),
+      slicesJson: serializer.fromJson<String>(json['slicesJson']),
+      updatedAt: serializer.fromJson<int>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'profileId': serializer.toJson<String>(profileId),
+      'slicesJson': serializer.toJson<String>(slicesJson),
+      'updatedAt': serializer.toJson<int>(updatedAt),
+    };
+  }
+
+  FinanceExpenseMarkerRow copyWith({
+    String? profileId,
+    String? slicesJson,
+    int? updatedAt,
+  }) => FinanceExpenseMarkerRow(
+    profileId: profileId ?? this.profileId,
+    slicesJson: slicesJson ?? this.slicesJson,
+    updatedAt: updatedAt ?? this.updatedAt,
+  );
+  FinanceExpenseMarkerRow copyWithCompanion(
+    FinanceExpenseMarkersCompanion data,
+  ) {
+    return FinanceExpenseMarkerRow(
+      profileId: data.profileId.present ? data.profileId.value : this.profileId,
+      slicesJson: data.slicesJson.present
+          ? data.slicesJson.value
+          : this.slicesJson,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('FinanceExpenseMarkerRow(')
+          ..write('profileId: $profileId, ')
+          ..write('slicesJson: $slicesJson, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(profileId, slicesJson, updatedAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is FinanceExpenseMarkerRow &&
+          other.profileId == this.profileId &&
+          other.slicesJson == this.slicesJson &&
+          other.updatedAt == this.updatedAt);
+}
+
+class FinanceExpenseMarkersCompanion
+    extends UpdateCompanion<FinanceExpenseMarkerRow> {
+  final Value<String> profileId;
+  final Value<String> slicesJson;
+  final Value<int> updatedAt;
+  final Value<int> rowid;
+  const FinanceExpenseMarkersCompanion({
+    this.profileId = const Value.absent(),
+    this.slicesJson = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  FinanceExpenseMarkersCompanion.insert({
+    required String profileId,
+    this.slicesJson = const Value.absent(),
+    required int updatedAt,
+    this.rowid = const Value.absent(),
+  }) : profileId = Value(profileId),
+       updatedAt = Value(updatedAt);
+  static Insertable<FinanceExpenseMarkerRow> custom({
+    Expression<String>? profileId,
+    Expression<String>? slicesJson,
+    Expression<int>? updatedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (profileId != null) 'profile_id': profileId,
+      if (slicesJson != null) 'slices_json': slicesJson,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  FinanceExpenseMarkersCompanion copyWith({
+    Value<String>? profileId,
+    Value<String>? slicesJson,
+    Value<int>? updatedAt,
+    Value<int>? rowid,
+  }) {
+    return FinanceExpenseMarkersCompanion(
+      profileId: profileId ?? this.profileId,
+      slicesJson: slicesJson ?? this.slicesJson,
+      updatedAt: updatedAt ?? this.updatedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (profileId.present) {
+      map['profile_id'] = Variable<String>(profileId.value);
+    }
+    if (slicesJson.present) {
+      map['slices_json'] = Variable<String>(slicesJson.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<int>(updatedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('FinanceExpenseMarkersCompanion(')
+          ..write('profileId: $profileId, ')
+          ..write('slicesJson: $slicesJson, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$ColonyDatabase extends GeneratedDatabase {
   _$ColonyDatabase(QueryExecutor e) : super(e);
   $ColonyDatabaseManager get managers => $ColonyDatabaseManager(this);
@@ -56189,6 +56468,8 @@ abstract class _$ColonyDatabase extends GeneratedDatabase {
   );
   late final $PiggyBankOverridesTable piggyBankOverrides =
       $PiggyBankOverridesTable(this);
+  late final $FinanceExpenseMarkersTable financeExpenseMarkers =
+      $FinanceExpenseMarkersTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -56287,6 +56568,7 @@ abstract class _$ColonyDatabase extends GeneratedDatabase {
     dayPlanItems,
     piggyBankConfigs,
     piggyBankOverrides,
+    financeExpenseMarkers,
   ];
 }
 
@@ -57691,6 +57973,34 @@ final class $$ProfilesTableReferences
 
     final cache = $_typedResult.readTableOrNull(
       _piggyBankOverridesRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<
+    $FinanceExpenseMarkersTable,
+    List<FinanceExpenseMarkerRow>
+  >
+  _financeExpenseMarkersRefsTable(_$ColonyDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.financeExpenseMarkers,
+        aliasName: $_aliasNameGenerator(
+          db.profiles.id,
+          db.financeExpenseMarkers.profileId,
+        ),
+      );
+
+  $$FinanceExpenseMarkersTableProcessedTableManager
+  get financeExpenseMarkersRefs {
+    final manager = $$FinanceExpenseMarkersTableTableManager(
+      $_db,
+      $_db.financeExpenseMarkers,
+    ).filter((f) => f.profileId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _financeExpenseMarkersRefsTable($_db),
     );
     return ProcessedTableManager(
       manager.$state.copyWith(prefetchedData: cache),
@@ -59240,6 +59550,32 @@ class $$ProfilesTableFilterComposer
                 $removeJoinBuilderFromRootComposer,
           ),
     );
+    return f(composer);
+  }
+
+  Expression<bool> financeExpenseMarkersRefs(
+    Expression<bool> Function($$FinanceExpenseMarkersTableFilterComposer f) f,
+  ) {
+    final $$FinanceExpenseMarkersTableFilterComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.financeExpenseMarkers,
+          getReferencedColumn: (t) => t.profileId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$FinanceExpenseMarkersTableFilterComposer(
+                $db: $db,
+                $table: $db.financeExpenseMarkers,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
     return f(composer);
   }
 }
@@ -60849,6 +61185,32 @@ class $$ProfilesTableAnnotationComposer
         );
     return f(composer);
   }
+
+  Expression<T> financeExpenseMarkersRefs<T extends Object>(
+    Expression<T> Function($$FinanceExpenseMarkersTableAnnotationComposer a) f,
+  ) {
+    final $$FinanceExpenseMarkersTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.financeExpenseMarkers,
+          getReferencedColumn: (t) => t.profileId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$FinanceExpenseMarkersTableAnnotationComposer(
+                $db: $db,
+                $table: $db.financeExpenseMarkers,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
 }
 
 class $$ProfilesTableTableManager
@@ -60924,6 +61286,7 @@ class $$ProfilesTableTableManager
             bool dayPlansRefs,
             bool piggyBankConfigsRefs,
             bool piggyBankOverridesRefs,
+            bool financeExpenseMarkersRefs,
           })
         > {
   $$ProfilesTableTableManager(_$ColonyDatabase db, $ProfilesTable table)
@@ -61058,6 +61421,7 @@ class $$ProfilesTableTableManager
                 dayPlansRefs = false,
                 piggyBankConfigsRefs = false,
                 piggyBankOverridesRefs = false,
+                financeExpenseMarkersRefs = false,
               }) {
                 return PrefetchHooks(
                   db: db,
@@ -61122,6 +61486,7 @@ class $$ProfilesTableTableManager
                     if (dayPlansRefs) db.dayPlans,
                     if (piggyBankConfigsRefs) db.piggyBankConfigs,
                     if (piggyBankOverridesRefs) db.piggyBankOverrides,
+                    if (financeExpenseMarkersRefs) db.financeExpenseMarkers,
                   ],
                   addJoins: null,
                   getPrefetchedDataCallback: (items) async {
@@ -62365,6 +62730,27 @@ class $$ProfilesTableTableManager
                               ),
                           typedResults: items,
                         ),
+                      if (financeExpenseMarkersRefs)
+                        await $_getPrefetchedData<
+                          Profile,
+                          $ProfilesTable,
+                          FinanceExpenseMarkerRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$ProfilesTableReferences
+                              ._financeExpenseMarkersRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$ProfilesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).financeExpenseMarkersRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.profileId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
                     ];
                   },
                 );
@@ -62445,6 +62831,7 @@ typedef $$ProfilesTableProcessedTableManager =
         bool dayPlansRefs,
         bool piggyBankConfigsRefs,
         bool piggyBankOverridesRefs,
+        bool financeExpenseMarkersRefs,
       })
     >;
 typedef $$DomainEventsTableCreateCompanionBuilder =
@@ -109012,6 +109399,314 @@ typedef $$PiggyBankOverridesTableProcessedTableManager =
       PiggyBankOverrideRow,
       PrefetchHooks Function({bool profileId})
     >;
+typedef $$FinanceExpenseMarkersTableCreateCompanionBuilder =
+    FinanceExpenseMarkersCompanion Function({
+      required String profileId,
+      Value<String> slicesJson,
+      required int updatedAt,
+      Value<int> rowid,
+    });
+typedef $$FinanceExpenseMarkersTableUpdateCompanionBuilder =
+    FinanceExpenseMarkersCompanion Function({
+      Value<String> profileId,
+      Value<String> slicesJson,
+      Value<int> updatedAt,
+      Value<int> rowid,
+    });
+
+final class $$FinanceExpenseMarkersTableReferences
+    extends
+        BaseReferences<
+          _$ColonyDatabase,
+          $FinanceExpenseMarkersTable,
+          FinanceExpenseMarkerRow
+        > {
+  $$FinanceExpenseMarkersTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $ProfilesTable _profileIdTable(_$ColonyDatabase db) =>
+      db.profiles.createAlias(
+        $_aliasNameGenerator(
+          db.financeExpenseMarkers.profileId,
+          db.profiles.id,
+        ),
+      );
+
+  $$ProfilesTableProcessedTableManager get profileId {
+    final $_column = $_itemColumn<String>('profile_id')!;
+
+    final manager = $$ProfilesTableTableManager(
+      $_db,
+      $_db.profiles,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_profileIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$FinanceExpenseMarkersTableFilterComposer
+    extends Composer<_$ColonyDatabase, $FinanceExpenseMarkersTable> {
+  $$FinanceExpenseMarkersTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get slicesJson => $composableBuilder(
+    column: $table.slicesJson,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$ProfilesTableFilterComposer get profileId {
+    final $$ProfilesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.profileId,
+      referencedTable: $db.profiles,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProfilesTableFilterComposer(
+            $db: $db,
+            $table: $db.profiles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$FinanceExpenseMarkersTableOrderingComposer
+    extends Composer<_$ColonyDatabase, $FinanceExpenseMarkersTable> {
+  $$FinanceExpenseMarkersTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get slicesJson => $composableBuilder(
+    column: $table.slicesJson,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$ProfilesTableOrderingComposer get profileId {
+    final $$ProfilesTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.profileId,
+      referencedTable: $db.profiles,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProfilesTableOrderingComposer(
+            $db: $db,
+            $table: $db.profiles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$FinanceExpenseMarkersTableAnnotationComposer
+    extends Composer<_$ColonyDatabase, $FinanceExpenseMarkersTable> {
+  $$FinanceExpenseMarkersTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get slicesJson => $composableBuilder(
+    column: $table.slicesJson,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  $$ProfilesTableAnnotationComposer get profileId {
+    final $$ProfilesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.profileId,
+      referencedTable: $db.profiles,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProfilesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.profiles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$FinanceExpenseMarkersTableTableManager
+    extends
+        RootTableManager<
+          _$ColonyDatabase,
+          $FinanceExpenseMarkersTable,
+          FinanceExpenseMarkerRow,
+          $$FinanceExpenseMarkersTableFilterComposer,
+          $$FinanceExpenseMarkersTableOrderingComposer,
+          $$FinanceExpenseMarkersTableAnnotationComposer,
+          $$FinanceExpenseMarkersTableCreateCompanionBuilder,
+          $$FinanceExpenseMarkersTableUpdateCompanionBuilder,
+          (FinanceExpenseMarkerRow, $$FinanceExpenseMarkersTableReferences),
+          FinanceExpenseMarkerRow,
+          PrefetchHooks Function({bool profileId})
+        > {
+  $$FinanceExpenseMarkersTableTableManager(
+    _$ColonyDatabase db,
+    $FinanceExpenseMarkersTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$FinanceExpenseMarkersTableFilterComposer(
+                $db: db,
+                $table: table,
+              ),
+          createOrderingComposer: () =>
+              $$FinanceExpenseMarkersTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$FinanceExpenseMarkersTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> profileId = const Value.absent(),
+                Value<String> slicesJson = const Value.absent(),
+                Value<int> updatedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => FinanceExpenseMarkersCompanion(
+                profileId: profileId,
+                slicesJson: slicesJson,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String profileId,
+                Value<String> slicesJson = const Value.absent(),
+                required int updatedAt,
+                Value<int> rowid = const Value.absent(),
+              }) => FinanceExpenseMarkersCompanion.insert(
+                profileId: profileId,
+                slicesJson: slicesJson,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$FinanceExpenseMarkersTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({profileId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (profileId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.profileId,
+                                referencedTable:
+                                    $$FinanceExpenseMarkersTableReferences
+                                        ._profileIdTable(db),
+                                referencedColumn:
+                                    $$FinanceExpenseMarkersTableReferences
+                                        ._profileIdTable(db)
+                                        .id,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$FinanceExpenseMarkersTableProcessedTableManager =
+    ProcessedTableManager<
+      _$ColonyDatabase,
+      $FinanceExpenseMarkersTable,
+      FinanceExpenseMarkerRow,
+      $$FinanceExpenseMarkersTableFilterComposer,
+      $$FinanceExpenseMarkersTableOrderingComposer,
+      $$FinanceExpenseMarkersTableAnnotationComposer,
+      $$FinanceExpenseMarkersTableCreateCompanionBuilder,
+      $$FinanceExpenseMarkersTableUpdateCompanionBuilder,
+      (FinanceExpenseMarkerRow, $$FinanceExpenseMarkersTableReferences),
+      FinanceExpenseMarkerRow,
+      PrefetchHooks Function({bool profileId})
+    >;
 
 class $ColonyDatabaseManager {
   final _$ColonyDatabase _db;
@@ -109245,4 +109940,6 @@ class $ColonyDatabaseManager {
       $$PiggyBankConfigsTableTableManager(_db, _db.piggyBankConfigs);
   $$PiggyBankOverridesTableTableManager get piggyBankOverrides =>
       $$PiggyBankOverridesTableTableManager(_db, _db.piggyBankOverrides);
+  $$FinanceExpenseMarkersTableTableManager get financeExpenseMarkers =>
+      $$FinanceExpenseMarkersTableTableManager(_db, _db.financeExpenseMarkers);
 }

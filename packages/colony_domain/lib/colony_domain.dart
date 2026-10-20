@@ -82,6 +82,7 @@ export 'src/ics_rrule.dart';
 export 'src/ics_feed_policy.dart';
 export 'src/ics_schedule_policy.dart';
 export 'src/captured_notification.dart';
+export 'src/finance_expense_marker.dart';
 export 'src/notification_extractor.dart';
 export 'src/piggy_bank.dart';
 export 'src/bank_connector.dart';

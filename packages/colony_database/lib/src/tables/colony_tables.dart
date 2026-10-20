@@ -1728,6 +1728,19 @@ class DayPlanItems extends Table {
   Set<Column<Object>> get primaryKey => {id};
 }
 
+@DataClassName('FinanceExpenseMarkerRow')
+class FinanceExpenseMarkers extends Table {
+  @override
+  String get tableName => 'finance_expense_markers';
+
+  TextColumn get profileId => text().references(Profiles, #id)();
+  TextColumn get slicesJson => text().withDefault(const Constant('[]'))();
+  IntColumn get updatedAt => integer()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {profileId};
+}
+
 @DataClassName('PiggyBankConfigRow')
 class PiggyBankConfigs extends Table {
   @override

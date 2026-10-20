@@ -13,6 +13,7 @@ import 'widgets/edit_category_budget_sheet.dart';
 import 'widgets/edit_financial_account_sheet.dart';
 import 'widgets/add_transaction_sheet.dart';
 import 'widgets/edit_transaction_sheet.dart';
+import 'widgets/expense_slice_editor.dart';
 import 'widgets/import_finance_csv_sheet.dart';
 
 class FinanceLedgerScreen extends ConsumerStatefulWidget {
@@ -103,6 +104,8 @@ class _FinanceLedgerScreenState extends ConsumerState<FinanceLedgerScreen> {
           const SizedBox(height: ColonySpacing.sm),
           _FinanceDisclaimerBanner(),
           const SizedBox(height: ColonySpacing.lg),
+          const ExpenseSliceEditor(),
+          const SizedBox(height: ColonySpacing.md),
           Expanded(
             child: accountsAsync.when(
               loading: () => const Center(child: CircularProgressIndicator()),
