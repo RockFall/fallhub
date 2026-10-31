@@ -38,13 +38,14 @@ void main() {
       String packageName = 'br.com.intermedium',
       String title = 'Compra aprovada',
       String text = 'R\$ 42,90 em RESTAURANTE X Cartão final 1234',
+      DateTime? postedAt,
     }) {
       return NotificationCapturePayload(
         nativeKey: nativeKey,
         packageName: packageName,
         title: title,
         text: text,
-        postedAt: DateTime.utc(2026, 8, 20, 15, 30),
+        postedAt: postedAt ?? DateTime.utc(2026, 8, 20, 15, 30),
       );
     }
 
@@ -133,6 +134,64 @@ void main() {
         ),
         throwsStateError,
       );
+    });
+
+    test('lists captures inside an inclusive local day range', () async {
+      final on30 = DateTime(2026, 10, 30, 15, 4);
+      final on28 = DateTime(2026, 10, 28, 9);
+      final atNextMidnight = DateTime(2026, 10, 31);
+      await repos.integrations.ingestCapturedNotification(
+        profileId: profile.id,
+        payload: payload(
+          nativeKey: 'day-30',
+          packageName: 'com.whatsapp',
+          title: 'Dia 30',
+          text: 'mensagem do dia',
+          postedAt: on30.toUtc(),
+        ),
+      );
+      await repos.integrations.ingestCapturedNotification(
+        profileId: profile.id,
+        payload: payload(
+          nativeKey: 'day-28',
+          packageName: 'com.whatsapp',
+          title: 'Dia 28',
+          text: 'antiga',
+          postedAt: on28.toUtc(),
+        ),
+      );
+      await repos.integrations.ingestCapturedNotification(
+        profileId: profile.id,
+        payload: payload(
+          nativeKey: 'midnight',
+          packageName: 'com.whatsapp',
+          title: 'Meia-noite',
+          text: 'já é o dia seguinte',
+          postedAt: atNextMidnight.toUtc(),
+        ),
+      );
+
+      final only30 = capturedNotificationDayRangeBounds(
+        fromDay: DateTime(2026, 10, 30),
+        toDay: DateTime(2026, 10, 30),
+      );
+      final listed = await repos.integrations.listCapturedNotificationsBetween(
+        profile.id,
+        startInclusive: only30.start,
+        endExclusive: only30.end,
+      );
+      expect(listed.map((n) => n.title), ['Dia 30']);
+
+      final swapped = capturedNotificationDayRangeBounds(
+        fromDay: DateTime(2026, 10, 31),
+        toDay: DateTime(2026, 10, 30),
+      );
+      final both = await repos.integrations.listCapturedNotificationsBetween(
+        profile.id,
+        startInclusive: swapped.start,
+        endExclusive: swapped.end,
+      );
+      expect(both.map((n) => n.title), ['Meia-noite', 'Dia 30']);
     });
 
     test('stores unknown notifications without a ledger row', () async {

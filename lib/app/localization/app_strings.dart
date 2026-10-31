@@ -2354,6 +2354,17 @@ abstract final class AppStrings {
   static const integrationsNotificationsNotReady =
       'App e Android precisam estar ligados. Depois volte a esta tela.';
   static const integrationsNotificationsRecent = 'Capturas recentes';
+  static const integrationsNotificationsRecentTruncated =
+      'Mostrando as 12 mais novas. Escolha um período para ver as outras.';
+  static const integrationsNotificationsRangeHint =
+      'Escolha o primeiro e o último dia. Os dois entram na busca; um dia só lista aquele dia inteiro.';
+  static const integrationsNotificationsRangeFrom = 'De';
+  static const integrationsNotificationsRangeTo = 'Até';
+  static const integrationsNotificationsRangeEmpty =
+      'Nenhuma captura nesse período.';
+  static const integrationsNotificationsRangeClear = 'Limpar período';
+  static String integrationsNotificationsRangeCount(int n) =>
+      n == 1 ? '1 captura neste período.' : '$n capturas neste período.';
   static const integrationsNotificationsEmpty =
       'Nenhuma notificação capturada ainda. Com os dois passos verdes, a próxima aparece aqui.';
   static const integrationsNotificationsBooked = 'Virou lançamento no ledger';
@@ -2768,7 +2779,8 @@ abstract final class AppStrings {
   static const piggyEndDate = 'Data fim (próximo salário)';
   static const piggyEndDateEmpty = 'Sem data fim';
   static const piggyClearEndDate = 'Remover data fim';
-  static const piggyInstallmentTotal = 'Parcelado conta o total no dia da compra';
+  static const piggyInstallmentTotal =
+      'Parcelado conta o total no dia da compra';
   static const piggyInstallmentTotalHint =
       'Desligado, entra só o valor da parcela.';
   static const piggyAlertWhenRed = 'Avisar quando o saldo ficar negativo';
@@ -2777,7 +2789,8 @@ abstract final class AppStrings {
       'A data fim precisa ser no dia de início ou depois.';
 
   static String piggySpentToday(String amount) => 'Hoje: $amount gastos';
-  static String piggyAvailableToday(String amount) => 'Pode gastar hoje: $amount';
+  static String piggyAvailableToday(String amount) =>
+      'Pode gastar hoje: $amount';
   static String piggyDebtDays(int days) => '−$days dias';
   static String piggyRequiredPace(String amount) =>
       'Ritmo até a data fim: $amount por dia';

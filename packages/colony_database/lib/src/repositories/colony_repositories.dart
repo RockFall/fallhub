@@ -5350,6 +5350,50 @@ class IntegrationRepository {
     return rows.map(ColonyMappers.toCapturedNotification).toList();
   }
 
+  /// Notifications whose [CapturedNotification.postedAt] falls in
+  /// `[startInclusive, endExclusive)`.
+  Stream<List<CapturedNotification>> watchCapturedNotificationsBetween(
+    EntityId profileId, {
+    required DateTime startInclusive,
+    required DateTime endExclusive,
+  }) {
+    return (_db.select(_db.capturedNotifications)
+          ..where(
+            (t) =>
+                t.profileId.equals(profileId.value) &
+                t.postedAt.isBiggerOrEqualValue(
+                  startInclusive.millisecondsSinceEpoch,
+                ) &
+                t.postedAt.isSmallerThanValue(
+                  endExclusive.millisecondsSinceEpoch,
+                ),
+          )
+          ..orderBy([(t) => OrderingTerm.desc(t.postedAt)]))
+        .watch()
+        .map((rows) => rows.map(ColonyMappers.toCapturedNotification).toList());
+  }
+
+  Future<List<CapturedNotification>> listCapturedNotificationsBetween(
+    EntityId profileId, {
+    required DateTime startInclusive,
+    required DateTime endExclusive,
+  }) async {
+    final rows = await (_db.select(_db.capturedNotifications)
+          ..where(
+            (t) =>
+                t.profileId.equals(profileId.value) &
+                t.postedAt.isBiggerOrEqualValue(
+                  startInclusive.millisecondsSinceEpoch,
+                ) &
+                t.postedAt.isSmallerThanValue(
+                  endExclusive.millisecondsSinceEpoch,
+                ),
+          )
+          ..orderBy([(t) => OrderingTerm.desc(t.postedAt)]))
+        .get();
+    return rows.map(ColonyMappers.toCapturedNotification).toList();
+  }
+
   /// Persist a captured notification and book finance spends when extracted.
   /// OTP/ignored payloads are dropped. Duplicate [nativeKey] is a no-op.
   /// Requires notificationListener consent enabled.

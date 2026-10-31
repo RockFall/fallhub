@@ -3,6 +3,7 @@ import 'package:equatable/equatable.dart';
 import 'financial_account.dart';
 import 'id_generator.dart';
 import 'ledger_transaction.dart';
+import 'schedule_day.dart';
 
 /// Raw notification as captured on-device (ADR-011).
 class CapturedNotification extends Equatable {
@@ -218,4 +219,20 @@ class NotificationIngestResult extends Equatable {
 
   @override
   List<Object?> get props => [skipped, notification, transaction, duplicate];
+}
+
+/// Inclusive local calendar days as a half-open UTC interval `[start, end)`.
+///
+/// [fromDay] and [toDay] may arrive in either order. Each bound uses local
+/// midnight, same rule as [scheduleDayUtcBounds].
+({DateTime start, DateTime end}) capturedNotificationDayRangeBounds({
+  required DateTime fromDay,
+  required DateTime toDay,
+}) {
+  final from = scheduleDayUtcBounds(fromDay);
+  final to = scheduleDayUtcBounds(toDay);
+  if (from.start.isAfter(to.start)) {
+    return (start: to.start, end: from.end);
+  }
+  return (start: from.start, end: to.end);
 }
