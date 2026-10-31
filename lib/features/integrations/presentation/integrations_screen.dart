@@ -5,7 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../../app/localization/app_locale.dart';
 import '../../../app/localization/app_strings.dart';
+import '../../../core/providers/app_providers.dart';
 import '../../music_atlas/application/music_atlas_providers.dart';
 import '../../music_atlas/presentation/widgets/spotify_integration_panel.dart';
 import '../application/ics_feed_client.dart';
@@ -25,6 +27,8 @@ class IntegrationsScreen extends ConsumerStatefulWidget {
 class _IntegrationsScreenState extends ConsumerState<IntegrationsScreen>
     with WidgetsBindingObserver {
   bool _androidListenerEnabled = false;
+  DateTime? _rangeFrom;
+  DateTime? _rangeTo;
   final _calendarKey = GlobalKey();
   final _feedUrl = TextEditingController();
 
@@ -119,6 +123,89 @@ class _IntegrationsScreenState extends ConsumerState<IntegrationsScreen>
     await ref.read(integrationsControllerProvider.notifier).unlinkIcsFeed();
     if (!mounted) return;
     _feedUrl.clear();
+  }
+
+  CapturedNotificationDayRange? get _notificationRange {
+    final from = _rangeFrom;
+    final to = _rangeTo;
+    if (from == null || to == null) return null;
+    return (fromDay: from, toDay: to);
+  }
+
+  Future<void> _pickNotificationDay({required bool from}) async {
+    final now = ref.read(clockProvider)().toLocal();
+    final current = from
+        ? (_rangeFrom ?? _rangeTo ?? now)
+        : (_rangeTo ?? _rangeFrom ?? now);
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime(current.year, current.month, current.day),
+      firstDate: DateTime(2020),
+      lastDate: DateTime(2100),
+    );
+    if (picked == null || !mounted) return;
+    final day = DateTime(picked.year, picked.month, picked.day);
+    setState(() {
+      if (from) {
+        _rangeFrom = day;
+        if (_rangeTo == null || _rangeTo!.isBefore(day)) {
+          _rangeTo = day;
+        }
+      } else {
+        _rangeTo = day;
+        if (_rangeFrom == null || _rangeFrom!.isAfter(day)) {
+          _rangeFrom = day;
+        }
+      }
+    });
+  }
+
+  String _captureSubtitle(CapturedNotification item) {
+    final when = AppLocale.date('dd/MM/yyyy HH:mm')
+        .format(item.postedAt.toLocal());
+    if (item.bookedAsFinance) {
+      return '$when · ${AppStrings.integrationsNotificationsBooked}';
+    }
+    final body = item.text.isEmpty ? item.packageName : item.text;
+    return '$when · $body';
+  }
+
+  Future<void> _showCapturedNotification(CapturedNotification item) {
+    final when = AppLocale.date('dd/MM/yyyy HH:mm')
+        .format(item.postedAt.toLocal());
+    final title = item.title.isEmpty
+        ? (item.appLabel ?? item.packageName)
+        : item.title;
+    return showDialog<void>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(title),
+        content: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(when),
+              Text(
+                item.appLabel ?? item.packageName,
+                style: Theme.of(ctx).textTheme.bodySmall,
+              ),
+              if (item.bookedAsFinance) ...[
+                const SizedBox(height: ColonySpacing.xs),
+                Text(AppStrings.integrationsNotificationsBooked),
+              ],
+              const SizedBox(height: ColonySpacing.sm),
+              SelectableText(item.text.isEmpty ? item.packageName : item.text),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text(AppStrings.close),
+          ),
+        ],
+      ),
+    );
   }
 
   Future<void> _openGoogleCalendar() {
@@ -281,7 +368,11 @@ class _IntegrationsScreenState extends ConsumerState<IntegrationsScreen>
     final icsConsent = ref.watch(calendarIcsConsentProvider);
     final notifConsent = ref.watch(notificationListenerConsentProvider);
     final eventsAsync = ref.watch(externalCalendarEventsProvider);
-    final capturesAsync = ref.watch(capturedNotificationsProvider);
+    final notificationRange = _notificationRange;
+    final capturesAsync = notificationRange == null
+        ? ref.watch(capturedNotificationsProvider)
+        : ref.watch(capturedNotificationsInRangeProvider(notificationRange));
+    final dayFormat = AppLocale.date('dd/MM/yyyy');
     final busy = ref.watch(integrationsControllerProvider).isLoading;
     final platform = ref.watch(notificationCapturePlatformProvider);
     final feedUrl = ref.watch(calendarIcsFeedUrlProvider).asData?.value;
@@ -528,6 +619,57 @@ class _IntegrationsScreenState extends ConsumerState<IntegrationsScreen>
             AppStrings.integrationsNotificationsRecent,
             style: Theme.of(context).textTheme.titleMedium,
           ),
+          const SizedBox(height: ColonySpacing.xs),
+          Text(
+            AppStrings.integrationsNotificationsRangeHint,
+            style: Theme.of(context).textTheme.bodySmall,
+          ),
+          const SizedBox(height: ColonySpacing.sm),
+          Wrap(
+            spacing: ColonySpacing.sm,
+            runSpacing: ColonySpacing.sm,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              Semantics(
+                button: true,
+                identifier: 'integrations.notifications.range_from',
+                label: AppStrings.integrationsNotificationsRangeFrom,
+                child: OutlinedButton.icon(
+                  onPressed: () => _pickNotificationDay(from: true),
+                  icon: const Icon(Icons.calendar_today_outlined),
+                  label: Text(
+                    _rangeFrom == null
+                        ? AppStrings.integrationsNotificationsRangeFrom
+                        : '${AppStrings.integrationsNotificationsRangeFrom}: ${dayFormat.format(_rangeFrom!)}',
+                  ),
+                ),
+              ),
+              Semantics(
+                button: true,
+                identifier: 'integrations.notifications.range_to',
+                label: AppStrings.integrationsNotificationsRangeTo,
+                child: OutlinedButton.icon(
+                  onPressed: () => _pickNotificationDay(from: false),
+                  icon: const Icon(Icons.event_outlined),
+                  label: Text(
+                    _rangeTo == null
+                        ? AppStrings.integrationsNotificationsRangeTo
+                        : '${AppStrings.integrationsNotificationsRangeTo}: ${dayFormat.format(_rangeTo!)}',
+                  ),
+                ),
+              ),
+              if (notificationRange != null)
+                TextButton(
+                  onPressed: () => setState(() {
+                    _rangeFrom = null;
+                    _rangeTo = null;
+                  }),
+                  child: const Text(
+                    AppStrings.integrationsNotificationsRangeClear,
+                  ),
+                ),
+            ],
+          ),
           const SizedBox(height: ColonySpacing.sm),
           capturesAsync.when(
             loading: () => const Padding(
@@ -536,30 +678,50 @@ class _IntegrationsScreenState extends ConsumerState<IntegrationsScreen>
             ),
             error: (_, __) => Text(AppStrings.errorGeneric),
             data: (items) {
-              if (items.isEmpty) {
+              final ranged = notificationRange != null;
+              final visible = ranged ? items : items.take(12).toList();
+              if (visible.isEmpty) {
                 return Text(
-                  AppStrings.integrationsNotificationsEmpty,
+                  ranged
+                      ? AppStrings.integrationsNotificationsRangeEmpty
+                      : AppStrings.integrationsNotificationsEmpty,
                   style: Theme.of(context).textTheme.bodyMedium,
                 );
               }
               return Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  for (final item in items.take(12))
+                  if (ranged)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: ColonySpacing.sm),
+                      child: Text(
+                        AppStrings.integrationsNotificationsRangeCount(
+                          visible.length,
+                        ),
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
+                    )
+                  else if (items.length > 12)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: ColonySpacing.sm),
+                      child: Text(
+                        AppStrings.integrationsNotificationsRecentTruncated,
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
+                    ),
+                  for (final item in visible)
                     Card(
                       margin: const EdgeInsets.only(bottom: ColonySpacing.sm),
                       child: ListTile(
+                        onTap: () => _showCapturedNotification(item),
                         title: Text(
                           item.title.isEmpty
                               ? (item.appLabel ?? item.packageName)
                               : item.title,
                         ),
                         subtitle: Text(
-                          item.bookedAsFinance
-                              ? AppStrings.integrationsNotificationsBooked
-                              : (item.text.isEmpty
-                                    ? item.packageName
-                                    : item.text),
-                          maxLines: 2,
+                          _captureSubtitle(item),
+                          maxLines: 3,
                           overflow: TextOverflow.ellipsis,
                         ),
                         trailing: item.bookedAsFinance

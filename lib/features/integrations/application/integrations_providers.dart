@@ -43,6 +43,33 @@ final capturedNotificationsProvider =
           .watchCapturedNotifications(profile.id);
     });
 
+/// Inclusive local calendar days. Both instants are date-only.
+typedef CapturedNotificationDayRange = ({DateTime fromDay, DateTime toDay});
+
+final capturedNotificationsInRangeProvider = StreamProvider.autoDispose
+    .family<List<CapturedNotification>, CapturedNotificationDayRange>((
+      ref,
+      range,
+    ) async* {
+      final profile = await ref.watch(profileProvider.future);
+      if (profile == null) {
+        yield [];
+        return;
+      }
+      final bounds = capturedNotificationDayRangeBounds(
+        fromDay: range.fromDay,
+        toDay: range.toDay,
+      );
+      yield* ref
+          .watch(repositoriesProvider)
+          .integrations
+          .watchCapturedNotificationsBetween(
+            profile.id,
+            startInclusive: bounds.start,
+            endExclusive: bounds.end,
+          );
+    });
+
 /// One-shot overlay for home/schedule (avoids an extra Drift stream in tests).
 final calendarOverlayEventsProvider =
     FutureProvider<List<ExternalCalendarEvent>>((ref) async {
